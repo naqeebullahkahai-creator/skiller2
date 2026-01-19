@@ -1,5 +1,5 @@
-import { Search, ShoppingCart, User, ChevronDown, Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Search, ShoppingCart, User, ChevronDown, Menu, X, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,14 +8,30 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { navCategories } from "@/data/mockData";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MainHeader = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout, setShowAuthModal, setAuthModalMode } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const cartItemCount = 3;
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const openLoginModal = () => {
+    setAuthModalMode("login");
+    setShowAuthModal(true);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-primary shadow-md">
@@ -77,14 +93,40 @@ const MainHeader = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Login/Signup - Desktop */}
-            <Button 
-              variant="ghost" 
-              className="hidden md:flex items-center gap-2 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground"
-            >
-              <User size={18} />
-              <span>Login / Sign Up</span>
-            </Button>
+            {/* Login/Signup or User Menu - Desktop */}
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className="hidden md:flex items-center gap-2 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground"
+                  >
+                    <User size={18} />
+                    <span>{user?.name}</span>
+                    <ChevronDown size={14} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>My Account</DropdownMenuItem>
+                  <DropdownMenuItem>My Orders</DropdownMenuItem>
+                  <DropdownMenuItem>Wishlist</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="text-destructive">
+                    <LogOut size={16} className="mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button 
+                variant="ghost" 
+                className="hidden md:flex items-center gap-2 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground"
+                onClick={openLoginModal}
+              >
+                <User size={18} />
+                <span>Login / Sign Up</span>
+              </Button>
+            )}
 
             {/* Cart */}
             <Link to="/cart" className="relative p-2">
