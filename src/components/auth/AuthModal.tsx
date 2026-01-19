@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { X, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Store } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ const AuthModal = () => {
     password: "",
     confirmPassword: "",
   });
+  const [isSeller, setIsSeller] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -46,7 +48,6 @@ const AuthModal = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -81,25 +82,28 @@ const AuthModal = () => {
 
     setIsLoading(true);
     try {
-      let success: boolean;
+      let result: { success: boolean; error?: string };
       if (authModalMode === "login") {
-        success = await login(formData.email, formData.password);
+        result = await login(formData.email, formData.password);
       } else {
-        success = await signup(formData.name, formData.email, formData.password);
+        result = await signup(formData.name, formData.email, formData.password, isSeller);
       }
 
-      if (success) {
+      if (result.success) {
         toast({
           title: authModalMode === "login" ? "Welcome back!" : "Account created!",
           description: authModalMode === "login" 
             ? "You have successfully logged in." 
-            : "Your account has been created successfully.",
+            : isSeller
+              ? "Your seller account has been created. Welcome to FANZON!"
+              : "Your account has been created successfully.",
         });
         setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+        setIsSeller(false);
       } else {
         toast({
           title: "Error",
-          description: "Something went wrong. Please try again.",
+          description: result.error || "Something went wrong. Please try again.",
           variant: "destructive",
         });
       }
@@ -118,6 +122,7 @@ const AuthModal = () => {
     setAuthModalMode(authModalMode === "login" ? "signup" : "login");
     setErrors({});
     setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+    setIsSeller(false);
   };
 
   return (
@@ -208,33 +213,55 @@ const AuthModal = () => {
           </div>
 
           {authModalMode === "signup" && (
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm Password
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  className={`pl-10 pr-10 ${errors.confirmPassword ? "border-destructive" : ""}`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className={`pl-10 pr-10 ${errors.confirmPassword ? "border-destructive" : ""}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-destructive text-xs">{errors.confirmPassword}</p>
+                )}
               </div>
-              {errors.confirmPassword && (
-                <p className="text-destructive text-xs">{errors.confirmPassword}</p>
+
+              {/* Seller Registration Checkbox */}
+              <div className="flex items-center space-x-3 p-4 bg-muted rounded-lg">
+                <Checkbox
+                  id="isSeller"
+                  checked={isSeller}
+                  onCheckedChange={(checked) => setIsSeller(checked === true)}
+                />
+                <div className="flex items-center gap-2">
+                  <Store className="h-4 w-4 text-primary" />
+                  <Label htmlFor="isSeller" className="text-sm font-medium cursor-pointer">
+                    Register as a Seller
+                  </Label>
+                </div>
+              </div>
+              {isSeller && (
+                <p className="text-xs text-muted-foreground bg-primary/5 p-3 rounded">
+                  ✓ As a seller, you'll be able to list products and manage orders on FANZON.
+                </p>
               )}
-            </div>
+            </>
           )}
 
           {authModalMode === "login" && (
