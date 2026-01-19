@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import AuthModal from "@/components/auth/AuthModal";
@@ -13,8 +13,15 @@ import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
-import MyOrders from "./pages/MyOrders";
 import NotFound from "./pages/NotFound";
+
+// Account Pages
+import AccountLayout from "./components/account/AccountLayout";
+import ProfilePage from "./pages/account/ProfilePage";
+import OrdersPage from "./pages/account/OrdersPage";
+import OrderDetailPage from "./pages/account/OrderDetailPage";
+import WishlistPage from "./pages/account/WishlistPage";
+import AddressesPage from "./pages/account/AddressesPage";
 
 // Admin Dashboard
 import AdminDashboardLayout from "./components/dashboard/AdminDashboardLayout";
@@ -57,14 +64,24 @@ const App = () => (
                 }
               />
               <Route path="/order-success/:orderNumber" element={<OrderSuccess />} />
+              
+              {/* Customer Account Routes */}
               <Route 
-                path="/my-orders" 
+                path="/account" 
                 element={
                   <ProtectedRoute>
-                    <MyOrders />
+                    <AccountLayout />
                   </ProtectedRoute>
                 }
-              />
+              >
+                <Route index element={<Navigate to="/account/profile" replace />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="orders" element={<OrdersPage />} />
+                <Route path="orders/:orderId" element={<OrderDetailPage />} />
+                <Route path="wishlist" element={<WishlistPage />} />
+                <Route path="addresses" element={<AddressesPage />} />
+              </Route>
+              <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
               
               {/* Admin Dashboard Routes */}
               <Route 
