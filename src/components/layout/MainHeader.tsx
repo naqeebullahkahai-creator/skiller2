@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User, ChevronDown, Menu, X, LogOut, LayoutDashboard } from "lucide-react";
+import { Search, User, ChevronDown, Menu, X, LogOut, LayoutDashboard, Package } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { navCategories } from "@/data/mockData";
 import { useAuth } from "@/contexts/AuthContext";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 const MainHeader = () => {
   const navigate = useNavigate();
@@ -19,7 +20,6 @@ const MainHeader = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const cartItemCount = 3;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,9 +121,10 @@ const MainHeader = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>My Account</DropdownMenuItem>
-                  <DropdownMenuItem>My Orders</DropdownMenuItem>
-                  <DropdownMenuItem>Wishlist</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/my-orders")}>
+                    <Package size={16} className="mr-2" />
+                    My Orders
+                  </DropdownMenuItem>
                   {getDashboardLink() && (
                     <>
                       <DropdownMenuSeparator />
@@ -152,14 +153,7 @@ const MainHeader = () => {
             )}
 
             {/* Cart */}
-            <Link to="/cart" className="relative p-2">
-              <ShoppingCart size={22} className="text-primary-foreground" />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-card text-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-            </Link>
+            <CartDrawer />
           </div>
         </div>
 

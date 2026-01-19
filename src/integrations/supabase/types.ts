@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          order_id: string
+          price_pkr: number
+          product_id: string
+          quantity: number
+          seller_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          order_id: string
+          price_pkr: number
+          product_id: string
+          quantity?: number
+          seller_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          order_id?: string
+          price_pkr?: number
+          product_id?: string
+          quantity?: number
+          seller_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           created_at: string
@@ -22,6 +73,7 @@ export type Database = {
           customer_phone: string | null
           id: string
           items: Json
+          order_number: string | null
           order_status: Database["public"]["Enums"]["order_status"]
           payment_method: string
           payment_status: Database["public"]["Enums"]["payment_status"]
@@ -36,6 +88,7 @@ export type Database = {
           customer_phone?: string | null
           id?: string
           items?: Json
+          order_number?: string | null
           order_status?: Database["public"]["Enums"]["order_status"]
           payment_method?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -50,6 +103,7 @@ export type Database = {
           customer_phone?: string | null
           id?: string
           items?: Json
+          order_number?: string | null
           order_status?: Database["public"]["Enums"]["order_status"]
           payment_method?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -166,6 +220,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decrease_product_stock: {
+        Args: { p_product_id: string; p_quantity: number }
+        Returns: boolean
+      }
+      generate_order_number: { Args: never; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
