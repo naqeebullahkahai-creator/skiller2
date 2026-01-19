@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User, ChevronDown, Menu, X, LogOut } from "lucide-react";
+import { Search, ShoppingCart, User, ChevronDown, Menu, X, LogOut, LayoutDashboard } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const MainHeader = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout, setShowAuthModal, setAuthModalMode } = useAuth();
+  const { user, profile, role, isAuthenticated, logout, setShowAuthModal, setAuthModalMode } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -32,6 +32,19 @@ const MainHeader = () => {
     setAuthModalMode("login");
     setShowAuthModal(true);
   };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
+
+  const getDashboardLink = () => {
+    if (role === "admin") return "/admin-dashboard";
+    if (role === "seller") return "/seller-center";
+    return null;
+  };
+
+  const displayName = profile?.full_name || user?.email?.split("@")[0] || "Account";
 
   return (
     <header className="sticky top-0 z-50 bg-primary shadow-md">
@@ -54,7 +67,7 @@ const MainHeader = () => {
 
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-2xl">
-            <div className="flex w-full bg-card rounded overflow-hidden">
+            <form onSubmit={handleSearch} className="flex w-full bg-card rounded overflow-hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:bg-muted border-r border-border whitespace-nowrap">
@@ -84,11 +97,12 @@ const MainHeader = () => {
                 className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
               />
               <Button 
+                type="submit"
                 className="rounded-none px-6 bg-fanzon-orange-hover hover:bg-fanzon-dark"
               >
                 <Search size={18} />
               </Button>
-            </div>
+            </form>
           </div>
 
           {/* Right Actions */}
@@ -102,7 +116,7 @@ const MainHeader = () => {
                     className="hidden md:flex items-center gap-2 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground"
                   >
                     <User size={18} />
-                    <span>{user?.name}</span>
+                    <span>{displayName}</span>
                     <ChevronDown size={14} />
                   </Button>
                 </DropdownMenuTrigger>
@@ -110,8 +124,17 @@ const MainHeader = () => {
                   <DropdownMenuItem>My Account</DropdownMenuItem>
                   <DropdownMenuItem>My Orders</DropdownMenuItem>
                   <DropdownMenuItem>Wishlist</DropdownMenuItem>
+                  {getDashboardLink() && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate(getDashboardLink()!)}>
+                        <LayoutDashboard size={16} className="mr-2" />
+                        {role === "admin" ? "Admin Dashboard" : "Seller Center"}
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout} className="text-destructive">
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                     <LogOut size={16} className="mr-2" />
                     Logout
                   </DropdownMenuItem>
@@ -142,7 +165,7 @@ const MainHeader = () => {
 
         {/* Mobile Search Bar */}
         <div className="md:hidden pb-3 px-2">
-          <div className="flex w-full bg-card rounded overflow-hidden">
+          <form onSubmit={handleSearch} className="flex w-full bg-card rounded overflow-hidden">
             <Input
               type="text"
               placeholder="Search in FANZON"
@@ -150,10 +173,10 @@ const MainHeader = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <Button className="rounded-none px-4 bg-fanzon-orange-hover hover:bg-fanzon-dark">
+            <Button type="submit" className="rounded-none px-4 bg-fanzon-orange-hover hover:bg-fanzon-dark">
               <Search size={18} />
             </Button>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -162,13 +185,47 @@ const MainHeader = () => {
         <div className="md:hidden bg-card border-t border-border animate-fade-in">
           <div className="container mx-auto py-4">
             <div className="flex flex-col gap-2">
-              <Button 
-                variant="ghost" 
-                className="justify-start gap-2 text-foreground"
-              >
-                <User size={18} />
-                Login / Sign Up
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <div className="px-4 py-2 text-sm font-medium text-foreground">
+                    Hello, {displayName}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start gap-2 text-foreground"
+                    onClick={() => { navigate("/orders"); setIsMobileMenuOpen(false); }}
+                  >
+                    My Orders
+                  </Button>
+                  {getDashboardLink() && (
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start gap-2 text-foreground"
+                      onClick={() => { navigate(getDashboardLink()!); setIsMobileMenuOpen(false); }}
+                    >
+                      <LayoutDashboard size={18} />
+                      {role === "admin" ? "Admin Dashboard" : "Seller Center"}
+                    </Button>
+                  )}
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start gap-2 text-destructive"
+                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                  >
+                    <LogOut size={18} />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  className="justify-start gap-2 text-foreground"
+                  onClick={() => { openLoginModal(); setIsMobileMenuOpen(false); }}
+                >
+                  <User size={18} />
+                  Login / Sign Up
+                </Button>
+              )}
               <div className="border-t border-border my-2" />
               {navCategories.map((category) => (
                 <Link
