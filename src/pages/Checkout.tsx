@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -7,8 +7,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -24,9 +24,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPKR } from "@/hooks/useProducts";
+import { useUserAddresses, UserAddress, PROVINCES, CITIES_BY_PROVINCE } from "@/hooks/useAddresses";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -38,61 +46,79 @@ import {
   ClipboardList,
   Loader2,
   Truck,
+  Plus,
+  Home,
+  Phone,
+  User,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const CITIES = [
-  "Karachi",
-  "Lahore",
-  "Islamabad",
-  "Rawalpindi",
-  "Faisalabad",
-  "Multan",
-  "Peshawar",
-  "Quetta",
-  "Sialkot",
-  "Gujranwala",
-  "Hyderabad",
-  "Abbottabad",
-];
-
-const shippingSchema = z.object({
-  fullName: z.string().min(3, "Full name must be at least 3 characters").max(100),
-  phoneNumber: z
+const addressSchema = z.object({
+  full_name: z.string().min(3, "Full name must be at least 3 characters").max(100),
+  phone: z
     .string()
-    .regex(/^(03[0-9]{9}|0[0-9]{10})$/, "Enter a valid Pakistan phone number (e.g., 03001234567)"),
+    .regex(/^03[0-9]{2}-?[0-9]{7}$/, "Enter a valid Pakistan phone number (e.g., 0300-1234567)"),
+  province: z.string().min(1, "Please select a province"),
   city: z.string().min(1, "Please select a city"),
-  address: z.string().min(10, "Address must be at least 10 characters").max(500),
+  area: z.string().optional(),
+  full_address: z.string().min(10, "Address must be at least 10 characters").max(500),
+  is_default: z.boolean().default(false),
 });
 
-type ShippingFormData = z.infer<typeof shippingSchema>;
+type AddressFormData = z.infer<typeof addressSchema>;
 
 const PAYMENT_METHODS = [
-  { id: "cod", name: "Cash on Delivery (COD)", description: "Pay when you receive your order" },
-  { id: "easypaisa", name: "EasyPaisa / JazzCash", description: "Mobile wallet payment" },
-  { id: "bank", name: "Bank Transfer", description: "Direct bank transfer" },
+  { id: "cod", name: "Cash on Delivery (COD)", description: "Pay when you receive your order", icon: "💵" },
+  { id: "easypaisa", name: "EasyPaisa / JazzCash", description: "Mobile wallet payment", icon: "📱" },
+  { id: "bank", name: "Bank Transfer", description: "Direct bank transfer", icon: "🏦" },
 ];
+
+const SHIPPING_FEE = 150;
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
   const { items, getSubtotal, getShippingFee, getCartTotal, clearCart } = useCart();
+  const { addresses, isLoading: addressesLoading, addAddress, deleteAddress } = useUserAddresses();
 
   const [step, setStep] = useState(1);
-  const [shippingData, setShippingData] = useState<ShippingFormData | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [showAddressModal, setShowAddressModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedProvince, setSelectedProvince] = useState("");
 
-  const form = useForm<ShippingFormData>({
-    resolver: zodResolver(shippingSchema),
+  const form = useForm<AddressFormData>({
+    resolver: zodResolver(addressSchema),
     defaultValues: {
-      fullName: "",
-      phoneNumber: "",
+      full_name: "",
+      phone: "",
+      province: "",
       city: "",
-      address: "",
+      area: "",
+      full_address: "",
+      is_default: false,
     },
   });
+
+  // Auto-select default address when addresses load
+  useEffect(() => {
+    if (addresses.length > 0 && !selectedAddressId) {
+      const defaultAddr = addresses.find((a) => a.is_default) || addresses[0];
+      setSelectedAddressId(defaultAddr.id);
+    }
+  }, [addresses, selectedAddressId]);
+
+  // Show add address form if no addresses exist
+  useEffect(() => {
+    if (!addressesLoading && addresses.length === 0) {
+      setShowAddressModal(true);
+    }
+  }, [addressesLoading, addresses]);
+
+  const selectedAddress = addresses.find((a) => a.id === selectedAddressId);
 
   // Redirect if cart is empty
   if (items.length === 0) {
@@ -115,17 +141,45 @@ const Checkout = () => {
     return null;
   }
 
-  const handleShippingSubmit = (data: ShippingFormData) => {
-    setShippingData(data);
+  const handleAddAddress = async (data: AddressFormData) => {
+    const newAddress = await addAddress({
+      full_name: data.full_name,
+      phone: data.phone,
+      province: data.province,
+      city: data.city,
+      area: data.area || "",
+      full_address: data.full_address,
+      is_default: data.is_default,
+    });
+    if (newAddress) {
+      setSelectedAddressId(newAddress.id);
+      setShowAddressModal(false);
+      form.reset();
+      setSelectedProvince("");
+    }
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    await deleteAddress(id);
+    if (selectedAddressId === id) {
+      setSelectedAddressId(addresses.find((a) => a.id !== id)?.id || null);
+    }
+  };
+
+  const handleContinueToPayment = () => {
+    if (!selectedAddressId) {
+      toast({
+        title: "Please select an address",
+        description: "You need to select or add a delivery address.",
+        variant: "destructive",
+      });
+      return;
+    }
     setStep(2);
   };
 
-  const handlePaymentSubmit = () => {
-    setStep(3);
-  };
-
   const handlePlaceOrder = async () => {
-    if (!shippingData || !user) return;
+    if (!selectedAddress || !user) return;
 
     setIsSubmitting(true);
 
@@ -164,9 +218,10 @@ const Checkout = () => {
         .from("orders")
         .insert([{
           customer_id: user.id,
-          customer_name: shippingData.fullName,
-          customer_phone: shippingData.phoneNumber,
-          shipping_address: `${shippingData.address}, ${shippingData.city}`,
+          customer_name: selectedAddress.full_name,
+          customer_phone: selectedAddress.phone,
+          shipping_address: `${selectedAddress.full_address}, ${selectedAddress.area ? selectedAddress.area + ", " : ""}${selectedAddress.city}, ${selectedAddress.province}`,
+          address_id: selectedAddress.id,
           payment_method: paymentMethod.toUpperCase(),
           total_amount_pkr: getCartTotal(),
           items: orderItems,
@@ -232,6 +287,15 @@ const Checkout = () => {
     { number: 3, title: "Review", icon: ClipboardList },
   ];
 
+  // Get estimated delivery date (3-5 days from now)
+  const getEstimatedDelivery = () => {
+    const start = new Date();
+    start.setDate(start.getDate() + 3);
+    const end = new Date();
+    end.setDate(end.getDate() + 5);
+    return `${start.toLocaleDateString("en-PK", { month: "short", day: "numeric" })} - ${end.toLocaleDateString("en-PK", { month: "short", day: "numeric" })}`;
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
@@ -243,12 +307,15 @@ const Checkout = () => {
         <div className="flex items-center justify-center mb-8">
           {steps.map((s, index) => (
             <div key={s.number} className="flex items-center">
-              <div
+              <button
+                onClick={() => s.number < step && setStep(s.number)}
+                disabled={s.number > step}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 rounded-full transition-colors",
                   step >= s.number
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
+                    : "bg-muted text-muted-foreground",
+                  s.number < step && "cursor-pointer hover:bg-primary/80"
                 )}
               >
                 {step > s.number ? (
@@ -257,7 +324,7 @@ const Checkout = () => {
                   <s.icon size={18} />
                 )}
                 <span className="font-medium hidden sm:inline">{s.title}</span>
-              </div>
+              </button>
               {index < steps.length - 1 && (
                 <div
                   className={cn(
@@ -273,92 +340,115 @@ const Checkout = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Step 1: Shipping */}
+            {/* Step 1: Shipping Address */}
             {step === 1 && (
-              <div className="bg-card border border-border rounded-lg p-6">
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <MapPin size={20} />
-                  Shipping Information
-                </h2>
-
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(handleShippingSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="fullName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your full name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="03001234567" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select your city" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {CITIES.map((city) => (
-                                <SelectItem key={city} value={city}>
-                                  {city}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Complete Address</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="House/Flat No., Street, Area, Landmark"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button type="submit" className="w-full">
-                      Continue to Payment
-                      <ChevronRight size={18} className="ml-2" />
+              <div className="space-y-4">
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold flex items-center gap-2">
+                      <MapPin size={20} />
+                      Delivery Address
+                    </h2>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowAddressModal(true)}
+                    >
+                      <Plus size={16} className="mr-2" />
+                      Add New
                     </Button>
-                  </form>
-                </Form>
+                  </div>
+
+                  {addressesLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : addresses.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Home size={48} className="mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground mb-4">No saved addresses yet</p>
+                      <Button onClick={() => setShowAddressModal(true)}>
+                        <Plus size={16} className="mr-2" />
+                        Add Your First Address
+                      </Button>
+                    </div>
+                  ) : (
+                    <RadioGroup
+                      value={selectedAddressId || ""}
+                      onValueChange={setSelectedAddressId}
+                      className="space-y-3"
+                    >
+                      {addresses.map((address) => (
+                        <div
+                          key={address.id}
+                          className={cn(
+                            "relative flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-colors",
+                            selectedAddressId === address.id
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:border-muted-foreground"
+                          )}
+                        >
+                          <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
+                          <Label htmlFor={address.id} className="flex-1 cursor-pointer">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-semibold">{address.full_name}</span>
+                              {address.is_default && (
+                                <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground flex items-center gap-1">
+                              <Phone size={12} />
+                              {address.phone}
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {address.full_address}
+                              {address.area && `, ${address.area}`}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {address.city}, {address.province}
+                            </p>
+                          </Label>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-2 right-2 h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteAddress(address.id);
+                            }}
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  )}
+                </div>
+
+                {/* Selected Address Summary */}
+                {selectedAddress && (
+                  <div className="bg-muted/50 rounded-lg p-4">
+                    <p className="text-sm font-medium mb-1">Deliver to:</p>
+                    <p className="text-sm">
+                      <span className="font-semibold">{selectedAddress.full_name}</span>, {selectedAddress.full_address}
+                      {selectedAddress.area && `, ${selectedAddress.area}`}, {selectedAddress.city}, {selectedAddress.province}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Estimated Delivery: {getEstimatedDelivery()}
+                    </p>
+                  </div>
+                )}
+
+                <Button
+                  onClick={handleContinueToPayment}
+                  disabled={!selectedAddressId}
+                  className="w-full"
+                >
+                  Continue to Payment
+                  <ChevronRight size={18} className="ml-2" />
+                </Button>
               </div>
             )}
 
@@ -386,6 +476,7 @@ const Checkout = () => {
                       )}
                     >
                       <RadioGroupItem value={method.id} id={method.id} />
+                      <span className="text-2xl">{method.icon}</span>
                       <Label htmlFor={method.id} className="flex-1 cursor-pointer">
                         <p className="font-medium">{method.name}</p>
                         <p className="text-sm text-muted-foreground">{method.description}</p>
@@ -399,7 +490,7 @@ const Checkout = () => {
                     <ChevronLeft size={18} className="mr-2" />
                     Back
                   </Button>
-                  <Button onClick={handlePaymentSubmit} className="flex-1">
+                  <Button onClick={() => setStep(3)} className="flex-1">
                     Review Order
                     <ChevronRight size={18} className="ml-2" />
                   </Button>
@@ -408,7 +499,7 @@ const Checkout = () => {
             )}
 
             {/* Step 3: Review */}
-            {step === 3 && shippingData && (
+            {step === 3 && selectedAddress && (
               <div className="space-y-4">
                 {/* Shipping Summary */}
                 <div className="bg-card border border-border rounded-lg p-6">
@@ -422,12 +513,23 @@ const Checkout = () => {
                     </Button>
                   </div>
                   <div className="text-sm space-y-1">
-                    <p className="font-medium">{shippingData.fullName}</p>
-                    <p className="text-muted-foreground">{shippingData.phoneNumber}</p>
-                    <p className="text-muted-foreground">
-                      {shippingData.address}, {shippingData.city}
+                    <p className="font-medium flex items-center gap-2">
+                      <User size={14} />
+                      {selectedAddress.full_name}
+                    </p>
+                    <p className="text-muted-foreground flex items-center gap-2">
+                      <Phone size={14} />
+                      {selectedAddress.phone}
+                    </p>
+                    <p className="text-muted-foreground flex items-center gap-2">
+                      <MapPin size={14} />
+                      {selectedAddress.full_address}
+                      {selectedAddress.area && `, ${selectedAddress.area}`}, {selectedAddress.city}, {selectedAddress.province}
                     </p>
                   </div>
+                  <p className="text-xs text-primary mt-3">
+                    📦 Estimated Delivery: {getEstimatedDelivery()}
+                  </p>
                 </div>
 
                 {/* Payment Summary */}
@@ -441,9 +543,14 @@ const Checkout = () => {
                       Edit
                     </Button>
                   </div>
-                  <p className="text-sm">
-                    {PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.name}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">
+                      {PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.icon}
+                    </span>
+                    <p className="text-sm font-medium">
+                      {PAYMENT_METHODS.find((m) => m.id === paymentMethod)?.name}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Order Items */}
@@ -470,7 +577,7 @@ const Checkout = () => {
                               {item.product.title}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              Qty: {item.quantity}
+                              Qty: {item.quantity} × {formatPKR(price)}
                             </p>
                             <p className="text-sm font-semibold text-primary">
                               {formatPKR(price * item.quantity)}
@@ -537,17 +644,194 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>{formatPKR(getShippingFee())}</span>
+                  <span>{formatPKR(SHIPPING_FEE)}</span>
                 </div>
                 <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
                   <span>Total</span>
                   <span className="text-primary">{formatPKR(getCartTotal())}</span>
                 </div>
               </div>
+
+              {/* Delivery Info */}
+              {selectedAddress && (
+                <div className="mt-4 pt-4 border-t border-border">
+                  <p className="text-xs text-muted-foreground mb-1">Deliver to:</p>
+                  <p className="text-sm font-medium">{selectedAddress.full_name}</p>
+                  <p className="text-xs text-muted-foreground">{selectedAddress.city}, {selectedAddress.province}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </main>
+
+      {/* Add Address Modal */}
+      <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MapPin size={20} />
+              Add New Address
+            </DialogTitle>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleAddAddress)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="full_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter recipient's full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="0300-1234567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="province"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Province</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setSelectedProvince(value);
+                        form.setValue("city", "");
+                      }}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select province" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {PROVINCES.map((province) => (
+                          <SelectItem key={province} value={province}>
+                            {province}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={!selectedProvince}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select city" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {(CITIES_BY_PROVINCE[selectedProvince] || []).map((city) => (
+                          <SelectItem key={city} value={city}>
+                            {city}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="area"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Area / Sector (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., DHA Phase 5, Gulberg" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="full_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Complete Address</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="House/Flat No., Street, Landmark"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_default"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Set as default address</FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddressModal(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1">
+                  Save Address
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { DatabaseProduct, formatPKR } from "@/hooks/useProducts";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   product: DatabaseProduct;
@@ -11,6 +12,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const { addToCart } = useCart();
   
   // Calculate discount percentage
   const discount = product.discount_price_pkr && product.discount_price_pkr < product.price_pkr
@@ -67,18 +69,21 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
         </button>
 
         {/* Quick Add to Cart - Desktop Only */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              // Add to cart logic
-            }}
-            className="w-full bg-primary hover:bg-fanzon-orange-hover text-primary-foreground text-xs font-medium py-2 rounded flex items-center justify-center gap-1 transition-colors"
-          >
-            <ShoppingCart size={14} />
-            Add to Cart
-          </button>
-        </div>
+        {product.stock_count > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addToCart(product, 1);
+              }}
+              className="w-full bg-primary hover:bg-fanzon-orange-hover text-primary-foreground text-xs font-medium py-2 rounded flex items-center justify-center gap-1 transition-colors"
+            >
+              <ShoppingCart size={14} />
+              Add to Cart
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
