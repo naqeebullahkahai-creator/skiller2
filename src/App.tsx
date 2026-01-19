@@ -9,6 +9,13 @@ import Index from "./pages/Index";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
+import DashboardLayout from "./components/dashboard/DashboardLayout";
+import DashboardHome from "./pages/dashboard/DashboardHome";
+import OrderManagement from "./pages/dashboard/OrderManagement";
+import ProductCatalog from "./pages/dashboard/ProductCatalog";
+import CategoryManager from "./pages/dashboard/CategoryManager";
+import SellerApprovals from "./pages/dashboard/SellerApprovals";
+import DashboardSettings from "./pages/dashboard/DashboardSettings";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +32,17 @@ const App = () => (
             <Route path="/category/:category" element={<ProductListing />} />
             <Route path="/search" element={<ProductListing />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            
+            {/* Dashboard Routes */}
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<DashboardHome />} />
+              <Route path="orders" element={<OrderManagement />} />
+              <Route path="products" element={<ProductCatalog />} />
+              <Route path="categories" element={<CategoryManager />} />
+              <Route path="approvals" element={<SellerApprovals />} />
+              <Route path="settings" element={<DashboardSettings />} />
+            </Route>
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
