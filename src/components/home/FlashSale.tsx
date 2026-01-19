@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Zap, ChevronRight } from "lucide-react";
+import { Zap, ChevronRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { flashSaleProducts } from "@/data/mockData";
 import ProductCard from "@/components/product/ProductCard";
+import { useActiveProducts } from "@/hooks/useProducts";
 
 const FlashSale = () => {
+  const { products, isLoading } = useActiveProducts(10);
   const [timeLeft, setTimeLeft] = useState({
     hours: 5,
     minutes: 23,
@@ -37,6 +38,25 @@ const FlashSale = () => {
 
   const formatTime = (num: number) => num.toString().padStart(2, "0");
 
+  // Filter products with discount for flash sale
+  const flashSaleProducts = products.filter(
+    (p) => p.discount_price_pkr && p.discount_price_pkr < p.price_pkr
+  );
+
+  if (isLoading) {
+    return (
+      <section className="bg-card py-4">
+        <div className="container mx-auto flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      </section>
+    );
+  }
+
+  if (flashSaleProducts.length === 0) {
+    return null; // Don't show section if no discounted products
+  }
+
   return (
     <section className="bg-card py-4">
       <div className="container mx-auto">
@@ -64,8 +84,8 @@ const FlashSale = () => {
               </div>
             </div>
           </div>
-          <Link 
-            to="/flash-sale" 
+          <Link
+            to="/products?sale=true"
             className="flex items-center gap-1 text-primary hover:text-fanzon-orange-hover font-medium text-sm transition-colors"
           >
             Shop More
@@ -76,7 +96,7 @@ const FlashSale = () => {
         {/* Products Horizontal Scroll */}
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
           <div className="flex gap-3 md:gap-4 pb-4">
-            {flashSaleProducts.map((product) => (
+            {flashSaleProducts.slice(0, 6).map((product) => (
               <div key={product.id} className="flex-shrink-0 w-[160px] md:w-[200px]">
                 <ProductCard product={product} showStockBar />
               </div>
