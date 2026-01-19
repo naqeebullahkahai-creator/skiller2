@@ -264,12 +264,20 @@ export type Database = {
           business_address: string
           city: string
           cnic_back_url: string | null
+          cnic_expiry_date: string | null
           cnic_front_url: string | null
+          cnic_issue_date: string | null
           cnic_number: string
           created_at: string
+          date_of_birth: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          father_husband_name: string | null
+          gender: string | null
           iban: string
           id: string
           legal_name: string
+          ntn_number: string | null
           rejection_reason: string | null
           shop_name: string
           submitted_at: string
@@ -285,12 +293,20 @@ export type Database = {
           business_address: string
           city: string
           cnic_back_url?: string | null
+          cnic_expiry_date?: string | null
           cnic_front_url?: string | null
+          cnic_issue_date?: string | null
           cnic_number: string
           created_at?: string
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          father_husband_name?: string | null
+          gender?: string | null
           iban: string
           id?: string
           legal_name: string
+          ntn_number?: string | null
           rejection_reason?: string | null
           shop_name: string
           submitted_at?: string
@@ -306,12 +322,20 @@ export type Database = {
           business_address?: string
           city?: string
           cnic_back_url?: string | null
+          cnic_expiry_date?: string | null
           cnic_front_url?: string | null
+          cnic_issue_date?: string | null
           cnic_number?: string
           created_at?: string
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          father_husband_name?: string | null
+          gender?: string | null
           iban?: string
           id?: string
           legal_name?: string
+          ntn_number?: string | null
           rejection_reason?: string | null
           shop_name?: string
           submitted_at?: string

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,19 +11,30 @@ import KycStep1Business from "@/components/seller/KycStep1Business";
 import KycStep2Identity from "@/components/seller/KycStep2Identity";
 import KycStep3Banking from "@/components/seller/KycStep3Banking";
 import VerificationPending from "@/components/seller/VerificationPending";
-import { useSellerKyc, KycFormData } from "@/hooks/useSellerKyc";
+import { useSellerKyc, KycFormData, isAtLeast18, calculateCnicExpiry } from "@/hooks/useSellerKyc";
 
 const step1Schema = z.object({
   shop_name: z.string().min(2, "Shop name must be at least 2 characters"),
   legal_name: z.string().min(3, "Legal name must be at least 3 characters"),
+  father_husband_name: z.string().min(3, "Father/Husband name is required"),
   city: z.string().min(1, "Please select a city"),
   business_address: z.string().min(10, "Please enter a complete address"),
+  ntn_number: z.string().optional(),
+  emergency_contact_name: z.string().min(2, "Emergency contact name is required"),
+  emergency_contact_phone: z.string().regex(/^\d{4}-\d{7}$/, "Phone must be in format 03XX-XXXXXXX"),
 });
 
 const step2Schema = z.object({
+  gender: z.string().min(1, "Please select a gender"),
+  date_of_birth: z.string().min(1, "Date of birth is required").refine(
+    (val) => isAtLeast18(val),
+    "You must be at least 18 years old"
+  ),
   cnic_number: z
     .string()
     .regex(/^\d{5}-\d{7}-\d{1}$/, "CNIC must be in format 00000-0000000-0"),
+  cnic_issue_date: z.string().min(1, "CNIC issue date is required"),
+  cnic_expiry_date: z.string(),
   cnic_front: z.custom<File>((val) => val instanceof File, "CNIC front image is required"),
   cnic_back: z.custom<File>((val) => val instanceof File, "CNIC back image is required"),
 });
@@ -42,13 +52,12 @@ const step3Schema = z.object({
 const fullSchema = step1Schema.merge(step2Schema).merge(step3Schema);
 
 const steps = [
-  { title: "Business Info", description: "Shop details" },
+  { title: "Business Info", description: "Shop & personal details" },
   { title: "Identity", description: "CNIC verification" },
   { title: "Banking", description: "Payment details" },
 ];
 
 const SellerKyc = () => {
-  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const { sellerProfile, isLoading, hasSubmittedKyc, submitKyc } = useSellerKyc();
 
@@ -57,9 +66,17 @@ const SellerKyc = () => {
     defaultValues: {
       shop_name: "",
       legal_name: "",
+      father_husband_name: "",
       business_address: "",
       city: "",
+      ntn_number: "",
+      emergency_contact_name: "",
+      emergency_contact_phone: "",
+      gender: "",
+      date_of_birth: "",
       cnic_number: "",
+      cnic_issue_date: "",
+      cnic_expiry_date: "",
       cnic_front: null,
       cnic_back: null,
       bank_name: "",
@@ -75,10 +92,13 @@ const SellerKyc = () => {
 
     switch (currentStep) {
       case 1:
-        fieldsToValidate = ["shop_name", "legal_name", "city", "business_address"];
+        fieldsToValidate = [
+          "shop_name", "legal_name", "father_husband_name", 
+          "city", "business_address", "emergency_contact_name", "emergency_contact_phone"
+        ];
         break;
       case 2:
-        fieldsToValidate = ["cnic_number", "cnic_front", "cnic_back"];
+        fieldsToValidate = ["gender", "date_of_birth", "cnic_number", "cnic_issue_date", "cnic_front", "cnic_back"];
         break;
       case 3:
         fieldsToValidate = ["bank_name", "account_title", "iban"];
@@ -103,6 +123,10 @@ const SellerKyc = () => {
   };
 
   const onSubmit = async (data: KycFormData) => {
+    // Ensure expiry date is calculated
+    if (data.cnic_issue_date) {
+      data.cnic_expiry_date = calculateCnicExpiry(data.cnic_issue_date);
+    }
     await submitKyc.mutateAsync(data);
   };
 

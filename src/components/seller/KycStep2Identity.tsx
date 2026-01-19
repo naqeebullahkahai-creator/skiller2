@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import {
   FormField,
@@ -9,8 +9,16 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Shield, Upload, X, Image as ImageIcon } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Shield, Upload, X, Image as ImageIcon, Calendar, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GENDER_OPTIONS, calculateCnicExpiry, isAtLeast18 } from "@/hooks/useSellerKyc";
 
 interface KycStep2Props {
   form: UseFormReturn<any>;
@@ -127,6 +135,19 @@ const FileUploadZone = ({
 };
 
 const KycStep2Identity = ({ form }: KycStep2Props) => {
+  const dobValue = form.watch("date_of_birth");
+  const issueDateValue = form.watch("cnic_issue_date");
+
+  // Auto-calculate expiry date when issue date changes
+  useEffect(() => {
+    if (issueDateValue) {
+      const expiryDate = calculateCnicExpiry(issueDateValue);
+      form.setValue("cnic_expiry_date", expiryDate);
+    }
+  }, [issueDateValue, form]);
+
+  const ageValid = dobValue ? isAtLeast18(dobValue) : true;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -139,6 +160,54 @@ const KycStep2Identity = ({ form }: KycStep2Props) => {
             We need to verify your identity
           </p>
         </div>
+      </div>
+
+      {/* Personal Identity Fields */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="gender"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Gender *</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {GENDER_OPTIONS.map((gender) => (
+                    <SelectItem key={gender} value={gender}>
+                      {gender}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="date_of_birth"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date of Birth *</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} max={new Date().toISOString().split('T')[0]} />
+              </FormControl>
+              {!ageValid && dobValue && (
+                <div className="flex items-center gap-1 text-destructive text-sm">
+                  <AlertTriangle className="w-4 h-4" />
+                  You must be at least 18 years old
+                </div>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
       <FormField
@@ -167,6 +236,54 @@ const KycStep2Identity = ({ form }: KycStep2Props) => {
           </FormItem>
         )}
       />
+
+      {/* CNIC Date Fields */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="cnic_issue_date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                CNIC Date of Issue *
+              </FormLabel>
+              <FormControl>
+                <Input type="date" {...field} max={new Date().toISOString().split('T')[0]} />
+              </FormControl>
+              <FormDescription>
+                As shown on your CNIC
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="cnic_expiry_date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                CNIC Date of Expiry
+              </FormLabel>
+              <FormControl>
+                <Input 
+                  type="date" 
+                  {...field} 
+                  disabled 
+                  className="bg-muted cursor-not-allowed"
+                />
+              </FormControl>
+              <FormDescription>
+                Auto-calculated (Issue + 10 years)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         <FormField
