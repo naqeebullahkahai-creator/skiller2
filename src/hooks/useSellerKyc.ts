@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,16 +23,33 @@ export interface SellerProfile {
   verified_at: string | null;
   created_at: string;
   updated_at: string;
+  // New fields
+  father_husband_name: string | null;
+  gender: string | null;
+  date_of_birth: string | null;
+  cnic_issue_date: string | null;
+  cnic_expiry_date: string | null;
+  ntn_number: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
 }
 
 export interface KycFormData {
   // Step 1: Business Info
   shop_name: string;
   legal_name: string;
+  father_husband_name: string;
   business_address: string;
   city: string;
+  ntn_number: string;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
   // Step 2: Identity
+  gender: string;
+  date_of_birth: string;
   cnic_number: string;
+  cnic_issue_date: string;
+  cnic_expiry_date: string;
   cnic_front: File | null;
   cnic_back: File | null;
   // Step 3: Banking
@@ -71,6 +87,36 @@ export const PAKISTAN_BANKS = [
   'Easypaisa (Telenor Microfinance Bank)',
   'JazzCash (Mobilink Microfinance Bank)'
 ];
+
+export const GENDER_OPTIONS = ['Male', 'Female', 'Other'];
+
+// Calculate CNIC expiry date (10 years from issue date)
+export const calculateCnicExpiry = (issueDate: string): string => {
+  if (!issueDate) return '';
+  const issue = new Date(issueDate);
+  const expiry = new Date(issue);
+  expiry.setFullYear(expiry.getFullYear() + 10);
+  return expiry.toISOString().split('T')[0];
+};
+
+// Check if user is at least 18 years old
+export const isAtLeast18 = (dob: string): boolean => {
+  if (!dob) return false;
+  const birthDate = new Date(dob);
+  const today = new Date();
+  const age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    return age - 1 >= 18;
+  }
+  return age >= 18;
+};
+
+// Check if CNIC is expired
+export const isCnicExpired = (expiryDate: string | null): boolean => {
+  if (!expiryDate) return false;
+  return new Date(expiryDate) < new Date();
+};
 
 export const useSellerKyc = () => {
   const { user } = useAuth();
@@ -144,16 +190,24 @@ export const useSellerKyc = () => {
         );
       }
 
-      // Insert seller profile
+      // Insert seller profile with all new fields
       const { data, error } = await supabase
         .from('seller_profiles')
         .insert({
           user_id: user.id,
           shop_name: formData.shop_name,
           legal_name: formData.legal_name,
+          father_husband_name: formData.father_husband_name,
           business_address: formData.business_address,
           city: formData.city,
+          ntn_number: formData.ntn_number || null,
+          emergency_contact_name: formData.emergency_contact_name,
+          emergency_contact_phone: formData.emergency_contact_phone,
+          gender: formData.gender,
+          date_of_birth: formData.date_of_birth,
           cnic_number: formData.cnic_number,
+          cnic_issue_date: formData.cnic_issue_date,
+          cnic_expiry_date: formData.cnic_expiry_date,
           cnic_front_url,
           cnic_back_url,
           bank_name: formData.bank_name,
