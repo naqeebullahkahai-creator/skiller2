@@ -11,7 +11,9 @@ import {
   Bell,
   Search,
   Store,
-  Plus
+  Plus,
+  ShieldCheck,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,12 +25,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSellerKyc } from "@/hooks/useSellerKyc";
 
 const sellerLinks = [
   { name: "Dashboard", href: "/seller-center", icon: LayoutDashboard },
+  { name: "KYC Verification", href: "/seller-center/kyc", icon: ShieldCheck },
   { name: "My Products", href: "/seller-center/products", icon: Package },
   { name: "Orders", href: "/seller-center/orders", icon: ShoppingCart },
   { name: "Settings", href: "/seller-center/settings", icon: Settings },
@@ -38,11 +42,43 @@ const SellerDashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
+  const { isVerified, isPending, isRejected, hasSubmittedKyc } = useSellerKyc();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleLogout = async () => {
     await logout();
     navigate("/auth");
+  };
+
+  const getVerificationBadge = () => {
+    if (isVerified) {
+      return (
+        <Badge className="bg-green-500 text-white hover:bg-green-600">
+          <ShieldCheck className="w-3 h-3 mr-1" />
+          {sidebarOpen ? "Verified Seller" : "V"}
+        </Badge>
+      );
+    }
+    if (isPending) {
+      return (
+        <Badge variant="outline" className="border-primary text-primary">
+          <AlertCircle className="w-3 h-3 mr-1" />
+          {sidebarOpen ? "Pending Review" : "P"}
+        </Badge>
+      );
+    }
+    if (isRejected) {
+      return (
+        <Badge variant="destructive">
+          {sidebarOpen ? "Rejected" : "R"}
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="outline" className="border-muted-foreground text-muted-foreground">
+        {sidebarOpen ? "Not Verified" : "NV"}
+      </Badge>
+    );
   };
 
   return (
@@ -71,15 +107,13 @@ const SellerDashboardLayout = () => {
           </Button>
         </div>
 
-        {/* Role Badge */}
+        {/* Verification Status Badge */}
         <div className="p-4 border-b border-slate-700">
-          <Badge className="bg-blue-500 text-white hover:bg-blue-600">
-            {sidebarOpen ? "Seller Center" : "S"}
-          </Badge>
+          {getVerificationBadge()}
         </div>
 
-        {/* Quick Add Product Button */}
-        {sidebarOpen && (
+        {/* Quick Add Product Button - Only for verified sellers */}
+        {sidebarOpen && isVerified && (
           <div className="p-4 border-b border-slate-700">
             <Button 
               className="w-full bg-primary hover:bg-primary/90"
@@ -91,11 +125,29 @@ const SellerDashboardLayout = () => {
           </div>
         )}
 
+        {/* KYC Required Alert for unverified sellers */}
+        {sidebarOpen && !isVerified && !isPending && (
+          <div className="p-4 border-b border-slate-700">
+            <Button 
+              className="w-full"
+              variant="outline"
+              onClick={() => navigate("/seller-center/kyc")}
+            >
+              <ShieldCheck size={16} className="mr-2" />
+              Complete KYC
+            </Button>
+          </div>
+        )}
+
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1">
           {sellerLinks.map((link) => {
             const isActive = location.pathname === link.href || 
-              (link.href !== "/seller-center" && location.pathname.startsWith(link.href));
+              (link.href !== "/seller-center" && link.href !== "/seller-center/kyc" && location.pathname.startsWith(link.href));
+            
+            // Show KYC link prominently if not verified
+            const isKycLink = link.href === "/seller-center/kyc";
+            const showKycHighlight = isKycLink && !isVerified;
             
             return (
               <Link
@@ -105,11 +157,18 @@ const SellerDashboardLayout = () => {
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground"
+                    : showKycHighlight
+                    ? "text-primary bg-primary/10 hover:bg-primary/20"
                     : "text-slate-300 hover:bg-slate-800 hover:text-white"
                 )}
               >
                 <link.icon size={20} />
                 {sidebarOpen && <span>{link.name}</span>}
+                {showKycHighlight && sidebarOpen && (
+                  <Badge variant="destructive" className="ml-auto text-xs">
+                    Required
+                  </Badge>
+                )}
               </Link>
             );
           })}
@@ -156,6 +215,7 @@ const SellerDashboardLayout = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
+                    <AvatarImage src={profile?.avatar_url || undefined} />
                     <AvatarFallback className="bg-blue-500 text-white">
                       {profile?.full_name?.charAt(0) || "S"}
                     </AvatarFallback>
@@ -164,8 +224,14 @@ const SellerDashboardLayout = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Store Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/seller-center/kyc")}>
+                  <ShieldCheck size={16} className="mr-2" />
+                  KYC Status
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/seller-center/settings")}>
+                  <Settings size={16} className="mr-2" />
+                  Settings
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut size={16} className="mr-2" />

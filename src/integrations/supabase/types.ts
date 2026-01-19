@@ -256,6 +256,72 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_profiles: {
+        Row: {
+          account_title: string
+          bank_cheque_url: string | null
+          bank_name: string
+          business_address: string
+          city: string
+          cnic_back_url: string | null
+          cnic_front_url: string | null
+          cnic_number: string
+          created_at: string
+          iban: string
+          id: string
+          legal_name: string
+          rejection_reason: string | null
+          shop_name: string
+          submitted_at: string
+          updated_at: string
+          user_id: string
+          verification_status: Database["public"]["Enums"]["seller_verification_status"]
+          verified_at: string | null
+        }
+        Insert: {
+          account_title: string
+          bank_cheque_url?: string | null
+          bank_name: string
+          business_address: string
+          city: string
+          cnic_back_url?: string | null
+          cnic_front_url?: string | null
+          cnic_number: string
+          created_at?: string
+          iban: string
+          id?: string
+          legal_name: string
+          rejection_reason?: string | null
+          shop_name: string
+          submitted_at?: string
+          updated_at?: string
+          user_id: string
+          verification_status?: Database["public"]["Enums"]["seller_verification_status"]
+          verified_at?: string | null
+        }
+        Update: {
+          account_title?: string
+          bank_cheque_url?: string | null
+          bank_name?: string
+          business_address?: string
+          city?: string
+          cnic_back_url?: string | null
+          cnic_front_url?: string | null
+          cnic_number?: string
+          created_at?: string
+          iban?: string
+          id?: string
+          legal_name?: string
+          rejection_reason?: string | null
+          shop_name?: string
+          submitted_at?: string
+          updated_at?: string
+          user_id?: string
+          verification_status?: Database["public"]["Enums"]["seller_verification_status"]
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       user_addresses: {
         Row: {
           area: string | null
@@ -340,6 +406,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_seller_verified: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "seller" | "customer"
@@ -351,6 +418,7 @@ export type Database = {
         | "cancelled"
       payment_status: "unpaid" | "paid"
       product_status: "pending" | "active" | "rejected"
+      seller_verification_status: "pending" | "verified" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -488,6 +556,7 @@ export const Constants = {
       ],
       payment_status: ["unpaid", "paid"],
       product_status: ["pending", "active", "rejected"],
+      seller_verification_status: ["pending", "verified", "rejected"],
     },
   },
 } as const

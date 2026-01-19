@@ -34,6 +34,8 @@ import AdminSettings from "./pages/dashboard/DashboardSettings";
 
 // Seller Dashboard
 import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
+import SellerKyc from "./pages/seller/SellerKyc";
+import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
 
 const queryClient = new QueryClient();
 
@@ -109,9 +111,11 @@ const App = () => (
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<AdminDashboardHome />} />
-                <Route path="products" element={<AdminProductCatalog />} />
-                <Route path="orders" element={<AdminOrderManagement />} />
+                <Route index element={<VerifiedSellerGuard><AdminDashboardHome /></VerifiedSellerGuard>} />
+                <Route path="kyc" element={<SellerKyc />} />
+                <Route path="products" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
+                <Route path="products/new" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
+                <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
               
