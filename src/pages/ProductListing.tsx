@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { ChevronDown, ChevronUp, Grid3X3, List, SlidersHorizontal, X } from "lucide-react";
+import { ChevronDown, ChevronUp, SlidersHorizontal, X } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
@@ -24,26 +24,25 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { categories, brands, allProducts, getProductsByCategory, searchProducts } from "@/data/mockData";
+import { categories, brands } from "@/data/mockData";
+import { useActiveProducts } from "@/hooks/useProducts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProductListing = () => {
   const { category } = useParams();
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
 
+  const { products, isLoading } = useActiveProducts();
+
   const [sortBy, setSortBy] = useState("relevance");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>(category ? [category] : []);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [freeShipping, setFreeShipping] = useState(false);
-  const [fulfilledByFanzon, setFulfilledByFanzon] = useState(false);
-  const [minRating, setMinRating] = useState(0);
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     price: true,
     brands: true,
-    service: true,
-    rating: true,
   });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -70,75 +69,62 @@ const ProductListing = () => {
   const clearFilters = () => {
     setSelectedCategories([]);
     setSelectedBrands([]);
-    setPriceRange([0, 10000]);
-    setFreeShipping(false);
-    setFulfilledByFanzon(false);
-    setMinRating(0);
+    setPriceRange([0, 500000]);
   };
 
   const filteredProducts = useMemo(() => {
-    let products = searchQuery ? searchProducts(searchQuery) : allProducts;
+    let filtered = [...products];
 
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.title.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query) ||
+          p.brand?.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by category
     if (selectedCategories.length > 0) {
-      products = products.filter((p) =>
+      filtered = filtered.filter((p) =>
         selectedCategories.some(
-          (c) => p.categorySlug === c || p.category.toLowerCase().replace(/\s+/g, "-") === c
+          (c) => p.category.toLowerCase().replace(/\s+/g, "-") === c
         )
       );
     }
 
+    // Filter by brand
     if (selectedBrands.length > 0) {
-      products = products.filter((p) =>
+      filtered = filtered.filter((p) =>
         selectedBrands.includes(p.brand?.toLowerCase() || "")
       );
     }
 
-    products = products.filter(
-      (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
+    // Filter by price range
+    const price = (p: typeof products[0]) => p.discount_price_pkr ?? p.price_pkr;
+    filtered = filtered.filter(
+      (p) => price(p) >= priceRange[0] && price(p) <= priceRange[1]
     );
-
-    if (freeShipping) {
-      products = products.filter((p) => p.freeShipping);
-    }
-
-    if (fulfilledByFanzon) {
-      products = products.filter((p) => p.fulfilledByFanzon);
-    }
-
-    if (minRating > 0) {
-      products = products.filter((p) => p.rating >= minRating);
-    }
 
     // Sort
     switch (sortBy) {
       case "price-low":
-        products = [...products].sort((a, b) => a.price - b.price);
+        filtered = filtered.sort((a, b) => price(a) - price(b));
         break;
       case "price-high":
-        products = [...products].sort((a, b) => b.price - a.price);
+        filtered = filtered.sort((a, b) => price(b) - price(a));
         break;
       case "newest":
-        products = [...products].reverse();
-        break;
-      case "rating":
-        products = [...products].sort((a, b) => b.rating - a.rating);
-        break;
-      case "bestseller":
-        products = [...products].sort((a, b) => b.soldCount - a.soldCount);
+        filtered = filtered.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
         break;
     }
 
-    return products;
-  }, [
-    searchQuery,
-    selectedCategories,
-    selectedBrands,
-    priceRange,
-    freeShipping,
-    fulfilledByFanzon,
-    minRating,
-    sortBy,
-  ]);
+    return filtered;
+  }, [products, searchQuery, selectedCategories, selectedBrands, priceRange, sortBy]);
 
   const pageTitle = searchQuery
     ? `Search results for "${searchQuery}"`
@@ -241,68 +227,6 @@ const ProductListing = () => {
         )}
       </div>
 
-      {/* Service */}
-      <div className="border-b border-border pb-4">
-        <button
-          onClick={() => toggleSection("service")}
-          className="flex items-center justify-between w-full text-sm font-semibold mb-3"
-        >
-          Service
-          {expandedSections.service ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
-        {expandedSections.service && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="free-shipping"
-                checked={freeShipping}
-                onCheckedChange={(checked) => setFreeShipping(checked as boolean)}
-              />
-              <Label htmlFor="free-shipping" className="text-sm cursor-pointer">
-                Free Shipping
-              </Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="fulfilled-fanzon"
-                checked={fulfilledByFanzon}
-                onCheckedChange={(checked) => setFulfilledByFanzon(checked as boolean)}
-              />
-              <Label htmlFor="fulfilled-fanzon" className="text-sm cursor-pointer">
-                Fulfilled by FANZON
-              </Label>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Rating */}
-      <div className="pb-4">
-        <button
-          onClick={() => toggleSection("rating")}
-          className="flex items-center justify-between w-full text-sm font-semibold mb-3"
-        >
-          Rating
-          {expandedSections.rating ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
-        {expandedSections.rating && (
-          <div className="space-y-2">
-            {[4, 3, 2, 1].map((rating) => (
-              <div key={rating} className="flex items-center gap-2">
-                <Checkbox
-                  id={`rating-${rating}`}
-                  checked={minRating === rating}
-                  onCheckedChange={(checked) => setMinRating(checked ? rating : 0)}
-                />
-                <Label htmlFor={`rating-${rating}`} className="text-sm cursor-pointer flex items-center gap-1">
-                  {rating}★ & Up
-                </Label>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       <Button variant="outline" onClick={clearFilters} className="w-full">
         Clear All Filters
       </Button>
@@ -360,11 +284,7 @@ const ProductListing = () => {
         </div>
 
         {/* Active Filters */}
-        {(selectedCategories.length > 0 ||
-          selectedBrands.length > 0 ||
-          freeShipping ||
-          fulfilledByFanzon ||
-          minRating > 0) && (
+        {(selectedCategories.length > 0 || selectedBrands.length > 0) && (
           <div className="flex flex-wrap gap-2 mb-4">
             {selectedCategories.map((cat) => (
               <span
@@ -388,30 +308,6 @@ const ProductListing = () => {
                 </button>
               </span>
             ))}
-            {freeShipping && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
-                Free Shipping
-                <button onClick={() => setFreeShipping(false)}>
-                  <X size={14} />
-                </button>
-              </span>
-            )}
-            {fulfilledByFanzon && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
-                Fulfilled by FANZON
-                <button onClick={() => setFulfilledByFanzon(false)}>
-                  <X size={14} />
-                </button>
-              </span>
-            )}
-            {minRating > 0 && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
-                {minRating}★ & Up
-                <button onClick={() => setMinRating(0)}>
-                  <X size={14} />
-                </button>
-              </span>
-            )}
           </div>
         )}
 
@@ -426,7 +322,17 @@ const ProductListing = () => {
 
           {/* Product Grid */}
           <div className="flex-1">
-            {filteredProducts.length > 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="space-y-3">
+                    <Skeleton className="h-48 w-full rounded-lg" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
