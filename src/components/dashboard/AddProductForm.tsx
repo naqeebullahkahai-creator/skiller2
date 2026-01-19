@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Check, ChevronRight, Upload, X, Plus, Trash2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { Check, ChevronRight, Upload, X, Plus, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,9 +15,12 @@ import { categories } from "@/data/mockData";
 import { brands } from "@/data/dashboardData";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { uploadProductImage, useSellerProducts } from "@/hooks/useProducts";
 
 interface AddProductFormProps {
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 const steps = [
@@ -27,9 +30,15 @@ const steps = [
   { id: 4, name: "Details" },
 ];
 
-const AddProductForm = ({ onClose }: AddProductFormProps) => {
+const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { createProduct } = useSellerProducts();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -67,15 +76,54 @@ const AddProductForm = ({ onClose }: AddProductFormProps) => {
     }));
   };
 
-  const handleImageUpload = () => {
-    // Simulate image upload with placeholder
-    const placeholderImages = [
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=200&h=200&fit=crop",
-    ];
-    const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
-    updateFormData("images", [...formData.images, randomImage]);
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || !user) return;
+
+    setIsUploading(true);
+    const uploadedUrls: string[] = [];
+
+    for (let i = 0; i < files.length && formData.images.length + uploadedUrls.length < 6; i++) {
+      const file = files[i];
+      
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        toast({
+          title: "Invalid file",
+          description: `${file.name} is not an image file`,
+          variant: "destructive",
+        });
+        continue;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: `${file.name} exceeds 5MB limit`,
+          variant: "destructive",
+        });
+        continue;
+      }
+
+      const url = await uploadProductImage(file, user.id);
+      if (url) {
+        uploadedUrls.push(url);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      updateFormData("images", [...formData.images, ...uploadedUrls]);
+      toast({
+        title: "Images Uploaded",
+        description: `${uploadedUrls.length} image(s) uploaded successfully`,
+      });
+    }
+
+    setIsUploading(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const removeImage = (index: number) => {
@@ -83,6 +131,33 @@ const AddProductForm = ({ onClose }: AddProductFormProps) => {
   };
 
   const handleNext = () => {
+    // Validation for each step
+    if (currentStep === 1) {
+      if (!formData.title.trim()) {
+        toast({ title: "Error", description: "Product title is required", variant: "destructive" });
+        return;
+      }
+      if (!formData.category) {
+        toast({ title: "Error", description: "Category is required", variant: "destructive" });
+        return;
+      }
+    }
+    
+    if (currentStep === 2) {
+      if (!formData.originalPrice || Number(formData.originalPrice) <= 0) {
+        toast({ title: "Error", description: "Valid original price is required", variant: "destructive" });
+        return;
+      }
+      if (!formData.discountedPrice || Number(formData.discountedPrice) <= 0) {
+        toast({ title: "Error", description: "Valid discounted price is required", variant: "destructive" });
+        return;
+      }
+      if (!formData.stock || Number(formData.stock) < 0) {
+        toast({ title: "Error", description: "Valid stock quantity is required", variant: "destructive" });
+        return;
+      }
+    }
+
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
@@ -94,12 +169,39 @@ const AddProductForm = ({ onClose }: AddProductFormProps) => {
     }
   };
 
-  const handleSubmit = () => {
-    toast({
-      title: "Product Submitted",
-      description: "Your product has been submitted for approval.",
+  const handleSubmit = async () => {
+    if (!user) {
+      toast({ title: "Error", description: "You must be logged in", variant: "destructive" });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Build description with specifications
+    let fullDescription = formData.description || "";
+    const specs = formData.specifications.filter(s => s.key && s.value);
+    if (specs.length > 0) {
+      fullDescription += "\n\nSpecifications:\n" + specs.map(s => `${s.key}: ${s.value}`).join("\n");
+    }
+
+    const success = await createProduct({
+      title: formData.title,
+      description: fullDescription,
+      category: formData.category,
+      brand: formData.brand,
+      sku: formData.sku,
+      price_pkr: Number(formData.originalPrice),
+      discount_price_pkr: Number(formData.discountedPrice),
+      stock_count: Number(formData.stock),
+      images: formData.images,
     });
-    onClose();
+
+    setIsSubmitting(false);
+
+    if (success) {
+      onSuccess?.();
+      onClose();
+    }
   };
 
   return (
@@ -193,7 +295,7 @@ const AddProductForm = ({ onClose }: AddProductFormProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sku">SKU *</Label>
+              <Label htmlFor="sku">SKU</Label>
               <Input
                 id="sku"
                 placeholder="e.g., PRD-001"
@@ -276,6 +378,14 @@ const AddProductForm = ({ onClose }: AddProductFormProps) => {
         {currentStep === 3 && (
           <div className="space-y-4">
             <Label>Product Images</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleImageUpload}
+            />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {formData.images.map((img, index) => (
                 <div key={index} className="relative aspect-square">
@@ -294,16 +404,23 @@ const AddProductForm = ({ onClose }: AddProductFormProps) => {
               ))}
               {formData.images.length < 6 && (
                 <button
-                  onClick={handleImageUpload}
-                  className="aspect-square border-2 border-dashed border-muted-foreground/30 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary hover:bg-primary/5 transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="aspect-square border-2 border-dashed border-muted-foreground/30 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary hover:bg-primary/5 transition-colors disabled:opacity-50"
                 >
-                  <Upload size={24} className="text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Upload</span>
+                  {isUploading ? (
+                    <Loader2 size={24} className="text-muted-foreground animate-spin" />
+                  ) : (
+                    <Upload size={24} className="text-muted-foreground" />
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {isUploading ? "Uploading..." : "Upload"}
+                  </span>
                 </button>
               )}
             </div>
             <p className="text-xs text-muted-foreground">
-              Upload up to 6 images. First image will be the cover.
+              Upload up to 6 images (max 5MB each). First image will be the cover.
             </p>
           </div>
         )}
@@ -371,11 +488,20 @@ const AddProductForm = ({ onClose }: AddProductFormProps) => {
 
       {/* Navigation Buttons */}
       <div className="flex justify-between pt-4 border-t">
-        <Button variant="outline" onClick={currentStep === 1 ? onClose : handleBack}>
+        <Button variant="outline" onClick={currentStep === 1 ? onClose : handleBack} disabled={isSubmitting}>
           {currentStep === 1 ? "Cancel" : "Back"}
         </Button>
-        <Button onClick={currentStep === 4 ? handleSubmit : handleNext}>
-          {currentStep === 4 ? "Submit for Approval" : "Next"}
+        <Button onClick={currentStep === 4 ? handleSubmit : handleNext} disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 size={16} className="mr-2 animate-spin" />
+              Submitting...
+            </>
+          ) : currentStep === 4 ? (
+            "Submit for Approval"
+          ) : (
+            "Next"
+          )}
         </Button>
       </div>
     </div>

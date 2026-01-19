@@ -1,17 +1,33 @@
 import { Heart, Star, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Product } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { DatabaseProduct, formatPKR } from "@/hooks/useProducts";
 
 interface ProductCardProps {
-  product: Product;
+  product: DatabaseProduct;
   showStockBar?: boolean;
 }
 
 const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const stockPercentage = (product.stockSold / product.stockTotal) * 100;
+  
+  // Calculate discount percentage
+  const discount = product.discount_price_pkr && product.discount_price_pkr < product.price_pkr
+    ? Math.round(((product.price_pkr - product.discount_price_pkr) / product.price_pkr) * 100)
+    : 0;
+
+  // Get display price
+  const displayPrice = product.discount_price_pkr || product.price_pkr;
+  
+  // Get first image or placeholder
+  const image = product.images && product.images.length > 0 
+    ? product.images[0] 
+    : "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop";
+
+  // Calculate stock percentage (for display purposes)
+  const stockSold = Math.max(0, 100 - product.stock_count);
+  const stockPercentage = Math.min(90, stockSold); // Cap at 90% for visual effect
 
   return (
     <Link
@@ -21,15 +37,15 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-muted">
         <img
-          src={product.image}
+          src={image}
           alt={product.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        
+
         {/* Discount Badge */}
-        {product.discount > 0 && (
+        {discount > 0 && (
           <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded">
-            -{product.discount}%
+            -{discount}%
           </div>
         )}
 
@@ -41,12 +57,12 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
           }}
           className="absolute top-2 right-2 p-1.5 bg-card/80 hover:bg-card rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          <Heart 
-            size={16} 
+          <Heart
+            size={16}
             className={cn(
               "transition-colors",
               isWishlisted ? "fill-destructive text-destructive" : "text-muted-foreground"
-            )} 
+            )}
           />
         </button>
 
@@ -67,9 +83,9 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
 
       {/* Content */}
       <div className="p-3 flex flex-col flex-1">
-        {/* Vendor */}
+        {/* Brand */}
         <p className="text-[10px] text-muted-foreground mb-1 truncate">
-          {product.vendor}
+          {product.brand || "FANZON"}
         </p>
 
         {/* Title */}
@@ -77,22 +93,22 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
           {product.title}
         </h3>
 
-        {/* Rating */}
+        {/* Rating placeholder - using static data for now */}
         <div className="flex items-center gap-1 mb-2">
           <Star size={12} className="fill-fanzon-star text-fanzon-star" />
           <span className="text-[10px] md:text-xs text-muted-foreground">
-            {product.rating} ({product.ratingCount})
+            4.5 (100+)
           </span>
         </div>
 
         {/* Price */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm md:text-base font-bold text-primary">
-            ৳{product.price.toLocaleString()}
+            {formatPKR(displayPrice)}
           </span>
-          {product.originalPrice > product.price && (
+          {discount > 0 && (
             <span className="text-[10px] md:text-xs text-muted-foreground line-through">
-              ৳{product.originalPrice.toLocaleString()}
+              {formatPKR(product.price_pkr)}
             </span>
           )}
         </div>
@@ -101,13 +117,13 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
         {showStockBar && (
           <div className="mt-2">
             <div className="h-1.5 bg-fanzon-orange-light rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-primary rounded-full transition-all duration-300"
                 style={{ width: `${stockPercentage}%` }}
               />
             </div>
             <p className="text-[10px] text-muted-foreground mt-1">
-              {product.stockSold} sold
+              {product.stock_count} left
             </p>
           </div>
         )}
