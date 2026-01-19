@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Star,
   Heart,
@@ -26,13 +26,14 @@ import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ProductCard from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
 import { useProduct, useActiveProducts, formatPKR } from "@/hooks/useProducts";
+import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   const { product, isLoading, error } = useProduct(id);
   const { products: allProducts } = useActiveProducts(20);
 
@@ -94,17 +95,16 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    toast({
-      title: "Added to Cart!",
-      description: `${quantity} x ${product.title} added to your cart.`,
-    });
+    if (product) {
+      addToCart(product, quantity);
+    }
   };
 
   const handleBuyNow = () => {
-    toast({
-      title: "Proceeding to Checkout",
-      description: "Redirecting to checkout page...",
-    });
+    if (product) {
+      addToCart(product, quantity);
+      navigate("/checkout");
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

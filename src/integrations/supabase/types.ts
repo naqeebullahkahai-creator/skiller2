@@ -67,6 +67,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          address_id: string | null
           created_at: string
           customer_id: string | null
           customer_name: string
@@ -82,6 +83,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          address_id?: string | null
           created_at?: string
           customer_id?: string | null
           customer_name: string
@@ -97,6 +99,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          address_id?: string | null
           created_at?: string
           customer_id?: string | null
           customer_name?: string
@@ -111,7 +114,15 @@ export type Database = {
           total_amount_pkr?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_address_id_fkey"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "user_addresses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -191,6 +202,48 @@ export type Database = {
           id?: string
           phone_number?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_addresses: {
+        Row: {
+          area: string | null
+          city: string
+          created_at: string
+          full_address: string
+          full_name: string
+          id: string
+          is_default: boolean
+          phone: string
+          province: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area?: string | null
+          city: string
+          created_at?: string
+          full_address: string
+          full_name: string
+          id?: string
+          is_default?: boolean
+          phone: string
+          province: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area?: string | null
+          city?: string
+          created_at?: string
+          full_address?: string
+          full_name?: string
+          id?: string
+          is_default?: boolean
+          phone?: string
+          province?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

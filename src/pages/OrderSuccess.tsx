@@ -2,10 +2,19 @@ import { Link, useParams } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Package, Home, FileText } from "lucide-react";
+import { CheckCircle, Package, Home, FileText, Truck, Calendar } from "lucide-react";
 
 const OrderSuccess = () => {
   const { orderNumber } = useParams();
+
+  // Get estimated delivery date (3-5 days from now)
+  const getEstimatedDelivery = () => {
+    const start = new Date();
+    start.setDate(start.getDate() + 3);
+    const end = new Date();
+    end.setDate(end.getDate() + 5);
+    return `${start.toLocaleDateString("en-PK", { weekday: "short", month: "short", day: "numeric" })} - ${end.toLocaleDateString("en-PK", { weekday: "short", month: "short", day: "numeric" })}`;
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -28,13 +37,40 @@ const OrderSuccess = () => {
             Thank you for shopping with FANZON. Your order has been confirmed and will be processed shortly.
           </p>
 
-          {/* Order Number */}
-          <div className="bg-card border border-border rounded-lg p-6 mb-8">
-            <p className="text-sm text-muted-foreground mb-2">Your Order Number</p>
-            <p className="text-2xl font-bold text-primary">{orderNumber || "FZ-00001"}</p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Please save this number for tracking your order
-            </p>
+          {/* Order Details Card */}
+          <div className="bg-card border border-border rounded-lg p-6 mb-6 text-left">
+            <div className="space-y-4">
+              {/* Order Number */}
+              <div className="flex items-center justify-between pb-4 border-b border-border">
+                <div>
+                  <p className="text-sm text-muted-foreground">Order Number</p>
+                  <p className="text-xl font-bold text-primary">{orderNumber || "FZ-00001"}</p>
+                </div>
+                <Package size={32} className="text-primary" />
+              </div>
+
+              {/* Estimated Delivery */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Calendar size={20} className="text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Estimated Delivery</p>
+                  <p className="font-semibold">{getEstimatedDelivery()}</p>
+                </div>
+              </div>
+
+              {/* Shipping Info */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Truck size={20} className="text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Shipping</p>
+                  <p className="font-semibold">Standard Delivery (3-5 days)</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* What's Next */}
