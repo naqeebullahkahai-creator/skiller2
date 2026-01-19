@@ -62,6 +62,23 @@ export interface SalesData {
   orders: number;
 }
 
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export const brands: Brand[] = [
+  { id: "b1", name: "Samsung", slug: "samsung" },
+  { id: "b2", name: "Apple", slug: "apple" },
+  { id: "b3", name: "Nike", slug: "nike" },
+  { id: "b4", name: "Adidas", slug: "adidas" },
+  { id: "b5", name: "Sony", slug: "sony" },
+  { id: "b6", name: "LG", slug: "lg" },
+  { id: "b7", name: "Xiaomi", slug: "xiaomi" },
+  { id: "b8", name: "Puma", slug: "puma" },
+];
+
 export const dashboardStats: DashboardStats = {
   totalRevenue: 2547890,
   totalOrders: 1234,
