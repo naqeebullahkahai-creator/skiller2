@@ -120,6 +120,47 @@
     @apply bg-background text-foreground antialiased;
   }
 
+  /* Urdu Font Class */
+  .font-urdu {
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  }
+
+  /* RTL Support */
+  html[dir="rtl"] {
+    direction: rtl;
+  }
+
+  html[dir="rtl"] body {
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+    text-align: right;
+  }
+
+  html[dir="rtl"] .ltr-only {
+    direction: ltr;
+  }
+
+  /* RTL Flex and Layout Adjustments */
+  html[dir="rtl"] .flex-row {
+    flex-direction: row-reverse;
+  }
+
+  html[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+  }
+
+  html[dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+  }
+
+  html[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+  }
+
+  /* RTL specific icon flips */
+  html[dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
+
   /* PWA Safe Area Insets */
   .safe-area-top {
     padding-top: env(safe-area-inset-top);
