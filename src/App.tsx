@@ -31,10 +31,14 @@ import AdminProductCatalog from "./pages/dashboard/ProductCatalog";
 import AdminCategoryManager from "./pages/dashboard/CategoryManager";
 import SellerApprovals from "./pages/dashboard/SellerApprovals";
 import AdminSettings from "./pages/dashboard/DashboardSettings";
+import AdminSellerKyc from "./pages/dashboard/AdminSellerKyc";
+import AdminSellerDetail from "./pages/dashboard/AdminSellerDetail";
+import AdminPayoutManagement from "./pages/dashboard/AdminPayoutManagement";
 
 // Seller Dashboard
 import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
 import SellerKyc from "./pages/seller/SellerKyc";
+import SellerWalletPage from "./pages/seller/SellerWalletPage";
 import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
 
 const queryClient = new QueryClient();
@@ -99,6 +103,9 @@ const App = () => (
                 <Route path="products" element={<AdminProductCatalog />} />
                 <Route path="categories" element={<AdminCategoryManager />} />
                 <Route path="approvals" element={<SellerApprovals />} />
+                <Route path="kyc" element={<AdminSellerKyc />} />
+                <Route path="kyc/:sellerId" element={<AdminSellerDetail />} />
+                <Route path="payouts" element={<AdminPayoutManagement />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 
@@ -116,6 +123,7 @@ const App = () => (
                 <Route path="products" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
                 <Route path="products/new" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
                 <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
+                <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
               
