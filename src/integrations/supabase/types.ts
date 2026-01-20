@@ -41,6 +41,153 @@ export type Database = {
         }
         Relationships: []
       }
+      flash_sale_products: {
+        Row: {
+          created_at: string
+          flash_price_pkr: number
+          flash_sale_id: string
+          id: string
+          original_price_pkr: number
+          product_id: string
+          sold_count: number
+          stock_limit: number
+        }
+        Insert: {
+          created_at?: string
+          flash_price_pkr: number
+          flash_sale_id: string
+          id?: string
+          original_price_pkr: number
+          product_id: string
+          sold_count?: number
+          stock_limit?: number
+        }
+        Update: {
+          created_at?: string
+          flash_price_pkr?: number
+          flash_sale_id?: string
+          id?: string
+          original_price_pkr?: number
+          product_id?: string
+          sold_count?: number
+          stock_limit?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flash_sale_products_flash_sale_id_fkey"
+            columns: ["flash_sale_id"]
+            isOneToOne: false
+            referencedRelation: "flash_sales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flash_sale_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flash_sales: {
+        Row: {
+          campaign_name: string
+          created_at: string
+          end_date: string
+          id: string
+          is_active: boolean
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_name: string
+          created_at?: string
+          end_date: string
+          id?: string
+          is_active?: boolean
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_name?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          is_active?: boolean
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hero_banners: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+          is_active: boolean
+          link_type: string
+          link_value: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url: string
+          is_active?: boolean
+          link_type?: string
+          link_value?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          link_type?: string
+          link_value?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          message: string
+          notification_type: Database["public"]["Enums"]["notification_type"]
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message: string
+          notification_type?: Database["public"]["Enums"]["notification_type"]
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message?: string
+          notification_type?: Database["public"]["Enums"]["notification_type"]
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -507,6 +654,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_recently_viewed: {
+        Row: {
+          category: string
+          id: string
+          product_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          category: string
+          id?: string
+          product_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          category?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_recently_viewed_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -525,6 +704,87 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      voucher_usage: {
+        Row: {
+          id: string
+          order_id: string | null
+          used_at: string
+          user_id: string
+          voucher_id: string
+        }
+        Insert: {
+          id?: string
+          order_id?: string | null
+          used_at?: string
+          user_id: string
+          voucher_id: string
+        }
+        Update: {
+          id?: string
+          order_id?: string | null
+          used_at?: string
+          user_id?: string
+          voucher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voucher_usage_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voucher_usage_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vouchers: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: Database["public"]["Enums"]["discount_type"]
+          discount_value: number
+          expiry_date: string
+          id: string
+          is_active: boolean
+          minimum_spend_pkr: number
+          updated_at: string
+          usage_limit: number | null
+          used_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type?: Database["public"]["Enums"]["discount_type"]
+          discount_value: number
+          expiry_date: string
+          id?: string
+          is_active?: boolean
+          minimum_spend_pkr?: number
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: Database["public"]["Enums"]["discount_type"]
+          discount_value?: number
+          expiry_date?: string
+          id?: string
+          is_active?: boolean
+          minimum_spend_pkr?: number
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
         }
         Relationships: []
       }
@@ -606,6 +866,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_flash_sale_sold: {
+        Args: {
+          p_flash_sale_id: string
+          p_product_id: string
+          p_quantity: number
+        }
+        Returns: boolean
+      }
       is_seller_verified: { Args: { _user_id: string }; Returns: boolean }
       process_order_earnings: {
         Args: { p_order_id: string; p_sale_amount: number; p_seller_id: string }
@@ -623,9 +891,19 @@ export type Database = {
         Args: { p_amount: number; p_order_id: string; p_seller_id: string }
         Returns: undefined
       }
+      validate_voucher: {
+        Args: { p_code: string; p_order_total: number; p_user_id: string }
+        Returns: {
+          discount_amount: number
+          message: string
+          valid: boolean
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "seller" | "customer"
+      discount_type: "fixed" | "percentage"
+      notification_type: "order" | "price_drop" | "promotion" | "system"
       order_status:
         | "pending"
         | "processing"
@@ -770,6 +1048,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "seller", "customer"],
+      discount_type: ["fixed", "percentage"],
+      notification_type: ["order", "price_drop", "promotion", "system"],
       order_status: [
         "pending",
         "processing",
