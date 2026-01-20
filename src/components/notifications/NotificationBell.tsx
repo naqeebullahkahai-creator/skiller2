@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Bell, Package, TrendingDown, Megaphone, Info, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,19 +9,29 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNotifications, Notification } from "@/hooks/useMarketing";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  notification_type: "order" | "price_drop" | "promotion" | "system";
+  link: string | null;
+  is_read: boolean;
+  created_at: string;
+}
 
 const getNotificationIcon = (type: Notification["notification_type"]) => {
   switch (type) {
     case "order":
       return <Package size={16} className="text-primary" />;
     case "price_drop":
-      return <TrendingDown size={16} className="text-emerald-500" />;
+      return <TrendingDown size={16} className="text-green-600" />;
     case "promotion":
-      return <Megaphone size={16} className="text-amber-500" />;
+      return <Megaphone size={16} className="text-orange-500" />;
     default:
       return <Info size={16} className="text-muted-foreground" />;
   }
@@ -28,7 +39,72 @@ const getNotificationIcon = (type: Notification["notification_type"]) => {
 
 const NotificationBell = () => {
   const navigate = useNavigate();
-  const { notifications, unreadCount, markAsRead, markAllAsRead, isLoading } = useNotifications();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Get the current user
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUserId(session?.user?.id || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Fetch notifications when userId changes
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!userId) {
+        setNotifications([]);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(20);
+
+        if (!error && data) {
+          setNotifications(data as Notification[]);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, [userId]);
+
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+  const markAsRead = async (id: string) => {
+    if (!userId) return;
+    await supabase.from("notifications").update({ is_read: true }).eq("id", id);
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+  };
+
+  const markAllAsRead = async () => {
+    if (!userId) return;
+    await supabase
+      .from("notifications")
+      .update({ is_read: true })
+      .eq("user_id", userId)
+      .eq("is_read", false);
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+  };
 
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification.id);
