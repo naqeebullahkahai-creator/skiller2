@@ -26,7 +26,7 @@ const signupSchema = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { login, signup, isAuthenticated, role, isLoading } = useAuth();
+  const { login, signup, isAuthenticated, role, isLoading, isSuperAdmin } = useAuth();
   const { toast } = useToast();
   
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -42,18 +42,19 @@ const Auth = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Role-based redirection
+  // Role-based redirection - Super Admin goes to admin dashboard
   useEffect(() => {
-    if (!isLoading && isAuthenticated && role) {
-      if (role === "admin") {
+    if (!isLoading && isAuthenticated) {
+      // Super Admin always goes to admin dashboard
+      if (isSuperAdmin) {
         navigate("/admin-dashboard", { replace: true });
       } else if (role === "seller") {
         navigate("/seller-center", { replace: true });
-      } else {
+      } else if (role) {
         navigate("/", { replace: true });
       }
     }
-  }, [isAuthenticated, role, isLoading, navigate]);
+  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
