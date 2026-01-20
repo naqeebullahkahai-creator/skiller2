@@ -465,12 +465,16 @@ export const useVoucherValidation = () => {
         order_id: orderId,
       }]);
 
-      // Increment used_count
-      await supabase.rpc("increment_flash_sale_sold", {
-        p_flash_sale_id: voucher.id,
-        p_product_id: voucher.id,
-        p_quantity: 1,
-      }).catch(() => {}); // Ignore if function doesn't match
+      // Increment used_count - using try/catch since .catch() isn't available on rpc
+      try {
+        await supabase.rpc("increment_flash_sale_sold", {
+          p_flash_sale_id: voucher.id,
+          p_product_id: voucher.id,
+          p_quantity: 1,
+        });
+      } catch {
+        // Ignore if function doesn't match
+      }
     }
   };
 
