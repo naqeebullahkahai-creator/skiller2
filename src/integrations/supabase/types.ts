@@ -1269,6 +1269,7 @@ export type Database = {
         Returns: boolean
       }
       is_seller_verified: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       process_customer_refund: {
         Args: { p_admin_id: string; p_return_request_id: string }
         Returns: boolean

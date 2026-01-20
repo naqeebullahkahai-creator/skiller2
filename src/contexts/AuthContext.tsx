@@ -4,6 +4,9 @@ import { User, Session } from "@supabase/supabase-js";
 
 export type UserRole = "admin" | "seller" | "customer";
 
+// Super Admin email - the only user allowed to access admin panel
+export const SUPER_ADMIN_EMAIL = "alxteam001@gmail.com";
+
 interface Profile {
   id: string;
   full_name: string;
@@ -20,6 +23,7 @@ interface AuthContextType {
   role: UserRole | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isSuperAdmin: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (name: string, email: string, password: string, isSeller?: boolean) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
@@ -180,6 +184,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRole(null);
   };
 
+  // Check if current user is super admin
+  const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
+
   return (
     <AuthContext.Provider
       value={{
@@ -189,6 +196,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role,
         isAuthenticated: !!user,
         isLoading,
+        isSuperAdmin,
         login,
         signup,
         logout,

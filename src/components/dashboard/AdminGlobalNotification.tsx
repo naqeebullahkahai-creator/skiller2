@@ -22,9 +22,11 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AdminGlobalNotification = () => {
   const { toast } = useToast();
+  const { isSuperAdmin } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [title, setTitle] = useState("");
@@ -96,6 +98,9 @@ const AdminGlobalNotification = () => {
       setIsSending(false);
     }
   };
+
+  // Only render for super admin
+  if (!isSuperAdmin) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

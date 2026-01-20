@@ -24,8 +24,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const DataSanitization = () => {
+  const { isSuperAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -138,6 +140,9 @@ const DataSanitization = () => {
     setCompleted(false);
     setDeletedCounts({});
   };
+
+  // Only render for super admin
+  if (!isSuperAdmin) return null;
 
   return (
     <>
