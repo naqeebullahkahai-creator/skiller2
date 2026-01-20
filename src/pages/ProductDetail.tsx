@@ -26,6 +26,7 @@ import ProductReviews from "@/components/product/ProductReviews";
 import ChatWithSellerButton from "@/components/messaging/ChatWithSellerButton";
 import VariantSelector from "@/components/product/VariantSelector";
 import SocialShareButtons from "@/components/product/SocialShareButtons";
+import ProductBreadcrumb from "@/components/product/ProductBreadcrumb";
 import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -168,17 +169,11 @@ const ProductDetail = () => {
 
       <main className="flex-1 container mx-auto px-4 py-6 pb-24 md:pb-6">
         {/* Breadcrumb */}
-        <nav className="text-sm text-muted-foreground mb-4">
-          <Link to="/" className="hover:text-primary">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <Link to={`/category/${product.category}`} className="hover:text-primary">
-            {product.category}
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-foreground">{product.title.slice(0, 30)}...</span>
-        </nav>
+        <ProductBreadcrumb 
+          category={product.category} 
+          productTitle={product.title}
+          categorySlug={product.category.toLowerCase().replace(/\s+/g, "-")}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left: Image Gallery */}

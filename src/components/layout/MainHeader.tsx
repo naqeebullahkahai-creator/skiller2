@@ -1,6 +1,6 @@
 import { Search, User, ChevronDown, Menu, X, LogOut, LayoutDashboard, Package } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,6 +16,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
+import SearchSuggestions from "@/components/search/SearchSuggestions";
 
 const MainHeader = () => {
   const navigate = useNavigate();
@@ -24,6 +25,9 @@ const MainHeader = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(t("nav.all_categories"));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +75,7 @@ const MainHeader = () => {
           </Link>
 
           {/* Search Bar - Desktop */}
-          <div className="hidden md:flex flex-1 max-w-2xl">
+          <div className="hidden md:flex flex-1 max-w-2xl relative">
             <form onSubmit={handleSearch} className="flex w-full bg-card rounded overflow-hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -95,10 +99,12 @@ const MainHeader = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
               <Input
+                ref={searchInputRef}
                 type="text"
                 placeholder={t("search.placeholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
                 className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
               />
               <Button 
@@ -108,6 +114,16 @@ const MainHeader = () => {
                 <Search size={18} />
               </Button>
             </form>
+            <SearchSuggestions
+              query={searchQuery}
+              isOpen={showSuggestions}
+              onClose={() => setShowSuggestions(false)}
+              onSelect={(value) => {
+                setSearchQuery(value);
+                navigate(`/search?q=${encodeURIComponent(value)}`);
+              }}
+              inputRef={searchInputRef}
+            />
           </div>
 
           {/* Right Actions */}
