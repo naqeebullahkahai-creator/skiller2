@@ -16,6 +16,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import NotFound from "./pages/NotFound";
+import Forbidden from "./pages/Forbidden";
 import HelpCenter from "./pages/HelpCenter";
 import ChatWidget from "./components/chat/ChatWidget";
 import InstallPrompt from "./components/pwa/InstallPrompt";
@@ -157,6 +158,9 @@ const App = () => (
                 <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
+              
+              {/* Forbidden Route */}
+              <Route path="/forbidden" element={<Forbidden />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>

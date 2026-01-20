@@ -11,13 +11,13 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { navCategories } from "@/data/mockData";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, SUPER_ADMIN_EMAIL } from "@/contexts/AuthContext";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
 const MainHeader = () => {
   const navigate = useNavigate();
-  const { user, profile, role, isAuthenticated, logout, setShowAuthModal, setAuthModalMode } = useAuth();
+  const { user, profile, role, isAuthenticated, isSuperAdmin, logout, setShowAuthModal, setAuthModalMode } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -40,7 +40,8 @@ const MainHeader = () => {
   };
 
   const getDashboardLink = () => {
-    if (role === "admin") return "/admin-dashboard";
+    // Only super admin can access admin dashboard
+    if (role === "admin" && isSuperAdmin) return "/admin-dashboard";
     if (role === "seller") return "/seller-center";
     return null;
   };
