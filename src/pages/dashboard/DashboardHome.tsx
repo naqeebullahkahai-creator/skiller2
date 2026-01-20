@@ -33,6 +33,7 @@ import {
   formatPKR,
 } from "@/data/dashboardData";
 import { cn } from "@/lib/utils";
+import AdminGlobalNotification from "@/components/dashboard/AdminGlobalNotification";
 
 const DashboardHome = () => {
   const { role, currentSellerId } = useDashboard();
@@ -102,13 +103,16 @@ const DashboardHome = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">
-          {role === "admin"
-            ? "Welcome back! Here's your store overview."
-            : "Welcome back! Here's your seller dashboard."}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground">
+            {role === "admin"
+              ? "Welcome back! Here's your store overview."
+              : "Welcome back! Here's your seller dashboard."}
+          </p>
+        </div>
+        {role === "admin" && <AdminGlobalNotification />}
       </div>
 
       {/* Stats Cards */}
