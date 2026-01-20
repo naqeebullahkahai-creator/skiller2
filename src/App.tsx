@@ -59,6 +59,8 @@ import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
 import CustomerMessagesPage from "./pages/account/MessagesPage";
 import NotificationsPage from "./pages/account/NotificationsPage";
 
+import OrderStatusNotification from "./components/orders/OrderStatusNotification";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -66,6 +68,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
+          <OrderStatusNotification>
           <TooltipProvider>
             <Toaster />
             <Sonner />
@@ -166,6 +169,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
+        </OrderStatusNotification>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>

@@ -1,6 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfMonth, subMonths, format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 export interface DashboardStats {
   totalRevenue: number;
@@ -173,6 +175,34 @@ export const useAdminDashboardAnalytics = () => {
     },
     staleTime: 60000, // 1 minute
   });
+
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Set up realtime subscription for orders
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-dashboard-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => {
+          // Invalidate queries to refetch data
+          queryClient.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
+          queryClient.invalidateQueries({ queryKey: ["admin-recent-orders"] });
+          queryClient.invalidateQueries({ queryKey: ["admin-sales-chart"] });
+          toast({
+            title: "Dashboard Updated",
+            description: "New order activity detected",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, toast]);
 
   return {
     stats: statsQuery.data,
