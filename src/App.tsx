@@ -34,6 +34,9 @@ import AdminSettings from "./pages/dashboard/DashboardSettings";
 import AdminSellerKyc from "./pages/dashboard/AdminSellerKyc";
 import AdminSellerDetail from "./pages/dashboard/AdminSellerDetail";
 import AdminPayoutManagement from "./pages/dashboard/AdminPayoutManagement";
+import FlashSaleManager from "./pages/dashboard/FlashSaleManager";
+import VoucherManager from "./pages/dashboard/VoucherManager";
+import BannerManager from "./pages/dashboard/BannerManager";
 
 // Seller Dashboard
 import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
@@ -106,6 +109,9 @@ const App = () => (
                 <Route path="kyc" element={<AdminSellerKyc />} />
                 <Route path="kyc/:sellerId" element={<AdminSellerDetail />} />
                 <Route path="payouts" element={<AdminPayoutManagement />} />
+                <Route path="flash-sales" element={<FlashSaleManager />} />
+                <Route path="vouchers" element={<VoucherManager />} />
+                <Route path="banners" element={<BannerManager />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 

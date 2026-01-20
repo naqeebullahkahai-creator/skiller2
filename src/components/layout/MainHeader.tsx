@@ -13,6 +13,7 @@ import {
 import { navCategories } from "@/data/mockData";
 import { useAuth } from "@/contexts/AuthContext";
 import CartDrawer from "@/components/cart/CartDrawer";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const MainHeader = () => {
   const navigate = useNavigate();
@@ -107,6 +108,9 @@ const MainHeader = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
+            {/* Notification Bell */}
+            {isAuthenticated && <NotificationBell />}
+            
             {/* Login/Signup or User Menu - Desktop */}
             {isAuthenticated ? (
               <DropdownMenu>
