@@ -24,9 +24,11 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ProductCard from "@/components/product/ProductCard";
+import ProductReviews from "@/components/product/ProductReviews";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProduct, useActiveProducts, formatPKR } from "@/hooks/useProducts";
+import { useProductReviews } from "@/hooks/useProductReviews";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +38,7 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { product, isLoading, error } = useProduct(id);
   const { products: allProducts } = useActiveProducts(20);
+  const { stats: reviewStats } = useProductReviews(id);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -235,7 +238,7 @@ const ProductDetail = () => {
               </h1>
             </div>
 
-            {/* Rating (placeholder) */}
+            {/* Rating */}
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -243,15 +246,19 @@ const ProductDetail = () => {
                     key={star}
                     size={16}
                     className={cn(
-                      star <= 4
-                        ? "fill-fanzon-star text-fanzon-star"
+                      star <= Math.round(reviewStats.averageRating)
+                        ? "fill-yellow-400 text-yellow-400"
                         : "text-muted-foreground"
                     )}
                   />
                 ))}
               </div>
-              <span className="text-sm font-medium">4.5</span>
-              <span className="text-sm text-muted-foreground">(100+ reviews)</span>
+              <span className="text-sm font-medium">
+                {reviewStats.averageRating > 0 ? reviewStats.averageRating.toFixed(1) : "No ratings"}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                ({reviewStats.totalReviews} {reviewStats.totalReviews === 1 ? "review" : "reviews"})
+              </span>
             </div>
 
             {/* Price */}
@@ -454,6 +461,12 @@ const ProductDetail = () => {
               >
                 Specifications
               </TabsTrigger>
+              <TabsTrigger
+                value="reviews"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+              >
+                Reviews
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="description" className="mt-6">
@@ -483,6 +496,10 @@ const ProductDetail = () => {
                   <span className="font-medium">{product.stock_count} units</span>
                 </div>
               </div>
+            </TabsContent>
+
+            <TabsContent value="reviews" className="mt-6">
+              <ProductReviews productId={product.id} />
             </TabsContent>
           </Tabs>
         </div>

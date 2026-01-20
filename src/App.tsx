@@ -14,7 +14,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import NotFound from "./pages/NotFound";
-
+import HelpCenter from "./pages/HelpCenter";
+import ChatWidget from "./components/chat/ChatWidget";
 // Account Pages
 import AccountLayout from "./components/account/AccountLayout";
 import ProfilePage from "./pages/account/ProfilePage";
@@ -55,6 +56,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <AuthModal />
+            <ChatWidget />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -62,6 +64,7 @@ const App = () => (
               <Route path="/category/:category" element={<ProductListing />} />
               <Route path="/search" element={<ProductListing />} />
               <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/help" element={<HelpCenter />} />
               
               {/* Checkout Routes */}
               <Route 
