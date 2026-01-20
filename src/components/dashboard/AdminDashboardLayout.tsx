@@ -33,6 +33,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { DashboardProvider } from "@/contexts/DashboardContext";
 
 const adminLinks = [
   { name: "Dashboard", href: "/admin-dashboard", icon: LayoutDashboard },
@@ -180,7 +181,9 @@ const AdminDashboardLayout = () => {
 
         {/* Page Content */}
         <main className="p-6">
-          <Outlet />
+          <DashboardProvider>
+            <Outlet />
+          </DashboardProvider>
         </main>
       </div>
     </div>
