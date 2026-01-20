@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import HelpCenter from "./pages/HelpCenter";
 import ChatWidget from "./components/chat/ChatWidget";
 import InstallPrompt from "./components/pwa/InstallPrompt";
+import NotificationPermissionBanner from "./components/notifications/NotificationPermissionBanner";
 // Account Pages
 import AccountLayout from "./components/account/AccountLayout";
 import ProfilePage from "./pages/account/ProfilePage";
@@ -53,6 +54,7 @@ import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
 
 // Customer Messages
 import CustomerMessagesPage from "./pages/account/MessagesPage";
+import NotificationsPage from "./pages/account/NotificationsPage";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +67,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <InstallPrompt />
+            <NotificationPermissionBanner />
             <AuthModal />
             <ChatWidget />
             <Routes>
@@ -103,6 +106,7 @@ const App = () => (
                 <Route path="wishlist" element={<WishlistPage />} />
                 <Route path="addresses" element={<AddressesPage />} />
                 <Route path="messages" element={<CustomerMessagesPage />} />
+                <Route path="notifications" element={<NotificationsPage />} />
               </Route>
               <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
               

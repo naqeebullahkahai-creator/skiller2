@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Bell, Package, TrendingDown, Megaphone, Info, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useNotifications } from "@/hooks/useNotifications";
 
 interface Notification {
   id: string;
@@ -39,72 +38,7 @@ const getNotificationIcon = (type: Notification["notification_type"]) => {
 
 const NotificationBell = () => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  // Get the current user
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUserId(user?.id || null);
-    };
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setUserId(session?.user?.id || null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Fetch notifications when userId changes
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      if (!userId) {
-        setNotifications([]);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from("notifications")
-          .select("*")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(20);
-
-        if (!error && data) {
-          setNotifications(data as Notification[]);
-        }
-      } catch {
-        // Silently fail
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchNotifications();
-  }, [userId]);
-
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
-
-  const markAsRead = async (id: string) => {
-    if (!userId) return;
-    await supabase.from("notifications").update({ is_read: true }).eq("id", id);
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-  };
-
-  const markAllAsRead = async () => {
-    if (!userId) return;
-    await supabase
-      .from("notifications")
-      .update({ is_read: true })
-      .eq("user_id", userId)
-      .eq("is_read", false);
-    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-  };
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useNotifications();
 
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification.id);
