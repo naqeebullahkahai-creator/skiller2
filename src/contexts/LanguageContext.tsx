@@ -35,9 +35,37 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.admin_dashboard": "Admin Dashboard",
     "auth.seller_center": "Seller Center",
     
-    // Search
-    "search.placeholder": "Search in FANZON",
+    // Search & Discovery
+    "search.placeholder": "Search products, brands and more...",
     "search.search": "Search",
+    "search.categories": "Categories",
+    "search.products": "Products",
+    "search.no_suggestions": "No suggestions found",
+    "search.recent": "Recent Searches",
+    "search.trending": "Trending Searches",
+    "search.recommended": "Recommended For You",
+    "search.no_results_title": "No products found",
+    "search.no_results_desc": "Try adjusting your filters or search query",
+    
+    // Filters
+    "filter.title": "Filters",
+    "filter.categories": "Categories",
+    "filter.price_range": "Price Range",
+    "filter.brands": "Brands",
+    "filter.rating": "Rating",
+    "filter.availability": "Availability",
+    "filter.in_stock_only": "In Stock Only",
+    "filter.min_rating": "4★ & above",
+    "filter.clear_all": "Clear All Filters",
+    
+    // Sort
+    "sort.title": "Sort By",
+    "sort.relevance": "Relevance",
+    "sort.price_low": "Price: Low to High",
+    "sort.price_high": "Price: High to Low",
+    "sort.newest": "Newest Arrivals",
+    "sort.rating": "Top Rated",
+    "sort.bestseller": "Best Sellers",
     
     // Product
     "product.add_to_cart": "Add to Cart",
@@ -114,6 +142,8 @@ const translations: Record<Language, Record<string, string>> = {
     "common.error": "Error",
     "common.success": "Success",
     "common.no_results": "No results found",
+    "common.clear": "Clear",
+    "common.items_found": "items found",
     
     // Notifications
     "notification.product_added": "Product Added to Cart",
@@ -144,9 +174,37 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.admin_dashboard": "ایڈمن ڈیش بورڈ",
     "auth.seller_center": "سیلر سینٹر",
     
-    // Search
-    "search.placeholder": "FANZON میں تلاش کریں",
+    // Search & Discovery
+    "search.placeholder": "مصنوعات، برانڈز اور مزید تلاش کریں...",
     "search.search": "تلاش کریں",
+    "search.categories": "زمرے",
+    "search.products": "مصنوعات",
+    "search.no_suggestions": "کوئی تجاویز نہیں ملیں",
+    "search.recent": "حالیہ تلاشیں",
+    "search.trending": "رجحان سازی کی تلاشیں",
+    "search.recommended": "آپ کے لیے تجویز کردہ",
+    "search.no_results_title": "کوئی مصنوعات نہیں ملیں",
+    "search.no_results_desc": "اپنے فلٹرز یا تلاش کو ایڈجسٹ کرنے کی کوشش کریں",
+    
+    // Filters
+    "filter.title": "فلٹرز",
+    "filter.categories": "زمرے",
+    "filter.price_range": "قیمت کی حد",
+    "filter.brands": "برانڈز",
+    "filter.rating": "درجہ بندی",
+    "filter.availability": "دستیابی",
+    "filter.in_stock_only": "صرف دستیاب",
+    "filter.min_rating": "4★ اور اس سے زیادہ",
+    "filter.clear_all": "تمام فلٹرز صاف کریں",
+    
+    // Sort
+    "sort.title": "ترتیب دیں",
+    "sort.relevance": "مطابقت",
+    "sort.price_low": "قیمت: کم سے زیادہ",
+    "sort.price_high": "قیمت: زیادہ سے کم",
+    "sort.newest": "نئی آمد",
+    "sort.rating": "اعلی درجہ",
+    "sort.bestseller": "بہترین فروخت",
     
     // Product
     "product.add_to_cart": "ٹوکری میں ڈالیں",
@@ -223,6 +281,8 @@ const translations: Record<Language, Record<string, string>> = {
     "common.error": "خرابی",
     "common.success": "کامیاب",
     "common.no_results": "کوئی نتائج نہیں ملے",
+    "common.clear": "صاف کریں",
+    "common.items_found": "آئٹمز ملے",
     
     // Notifications
     "notification.product_added": "پروڈکٹ ٹوکری میں شامل ہو گئی",
