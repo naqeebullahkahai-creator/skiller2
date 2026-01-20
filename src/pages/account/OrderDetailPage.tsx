@@ -35,8 +35,10 @@ import {
   Loader2,
   PackageCheck,
   Home,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
 
 interface OrderItem {
   product_id: string;
@@ -60,6 +62,8 @@ interface Order {
   items: OrderItem[];
   created_at: string;
   updated_at: string;
+  tracking_id: string | null;
+  courier_name: string | null;
 }
 
 interface Review {
@@ -269,26 +273,54 @@ const OrderDetailPage = () => {
   return (
     <div className="space-y-6">
       {/* Back Button & Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link to="/account/orders">
-            <ChevronLeft size={20} />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-xl font-bold">
-            {order.order_number || `Order #${order.id.slice(0, 8)}`}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Placed on {new Date(order.created_at).toLocaleDateString("en-PK", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/account/orders">
+              <ChevronLeft size={20} />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold">
+              {order.order_number || `Order #${order.id.slice(0, 8)}`}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Placed on {new Date(order.created_at).toLocaleDateString("en-PK", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
         </div>
+        <Button variant="outline" size="sm" onClick={() => generateOrderInvoice(order)}>
+          <FileText className="h-4 w-4 mr-2" />
+          Download Invoice
+        </Button>
       </div>
+
+      {/* Tracking Info Card - Show when shipped */}
+      {order.tracking_id && order.courier_name && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Truck className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Shipment Tracking</p>
+                <p className="text-sm text-muted-foreground">
+                  Courier: <span className="font-medium text-foreground">{order.courier_name}</span>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Tracking ID: <span className="font-medium text-foreground">{order.tracking_id}</span>
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Order Status Tracker */}
       <Card>

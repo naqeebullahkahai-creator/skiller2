@@ -466,6 +466,7 @@ export type Database = {
       orders: {
         Row: {
           address_id: string | null
+          courier_name: string | null
           created_at: string
           customer_id: string | null
           customer_name: string
@@ -478,10 +479,12 @@ export type Database = {
           payment_status: Database["public"]["Enums"]["payment_status"]
           shipping_address: string
           total_amount_pkr: number
+          tracking_id: string | null
           updated_at: string
         }
         Insert: {
           address_id?: string | null
+          courier_name?: string | null
           created_at?: string
           customer_id?: string | null
           customer_name: string
@@ -494,10 +497,12 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           shipping_address: string
           total_amount_pkr: number
+          tracking_id?: string | null
           updated_at?: string
         }
         Update: {
           address_id?: string | null
+          courier_name?: string | null
           created_at?: string
           customer_id?: string | null
           customer_name?: string
@@ -510,6 +515,7 @@ export type Database = {
           payment_status?: Database["public"]["Enums"]["payment_status"]
           shipping_address?: string
           total_amount_pkr?: number
+          tracking_id?: string | null
           updated_at?: string
         }
         Relationships: [
