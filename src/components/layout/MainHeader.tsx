@@ -12,14 +12,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { navCategories } from "@/data/mockData";
 import { useAuth, SUPER_ADMIN_EMAIL } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 
 const MainHeader = () => {
   const navigate = useNavigate();
   const { user, profile, role, isAuthenticated, isSuperAdmin, logout, setShowAuthModal, setAuthModalMode } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [selectedCategory, setSelectedCategory] = useState(t("nav.all_categories"));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -77,9 +80,9 @@ const MainHeader = () => {
                     <ChevronDown size={14} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  <DropdownMenuItem onClick={() => setSelectedCategory("All Categories")}>
-                    All Categories
+                <DropdownMenuContent align={isRTL ? "end" : "start"} className="w-48">
+                  <DropdownMenuItem onClick={() => setSelectedCategory(t("nav.all_categories"))}>
+                    {t("nav.all_categories")}
                   </DropdownMenuItem>
                   {navCategories.map((category) => (
                     <DropdownMenuItem 
@@ -93,7 +96,7 @@ const MainHeader = () => {
               </DropdownMenu>
               <Input
                 type="text"
-                placeholder="Search in FANZON"
+                placeholder={t("search.placeholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
@@ -109,6 +112,11 @@ const MainHeader = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
+            {/* Language Switcher - Desktop */}
+            <div className="hidden md:block">
+              <LanguageSwitcher variant="header" />
+            </div>
+            
             {/* Notification Bell */}
             {isAuthenticated && <NotificationBell />}
             
@@ -125,24 +133,24 @@ const MainHeader = () => {
                     <ChevronDown size={14} />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align={isRTL ? "start" : "end"}>
                   <DropdownMenuItem onClick={() => navigate("/my-orders")}>
-                    <Package size={16} className="mr-2" />
-                    My Orders
+                    <Package size={16} className="me-2" />
+                    {t("auth.my_orders")}
                   </DropdownMenuItem>
                   {getDashboardLink() && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => navigate(getDashboardLink()!)}>
-                        <LayoutDashboard size={16} className="mr-2" />
-                        {role === "admin" ? "Admin Dashboard" : "Seller Center"}
+                        <LayoutDashboard size={16} className="me-2" />
+                        {role === "admin" ? t("auth.admin_dashboard") : t("auth.seller_center")}
                       </DropdownMenuItem>
                     </>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                    <LogOut size={16} className="mr-2" />
-                    Logout
+                    <LogOut size={16} className="me-2" />
+                    {t("auth.logout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -153,7 +161,7 @@ const MainHeader = () => {
                 onClick={openLoginModal}
               >
                 <User size={18} />
-                <span>Login / Sign Up</span>
+                <span>{t("auth.login_signup")}</span>
               </Button>
             )}
 
@@ -167,7 +175,7 @@ const MainHeader = () => {
           <form onSubmit={handleSearch} className="flex w-full bg-card rounded overflow-hidden">
             <Input
               type="text"
-              placeholder="Search in FANZON"
+              placeholder={t("search.placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -187,14 +195,14 @@ const MainHeader = () => {
               {isAuthenticated ? (
                 <>
                   <div className="px-4 py-2 text-sm font-medium text-foreground">
-                    Hello, {displayName}
+                    {t("common.hello")}, {displayName}
                   </div>
                   <Button 
                     variant="ghost" 
                     className="justify-start gap-2 text-foreground"
                     onClick={() => { navigate("/orders"); setIsMobileMenuOpen(false); }}
                   >
-                    My Orders
+                    {t("auth.my_orders")}
                   </Button>
                   {getDashboardLink() && (
                     <Button 
@@ -203,7 +211,7 @@ const MainHeader = () => {
                       onClick={() => { navigate(getDashboardLink()!); setIsMobileMenuOpen(false); }}
                     >
                       <LayoutDashboard size={18} />
-                      {role === "admin" ? "Admin Dashboard" : "Seller Center"}
+                      {role === "admin" ? t("auth.admin_dashboard") : t("auth.seller_center")}
                     </Button>
                   )}
                   <Button 
@@ -212,7 +220,7 @@ const MainHeader = () => {
                     onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
                   >
                     <LogOut size={18} />
-                    Logout
+                    {t("auth.logout")}
                   </Button>
                 </>
               ) : (
@@ -222,7 +230,7 @@ const MainHeader = () => {
                   onClick={() => { openLoginModal(); setIsMobileMenuOpen(false); }}
                 >
                   <User size={18} />
-                  Login / Sign Up
+                  {t("auth.login_signup")}
                 </Button>
               )}
               <div className="border-t border-border my-2" />

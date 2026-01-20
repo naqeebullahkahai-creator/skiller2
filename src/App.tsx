@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import AuthModal from "@/components/auth/AuthModal";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -68,6 +69,7 @@ const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
     <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
       <AuthProvider>
         <CartProvider>
           <OrderStatusNotification>
@@ -175,6 +177,7 @@ const App = () => (
         </OrderStatusNotification>
       </CartProvider>
     </AuthProvider>
+    </LanguageProvider>
   </QueryClientProvider>
   </HelmetProvider>
   </ErrorBoundary>

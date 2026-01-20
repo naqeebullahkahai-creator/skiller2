@@ -11,8 +11,11 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Footer = () => {
+  const { t } = useLanguage();
+  
   return (
     <footer className="bg-fanzon-dark text-secondary mt-8 pb-20 md:pb-0">
       {/* Features Bar */}
@@ -24,8 +27,8 @@ const Footer = () => {
                 <Truck className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">Free Delivery</p>
-                <p className="text-xs text-muted-foreground">On orders over ৳999</p>
+                <p className="font-medium text-sm">{t("footer.free_delivery")}</p>
+                <p className="text-xs text-muted-foreground">{t("footer.free_delivery_desc")}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -33,8 +36,8 @@ const Footer = () => {
                 <Shield className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">Secure Payment</p>
-                <p className="text-xs text-muted-foreground">100% Protected</p>
+                <p className="font-medium text-sm">{t("footer.secure_payment")}</p>
+                <p className="text-xs text-muted-foreground">{t("footer.secure_payment_desc")}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -42,8 +45,8 @@ const Footer = () => {
                 <CreditCard className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">Easy Returns</p>
-                <p className="text-xs text-muted-foreground">7-day returns</p>
+                <p className="font-medium text-sm">{t("footer.easy_returns")}</p>
+                <p className="text-xs text-muted-foreground">{t("footer.easy_returns_desc")}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -51,8 +54,8 @@ const Footer = () => {
                 <Headphones className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">24/7 Support</p>
-                <p className="text-xs text-muted-foreground">Dedicated support</p>
+                <p className="font-medium text-sm">{t("footer.support_24_7")}</p>
+                <p className="text-xs text-muted-foreground">{t("footer.support_desc")}</p>
               </div>
             </div>
           </div>
@@ -64,9 +67,9 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {/* Customer Care */}
           <div>
-            <h4 className="font-semibold text-sm mb-4">Customer Care</h4>
+            <h4 className="font-semibold text-sm mb-4">{t("footer.customer_care")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/help" className="hover:text-primary transition-colors">Help Center</Link></li>
+              <li><Link to="/help" className="hover:text-primary transition-colors">{t("nav.help")}</Link></li>
               <li><Link to="/how-to-buy" className="hover:text-primary transition-colors">How to Buy</Link></li>
               <li><Link to="/returns" className="hover:text-primary transition-colors">Returns & Refunds</Link></li>
               <li><Link to="/contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
@@ -75,7 +78,7 @@ const Footer = () => {
 
           {/* About FANZON */}
           <div>
-            <h4 className="font-semibold text-sm mb-4">About FANZON</h4>
+            <h4 className="font-semibold text-sm mb-4">{t("footer.about")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link to="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
@@ -86,7 +89,7 @@ const Footer = () => {
 
           {/* Earn With FANZON */}
           <div>
-            <h4 className="font-semibold text-sm mb-4">Earn With FANZON</h4>
+            <h4 className="font-semibold text-sm mb-4">{t("footer.earn")}</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/sell" className="hover:text-primary transition-colors">Sell on FANZON</Link></li>
               <li><Link to="/affiliate" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
@@ -96,20 +99,20 @@ const Footer = () => {
 
           {/* Payment Methods */}
           <div>
-            <h4 className="font-semibold text-sm mb-4">Payment Methods</h4>
+            <h4 className="font-semibold text-sm mb-4">{t("footer.payment")}</h4>
             <div className="flex flex-wrap gap-2">
               <div className="bg-card px-2 py-1 rounded text-xs text-foreground">Visa</div>
               <div className="bg-card px-2 py-1 rounded text-xs text-foreground">Mastercard</div>
-              <div className="bg-card px-2 py-1 rounded text-xs text-foreground">bKash</div>
-              <div className="bg-card px-2 py-1 rounded text-xs text-foreground">Nagad</div>
+              <div className="bg-card px-2 py-1 rounded text-xs text-foreground">JazzCash</div>
+              <div className="bg-card px-2 py-1 rounded text-xs text-foreground">Easypaisa</div>
               <div className="bg-card px-2 py-1 rounded text-xs text-foreground">COD</div>
             </div>
           </div>
 
           {/* Newsletter */}
           <div>
-            <h4 className="font-semibold text-sm mb-4">Stay Connected</h4>
-            <p className="text-sm text-muted-foreground mb-3">Subscribe for exclusive deals</p>
+            <h4 className="font-semibold text-sm mb-4">{t("footer.stay_connected")}</h4>
+            <p className="text-sm text-muted-foreground mb-3">{t("footer.subscribe_desc")}</p>
             <div className="flex gap-2">
               <Input 
                 type="email" 
@@ -117,7 +120,7 @@ const Footer = () => {
                 className="bg-muted border-muted-foreground/30 text-sm h-9"
               />
               <Button size="sm" className="h-9">
-                Subscribe
+                {t("footer.subscribe")}
               </Button>
             </div>
             <div className="flex gap-3 mt-4">

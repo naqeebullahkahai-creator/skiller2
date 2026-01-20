@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
 const MobileHeader = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -23,9 +26,8 @@ const MobileHeader = () => {
   };
 
   const sidebarLinks = [
-    { icon: HelpCircle, label: "Help Center", path: "/help" },
-    { icon: Settings, label: "Settings", path: "/account/profile" },
-    { icon: Globe, label: "Language", path: "#", onClick: () => {} },
+    { icon: HelpCircle, label: t("nav.help"), path: "/help" },
+    { icon: Settings, label: t("nav.settings"), path: "/account/profile" },
   ];
 
   return (
@@ -39,7 +41,7 @@ const MobileHeader = () => {
               <Menu size={24} />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] p-0">
+          <SheetContent side={isRTL ? "right" : "left"} className="w-[280px] p-0">
             <SheetHeader className="bg-primary p-4 text-left">
               <SheetTitle className="text-primary-foreground text-xl">FANZON</SheetTitle>
             </SheetHeader>
@@ -48,13 +50,21 @@ const MobileHeader = () => {
                 <Link
                   key={link.label}
                   to={link.path}
-                  onClick={link.onClick}
                   className="flex items-center gap-3 p-3 rounded-lg text-foreground hover:bg-muted active:bg-muted/80 transition-colors"
                 >
                   <link.icon size={20} className="text-muted-foreground" />
                   <span className="font-medium">{link.label}</span>
                 </Link>
               ))}
+              
+              {/* Language Switcher Section */}
+              <div className="pt-4 border-t border-border mt-4">
+                <div className="flex items-center gap-3 p-3 text-muted-foreground">
+                  <Globe size={20} />
+                  <span className="font-medium">{t("nav.language")}</span>
+                </div>
+                <LanguageSwitcher variant="sidebar" className="ps-4" />
+              </div>
             </nav>
           </SheetContent>
         </Sheet>
@@ -76,25 +86,31 @@ const MobileHeader = () => {
         <form onSubmit={handleSearch} className="relative">
           <Input
             type="text"
-            placeholder="Search in FANZON..."
+            placeholder={t("search.placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
             className={cn(
-              "w-full pl-10 pr-4 h-10 bg-white border-0 rounded-lg transition-shadow",
+              "w-full ps-10 pe-4 h-10 bg-white border-0 rounded-lg transition-shadow",
               isSearchFocused && "ring-2 ring-white/50"
             )}
           />
           <Search
             size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            className={cn(
+              "absolute top-1/2 -translate-y-1/2 text-muted-foreground",
+              isRTL ? "right-3" : "left-3"
+            )}
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground p-1"
+              className={cn(
+                "absolute top-1/2 -translate-y-1/2 text-muted-foreground p-1",
+                isRTL ? "left-3" : "right-3"
+              )}
             >
               <X size={16} />
             </button>
