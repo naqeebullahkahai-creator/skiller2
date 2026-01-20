@@ -12,12 +12,15 @@ import {
   MapPin,
   LogOut,
   ChevronRight,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUnreadCount } from "@/hooks/useMessaging";
 
 const menuItems = [
   { icon: User, label: "Profile Info", path: "/account/profile" },
   { icon: Package, label: "My Orders", path: "/account/orders" },
+  { icon: MessageSquare, label: "Messages", path: "/account/messages" },
   { icon: Heart, label: "My Wishlist", path: "/account/wishlist" },
   { icon: MapPin, label: "Saved Addresses", path: "/account/addresses" },
 ];
@@ -25,6 +28,7 @@ const menuItems = [
 const AccountLayout = () => {
   const navigate = useNavigate();
   const { user, profile, logout, isLoading } = useAuth();
+  const { unreadCount } = useUnreadCount();
 
   if (!isLoading && !user) {
     navigate("/auth?redirect=/account/profile");
@@ -79,24 +83,32 @@ const AccountLayout = () => {
 
               {/* Navigation Menu */}
               <nav className="space-y-1">
-                {menuItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={({ isActive }) =>
-                      cn(
-                        "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                      )
-                    }
-                  >
-                    <item.icon size={20} />
-                    <span className="flex-1">{item.label}</span>
-                    <ChevronRight size={16} />
-                  </NavLink>
-                ))}
+                {menuItems.map((item) => {
+                  const isMessagesItem = item.path === "/account/messages";
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                        )
+                      }
+                    >
+                      <item.icon size={20} />
+                      <span className="flex-1">{item.label}</span>
+                      {isMessagesItem && unreadCount > 0 && (
+                        <span className="bg-destructive text-destructive-foreground text-xs px-2 py-0.5 rounded-full">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                      <ChevronRight size={16} />
+                    </NavLink>
+                  );
+                })}
               </nav>
 
               {/* Logout Button */}

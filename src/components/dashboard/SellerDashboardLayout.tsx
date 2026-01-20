@@ -14,7 +14,8 @@ import {
   Plus,
   ShieldCheck,
   AlertCircle,
-  Wallet
+  Wallet,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,12 +31,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSellerKyc } from "@/hooks/useSellerKyc";
+import { useUnreadCount } from "@/hooks/useMessaging";
 
 const sellerLinks = [
   { name: "Dashboard", href: "/seller-center", icon: LayoutDashboard },
   { name: "KYC Verification", href: "/seller-center/kyc", icon: ShieldCheck },
   { name: "My Products", href: "/seller-center/products", icon: Package },
   { name: "Orders", href: "/seller-center/orders", icon: ShoppingCart },
+  { name: "Messages", href: "/seller-center/messages", icon: MessageSquare },
   { name: "Wallet", href: "/seller-center/wallet", icon: Wallet },
   { name: "Settings", href: "/seller-center/settings", icon: Settings },
 ];
@@ -45,6 +48,7 @@ const SellerDashboardLayout = () => {
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
   const { isVerified, isPending, isRejected, hasSubmittedKyc } = useSellerKyc();
+  const { unreadCount } = useUnreadCount();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleLogout = async () => {
@@ -150,6 +154,7 @@ const SellerDashboardLayout = () => {
             // Show KYC link prominently if not verified
             const isKycLink = link.href === "/seller-center/kyc";
             const showKycHighlight = isKycLink && !isVerified;
+            const isMessagesLink = link.href === "/seller-center/messages";
             
             return (
               <Link
@@ -169,6 +174,11 @@ const SellerDashboardLayout = () => {
                 {showKycHighlight && sidebarOpen && (
                   <Badge variant="destructive" className="ml-auto text-xs">
                     Required
+                  </Badge>
+                )}
+                {isMessagesLink && unreadCount > 0 && (
+                  <Badge className="ml-auto bg-destructive text-destructive-foreground text-xs h-5 min-w-5 flex items-center justify-center">
+                    {unreadCount > 99 ? "99+" : unreadCount}
                   </Badge>
                 )}
               </Link>

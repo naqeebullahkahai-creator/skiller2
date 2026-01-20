@@ -25,6 +25,7 @@ import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ProductCard from "@/components/product/ProductCard";
 import ProductReviews from "@/components/product/ProductReviews";
+import ChatWithSellerButton from "@/components/messaging/ChatWithSellerButton";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProduct, useActiveProducts, formatPKR } from "@/hooks/useProducts";
@@ -437,10 +438,12 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <Button variant="outline" className="w-full" size="sm">
-                <MessageCircle size={16} className="mr-2" />
-                Chat Now
-              </Button>
+              <ChatWithSellerButton
+                sellerId={product.seller_id}
+                productId={product.id}
+                productTitle={product.title}
+                sellerName="FANZON Seller"
+              />
             </div>
           </div>
         </div>
