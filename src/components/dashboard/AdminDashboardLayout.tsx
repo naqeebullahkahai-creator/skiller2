@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Wallet,
   Zap,
+  BarChart3,
   Ticket,
   Image
 } from "lucide-react";
@@ -41,6 +42,7 @@ const adminLinks = [
   { name: "Flash Sales", href: "/admin-dashboard/flash-sales", icon: Zap },
   { name: "Vouchers", href: "/admin-dashboard/vouchers", icon: Ticket },
   { name: "Banners", href: "/admin-dashboard/banners", icon: Image },
+  { name: "Analytics", href: "/admin-dashboard/analytics", icon: BarChart3 },
   { name: "Seller Approvals", href: "/admin-dashboard/approvals", icon: Users },
   { name: "Seller KYC", href: "/admin-dashboard/kyc", icon: ShieldCheck },
   { name: "Payouts", href: "/admin-dashboard/payouts", icon: Wallet },

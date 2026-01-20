@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   AlertCircle,
   Wallet,
-  MessageSquare
+  MessageSquare,
+  BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ const sellerLinks = [
   { name: "KYC Verification", href: "/seller-center/kyc", icon: ShieldCheck },
   { name: "My Products", href: "/seller-center/products", icon: Package },
   { name: "Orders", href: "/seller-center/orders", icon: ShoppingCart },
+  { name: "Analytics", href: "/seller-center/analytics", icon: BarChart3 },
   { name: "Messages", href: "/seller-center/messages", icon: MessageSquare },
   { name: "Wallet", href: "/seller-center/wallet", icon: Wallet },
   { name: "Settings", href: "/seller-center/settings", icon: Settings },
