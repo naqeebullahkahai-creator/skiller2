@@ -130,7 +130,6 @@ const ProductListing = () => {
     }
 
     // Sort
-    const price = (p: typeof products[0]) => p.discount_price_pkr ?? p.price_pkr;
     switch (sortBy) {
       case "price-low":
         filtered = filtered.sort((a, b) => price(a) - price(b));
