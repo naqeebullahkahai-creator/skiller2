@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { uploadProductImage, useSellerProducts } from "@/hooks/useProducts";
+import VariantManager, { LocalVariant } from "./VariantManager";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AddProductFormProps {
   onClose: () => void;
@@ -51,6 +53,7 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
     description: "",
     specifications: [{ key: "", value: "" }],
   });
+  const [variants, setVariants] = useState<LocalVariant[]>([]);
 
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -184,23 +187,68 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
       fullDescription += "\n\nSpecifications:\n" + specs.map(s => `${s.key}: ${s.value}`).join("\n");
     }
 
-    const success = await createProduct({
-      title: formData.title,
-      description: fullDescription,
-      category: formData.category,
-      brand: formData.brand,
-      sku: formData.sku,
-      price_pkr: Number(formData.originalPrice),
-      discount_price_pkr: Number(formData.discountedPrice),
-      stock_count: Number(formData.stock),
-      images: formData.images,
-    });
+    try {
+      // Create the product first
+      const { data: newProduct, error: productError } = await supabase
+        .from("products")
+        .insert({
+          seller_id: user.id,
+          title: formData.title,
+          description: fullDescription || null,
+          category: formData.category,
+          brand: formData.brand || null,
+          sku: formData.sku || null,
+          price_pkr: Number(formData.originalPrice),
+          discount_price_pkr: Number(formData.discountedPrice),
+          stock_count: Number(formData.stock),
+          images: formData.images,
+          status: "pending",
+        })
+        .select("id")
+        .single();
 
-    setIsSubmitting(false);
+      if (productError) throw productError;
 
-    if (success) {
+      // If there are variants, add them
+      if (variants.length > 0 && newProduct) {
+        const variantsToInsert = variants.map((v) => ({
+          product_id: newProduct.id,
+          variant_name: v.variant_name,
+          variant_value: v.variant_value,
+          additional_price_pkr: v.additional_price_pkr,
+          stock_count: v.stock_count,
+        }));
+
+        const { error: variantsError } = await supabase
+          .from("product_variants")
+          .insert(variantsToInsert);
+
+        if (variantsError) {
+          console.error("Error adding variants:", variantsError);
+          toast({
+            title: "Warning",
+            description: "Product created but some variants failed to save.",
+            variant: "destructive",
+          });
+        }
+      }
+
+      toast({
+        title: "Product Submitted",
+        description: "Your product has been submitted for approval.",
+      });
+
       onSuccess?.();
       onClose();
+    } catch (err: any) {
+      console.error("Error creating product:", err);
+      toast({
+        title: "Error",
+        description: err.message || "Failed to create product",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -308,7 +356,7 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
 
         {/* Step 2: Pricing & Stock */}
         {currentStep === 2 && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="originalPrice">Original Price (PKR) *</Label>
@@ -346,14 +394,17 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stock">Stock Quantity *</Label>
+              <Label htmlFor="stock">Base Stock Quantity *</Label>
               <Input
                 id="stock"
                 type="number"
-                placeholder="Enter available quantity"
+                placeholder="Enter base quantity (or 0 if using variants only)"
                 value={formData.stock}
                 onChange={(e) => updateFormData("stock", e.target.value)}
               />
+              <p className="text-xs text-muted-foreground">
+                If you add variants, each variant has its own stock. Base stock is for products without variant selection.
+              </p>
             </div>
 
             {formData.originalPrice && formData.discountedPrice && (
@@ -371,6 +422,11 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
                 </p>
               </div>
             )}
+
+            {/* Variants Section */}
+            <div className="border-t border-border pt-6">
+              <VariantManager variants={variants} onChange={setVariants} />
+            </div>
           </div>
         )}
 
