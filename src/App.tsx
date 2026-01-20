@@ -43,7 +43,11 @@ import BannerManager from "./pages/dashboard/BannerManager";
 import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
 import SellerKyc from "./pages/seller/SellerKyc";
 import SellerWalletPage from "./pages/seller/SellerWalletPage";
+import SellerMessagesPage from "./pages/seller/SellerMessagesPage";
 import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
+
+// Customer Messages
+import CustomerMessagesPage from "./pages/account/MessagesPage";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +96,7 @@ const App = () => (
                 <Route path="orders/:orderId" element={<OrderDetailPage />} />
                 <Route path="wishlist" element={<WishlistPage />} />
                 <Route path="addresses" element={<AddressesPage />} />
+                <Route path="messages" element={<CustomerMessagesPage />} />
               </Route>
               <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
               
@@ -132,6 +137,7 @@ const App = () => (
                 <Route path="products" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
                 <Route path="products/new" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
                 <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
+                <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
                 <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
