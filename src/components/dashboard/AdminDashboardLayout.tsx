@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -12,7 +12,9 @@ import {
   LogOut,
   Bell,
   Search,
-  Store
+  Store,
+  ShieldCheck,
+  Wallet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +36,8 @@ const adminLinks = [
   { name: "Product Catalog", href: "/admin-dashboard/products", icon: Package },
   { name: "Category Manager", href: "/admin-dashboard/categories", icon: FolderOpen },
   { name: "Seller Approvals", href: "/admin-dashboard/approvals", icon: Users },
+  { name: "Seller KYC", href: "/admin-dashboard/kyc", icon: ShieldCheck },
+  { name: "Payouts", href: "/admin-dashboard/payouts", icon: Wallet },
   { name: "Settings", href: "/admin-dashboard/settings", icon: Settings },
 ];
 

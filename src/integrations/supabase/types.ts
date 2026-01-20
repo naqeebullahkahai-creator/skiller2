@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -120,6 +147,65 @@ export type Database = {
             columns: ["address_id"]
             isOneToOne: false
             referencedRelation: "user_addresses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payout_requests: {
+        Row: {
+          account_title: string
+          admin_notes: string | null
+          amount: number
+          bank_name: string
+          created_at: string
+          iban: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          seller_id: string
+          status: Database["public"]["Enums"]["payout_status"]
+          transaction_reference: string | null
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          account_title: string
+          admin_notes?: string | null
+          amount: number
+          bank_name: string
+          created_at?: string
+          iban: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          seller_id: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          transaction_reference?: string | null
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          account_title?: string
+          admin_notes?: string | null
+          amount?: number
+          bank_name?: string
+          created_at?: string
+          iban?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          seller_id?: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          transaction_reference?: string | null
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_requests_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "seller_wallets"
             referencedColumns: ["id"]
           },
         ]
@@ -346,6 +432,39 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_wallets: {
+        Row: {
+          created_at: string
+          current_balance: number
+          id: string
+          pending_clearance: number
+          seller_id: string
+          total_earnings: number
+          total_withdrawn: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_balance?: number
+          id?: string
+          pending_clearance?: number
+          seller_id: string
+          total_earnings?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_balance?: number
+          id?: string
+          pending_clearance?: number
+          seller_id?: string
+          total_earnings?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_addresses: {
         Row: {
           area: string | null
@@ -409,6 +528,63 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_transactions: {
+        Row: {
+          commission_amount: number
+          commission_percentage: number
+          created_at: string
+          description: string | null
+          gross_amount: number
+          id: string
+          net_amount: number
+          order_id: string | null
+          seller_id: string
+          transaction_type: Database["public"]["Enums"]["wallet_transaction_type"]
+          wallet_id: string
+        }
+        Insert: {
+          commission_amount?: number
+          commission_percentage?: number
+          created_at?: string
+          description?: string | null
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          order_id?: string | null
+          seller_id: string
+          transaction_type: Database["public"]["Enums"]["wallet_transaction_type"]
+          wallet_id: string
+        }
+        Update: {
+          commission_amount?: number
+          commission_percentage?: number
+          created_at?: string
+          description?: string | null
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          order_id?: string | null
+          seller_id?: string
+          transaction_type?: Database["public"]["Enums"]["wallet_transaction_type"]
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "seller_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -431,6 +607,22 @@ export type Database = {
         Returns: boolean
       }
       is_seller_verified: { Args: { _user_id: string }; Returns: boolean }
+      process_order_earnings: {
+        Args: { p_order_id: string; p_sale_amount: number; p_seller_id: string }
+        Returns: undefined
+      }
+      process_payout: {
+        Args: {
+          p_admin_id: string
+          p_payout_id: string
+          p_transaction_reference: string
+        }
+        Returns: boolean
+      }
+      process_refund_deduction: {
+        Args: { p_amount: number; p_order_id: string; p_seller_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "seller" | "customer"
@@ -441,8 +633,15 @@ export type Database = {
         | "delivered"
         | "cancelled"
       payment_status: "unpaid" | "paid"
+      payout_status: "pending" | "approved" | "rejected" | "completed"
       product_status: "pending" | "active" | "rejected"
       seller_verification_status: "pending" | "verified" | "rejected"
+      wallet_transaction_type:
+        | "earning"
+        | "commission_deduction"
+        | "withdrawal"
+        | "refund_deduction"
+        | "adjustment"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -579,8 +778,16 @@ export const Constants = {
         "cancelled",
       ],
       payment_status: ["unpaid", "paid"],
+      payout_status: ["pending", "approved", "rejected", "completed"],
       product_status: ["pending", "active", "rejected"],
       seller_verification_status: ["pending", "verified", "rejected"],
+      wallet_transaction_type: [
+        "earning",
+        "commission_deduction",
+        "withdrawal",
+        "refund_deduction",
+        "adjustment",
+      ],
     },
   },
 } as const
