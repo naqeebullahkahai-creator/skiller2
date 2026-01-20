@@ -80,15 +80,19 @@ const CartDrawer = ({ children }: CartDrawerProps) => {
             {/* Cart Items */}
             <div className="flex-1 overflow-y-auto py-4 space-y-4">
               {items.map((item) => {
-                const price =
-                  item.product.discount_price_pkr || item.product.price_pkr;
+                const basePrice = item.product.discount_price_pkr || item.product.price_pkr;
+                const additionalPrice = item.selectedVariant?.additional_price_pkr || 0;
+                const totalPrice = basePrice + additionalPrice;
                 const image =
                   item.product.images?.[0] ||
                   "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop";
+                const availableStock = item.selectedVariant 
+                  ? item.selectedVariant.stock_count 
+                  : item.product.stock_count;
 
                 return (
                   <div
-                    key={item.product.id}
+                    key={`${item.product.id}-${item.selectedVariant?.id || 'base'}`}
                     className="flex gap-4 p-3 bg-muted/50 rounded-lg"
                   >
                     <Link
@@ -111,15 +115,32 @@ const CartDrawer = ({ children }: CartDrawerProps) => {
                       >
                         {item.product.title}
                       </Link>
+                      
+                      {/* Variant Info */}
+                      {item.selectedVariant && (
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {item.selectedVariant.variant_name}: {item.selectedVariant.variant_value}
+                        </p>
+                      )}
+                      
                       <p className="text-primary font-semibold mt-1">
-                        {formatPKR(price)}
+                        {formatPKR(totalPrice)}
+                        {additionalPrice > 0 && (
+                          <span className="text-xs text-muted-foreground ml-1">
+                            (+Rs. {additionalPrice.toLocaleString()})
+                          </span>
+                        )}
                       </p>
 
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center border border-border rounded">
                           <button
                             onClick={() =>
-                              updateQuantity(item.product.id, item.quantity - 1)
+                              updateQuantity(
+                                item.product.id, 
+                                item.quantity - 1, 
+                                item.selectedVariant?.id
+                              )
                             }
                             className="p-1 hover:bg-muted"
                           >
@@ -130,9 +151,13 @@ const CartDrawer = ({ children }: CartDrawerProps) => {
                           </span>
                           <button
                             onClick={() =>
-                              updateQuantity(item.product.id, item.quantity + 1)
+                              updateQuantity(
+                                item.product.id, 
+                                item.quantity + 1, 
+                                item.selectedVariant?.id
+                              )
                             }
-                            disabled={item.quantity >= item.product.stock_count}
+                            disabled={item.quantity >= availableStock}
                             className="p-1 hover:bg-muted disabled:opacity-50"
                           >
                             <Plus size={14} />
@@ -140,7 +165,7 @@ const CartDrawer = ({ children }: CartDrawerProps) => {
                         </div>
 
                         <button
-                          onClick={() => removeFromCart(item.product.id)}
+                          onClick={() => removeFromCart(item.product.id, item.selectedVariant?.id)}
                           className="p-1 text-destructive hover:bg-destructive/10 rounded"
                         >
                           <Trash2 size={16} />

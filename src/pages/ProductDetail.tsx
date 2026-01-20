@@ -26,9 +26,11 @@ import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ProductCard from "@/components/product/ProductCard";
 import ProductReviews from "@/components/product/ProductReviews";
 import ChatWithSellerButton from "@/components/messaging/ChatWithSellerButton";
+import VariantSelector from "@/components/product/VariantSelector";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProduct, useActiveProducts, formatPKR } from "@/hooks/useProducts";
+import { useProductVariants, ProductVariant } from "@/hooks/useProductVariants";
 import { useProductReviews } from "@/hooks/useProductReviews";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
@@ -40,12 +42,14 @@ const ProductDetail = () => {
   const { product, isLoading, error } = useProduct(id);
   const { products: allProducts } = useActiveProducts(20);
   const { stats: reviewStats } = useProductReviews(id);
+  const { groupedVariants, variants } = useProductVariants(id);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariant | null>>({});
 
   // Related products (same category)
   const relatedProducts = useMemo(() => {
@@ -89,24 +93,40 @@ const ProductDetail = () => {
     ? product.images 
     : ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop"];
 
-  const displayPrice = product.discount_price_pkr || product.price_pkr;
+  // Calculate pricing based on selected variant
+  const selectedVariant = Object.values(selectedVariants).find(v => v !== null) || null;
+  const additionalPrice = selectedVariant?.additional_price_pkr || 0;
+  const basePrice = product.discount_price_pkr || product.price_pkr;
+  const displayPrice = basePrice + additionalPrice;
   const discount = product.discount_price_pkr && product.discount_price_pkr < product.price_pkr
     ? Math.round(((product.price_pkr - product.discount_price_pkr) / product.price_pkr) * 100)
     : 0;
 
+  // Calculate available stock based on variant or product
+  const availableStock = selectedVariant ? selectedVariant.stock_count : product.stock_count;
+  const hasVariants = variants.length > 0;
+  const needsVariantSelection = hasVariants && !selectedVariant;
+
+  const handleVariantSelect = (variantName: string, variant: ProductVariant) => {
+    setSelectedVariants(prev => ({ ...prev, [variantName]: variant }));
+    setQuantity(1); // Reset quantity when variant changes
+  };
+
   const handleQuantityChange = (delta: number) => {
-    setQuantity((prev) => Math.max(1, Math.min(prev + delta, product.stock_count)));
+    setQuantity((prev) => Math.max(1, Math.min(prev + delta, availableStock)));
   };
 
   const handleAddToCart = () => {
     if (product) {
-      addToCart(product, quantity);
+      if (needsVariantSelection) return;
+      addToCart(product, quantity, selectedVariant);
     }
   };
 
   const handleBuyNow = () => {
     if (product) {
-      addToCart(product, quantity);
+      if (needsVariantSelection) return;
+      addToCart(product, quantity, selectedVariant);
       navigate("/checkout");
     }
   };
@@ -279,13 +299,29 @@ const ProductDetail = () => {
                   </>
                 )}
               </div>
+              {additionalPrice > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Includes +Rs. {additionalPrice.toLocaleString()} for selected variant
+                </p>
+              )}
             </div>
 
+            {/* Variant Selector */}
+            {hasVariants && (
+              <div className="mb-6">
+                <VariantSelector
+                  groupedVariants={groupedVariants}
+                  selectedVariants={selectedVariants}
+                  onVariantSelect={handleVariantSelect}
+                />
+              </div>
+            )}
+
             {/* Stock Status */}
-            {product.stock_count > 0 ? (
+            {availableStock > 0 ? (
               <div className="flex items-center gap-2 text-fanzon-success mb-4">
                 <Package size={18} />
-                <span className="text-sm font-medium">In Stock ({product.stock_count} available)</span>
+                <span className="text-sm font-medium">In Stock ({availableStock} available)</span>
               </div>
             ) : (
               <div className="flex items-center gap-2 text-destructive mb-4">
@@ -295,7 +331,7 @@ const ProductDetail = () => {
             )}
 
             {/* Quantity Selector */}
-            {product.stock_count > 0 && (
+            {availableStock > 0 && (
               <div className="mb-6">
                 <label className="text-sm font-medium mb-2 block">Quantity</label>
                 <div className="flex items-center gap-3">
@@ -310,14 +346,14 @@ const ProductDetail = () => {
                     <span className="w-12 text-center font-medium">{quantity}</span>
                     <button
                       onClick={() => handleQuantityChange(1)}
-                      disabled={quantity >= product.stock_count}
+                      disabled={quantity >= availableStock}
                       className="p-2 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Plus size={16} />
                     </button>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {product.stock_count} pieces available
+                    {availableStock} pieces available
                   </span>
                 </div>
               </div>
@@ -327,14 +363,14 @@ const ProductDetail = () => {
             <div className="flex gap-3 mb-6">
               <Button
                 onClick={handleBuyNow}
-                disabled={product.stock_count === 0}
+                disabled={availableStock === 0 || needsVariantSelection}
                 className="flex-1 bg-primary hover:bg-fanzon-orange-hover text-primary-foreground font-semibold"
               >
-                Buy Now
+                {needsVariantSelection ? "Select Variant" : "Buy Now"}
               </Button>
               <Button
                 onClick={handleAddToCart}
-                disabled={product.stock_count === 0}
+                disabled={availableStock === 0 || needsVariantSelection}
                 variant="outline"
                 className="flex-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               >

@@ -481,6 +481,47 @@ export type Database = {
           },
         ]
       }
+      product_variants: {
+        Row: {
+          additional_price_pkr: number
+          created_at: string
+          id: string
+          product_id: string
+          stock_count: number
+          updated_at: string
+          variant_name: string
+          variant_value: string
+        }
+        Insert: {
+          additional_price_pkr?: number
+          created_at?: string
+          id?: string
+          product_id: string
+          stock_count?: number
+          updated_at?: string
+          variant_name: string
+          variant_value: string
+        }
+        Update: {
+          additional_price_pkr?: number
+          created_at?: string
+          id?: string
+          product_id?: string
+          stock_count?: number
+          updated_at?: string
+          variant_name?: string
+          variant_value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           brand: string | null
@@ -928,6 +969,10 @@ export type Database = {
     Functions: {
       decrease_product_stock: {
         Args: { p_product_id: string; p_quantity: number }
+        Returns: boolean
+      }
+      decrease_variant_stock: {
+        Args: { p_quantity: number; p_variant_id: string }
         Returns: boolean
       }
       generate_order_number: { Args: never; Returns: string }

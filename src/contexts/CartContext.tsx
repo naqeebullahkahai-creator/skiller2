@@ -1,23 +1,25 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { DatabaseProduct } from "@/hooks/useProducts";
+import { ProductVariant } from "@/hooks/useProductVariants";
 import { useToast } from "@/hooks/use-toast";
 
 export interface CartItem {
   product: DatabaseProduct;
   quantity: number;
+  selectedVariant?: ProductVariant | null;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: DatabaseProduct, quantity?: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: DatabaseProduct, quantity?: number, variant?: ProductVariant | null) => void;
+  removeFromCart: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   getCartTotal: () => number;
   getSubtotal: () => number;
   getShippingFee: () => number;
   getItemCount: () => number;
-  isInCart: (productId: string) => boolean;
+  isInCart: (productId: string, variantId?: string) => boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -47,25 +49,36 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addToCart = (product: DatabaseProduct, quantity: number = 1) => {
-    if (product.stock_count < quantity) {
+  // Generate unique key for cart item (product + variant combination)
+  const getCartItemKey = (productId: string, variantId?: string) => {
+    return variantId ? `${productId}-${variantId}` : productId;
+  };
+
+  const addToCart = (product: DatabaseProduct, quantity: number = 1, variant?: ProductVariant | null) => {
+    // Check stock based on variant or product
+    const availableStock = variant ? variant.stock_count : product.stock_count;
+    
+    if (availableStock < quantity) {
       toast({
         title: "Insufficient Stock",
-        description: `Only ${product.stock_count} items available.`,
+        description: `Only ${availableStock} items available.`,
         variant: "destructive",
       });
       return;
     }
 
     setItems((prev) => {
-      const existingItem = prev.find((item) => item.product.id === product.id);
+      const existingItem = prev.find((item) => 
+        item.product.id === product.id && 
+        (item.selectedVariant?.id || null) === (variant?.id || null)
+      );
       
       if (existingItem) {
         const newQuantity = existingItem.quantity + quantity;
-        if (newQuantity > product.stock_count) {
+        if (newQuantity > availableStock) {
           toast({
             title: "Maximum Stock Reached",
-            description: `Only ${product.stock_count} items available.`,
+            description: `Only ${availableStock} items available.`,
             variant: "destructive",
           });
           return prev;
@@ -73,11 +86,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         
         toast({
           title: "Cart Updated",
-          description: `${product.title} quantity updated to ${newQuantity}.`,
+          description: `${product.title}${variant ? ` (${variant.variant_value})` : ""} quantity updated to ${newQuantity}.`,
         });
         
         return prev.map((item) =>
-          item.product.id === product.id
+          item.product.id === product.id && 
+          (item.selectedVariant?.id || null) === (variant?.id || null)
             ? { ...item, quantity: newQuantity }
             : item
         );
@@ -85,45 +99,64 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       toast({
         title: "Added to Cart",
-        description: `${product.title} added to your cart.`,
+        description: `${product.title}${variant ? ` (${variant.variant_value})` : ""} added to your cart.`,
       });
 
-      return [...prev, { product, quantity }];
+      return [...prev, { product, quantity, selectedVariant: variant || null }];
     });
   };
 
-  const removeFromCart = (productId: string) => {
+  const removeFromCart = (productId: string, variantId?: string) => {
     setItems((prev) => {
-      const item = prev.find((i) => i.product.id === productId);
+      const item = prev.find((i) => 
+        i.product.id === productId && 
+        (i.selectedVariant?.id || undefined) === variantId
+      );
       if (item) {
         toast({
           title: "Removed from Cart",
-          description: `${item.product.title} removed from your cart.`,
+          description: `${item.product.title}${item.selectedVariant ? ` (${item.selectedVariant.variant_value})` : ""} removed from your cart.`,
         });
       }
-      return prev.filter((item) => item.product.id !== productId);
+      return prev.filter((item) => 
+        !(item.product.id === productId && 
+          (item.selectedVariant?.id || undefined) === variantId)
+      );
     });
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number, variantId?: string) => {
     if (quantity < 1) {
-      removeFromCart(productId);
+      removeFromCart(productId, variantId);
       return;
     }
 
     setItems((prev) => {
-      const item = prev.find((i) => i.product.id === productId);
-      if (item && quantity > item.product.stock_count) {
-        toast({
-          title: "Insufficient Stock",
-          description: `Only ${item.product.stock_count} items available.`,
-          variant: "destructive",
-        });
-        return prev;
+      const item = prev.find((i) => 
+        i.product.id === productId && 
+        (i.selectedVariant?.id || undefined) === variantId
+      );
+      
+      if (item) {
+        const availableStock = item.selectedVariant 
+          ? item.selectedVariant.stock_count 
+          : item.product.stock_count;
+        
+        if (quantity > availableStock) {
+          toast({
+            title: "Insufficient Stock",
+            description: `Only ${availableStock} items available.`,
+            variant: "destructive",
+          });
+          return prev;
+        }
       }
 
       return prev.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
+        item.product.id === productId && 
+        (item.selectedVariant?.id || undefined) === variantId
+          ? { ...item, quantity } 
+          : item
       );
     });
   };
@@ -138,8 +171,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const getSubtotal = () => {
     return items.reduce((total, item) => {
-      const price = item.product.discount_price_pkr || item.product.price_pkr;
-      return total + price * item.quantity;
+      const basePrice = item.product.discount_price_pkr || item.product.price_pkr;
+      const additionalPrice = item.selectedVariant?.additional_price_pkr || 0;
+      return total + (basePrice + additionalPrice) * item.quantity;
     }, 0);
   };
 
@@ -155,8 +189,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return items.reduce((count, item) => count + item.quantity, 0);
   };
 
-  const isInCart = (productId: string) => {
-    return items.some((item) => item.product.id === productId);
+  const isInCart = (productId: string, variantId?: string) => {
+    return items.some((item) => 
+      item.product.id === productId && 
+      (item.selectedVariant?.id || undefined) === variantId
+    );
   };
 
   return (
