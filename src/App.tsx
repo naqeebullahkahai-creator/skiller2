@@ -44,7 +44,11 @@ import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout"
 import SellerKyc from "./pages/seller/SellerKyc";
 import SellerWalletPage from "./pages/seller/SellerWalletPage";
 import SellerMessagesPage from "./pages/seller/SellerMessagesPage";
+import SellerAnalyticsPage from "./pages/seller/SellerAnalyticsPage";
 import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
+
+// Admin Analytics
+import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
 
 // Customer Messages
 import CustomerMessagesPage from "./pages/account/MessagesPage";
@@ -120,6 +124,7 @@ const App = () => (
                 <Route path="flash-sales" element={<FlashSaleManager />} />
                 <Route path="vouchers" element={<VoucherManager />} />
                 <Route path="banners" element={<BannerManager />} />
+                <Route path="analytics" element={<AdminAnalyticsPage />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 
@@ -139,6 +144,7 @@ const App = () => (
                 <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
                 <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
                 <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
+                <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
               
