@@ -11,6 +11,7 @@ export interface DatabaseProduct {
   category: string;
   brand: string | null;
   sku: string | null;
+  slug: string | null;
   price_pkr: number;
   discount_price_pkr: number | null;
   stock_count: number;
@@ -144,27 +145,37 @@ export const useProductSearch = (query: string) => {
   return { products, isLoading, error };
 };
 
-// Hook for fetching a single product
-export const useProduct = (productId: string | undefined) => {
+// Hook for fetching a single product by ID or slug
+export const useProduct = (identifier: string | undefined) => {
   const [product, setProduct] = useState<DatabaseProduct | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (productId) {
-      fetchProduct(productId);
+    if (identifier) {
+      fetchProduct(identifier);
     }
-  }, [productId]);
+  }, [identifier]);
 
   const fetchProduct = async (id: string) => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
+      
+      // Check if identifier is a UUID or a slug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      
+      let query = supabase
         .from("products")
         .select("*")
-        .eq("id", id)
-        .eq("status", "active")
-        .maybeSingle();
+        .eq("status", "active");
+      
+      if (isUUID) {
+        query = query.eq("id", id);
+      } else {
+        query = query.eq("slug", id);
+      }
+      
+      const { data, error } = await query.maybeSingle();
 
       if (error) throw error;
       setProduct(data);
@@ -176,7 +187,7 @@ export const useProduct = (productId: string | undefined) => {
     }
   };
 
-  return { product, isLoading, error, refetch: () => productId && fetchProduct(productId) };
+  return { product, isLoading, error, refetch: () => identifier && fetchProduct(identifier) };
 };
 
 // Hook for seller products management

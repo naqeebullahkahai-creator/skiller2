@@ -3,14 +3,12 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Star,
   Heart,
-  Share2,
   Minus,
   Plus,
   ShoppingCart,
   Truck,
   Shield,
   RotateCcw,
-  MessageCircle,
   ChevronLeft,
   ChevronRight,
   Store,
@@ -27,6 +25,8 @@ import ProductCard from "@/components/product/ProductCard";
 import ProductReviews from "@/components/product/ProductReviews";
 import ChatWithSellerButton from "@/components/messaging/ChatWithSellerButton";
 import VariantSelector from "@/components/product/VariantSelector";
+import SocialShareButtons from "@/components/product/SocialShareButtons";
+import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProduct, useActiveProducts, formatPKR } from "@/hooks/useProducts";
@@ -147,8 +147,23 @@ const ProductDetail = () => {
     setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  // Generate SEO data
+  const productUrl = `/product/${product.slug || product.id}`;
+  const productImage = images[0];
+  const seoDescription = `Get this ${product.category} for only ${formatPKR(displayPrice)}. Authentic products, fast delivery in Pakistan!`;
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead
+        title={`${product.title} - Buy at FANZON Pakistan`}
+        description={seoDescription}
+        image={productImage}
+        url={productUrl}
+        type="product"
+        price={displayPrice}
+        availability={availableStock > 0 ? "in stock" : "out of stock"}
+        category={product.category}
+      />
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-6 pb-24 md:pb-6">
@@ -380,7 +395,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Wishlist & Share */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
               <button
                 onClick={() => setIsWishlisted(!isWishlisted)}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
@@ -391,10 +406,13 @@ const ProductDetail = () => {
                 />
                 {isWishlisted ? "Wishlisted" : "Add to Wishlist"}
               </button>
-              <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary">
-                <Share2 size={18} />
-                Share
-              </button>
+              
+              <SocialShareButtons
+                productName={product.title}
+                productUrl={productUrl}
+                productPrice={displayPrice}
+                compact
+              />
             </div>
 
             {/* Guarantees */}

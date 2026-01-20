@@ -3,12 +3,14 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import AuthModal from "@/components/auth/AuthModal";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import OfflineIndicator from "@/components/OfflineIndicator";
+import OrderStatusNotification from "./components/orders/OrderStatusNotification";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ProductListing from "./pages/ProductListing";
@@ -59,12 +61,12 @@ import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
 import CustomerMessagesPage from "./pages/account/MessagesPage";
 import NotificationsPage from "./pages/account/NotificationsPage";
 
-import OrderStatusNotification from "./components/orders/OrderStatusNotification";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <ErrorBoundary>
+    <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
@@ -85,6 +87,7 @@ const App = () => (
               <Route path="/category/:category" element={<ProductListing />} />
               <Route path="/search" element={<ProductListing />} />
               <Route path="/product/:id" element={<ProductDetail />} />
+              {/* Slug-based product URLs also supported via the same route */}
               <Route path="/help" element={<HelpCenter />} />
               
               {/* Checkout Routes */}
@@ -173,6 +176,7 @@ const App = () => (
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
+  </HelmetProvider>
   </ErrorBoundary>
 );
 
