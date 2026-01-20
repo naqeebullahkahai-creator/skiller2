@@ -31,7 +31,7 @@ import AddressesPage from "./pages/account/AddressesPage";
 
 // Admin Dashboard
 import AdminDashboardLayout from "./components/dashboard/AdminDashboardLayout";
-import AdminDashboardHome from "./pages/dashboard/DashboardHome";
+import AdminDashboardHome from "./pages/dashboard/AdminDashboardHome";
 import AdminOrderManagement from "./pages/dashboard/OrderManagement";
 import AdminProductCatalog from "./pages/dashboard/ProductCatalog";
 import AdminCategoryManager from "./pages/dashboard/CategoryManager";
