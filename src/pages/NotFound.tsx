@@ -36,7 +36,10 @@ const NotFound = () => {
             Page Not Found
           </h2>
           <p className="text-muted-foreground">
-            Oops! The page you're looking for doesn't exist or has been moved.
+            یہ صفحہ موجود نہیں ہے
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Oops! The page you're looking for doesn't exist.
             Let's get you back to shopping!
           </p>
         </div>

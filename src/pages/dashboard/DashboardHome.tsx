@@ -34,6 +34,7 @@ import {
 } from "@/data/dashboardData";
 import { cn } from "@/lib/utils";
 import AdminGlobalNotification from "@/components/dashboard/AdminGlobalNotification";
+import DataSanitization from "@/components/dashboard/DataSanitization";
 
 const DashboardHome = () => {
   const { role, currentSellerId } = useDashboard();
@@ -112,7 +113,12 @@ const DashboardHome = () => {
               : "Welcome back! Here's your seller dashboard."}
           </p>
         </div>
-        {role === "admin" && <AdminGlobalNotification />}
+        {role === "admin" && (
+          <div className="flex items-center gap-2">
+            <DataSanitization />
+            <AdminGlobalNotification />
+          </div>
+        )}
       </div>
 
       {/* Stats Cards */}
