@@ -16,6 +16,7 @@ import OrderSuccess from "./pages/OrderSuccess";
 import NotFound from "./pages/NotFound";
 import HelpCenter from "./pages/HelpCenter";
 import ChatWidget from "./components/chat/ChatWidget";
+import InstallPrompt from "./components/pwa/InstallPrompt";
 // Account Pages
 import AccountLayout from "./components/account/AccountLayout";
 import ProfilePage from "./pages/account/ProfilePage";
@@ -63,6 +64,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <InstallPrompt />
             <AuthModal />
             <ChatWidget />
             <Routes>
