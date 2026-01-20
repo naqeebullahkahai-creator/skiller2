@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ProductCard from "@/components/product/ProductCard";
+import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -132,6 +133,18 @@ const ProductListing = () => {
     ? categories.find((c) => c.slug === category)?.name || "Products"
     : "All Products";
 
+  const seoDescription = searchQuery
+    ? `Find ${searchQuery} products at FANZON Pakistan. Best prices, fast delivery!`
+    : category
+    ? `Shop ${pageTitle} at FANZON Pakistan. Authentic products, great prices in PKR!`
+    : "Browse all products at FANZON Pakistan. Electronics, Fashion, Home & more!";
+
+  const seoUrl = searchQuery
+    ? `/search?q=${searchQuery}`
+    : category
+    ? `/category/${category}`
+    : "/products";
+
   const FilterSidebar = () => (
     <div className="space-y-6">
       {/* Categories */}
@@ -235,6 +248,11 @@ const ProductListing = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEOHead
+        title={pageTitle}
+        description={seoDescription}
+        url={seoUrl}
+      />
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-6">

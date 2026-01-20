@@ -1,8 +1,13 @@
+# FANZON Robots.txt
+# https://fanzon.pk
+
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 2
 
 User-agent: Twitterbot
 Allow: /
@@ -10,5 +15,20 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: WhatsApp
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
 User-agent: *
 Allow: /
+
+# Disallow admin/seller areas
+Disallow: /admin-dashboard
+Disallow: /seller-center
+Disallow: /account
+Disallow: /checkout
+
+# Sitemap
+Sitemap: https://fanzon.pk/sitemap.xml

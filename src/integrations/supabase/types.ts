@@ -688,6 +688,7 @@ export type Database = {
           price_pkr: number
           seller_id: string
           sku: string | null
+          slug: string | null
           status: Database["public"]["Enums"]["product_status"]
           stock_count: number
           title: string
@@ -704,6 +705,7 @@ export type Database = {
           price_pkr: number
           seller_id: string
           sku?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["product_status"]
           stock_count?: number
           title: string
@@ -720,6 +722,7 @@ export type Database = {
           price_pkr?: number
           seller_id?: string
           sku?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["product_status"]
           stock_count?: number
           title?: string
@@ -1255,6 +1258,7 @@ export type Database = {
         Returns: boolean
       }
       generate_order_number: { Args: never; Returns: string }
+      generate_product_slug: { Args: { title: string }; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
