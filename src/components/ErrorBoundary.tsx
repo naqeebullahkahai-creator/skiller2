@@ -63,8 +63,10 @@ class ErrorBoundary extends Component<Props, State> {
                 Oops! Something went wrong
               </h1>
               <p className="text-muted-foreground">
-                We're sorry, but something unexpected happened. Please try refreshing
-                the page or go back to the homepage.
+                کچھ غلط ہو گیا - براہ کرم دوبارہ کوشش کریں
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Please try refreshing the page or go back to the homepage.
               </p>
             </div>
 

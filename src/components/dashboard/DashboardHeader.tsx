@@ -1,8 +1,6 @@
-import { Bell, Menu, Search, User } from "lucide-react";
+import { Bell, Menu, Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +9,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDashboard } from "@/contexts/DashboardContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { Link, useNavigate } from "react-router-dom";
 
 const DashboardHeader = () => {
-  const { role, setRole, sidebarOpen, setSidebarOpen } = useDashboard();
+  const { role, sidebarOpen, setSidebarOpen } = useDashboard();
+  const { logout, profile } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
 
   return (
     <header
@@ -41,40 +48,24 @@ const DashboardHeader = () => {
         </div>
       </div>
 
-      {/* Right: Role Switcher, Notifications, Profile */}
+      {/* Right: Notifications & Profile */}
       <div className="flex items-center gap-4">
-        {/* Role Switcher */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg">
-          <Label
-            htmlFor="role-switch"
-            className={cn(
-              "text-xs font-medium cursor-pointer transition-colors",
-              role === "seller" ? "text-foreground" : "text-muted-foreground"
-            )}
-          >
-            Seller
-          </Label>
-          <Switch
-            id="role-switch"
-            checked={role === "admin"}
-            onCheckedChange={(checked) => setRole(checked ? "admin" : "seller")}
-            className="data-[state=checked]:bg-primary"
-          />
-          <Label
-            htmlFor="role-switch"
-            className={cn(
-              "text-xs font-medium cursor-pointer transition-colors",
-              role === "admin" ? "text-foreground" : "text-muted-foreground"
-            )}
-          >
-            Admin
-          </Label>
+        {/* Role Badge */}
+        <div className="hidden sm:flex items-center px-3 py-1.5 bg-muted rounded-lg">
+          <span className={cn(
+            "text-xs font-medium capitalize",
+            role === "admin" ? "text-primary" : "text-blue-600"
+          )}>
+            {role} Dashboard
+          </span>
         </div>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell size={20} />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
+        <Button variant="ghost" size="icon" className="relative" asChild>
+          <Link to="/account/notifications">
+            <Bell size={20} />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
+          </Link>
         </Button>
 
         {/* Profile Dropdown */}
@@ -85,28 +76,23 @@ const DashboardHeader = () => {
                 <User size={16} className="text-primary" />
               </div>
               <span className="hidden md:block text-sm font-medium">
-                {role === "admin" ? "Admin User" : "TechZone Store"}
+                {profile?.full_name || (role === "admin" ? "Admin" : "Seller")}
               </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem>My Profile</DropdownMenuItem>
-            <DropdownMenuItem>Account Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/account/profile">My Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/">Back to Store</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <div className="sm:hidden px-2 py-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  {role === "admin" ? "Admin Mode" : "Seller Mode"}
-                </span>
-                <Switch
-                  checked={role === "admin"}
-                  onCheckedChange={(checked) => setRole(checked ? "admin" : "seller")}
-                  className="scale-75"
-                />
-              </div>
-            </div>
-            <DropdownMenuSeparator className="sm:hidden" />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem 
+              className="text-destructive cursor-pointer"
+              onClick={handleLogout}
+            >
+              <LogOut size={16} className="mr-2" />
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
