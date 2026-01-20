@@ -82,6 +82,154 @@ export type Database = {
           },
         ]
       }
+      customer_wallet_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_id: string
+          description: string | null
+          id: string
+          order_id: string | null
+          return_request_id: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_id: string
+          description?: string | null
+          id?: string
+          order_id?: string | null
+          return_request_id?: string | null
+          transaction_type: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_id?: string
+          description?: string | null
+          id?: string
+          order_id?: string | null
+          return_request_id?: string | null
+          transaction_type?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_wallet_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_wallet_transactions_return_request_id_fkey"
+            columns: ["return_request_id"]
+            isOneToOne: false
+            referencedRelation: "return_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "customer_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          customer_id: string
+          id: string
+          total_refunds: number
+          total_spent: number
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          customer_id: string
+          id?: string
+          total_refunds?: number
+          total_spent?: number
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          customer_id?: string
+          id?: string
+          total_refunds?: number
+          total_spent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      financial_logs: {
+        Row: {
+          amount_pkr: number
+          commission_amount_pkr: number | null
+          created_at: string
+          customer_id: string | null
+          description: string
+          id: string
+          log_type: string
+          metadata: Json | null
+          net_amount_pkr: number
+          order_id: string | null
+          return_request_id: string | null
+          seller_id: string | null
+        }
+        Insert: {
+          amount_pkr: number
+          commission_amount_pkr?: number | null
+          created_at?: string
+          customer_id?: string | null
+          description: string
+          id?: string
+          log_type: string
+          metadata?: Json | null
+          net_amount_pkr: number
+          order_id?: string | null
+          return_request_id?: string | null
+          seller_id?: string | null
+        }
+        Update: {
+          amount_pkr?: number
+          commission_amount_pkr?: number | null
+          created_at?: string
+          customer_id?: string | null
+          description?: string
+          id?: string
+          log_type?: string
+          metadata?: Json | null
+          net_amount_pkr?: number
+          order_id?: string | null
+          return_request_id?: string | null
+          seller_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_logs_return_request_id_fkey"
+            columns: ["return_request_id"]
+            isOneToOne: false
+            referencedRelation: "return_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flash_sale_products: {
         Row: {
           created_at: string
@@ -606,6 +754,100 @@ export type Database = {
         }
         Relationships: []
       }
+      return_requests: {
+        Row: {
+          additional_comments: string | null
+          admin_decided_at: string | null
+          admin_decision: string | null
+          admin_id: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          order_id: string
+          order_item_id: string
+          photos: string[] | null
+          product_id: string
+          quantity: number
+          reason: Database["public"]["Enums"]["return_reason"]
+          refund_amount: number
+          refund_processed_at: string | null
+          seller_id: string
+          seller_responded_at: string | null
+          seller_response: string | null
+          status: Database["public"]["Enums"]["return_status"]
+          tracking_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          additional_comments?: string | null
+          admin_decided_at?: string | null
+          admin_decision?: string | null
+          admin_id?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          order_id: string
+          order_item_id: string
+          photos?: string[] | null
+          product_id: string
+          quantity?: number
+          reason: Database["public"]["Enums"]["return_reason"]
+          refund_amount?: number
+          refund_processed_at?: string | null
+          seller_id: string
+          seller_responded_at?: string | null
+          seller_response?: string | null
+          status?: Database["public"]["Enums"]["return_status"]
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          additional_comments?: string | null
+          admin_decided_at?: string | null
+          admin_decision?: string | null
+          admin_id?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          order_id?: string
+          order_item_id?: string
+          photos?: string[] | null
+          product_id?: string
+          quantity?: number
+          reason?: Database["public"]["Enums"]["return_reason"]
+          refund_amount?: number
+          refund_processed_at?: string | null
+          seller_id?: string
+          seller_responded_at?: string | null
+          seller_response?: string | null
+          status?: Database["public"]["Enums"]["return_status"]
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_requests_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "return_requests_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: true
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "return_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seller_profiles: {
         Row: {
           account_title: string
@@ -967,6 +1209,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_request_return: { Args: { p_order_id: string }; Returns: boolean }
       decrease_product_stock: {
         Args: { p_product_id: string; p_quantity: number }
         Returns: boolean
@@ -996,6 +1239,10 @@ export type Database = {
         Returns: boolean
       }
       is_seller_verified: { Args: { _user_id: string }; Returns: boolean }
+      process_customer_refund: {
+        Args: { p_admin_id: string; p_return_request_id: string }
+        Returns: boolean
+      }
       process_order_earnings: {
         Args: { p_order_id: string; p_sale_amount: number; p_seller_id: string }
         Returns: undefined
@@ -1034,6 +1281,21 @@ export type Database = {
       payment_status: "unpaid" | "paid"
       payout_status: "pending" | "approved" | "rejected" | "completed"
       product_status: "pending" | "active" | "rejected"
+      return_reason:
+        | "wrong_item"
+        | "damaged"
+        | "quality_not_as_expected"
+        | "size_fit_issue"
+        | "changed_mind"
+        | "other"
+      return_status:
+        | "return_requested"
+        | "under_review"
+        | "approved"
+        | "rejected"
+        | "item_shipped"
+        | "item_received"
+        | "refund_issued"
       seller_verification_status: "pending" | "verified" | "rejected"
       wallet_transaction_type:
         | "earning"
@@ -1181,6 +1443,23 @@ export const Constants = {
       payment_status: ["unpaid", "paid"],
       payout_status: ["pending", "approved", "rejected", "completed"],
       product_status: ["pending", "active", "rejected"],
+      return_reason: [
+        "wrong_item",
+        "damaged",
+        "quality_not_as_expected",
+        "size_fit_issue",
+        "changed_mind",
+        "other",
+      ],
+      return_status: [
+        "return_requested",
+        "under_review",
+        "approved",
+        "rejected",
+        "item_shipped",
+        "item_received",
+        "refund_issued",
+      ],
       seller_verification_status: ["pending", "verified", "rejected"],
       wallet_transaction_type: [
         "earning",
