@@ -2,7 +2,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import HeroCarousel from "@/components/home/HeroCarousel";
-import FlashSale from "@/components/home/FlashSale";
+import FlashSaleSection from "@/components/home/FlashSaleSection";
 import Categories from "@/components/home/Categories";
 import JustForYou from "@/components/home/JustForYou";
 import SEOHead from "@/components/seo/SEOHead";
@@ -19,7 +19,7 @@ const Index = () => {
       
       <main>
         <HeroCarousel />
-        <FlashSale />
+        <FlashSaleSection />
         <Categories />
         <JustForYou />
       </main>

@@ -230,6 +230,62 @@ export type Database = {
           },
         ]
       }
+      flash_sale_nominations: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          flash_sale_id: string | null
+          id: string
+          original_price_pkr: number
+          product_id: string
+          proposed_price_pkr: number
+          seller_id: string
+          status: string
+          stock_limit: number
+          time_slot_end: string
+          time_slot_start: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          flash_sale_id?: string | null
+          id?: string
+          original_price_pkr: number
+          product_id: string
+          proposed_price_pkr: number
+          seller_id: string
+          status?: string
+          stock_limit?: number
+          time_slot_end: string
+          time_slot_start: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          flash_sale_id?: string | null
+          id?: string
+          original_price_pkr?: number
+          product_id?: string
+          proposed_price_pkr?: number
+          seller_id?: string
+          status?: string
+          stock_limit?: number
+          time_slot_end?: string
+          time_slot_start?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flash_sale_nominations_flash_sale_id_fkey"
+            columns: ["flash_sale_id"]
+            isOneToOne: false
+            referencedRelation: "flash_sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flash_sale_products: {
         Row: {
           created_at: string
