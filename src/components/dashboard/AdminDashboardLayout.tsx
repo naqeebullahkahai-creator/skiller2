@@ -18,7 +18,8 @@ import {
   Zap,
   BarChart3,
   Ticket,
-  Image
+  Image,
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ const adminLinks = [
   { name: "Order Management", href: "/admin-dashboard/orders", icon: ShoppingCart },
   { name: "Product Catalog", href: "/admin-dashboard/products", icon: Package },
   { name: "Category Manager", href: "/admin-dashboard/categories", icon: FolderOpen },
+  { name: "Reviews", href: "/admin-dashboard/reviews", icon: Star },
   { name: "Flash Sales", href: "/admin-dashboard/flash-sales", icon: Zap },
   { name: "Vouchers", href: "/admin-dashboard/vouchers", icon: Ticket },
   { name: "Banners", href: "/admin-dashboard/banners", icon: Image },

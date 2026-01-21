@@ -646,31 +646,52 @@ export type Database = {
       product_reviews: {
         Row: {
           created_at: string
+          hidden_at: string | null
+          hidden_by: string | null
+          hidden_reason: string | null
           id: string
+          images: string[] | null
+          is_hidden: boolean | null
           order_id: string
           product_id: string
           rating: number
           review_text: string | null
+          seller_replied_at: string | null
+          seller_reply: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          hidden_at?: string | null
+          hidden_by?: string | null
+          hidden_reason?: string | null
           id?: string
+          images?: string[] | null
+          is_hidden?: boolean | null
           order_id: string
           product_id: string
           rating: number
           review_text?: string | null
+          seller_replied_at?: string | null
+          seller_reply?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          hidden_at?: string | null
+          hidden_by?: string | null
+          hidden_reason?: string | null
           id?: string
+          images?: string[] | null
+          is_hidden?: boolean | null
           order_id?: string
           product_id?: string
           rating?: number
           review_text?: string | null
+          seller_replied_at?: string | null
+          seller_reply?: string | null
           updated_at?: string
           user_id?: string
         }
