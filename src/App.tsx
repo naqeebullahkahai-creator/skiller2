@@ -54,9 +54,13 @@ import SellerWalletPage from "./pages/seller/SellerWalletPage";
 import SellerMessagesPage from "./pages/seller/SellerMessagesPage";
 import SellerAnalyticsPage from "./pages/seller/SellerAnalyticsPage";
 import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
+import SellerFlashSalePage from "./pages/seller/SellerFlashSalePage";
+import SellerReviewsPage from "./pages/seller/SellerReviewsPage";
 
 // Admin Analytics
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
+import AdminReviewsPage from "./pages/dashboard/AdminReviewsPage";
+import AdminFlashNominations from "./pages/dashboard/AdminFlashNominations";
 
 // Customer Messages
 import CustomerMessagesPage from "./pages/account/MessagesPage";
@@ -141,6 +145,8 @@ const App = () => (
                 <Route path="kyc/:sellerId" element={<AdminSellerDetail />} />
                 <Route path="payouts" element={<AdminPayoutManagement />} />
                 <Route path="flash-sales" element={<FlashSaleManager />} />
+                <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                <Route path="reviews" element={<AdminReviewsPage />} />
                 <Route path="vouchers" element={<VoucherManager />} />
                 <Route path="banners" element={<BannerManager />} />
                 <Route path="analytics" element={<AdminAnalyticsPage />} />
@@ -161,6 +167,8 @@ const App = () => (
                 <Route path="products" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
                 <Route path="products/new" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
                 <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
+                <Route path="reviews" element={<SellerReviewsPage />} />
+                <Route path="flash-sales" element={<SellerFlashSalePage />} />
                 <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
                 <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
                 <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />

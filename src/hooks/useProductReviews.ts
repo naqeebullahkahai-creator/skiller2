@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -10,6 +10,11 @@ export interface ProductReview {
   order_id: string;
   rating: number;
   review_text: string | null;
+  images: string[];
+  seller_reply: string | null;
+  seller_replied_at: string | null;
+  is_hidden: boolean;
+  hidden_reason: string | null;
   created_at: string;
   user_name?: string;
 }
@@ -20,7 +25,7 @@ export interface ReviewStats {
   ratingCounts: { [key: number]: number };
 }
 
-// Hook to fetch reviews for a product
+// Hook to fetch reviews for a product (excluding hidden ones for customers)
 export const useProductReviews = (productId: string | undefined) => {
   const { data: reviews = [], isLoading } = useQuery({
     queryKey: ["product-reviews", productId],
@@ -34,12 +39,14 @@ export const useProductReviews = (productId: string | undefined) => {
           profiles:user_id (full_name)
         `)
         .eq("product_id", productId)
+        .eq("is_hidden", false)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
       return (data || []).map((review: any) => ({
         ...review,
+        images: review.images || [],
         user_name: review.profiles?.full_name || "Customer",
       })) as ProductReview[];
     },
@@ -61,19 +68,21 @@ export const useProductReviews = (productId: string | undefined) => {
     },
   };
 
-  return { reviews, stats, isLoading };
+  // Collect all customer images
+  const customerImages = reviews.flatMap((r) => r.images || []);
+
+  return { reviews, stats, isLoading, customerImages };
 };
 
 // Hook to check if user can review a product (has delivered order)
 export const useCanReview = (productId: string | undefined) => {
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Get current user
-  useState(() => {
+  useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUserId(data.user?.id || null);
     });
-  });
+  }, []);
 
   const { data: canReview = false, isLoading } = useQuery({
     queryKey: ["can-review", productId, userId],
@@ -138,7 +147,7 @@ export const useCanReview = (productId: string | undefined) => {
   return { canReview, isLoading, deliveredOrderId, userId };
 };
 
-// Hook to submit a review
+// Hook to submit a review with images
 export const useSubmitReview = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -150,12 +159,14 @@ export const useSubmitReview = () => {
       userId,
       rating,
       reviewText,
+      images,
     }: {
       productId: string;
       orderId: string;
       userId: string;
       rating: number;
       reviewText: string;
+      images?: string[];
     }) => {
       const { error } = await supabase.from("product_reviews").insert([
         {
@@ -164,6 +175,7 @@ export const useSubmitReview = () => {
           user_id: userId,
           rating,
           review_text: reviewText || null,
+          images: images || [],
         },
       ]);
 
@@ -187,4 +199,198 @@ export const useSubmitReview = () => {
   });
 
   return mutation;
+};
+
+// Hook for sellers to reply to reviews
+export const useSellerReplyToReview = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ reviewId, reply }: { reviewId: string; reply: string }) => {
+      const { error } = await supabase
+        .from("product_reviews")
+        .update({
+          seller_reply: reply,
+          seller_replied_at: new Date().toISOString(),
+        })
+        .eq("id", reviewId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({ title: "Reply Posted", description: "Your reply has been saved." });
+      queryClient.invalidateQueries({ queryKey: ["seller-product-reviews"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to post reply",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+// Hook for sellers to get reviews on their products
+export const useSellerProductReviews = (sellerId: string | undefined) => {
+  return useQuery({
+    queryKey: ["seller-product-reviews", sellerId],
+    queryFn: async () => {
+      if (!sellerId) return [];
+
+      // Get seller's products first
+      const { data: products } = await supabase
+        .from("products")
+        .select("id, title, images")
+        .eq("seller_id", sellerId);
+
+      if (!products?.length) return [];
+
+      const productIds = products.map((p) => p.id);
+      const productMap = new Map(products.map((p) => [p.id, p]));
+
+      // Get reviews for those products
+      const { data: reviews, error } = await supabase
+        .from("product_reviews")
+        .select(`
+          *,
+          profiles:user_id (full_name)
+        `)
+        .in("product_id", productIds)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      return (reviews || []).map((r: any) => ({
+        ...r,
+        images: r.images || [],
+        user_name: r.profiles?.full_name || "Customer",
+        product: productMap.get(r.product_id),
+      }));
+    },
+    enabled: !!sellerId,
+  });
+};
+
+// Hook for admin to get all reviews for moderation
+export const useAdminReviews = () => {
+  return useQuery({
+    queryKey: ["admin-reviews"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_reviews")
+        .select(`
+          *,
+          profiles:user_id (full_name, email),
+          products:product_id (title, images, seller_id)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      return (data || []).map((r: any) => ({
+        ...r,
+        images: r.images || [],
+        user_name: r.profiles?.full_name || "Customer",
+        user_email: r.profiles?.email,
+        product_title: r.products?.title,
+        product_image: r.products?.images?.[0],
+        seller_id: r.products?.seller_id,
+      }));
+    },
+  });
+};
+
+// Hook for admin to hide/unhide reviews
+export const useAdminModerateReview = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      reviewId,
+      isHidden,
+      reason,
+      adminId,
+    }: {
+      reviewId: string;
+      isHidden: boolean;
+      reason?: string;
+      adminId: string;
+    }) => {
+      const { error } = await supabase
+        .from("product_reviews")
+        .update({
+          is_hidden: isHidden,
+          hidden_by: isHidden ? adminId : null,
+          hidden_at: isHidden ? new Date().toISOString() : null,
+          hidden_reason: isHidden ? reason || null : null,
+        })
+        .eq("id", reviewId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      toast({
+        title: variables.isHidden ? "Review Hidden" : "Review Restored",
+        description: variables.isHidden
+          ? "The review is now hidden from customers."
+          : "The review is now visible to customers.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["product-reviews"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to moderate review",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+// Hook to get average rating for a product (for search ranking)
+export const useProductRating = (productId: string | undefined) => {
+  return useQuery({
+    queryKey: ["product-rating", productId],
+    queryFn: async () => {
+      if (!productId) return { average: 0, count: 0 };
+
+      const { data, error } = await supabase
+        .from("product_reviews")
+        .select("rating")
+        .eq("product_id", productId)
+        .eq("is_hidden", false);
+
+      if (error) throw error;
+
+      const ratings = data || [];
+      const average = ratings.length > 0
+        ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+        : 0;
+
+      return { average, count: ratings.length };
+    },
+    enabled: !!productId,
+  });
+};
+
+// Utility to upload review images
+export const uploadReviewImage = async (userId: string, file: File): Promise<string | null> => {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+  const { error } = await supabase.storage
+    .from("review-images")
+    .upload(fileName, file);
+
+  if (error) {
+    console.error("Error uploading review image:", error);
+    return null;
+  }
+
+  const { data } = supabase.storage.from("review-images").getPublicUrl(fileName);
+  return data.publicUrl;
 };

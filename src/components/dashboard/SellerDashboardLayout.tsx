@@ -17,7 +17,8 @@ import {
   Wallet,
   MessageSquare,
   BarChart3,
-  Zap
+  Zap,
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ const sellerLinks = [
   { name: "Dashboard", href: "/seller-center", icon: LayoutDashboard },
   { name: "KYC Verification", href: "/seller-center/kyc", icon: ShieldCheck },
   { name: "My Products", href: "/seller-center/products", icon: Package },
+  { name: "Reviews", href: "/seller-center/reviews", icon: Star },
   { name: "Flash Sales", href: "/seller-center/flash-sales", icon: Zap },
   { name: "Orders", href: "/seller-center/orders", icon: ShoppingCart },
   { name: "Analytics", href: "/seller-center/analytics", icon: BarChart3 },
