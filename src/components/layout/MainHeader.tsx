@@ -1,4 +1,4 @@
-import { Search, User, ChevronDown, Menu, X, LogOut, LayoutDashboard, Package } from "lucide-react";
+import { Search, ChevronDown, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -8,26 +8,27 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { navCategories } from "@/data/mockData";
-import { useAuth, SUPER_ADMIN_EMAIL } from "@/contexts/AuthContext";
+import { useMainCategories } from "@/hooks/useCategories";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 import SearchSuggestions from "@/components/search/SearchSuggestions";
+import AnimatedProfileMenu from "@/components/navigation/AnimatedProfileMenu";
+import CategoryAccordion from "@/components/navigation/CategoryAccordion";
 
 const MainHeader = () => {
   const navigate = useNavigate();
-  const { user, profile, role, isAuthenticated, isSuperAdmin, logout, setShowAuthModal, setAuthModalMode } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { t, isRTL } = useLanguage();
+  const { data: categories } = useMainCategories();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(t("nav.all_categories"));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,25 +36,6 @@ const MainHeader = () => {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
-
-  const openLoginModal = () => {
-    setAuthModalMode("login");
-    setShowAuthModal(true);
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
-
-  const getDashboardLink = () => {
-    // Only super admin can access admin dashboard
-    if (role === "admin" && isSuperAdmin) return "/admin-dashboard";
-    if (role === "seller") return "/seller-center";
-    return null;
-  };
-
-  const displayName = profile?.full_name || user?.email?.split("@")[0] || "Account";
 
   return (
     <header className="sticky top-0 z-50 bg-primary shadow-md">
@@ -79,7 +61,7 @@ const MainHeader = () => {
             <form onSubmit={handleSearch} className="flex w-full bg-card rounded overflow-hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:bg-muted border-r border-border whitespace-nowrap">
+                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:bg-muted border-r border-border whitespace-nowrap transition-colors duration-200">
                     {selectedCategory}
                     <ChevronDown size={14} />
                   </button>
@@ -88,12 +70,12 @@ const MainHeader = () => {
                   <DropdownMenuItem onClick={() => setSelectedCategory(t("nav.all_categories"))}>
                     {t("nav.all_categories")}
                   </DropdownMenuItem>
-                  {navCategories.map((category) => (
+                  {categories?.map((category) => (
                     <DropdownMenuItem 
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.name)}
                     >
-                      {category}
+                      {category.name}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -109,7 +91,7 @@ const MainHeader = () => {
               />
               <Button 
                 type="submit"
-                className="rounded-none px-6 bg-fanzon-orange-hover hover:bg-fanzon-dark"
+                className="rounded-none px-6 bg-fanzon-orange-hover hover:bg-fanzon-dark transition-colors duration-200"
               >
                 <Search size={18} />
               </Button>
@@ -136,50 +118,8 @@ const MainHeader = () => {
             {/* Notification Bell */}
             {isAuthenticated && <NotificationBell />}
             
-            {/* Login/Signup or User Menu - Desktop */}
-            {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    className="hidden md:flex items-center gap-2 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground"
-                  >
-                    <User size={18} />
-                    <span>{displayName}</span>
-                    <ChevronDown size={14} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align={isRTL ? "start" : "end"}>
-                  <DropdownMenuItem onClick={() => navigate("/my-orders")}>
-                    <Package size={16} className="me-2" />
-                    {t("auth.my_orders")}
-                  </DropdownMenuItem>
-                  {getDashboardLink() && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => navigate(getDashboardLink()!)}>
-                        <LayoutDashboard size={16} className="me-2" />
-                        {role === "admin" ? t("auth.admin_dashboard") : t("auth.seller_center")}
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                    <LogOut size={16} className="me-2" />
-                    {t("auth.logout")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button 
-                variant="ghost" 
-                className="hidden md:flex items-center gap-2 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground"
-                onClick={openLoginModal}
-              >
-                <User size={18} />
-                <span>{t("auth.login_signup")}</span>
-              </Button>
-            )}
+            {/* Animated Profile Menu - Desktop */}
+            <AnimatedProfileMenu />
 
             {/* Cart */}
             <CartDrawer />
@@ -196,74 +136,23 @@ const MainHeader = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <Button type="submit" className="rounded-none px-4 bg-fanzon-orange-hover hover:bg-fanzon-dark">
+            <Button type="submit" className="rounded-none px-4 bg-fanzon-orange-hover hover:bg-fanzon-dark transition-colors duration-200">
               <Search size={18} />
             </Button>
           </form>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-card border-t border-border animate-fade-in">
-          <div className="container mx-auto py-4">
-            <div className="flex flex-col gap-2">
-              {isAuthenticated ? (
-                <>
-                  <div className="px-4 py-2 text-sm font-medium text-foreground">
-                    {t("common.hello")}, {displayName}
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    className="justify-start gap-2 text-foreground"
-                    onClick={() => { navigate("/orders"); setIsMobileMenuOpen(false); }}
-                  >
-                    {t("auth.my_orders")}
-                  </Button>
-                  {getDashboardLink() && (
-                    <Button 
-                      variant="ghost" 
-                      className="justify-start gap-2 text-foreground"
-                      onClick={() => { navigate(getDashboardLink()!); setIsMobileMenuOpen(false); }}
-                    >
-                      <LayoutDashboard size={18} />
-                      {role === "admin" ? t("auth.admin_dashboard") : t("auth.seller_center")}
-                    </Button>
-                  )}
-                  <Button 
-                    variant="ghost" 
-                    className="justify-start gap-2 text-destructive"
-                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                  >
-                    <LogOut size={18} />
-                    {t("auth.logout")}
-                  </Button>
-                </>
-              ) : (
-                <Button 
-                  variant="ghost" 
-                  className="justify-start gap-2 text-foreground"
-                  onClick={() => { openLoginModal(); setIsMobileMenuOpen(false); }}
-                >
-                  <User size={18} />
-                  {t("auth.login_signup")}
-                </Button>
-              )}
-              <div className="border-t border-border my-2" />
-              {navCategories.map((category) => (
-                <Link
-                  key={category}
-                  to={`/category/${category.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="py-2 px-4 hover:bg-muted rounded text-sm"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {category}
-                </Link>
-              ))}
-            </div>
-          </div>
+      {/* Mobile Menu Dropdown with Category Accordion */}
+      <div
+        className={`md:hidden bg-card border-t border-border overflow-hidden transition-all duration-300 ease-out ${
+          isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="container mx-auto py-4 max-h-[70vh] overflow-y-auto">
+          <CategoryAccordion onCategoryClick={() => setIsMobileMenuOpen(false)} />
         </div>
-      )}
+      </div>
     </header>
   );
 };
