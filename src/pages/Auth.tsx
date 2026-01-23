@@ -42,15 +42,16 @@ const Auth = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Role-based redirection - Super Admin goes to admin dashboard
+  // Role-based redirection - Admin/Seller go to their dashboards
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isLoading && isAuthenticated && role) {
       // Super Admin always goes to admin dashboard
-      if (isSuperAdmin) {
+      if (isSuperAdmin || role === "admin") {
         navigate("/admin-dashboard", { replace: true });
       } else if (role === "seller") {
         navigate("/seller-center", { replace: true });
-      } else if (role) {
+      } else {
+        // Customer goes to homepage
         navigate("/", { replace: true });
       }
     }

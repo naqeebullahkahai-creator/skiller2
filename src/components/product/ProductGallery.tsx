@@ -249,7 +249,7 @@ const ProductGallery = ({
               src={currentItem?.url || "/placeholder.svg"}
               alt={productTitle}
               className={cn(
-                "w-full h-full object-cover transition-transform duration-200",
+                "w-full h-full object-contain transition-transform duration-200",
                 isZoomed && "scale-150 md:scale-150",
                 scale > 1 && "md:scale-100"
               )}

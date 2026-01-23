@@ -114,10 +114,17 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Prevent pull-to-refresh on mobile browsers */
+  html {
+    overscroll-behavior: none;
   }
 
   /* Urdu Font Class */

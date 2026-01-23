@@ -199,7 +199,54 @@ const SellerDashboardLayout = () => {
   );
 
   return (
-    <div className="min-h-screen bg-muted flex">
+    <div className="min-h-screen bg-muted">
+      {/* Mobile Header with Menu */}
+      <header className="md:hidden sticky top-0 z-50 h-14 bg-slate-900 border-b border-slate-700 flex items-center justify-between px-4">
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-white">
+              <Menu size={24} />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-72 p-0 bg-slate-900 border-slate-700">
+            <div className="flex h-14 items-center px-4 border-b border-slate-700">
+              <span className="text-xl font-bold text-primary">FANZON</span>
+            </div>
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+        
+        <span className="text-lg font-bold text-primary">Seller Center</span>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-white">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={profile?.avatar_url || undefined} />
+                <AvatarFallback className="bg-blue-500 text-white text-sm">
+                  {profile?.full_name?.charAt(0) || "S"}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => navigate("/seller-center/kyc")}>
+              <ShieldCheck size={16} className="mr-2" />
+              KYC Status
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/seller-center/settings")}>
+              <Settings size={16} className="mr-2" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+              <LogOut size={16} className="mr-2" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </header>
+
       {/* Desktop Sidebar */}
       <aside 
         className={cn(
@@ -257,7 +304,7 @@ const SellerDashboardLayout = () => {
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {sellerLinks.map((link) => {
             const isActive = location.pathname === link.href || 
               (link.href !== "/seller-center" && link.href !== "/seller-center/kyc" && location.pathname.startsWith(link.href));
@@ -311,13 +358,14 @@ const SellerDashboardLayout = () => {
 
       {/* Main Content */}
       <div className={cn(
-        "flex-1 transition-all duration-300",
-        sidebarOpen ? "ml-64" : "ml-20"
+        "flex-1 transition-all duration-300 min-h-screen",
+        "md:ml-64",
+        !sidebarOpen && "md:ml-20"
       )}>
-        {/* Header */}
-        <header className="sticky top-0 z-30 h-16 bg-background border-b flex items-center justify-between px-6">
+        {/* Desktop Header */}
+        <header className="hidden md:flex sticky top-0 z-30 h-16 bg-background border-b items-center justify-between px-6">
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex relative">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search products..."
@@ -343,7 +391,7 @@ const SellerDashboardLayout = () => {
                       {profile?.full_name?.charAt(0) || "S"}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="hidden md:inline">{profile?.full_name || "Seller"}</span>
+                  <span>{profile?.full_name || "Seller"}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -365,8 +413,8 @@ const SellerDashboardLayout = () => {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="p-6">
+        {/* Page Content - full width on mobile */}
+        <main className="p-4 md:p-6 pb-20 md:pb-6">
           <Outlet />
         </main>
       </div>
