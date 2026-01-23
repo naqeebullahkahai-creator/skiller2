@@ -28,6 +28,7 @@ import SocialShareButtons from "@/components/product/SocialShareButtons";
 import ProductBreadcrumb from "@/components/product/ProductBreadcrumb";
 import ProductGallery from "@/components/product/ProductGallery";
 import MobileStickyBar from "@/components/product/MobileStickyBar";
+import AddToCompareButton from "@/components/comparison/AddToCompareButton";
 import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -307,7 +308,7 @@ const ProductDetail = () => {
               </Button>
             </div>
 
-            {/* Wishlist & Share */}
+            {/* Wishlist, Compare & Share */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
               <button
                 onClick={() => setIsWishlisted(!isWishlisted)}
@@ -319,6 +320,8 @@ const ProductDetail = () => {
                 />
                 {isWishlisted ? "Wishlisted" : "Add to Wishlist"}
               </button>
+
+              <AddToCompareButton product={product} variant="text" />
               
               <SocialShareButtons
                 productName={product.title}

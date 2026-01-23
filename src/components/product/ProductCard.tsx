@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { DatabaseProduct, formatPKR } from "@/hooks/useProducts";
 import { useCart } from "@/contexts/CartContext";
+import AddToCompareButton from "@/components/comparison/AddToCompareButton";
 
 interface ProductCardProps {
   product: DatabaseProduct;
@@ -53,22 +54,25 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
           </div>
         )}
 
-        {/* Wishlist Button */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            setIsWishlisted(!isWishlisted);
-          }}
-          className="absolute top-2 right-2 p-1.5 bg-card/80 hover:bg-card rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-          <Heart
-            size={16}
-            className={cn(
-              "transition-colors",
-              isWishlisted ? "fill-destructive text-destructive" : "text-muted-foreground"
-            )}
-          />
-        </button>
+        {/* Compare & Wishlist Buttons */}
+        <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <AddToCompareButton product={product} variant="icon" />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setIsWishlisted(!isWishlisted);
+            }}
+            className="p-1.5 bg-card/80 hover:bg-card rounded-full"
+          >
+            <Heart
+              size={16}
+              className={cn(
+                "transition-colors",
+                isWishlisted ? "fill-destructive text-destructive" : "text-muted-foreground"
+              )}
+            />
+          </button>
+        </div>
 
         {/* Quick Add to Cart - Desktop Only */}
         {product.stock_count > 0 && (
