@@ -15,7 +15,8 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
-  ListChecks
+  ListChecks,
+  FileX2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,10 @@ import { useBulkUpload, BulkUploadError } from "@/hooks/useBulkUpload";
 import { 
   generateFanzonTemplate,
   generateInstructionsGuide,
-  parseCSVContent,
+  generateExcelTemplate,
+  parseUploadFile,
+  isSupportedFileType,
+  getFileTypeLabel,
   validateProductRow,
   ParsedProductRow,
   ValidationError,
@@ -78,13 +82,23 @@ const SellerBulkUploadPage = () => {
     fetchUploadLogs();
   }, []);
 
-  const handleDownloadTemplate = () => {
+  const handleDownloadCSVTemplate = () => {
     const template = generateFanzonTemplate();
     const blob = new Blob([template], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "FANZON_Bulk_Upload_Template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadExcelTemplate = () => {
+    const blob = generateExcelTemplate();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "FANZON_Bulk_Upload_Template.xlsx";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -100,12 +114,13 @@ const SellerBulkUploadPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  const processFile = useCallback((file: File) => {
-    if (!file.name.endsWith('.csv')) {
+  const processFile = useCallback(async (file: File) => {
+    // Check if file type is supported
+    if (!isSupportedFileType(file.name)) {
       setLocalErrors([{
         row: 0,
         field: "File",
-        message: "Please upload a CSV file only. Excel files (.xlsx) are not supported.",
+        message: "Unsupported file format. Please use .csv or .xlsx files.",
       }]);
       return;
     }
@@ -114,10 +129,8 @@ const SellerBulkUploadPage = () => {
     setLocalErrors([]);
     setValidationErrors([]);
     
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      const rows = parseCSVContent(content);
+    try {
+      const rows = await parseUploadFile(file);
       
       if (rows.length === 0) {
         setLocalErrors([{
@@ -147,8 +160,13 @@ const SellerBulkUploadPage = () => {
       setLocalErrors(allErrors);
       setParsedRows(rows);
       setPreviewMode(true);
-    };
-    reader.readAsText(file);
+    } catch (error: any) {
+      setLocalErrors([{
+        row: 0,
+        field: "File",
+        message: error.message || "Failed to parse the file. Please check the format.",
+      }]);
+    }
   }, [setValidationErrors]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -371,15 +389,19 @@ const SellerBulkUploadPage = () => {
             <CardContent className="space-y-4 relative z-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <Button 
-                  onClick={handleDownloadTemplate} 
+                  onClick={handleDownloadExcelTemplate} 
                   className="gap-2 shadow-md bg-[#1e3a5f] hover:bg-[#2d5a87]"
                 >
                   <Download size={18} />
+                  Download Excel Template
+                </Button>
+                <Button onClick={handleDownloadCSVTemplate} variant="outline" className="gap-2">
+                  <FileSpreadsheet size={18} />
                   Download CSV Template
                 </Button>
-                <Button onClick={handleDownloadInstructions} variant="outline" className="gap-2">
+                <Button onClick={handleDownloadInstructions} variant="ghost" className="gap-2">
                   <FileText size={18} />
-                  Download Instructions Guide
+                  Instructions
                 </Button>
               </div>
               
@@ -519,7 +541,7 @@ const SellerBulkUploadPage = () => {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".csv"
+                    accept=".csv,.xlsx,.xls"
                     onChange={handleFileSelect}
                     className="hidden"
                   />

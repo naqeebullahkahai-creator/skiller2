@@ -1,7 +1,8 @@
 /**
  * FANZON Bulk Upload Template Generator
- * Generates professional CSV templates with category mapping and instructions
+ * Generates professional CSV/Excel templates with category mapping and instructions
  */
+import * as XLSX from 'xlsx';
 
 export interface CategoryMapping {
   id: number;
@@ -491,4 +492,209 @@ export const validateProductRow = (
   }
   
   return errors;
+};
+
+// ============================================================================
+// EXCEL SUPPORT FUNCTIONS
+// ============================================================================
+
+// Generate Excel template with branded styling and instructions sheet
+export const generateExcelTemplate = (): Blob => {
+  const workbook = XLSX.utils.book_new();
+  
+  // === PRODUCTS SHEET ===
+  const headers = [
+    "Product_Title*",
+    "Category*",
+    "Price_PKR*",
+    "Stock_Quantity*",
+    "Discount_Price",
+    "Brand_Name",
+    "Product_Description",
+    "Image_URL",
+    "SKU"
+  ];
+  
+  const exampleData = [
+    ["Wireless Bluetooth Earbuds Pro", "Electronics", 4500, 50, 3999, "TechPro", "Premium quality earbuds with noise cancellation and 24-hour battery life", "https://example.com/earbuds.jpg", "SKU-EAR-001"],
+    ["Cotton T-Shirt - Large Blue", "Fashion", 1200, 100, "", "StyleWear", "100% cotton casual t-shirt comfortable fit", "", "SKU-TSH-002"],
+    ["LED Desk Lamp", "Home & Garden", 2800, 30, 2499, "HomeBright", "Adjustable LED desk lamp with 3 brightness levels", "https://example.com/lamp.jpg", "SKU-LMP-003"],
+  ];
+  
+  const productsData = [headers, ...exampleData];
+  const productsSheet = XLSX.utils.aoa_to_sheet(productsData);
+  
+  // Set column widths
+  productsSheet['!cols'] = [
+    { wch: 35 }, // Product_Title
+    { wch: 15 }, // Category
+    { wch: 12 }, // Price_PKR
+    { wch: 15 }, // Stock_Quantity
+    { wch: 14 }, // Discount_Price
+    { wch: 15 }, // Brand_Name
+    { wch: 50 }, // Product_Description
+    { wch: 40 }, // Image_URL
+    { wch: 15 }, // SKU
+  ];
+  
+  XLSX.utils.book_append_sheet(workbook, productsSheet, "Products");
+  
+  // === INSTRUCTIONS SHEET ===
+  const instructionsData = [
+    ["FANZON BULK UPLOAD TEMPLATE - INSTRUCTIONS"],
+    [""],
+    ["📋 MANDATORY FIELDS (marked with * in header)"],
+    ["Field", "Description", "Example"],
+    ["Product_Title*", "Your product name (max 200 characters)", "Wireless Bluetooth Earbuds Pro"],
+    ["Category*", "Category name OR ID number (see table below)", "Electronics or 1"],
+    ["Price_PKR*", "Regular price - NUMBERS ONLY", "2500"],
+    ["Stock_Quantity*", "Available quantity (whole number)", "50"],
+    [""],
+    ["📝 OPTIONAL FIELDS"],
+    ["Field", "Description", "Example"],
+    ["Discount_Price", "Sale price (must be less than regular price)", "1999"],
+    ["Brand_Name", "Brand or manufacturer name", "TechPro"],
+    ["Product_Description", "Product details (max 2000 characters)", "Premium quality..."],
+    ["Image_URL", "Direct link to product image", "https://cdn.example.com/image.jpg"],
+    ["SKU", "Your unique product code", "SKU-001"],
+    [""],
+    ["📂 CATEGORY REFERENCE"],
+    ["ID", "Category Name", "Examples"],
+  ];
+  
+  // Add category mappings
+  CATEGORY_MAPPINGS.forEach(cat => {
+    instructionsData.push([cat.id.toString(), cat.name, cat.examples]);
+  });
+  
+  instructionsData.push([""]);
+  instructionsData.push(["⚠️ IMPORTANT TIPS"]);
+  instructionsData.push(["• Do NOT change the header row in the Products sheet"]);
+  instructionsData.push(["• Delete the 3 example rows before uploading your data"]);
+  instructionsData.push(["• Maximum 1,000 products per upload"]);
+  instructionsData.push(["• Price must be numbers only (e.g., 2500, not Rs. 2500)"]);
+  instructionsData.push(["• Image URLs must start with http:// or https://"]);
+  instructionsData.push([""]);
+  instructionsData.push(["❓ Need help? Contact seller-support@fanzon.pk"]);
+  
+  const instructionsSheet = XLSX.utils.aoa_to_sheet(instructionsData);
+  
+  // Set column widths for instructions
+  instructionsSheet['!cols'] = [
+    { wch: 20 },
+    { wch: 45 },
+    { wch: 40 },
+  ];
+  
+  XLSX.utils.book_append_sheet(workbook, instructionsSheet, "Instructions");
+  
+  // Generate binary Excel file
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+};
+
+// Parse Excel file content
+export const parseExcelFile = (file: File): Promise<ParsedProductRow[]> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        
+        // Get the first sheet (should be "Products")
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        
+        // Convert to JSON
+        const jsonData = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { 
+          raw: false,
+          defval: "" 
+        });
+        
+        if (jsonData.length === 0) {
+          resolve([]);
+          return;
+        }
+        
+        // Map Excel columns to our format
+        const rows: ParsedProductRow[] = jsonData.map((row) => {
+          // Get value by trying multiple possible column names
+          const getValue = (keys: string[]): string => {
+            for (const key of keys) {
+              const lowerKey = key.toLowerCase();
+              for (const [colName, value] of Object.entries(row)) {
+                if (colName.toLowerCase().replace(/\*/g, "").trim() === lowerKey.replace(/\*/g, "").trim()) {
+                  return String(value ?? "").trim();
+                }
+              }
+            }
+            return "";
+          };
+          
+          return {
+            title: getValue(["Product_Title*", "Product_Title", "title", "Title"]),
+            category: getValue(["Category*", "Category", "category"]),
+            price: getValue(["Price_PKR*", "Price_PKR", "Price", "price"]),
+            stock_quantity: getValue(["Stock_Quantity*", "Stock_Quantity", "Stock", "stock", "Quantity"]),
+            discount_price: getValue(["Discount_Price", "discount_price", "Sale_Price", "sale_price"]),
+            brand: getValue(["Brand_Name", "brand_name", "Brand", "brand"]),
+            description: getValue(["Product_Description", "product_description", "Description", "description"]),
+            image_url: getValue(["Image_URL", "image_url", "Image", "image"]),
+            sku: getValue(["SKU", "sku"]),
+          };
+        });
+        
+        resolve(rows);
+      } catch (error) {
+        reject(new Error("Failed to parse Excel file. Please ensure it's a valid .xlsx file."));
+      }
+    };
+    
+    reader.onerror = () => {
+      reject(new Error("Failed to read the file."));
+    };
+    
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+// Parse file (CSV or Excel) based on extension
+export const parseUploadFile = async (file: File): Promise<ParsedProductRow[]> => {
+  const fileName = file.name.toLowerCase();
+  
+  if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+    return parseExcelFile(file);
+  } else if (fileName.endsWith('.csv')) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          resolve(parseCSVContent(content));
+        } catch (error) {
+          reject(new Error("Failed to parse CSV file."));
+        }
+      };
+      reader.onerror = () => reject(new Error("Failed to read the file."));
+      reader.readAsText(file);
+    });
+  } else {
+    throw new Error("Unsupported file format. Please use .csv or .xlsx files.");
+  }
+};
+
+// Check if file type is supported
+export const isSupportedFileType = (fileName: string): boolean => {
+  const lower = fileName.toLowerCase();
+  return lower.endsWith('.csv') || lower.endsWith('.xlsx') || lower.endsWith('.xls');
+};
+
+// Get file type label
+export const getFileTypeLabel = (fileName: string): string => {
+  const lower = fileName.toLowerCase();
+  if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) return 'Excel';
+  if (lower.endsWith('.csv')) return 'CSV';
+  return 'Unknown';
 };
