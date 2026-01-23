@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_category: string
+          action_type: string
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          description: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          role: string
+          severity: string
+          user_agent: string | null
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          action_category: string
+          action_type: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          description: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          role: string
+          severity?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          action_category?: string
+          action_type?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          description?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          role?: string
+          severity?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       admin_settings: {
         Row: {
           created_at: string
@@ -1584,6 +1641,25 @@ export type Database = {
       }
       is_seller_verified: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      log_activity: {
+        Args: {
+          p_action_category: string
+          p_action_type: string
+          p_after_data?: Json
+          p_before_data?: Json
+          p_description: string
+          p_ip_address?: string
+          p_metadata?: Json
+          p_resource_id?: string
+          p_resource_type?: string
+          p_role: string
+          p_severity: string
+          p_user_agent?: string
+          p_user_email: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       process_customer_refund: {
         Args: { p_admin_id: string; p_return_request_id: string }
         Returns: boolean

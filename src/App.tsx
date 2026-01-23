@@ -6,16 +6,19 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { ComparisonProvider } from "@/contexts/ComparisonContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import AuthModal from "@/components/auth/AuthModal";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import OfflineIndicator from "@/components/OfflineIndicator";
 import OrderStatusNotification from "./components/orders/OrderStatusNotification";
+import ComparisonBar from "./components/comparison/ComparisonBar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
+import ComparePage from "./pages/ComparePage";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import NotFound from "./pages/NotFound";
@@ -85,18 +88,20 @@ const App = () => (
     <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-      <AuthProvider>
-        <CartProvider>
-          <OrderStatusNotification>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
+  <AuthProvider>
+    <CartProvider>
+      <ComparisonProvider>
+      <OrderStatusNotification>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
             <OfflineIndicator />
             <BrowserRouter>
               <InstallPrompt />
               <NotificationPermissionBanner />
               <AuthModal />
               <ChatWidget />
+              <ComparisonBar />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -104,6 +109,7 @@ const App = () => (
               <Route path="/category/:category" element={<ProductListing />} />
               <Route path="/search" element={<ProductListing />} />
               <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/compare" element={<ComparePage />} />
               {/* Slug-based product URLs also supported via the same route */}
               <Route path="/help" element={<HelpCenter />} />
               
@@ -201,6 +207,7 @@ const App = () => (
           </BrowserRouter>
         </TooltipProvider>
         </OrderStatusNotification>
+      </ComparisonProvider>
       </CartProvider>
     </AuthProvider>
     </LanguageProvider>
