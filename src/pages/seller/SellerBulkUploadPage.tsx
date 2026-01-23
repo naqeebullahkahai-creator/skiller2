@@ -191,13 +191,18 @@ const SellerBulkUploadPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {/* Page Header with FANZON branding */}
       <div className="flex items-center gap-3">
-        <div className="p-3 rounded-xl bg-primary/10">
-          <Sparkles className="h-6 w-6 text-primary" />
+        <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg">
+          <Sparkles className="h-6 w-6 text-primary-foreground" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Bulk Upload</h1>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            Bulk Upload
+            <Badge className="bg-primary/10 text-primary border-0 text-xs font-medium">
+              FANZON
+            </Badge>
+          </h1>
           <p className="text-muted-foreground">
             Upload up to 1,000 products at once using our FANZON template
           </p>
@@ -217,20 +222,28 @@ const SellerBulkUploadPage = () => {
         </TabsList>
 
         <TabsContent value="upload" className="space-y-6">
-          {/* Template Download Section */}
-          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <FileSpreadsheet className="h-5 w-5 text-primary" />
-                Step 1: Download FANZON Template
-              </CardTitle>
-              <CardDescription>
-                Use our branded template for hassle-free uploads. Includes examples and field descriptions.
-              </CardDescription>
+          {/* Template Download Section - Enhanced FANZON branding */}
+          <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden relative">
+            {/* Decorative element */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
+            
+            <CardHeader className="relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary text-primary-foreground">
+                  <FileSpreadsheet className="h-5 w-5" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Step 1: Download FANZON Template</CardTitle>
+                  <CardDescription>
+                    Use our branded template for hassle-free uploads with examples
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 relative z-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <Button onClick={handleDownloadTemplate} className="gap-2">
+                <Button onClick={handleDownloadTemplate} className="gap-2 shadow-md">
                   <Download size={18} />
                   Download CSV Template
                 </Button>
@@ -240,70 +253,103 @@ const SellerBulkUploadPage = () => {
                 </Button>
               </div>
               
-              {/* Field Legend */}
+              {/* Field Legend with better styling */}
               <div className="grid sm:grid-cols-2 gap-4 mt-4">
-                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-                  <p className="font-semibold text-destructive flex items-center gap-2 mb-2">
-                    <span className="h-3 w-3 rounded-full bg-destructive" />
-                    Mandatory Fields
+                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
+                  <p className="font-semibold text-destructive flex items-center gap-2 mb-3">
+                    <span className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
+                    Mandatory Fields (Required)
                   </p>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Product Name*</li>
-                    <li>• Price (PKR)*</li>
-                    <li>• Category*</li>
-                    <li>• Stock*</li>
+                  <ul className="text-sm text-muted-foreground space-y-1.5">
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                      Product Name*
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                      Price (PKR)*
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                      Category*
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
+                      Stock*
+                    </li>
                   </ul>
                 </div>
-                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-                  <p className="font-semibold text-green-600 dark:text-green-400 flex items-center gap-2 mb-2">
+                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
+                  <p className="font-semibold text-green-600 dark:text-green-400 flex items-center gap-2 mb-3">
                     <span className="h-3 w-3 rounded-full bg-green-500" />
                     Optional Fields
                   </p>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Description</li>
-                    <li>• Sale Price (PKR)</li>
-                    <li>• Image URL, Brand, SKU</li>
+                  <ul className="text-sm text-muted-foreground space-y-1.5">
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      Description
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      Sale Price (PKR)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      Image URL, Brand, SKU
+                    </li>
                   </ul>
                 </div>
               </div>
 
-              {/* Valid Categories */}
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-sm font-medium mb-2">Valid Categories:</p>
+              {/* Valid Categories with better pills */}
+              <div className="p-4 bg-muted/50 rounded-xl border border-border">
+                <p className="text-sm font-medium mb-3 flex items-center gap-2">
+                  <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
+                  Valid Categories:
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {["Electronics", "Fashion", "Home & Garden", "Sports", "Beauty", "Books", "Toys", "Automotive", "Health", "Groceries"].map((cat) => (
-                    <Badge key={cat} variant="secondary" className="text-xs">{cat}</Badge>
+                    <Badge key={cat} variant="secondary" className="text-xs px-3 py-1 rounded-full">{cat}</Badge>
                   ))}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* File Upload Section */}
+          {/* File Upload Section - Enhanced drag & drop */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Upload className="h-5 w-5" />
-                Step 2: Upload Your File
-              </CardTitle>
-              <CardDescription>
-                Drag & drop your filled CSV file or click to browse
-              </CardDescription>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted">
+                  <Upload className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Step 2: Upload Your File</CardTitle>
+                  <CardDescription>
+                    Drag & drop your filled CSV file or click to browse
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {!previewMode ? (
                 <div 
                   className={cn(
-                    "border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer",
+                    "border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer relative overflow-hidden",
                     isDragging 
-                      ? "border-primary bg-primary/5 scale-[1.02]" 
-                      : "border-border hover:border-primary/50 hover:bg-muted/50"
+                      ? "border-primary bg-primary/5 scale-[1.01] shadow-lg" 
+                      : "border-border hover:border-primary/50 hover:bg-muted/30"
                   )}
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
+                  {/* Decorative background gradient */}
+                  {isDragging && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
+                  )}
+                  
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -311,18 +357,29 @@ const SellerBulkUploadPage = () => {
                     onChange={handleFileSelect}
                     className="hidden"
                   />
-                  <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <FileDown className="h-8 w-8 text-primary" />
+                  <div className={cn(
+                    "mx-auto w-20 h-20 rounded-2xl flex items-center justify-center mb-4 transition-all",
+                    isDragging ? "bg-primary/20 scale-110" : "bg-muted"
+                  )}>
+                    <FileDown className={cn(
+                      "h-10 w-10 transition-colors",
+                      isDragging ? "text-primary" : "text-muted-foreground"
+                    )} />
                   </div>
-                  <p className="text-lg font-semibold">
+                  <p className="text-xl font-semibold mb-1">
                     {isDragging ? "Drop your file here!" : "Drag & Drop your CSV file"}
                   </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    or <span className="text-primary font-medium">click to browse</span>
+                  <p className="text-sm text-muted-foreground">
+                    or <span className="text-primary font-medium underline">click to browse</span>
                   </p>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    CSV files only • Maximum 1,000 products per upload
-                  </p>
+                  <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <FileSpreadsheet className="h-3.5 w-3.5" />
+                      CSV files only
+                    </span>
+                    <span>•</span>
+                    <span>Max 1,000 products</span>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
