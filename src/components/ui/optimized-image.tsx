@@ -102,7 +102,7 @@ const OptimizedImage = ({
             setIsLoaded(true);
           }}
           className={cn(
-            "transition-opacity duration-300",
+            "transition-opacity duration-300 object-cover",
             isLoaded ? "opacity-100" : "opacity-0",
             className
           )}
