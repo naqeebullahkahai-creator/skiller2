@@ -41,6 +41,38 @@ export type Database = {
         }
         Relationships: []
       }
+      collected_vouchers: {
+        Row: {
+          collected_at: string
+          id: string
+          used_at: string | null
+          user_id: string
+          voucher_id: string
+        }
+        Insert: {
+          collected_at?: string
+          id?: string
+          used_at?: string | null
+          user_id: string
+          voucher_id: string
+        }
+        Update: {
+          collected_at?: string
+          id?: string
+          used_at?: string | null
+          user_id?: string
+          voucher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collected_vouchers_voucher_id_fkey"
+            columns: ["voucher_id"]
+            isOneToOne: false
+            referencedRelation: "vouchers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
@@ -1225,43 +1257,69 @@ export type Database = {
         Row: {
           code: string
           created_at: string
+          description: string | null
           discount_type: Database["public"]["Enums"]["discount_type"]
           discount_value: number
           expiry_date: string
           id: string
           is_active: boolean
           minimum_spend_pkr: number
+          one_per_customer: boolean
+          product_id: string | null
+          seller_id: string | null
+          title: string | null
           updated_at: string
           usage_limit: number | null
           used_count: number
+          voucher_type: string
         }
         Insert: {
           code: string
           created_at?: string
+          description?: string | null
           discount_type?: Database["public"]["Enums"]["discount_type"]
           discount_value: number
           expiry_date: string
           id?: string
           is_active?: boolean
           minimum_spend_pkr?: number
+          one_per_customer?: boolean
+          product_id?: string | null
+          seller_id?: string | null
+          title?: string | null
           updated_at?: string
           usage_limit?: number | null
           used_count?: number
+          voucher_type?: string
         }
         Update: {
           code?: string
           created_at?: string
+          description?: string | null
           discount_type?: Database["public"]["Enums"]["discount_type"]
           discount_value?: number
           expiry_date?: string
           id?: string
           is_active?: boolean
           minimum_spend_pkr?: number
+          one_per_customer?: boolean
+          product_id?: string | null
+          seller_id?: string | null
+          title?: string | null
           updated_at?: string
           usage_limit?: number | null
           used_count?: number
+          voucher_type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vouchers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wallet_transactions: {
         Row: {

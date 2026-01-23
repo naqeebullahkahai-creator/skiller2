@@ -451,30 +451,33 @@ export const useVoucherValidation = () => {
   const recordVoucherUsage = async (code: string, orderId: string) => {
     if (!user) return;
 
-    // Get voucher ID
+    // Get voucher ID and current used_count
     const { data: voucher } = await supabase
       .from("vouchers")
-      .select("id")
+      .select("id, used_count")
       .ilike("code", code)
       .single();
 
     if (voucher) {
+      // Record usage
       await supabase.from("voucher_usage").insert([{
         voucher_id: voucher.id,
         user_id: user.id,
         order_id: orderId,
       }]);
 
-      // Increment used_count - using try/catch since .catch() isn't available on rpc
-      try {
-        await supabase.rpc("increment_flash_sale_sold", {
-          p_flash_sale_id: voucher.id,
-          p_product_id: voucher.id,
-          p_quantity: 1,
-        });
-      } catch {
-        // Ignore if function doesn't match
-      }
+      // Increment used_count
+      await supabase
+        .from("vouchers")
+        .update({ used_count: (voucher.used_count || 0) + 1 })
+        .eq("id", voucher.id);
+
+      // Mark collected voucher as used if applicable
+      await supabase
+        .from("collected_vouchers")
+        .update({ used_at: new Date().toISOString() })
+        .eq("voucher_id", voucher.id)
+        .eq("user_id", user.id);
     }
   };
 
