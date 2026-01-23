@@ -19,7 +19,9 @@ import {
   BarChart3,
   Ticket,
   Image,
-  Star
+  Star,
+  XCircle,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +41,8 @@ import { DashboardProvider } from "@/contexts/DashboardContext";
 const adminLinks = [
   { name: "Dashboard", href: "/admin-dashboard", icon: LayoutDashboard },
   { name: "Order Management", href: "/admin-dashboard/orders", icon: ShoppingCart },
+  { name: "Cancellations", href: "/admin-dashboard/cancellations", icon: XCircle },
+  { name: "Returns", href: "/admin-dashboard/returns", icon: RotateCcw },
   { name: "Product Catalog", href: "/admin-dashboard/products", icon: Package },
   { name: "Category Manager", href: "/admin-dashboard/categories", icon: FolderOpen },
   { name: "Reviews", href: "/admin-dashboard/reviews", icon: Star },

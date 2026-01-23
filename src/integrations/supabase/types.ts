@@ -80,6 +80,50 @@ export type Database = {
         }
         Relationships: []
       }
+      cancellation_logs: {
+        Row: {
+          cancelled_by: string
+          cancelled_by_role: string
+          created_at: string
+          id: string
+          items_restocked: boolean | null
+          order_id: string
+          reason: string
+          refund_amount: number | null
+          refund_processed: boolean | null
+        }
+        Insert: {
+          cancelled_by: string
+          cancelled_by_role: string
+          created_at?: string
+          id?: string
+          items_restocked?: boolean | null
+          order_id: string
+          reason: string
+          refund_amount?: number | null
+          refund_processed?: boolean | null
+        }
+        Update: {
+          cancelled_by?: string
+          cancelled_by_role?: string
+          created_at?: string
+          id?: string
+          items_restocked?: boolean | null
+          order_id?: string
+          reason?: string
+          refund_amount?: number | null
+          refund_processed?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cancellation_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collected_vouchers: {
         Row: {
           collected_at: string
@@ -593,6 +637,9 @@ export type Database = {
       orders: {
         Row: {
           address_id: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           courier_name: string | null
           created_at: string
           customer_id: string | null
@@ -611,6 +658,9 @@ export type Database = {
         }
         Insert: {
           address_id?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           courier_name?: string | null
           created_at?: string
           customer_id?: string | null
@@ -629,6 +679,9 @@ export type Database = {
         }
         Update: {
           address_id?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           courier_name?: string | null
           created_at?: string
           customer_id?: string | null
@@ -1423,6 +1476,15 @@ export type Database = {
     }
     Functions: {
       can_request_return: { Args: { p_order_id: string }; Returns: boolean }
+      cancel_order_with_refund: {
+        Args: {
+          p_cancelled_by: string
+          p_cancelled_by_role: string
+          p_order_id: string
+          p_reason: string
+        }
+        Returns: Json
+      }
       decrease_product_stock: {
         Args: { p_product_id: string; p_quantity: number }
         Returns: boolean
@@ -1474,6 +1536,7 @@ export type Database = {
         Args: { p_amount: number; p_order_id: string; p_seller_id: string }
         Returns: undefined
       }
+      restock_order_items: { Args: { p_order_id: string }; Returns: boolean }
       validate_voucher: {
         Args: { p_code: string; p_order_total: number; p_user_id: string }
         Returns: {

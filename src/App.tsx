@@ -47,6 +47,8 @@ import FlashSaleManager from "./pages/dashboard/FlashSaleManager";
 import VoucherManager from "./pages/dashboard/VoucherManager";
 import BannerManager from "./pages/dashboard/BannerManager";
 import AdminBulkUploadLogs from "./pages/dashboard/AdminBulkUploadLogs";
+import AdminCancellationsPage from "./pages/dashboard/AdminCancellationsPage";
+import AdminReturnsPage from "./pages/dashboard/AdminReturnsPage";
 
 // Seller Dashboard
 import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
@@ -141,6 +143,8 @@ const App = () => (
               >
                 <Route index element={<AdminDashboardHome />} />
                 <Route path="orders" element={<AdminOrderManagement />} />
+                <Route path="cancellations" element={<AdminCancellationsPage />} />
+                <Route path="returns" element={<AdminReturnsPage />} />
                 <Route path="products" element={<AdminProductCatalog />} />
                 <Route path="categories" element={<AdminCategoryManager />} />
                 <Route path="approvals" element={<SellerApprovals />} />
