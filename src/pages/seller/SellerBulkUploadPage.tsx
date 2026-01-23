@@ -10,7 +10,12 @@ import {
   History,
   FileText,
   Sparkles,
-  FileDown
+  FileDown,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  ListChecks
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,22 +33,33 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  useBulkUpload, 
-  generateCSVTemplate, 
-  generateExcelInstructions,
-  parseCSV,
-  ProductCSVRow,
-  BulkUploadError 
-} from "@/hooks/useBulkUpload";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { useBulkUpload, BulkUploadError } from "@/hooks/useBulkUpload";
+import { 
+  generateFanzonTemplate,
+  generateInstructionsGuide,
+  parseCSVContent,
+  validateProductRow,
+  ParsedProductRow,
+  ValidationError,
+  CATEGORY_MAPPINGS,
+  resolveCategory
+} from "@/utils/bulkUploadTemplate";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const SellerBulkUploadPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [parsedRows, setParsedRows] = useState<ProductCSVRow[]>([]);
+  const [parsedRows, setParsedRows] = useState<ParsedProductRow[]>([]);
   const [previewMode, setPreviewMode] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [localErrors, setLocalErrors] = useState<ValidationError[]>([]);
+  const [showGuide, setShowGuide] = useState(false);
+  const [showCategoryRef, setShowCategoryRef] = useState(false);
   
   const { 
     isUploading, 
@@ -63,7 +79,7 @@ const SellerBulkUploadPage = () => {
   }, []);
 
   const handleDownloadTemplate = () => {
-    const template = generateCSVTemplate();
+    const template = generateFanzonTemplate();
     const blob = new Blob([template], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -74,7 +90,7 @@ const SellerBulkUploadPage = () => {
   };
 
   const handleDownloadInstructions = () => {
-    const instructions = generateExcelInstructions();
+    const instructions = generateInstructionsGuide();
     const blob = new Blob([instructions], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -86,40 +102,49 @@ const SellerBulkUploadPage = () => {
 
   const processFile = useCallback((file: File) => {
     if (!file.name.endsWith('.csv')) {
-      setValidationErrors([{
+      setLocalErrors([{
         row: 0,
         field: "File",
-        message: "Please upload a CSV file only"
+        message: "Please upload a CSV file only. Excel files (.xlsx) are not supported.",
       }]);
       return;
     }
     
     setSelectedFile(file);
+    setLocalErrors([]);
     setValidationErrors([]);
     
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
-      const rows = parseCSV(content);
+      const rows = parseCSVContent(content);
       
       if (rows.length === 0) {
-        setValidationErrors([{
+        setLocalErrors([{
           row: 0,
           field: "File",
-          message: "No valid data rows found in the file"
+          message: "No valid data rows found. Make sure your file has data after the header row.",
         }]);
         return;
       }
       
       if (rows.length > 1000) {
-        setValidationErrors([{
+        setLocalErrors([{
           row: 0,
           field: "File",
-          message: "Maximum 1000 products per upload. Please split your file."
+          message: `File contains ${rows.length} products. Maximum allowed is 1,000 per upload. Please split your file.`,
         }]);
         return;
       }
       
+      // Validate all rows and collect errors
+      const allErrors: ValidationError[] = [];
+      rows.forEach((row, index) => {
+        const rowErrors = validateProductRow(row, index);
+        allErrors.push(...rowErrors);
+      });
+      
+      setLocalErrors(allErrors);
       setParsedRows(rows);
       setPreviewMode(true);
     };
@@ -150,14 +175,28 @@ const SellerBulkUploadPage = () => {
   }, [processFile]);
 
   const handleUpload = async () => {
-    if (!selectedFile || parsedRows.length === 0) return;
+    if (!selectedFile || parsedRows.length === 0 || localErrors.length > 0) return;
     
-    const result = await processUpload(parsedRows, selectedFile.name);
+    // Convert parsed rows to the format expected by useBulkUpload
+    const uploadRows = parsedRows.map(row => ({
+      title: row.title,
+      description: row.description || "",
+      price: row.price,
+      discount_price: row.discount_price || "",
+      category: resolveCategory(row.category) || row.category,
+      stock_quantity: row.stock_quantity,
+      image_url: row.image_url || "",
+      brand: row.brand || "",
+      sku: row.sku || "",
+    }));
+    
+    const result = await processUpload(uploadRows, selectedFile.name);
     
     if (result.success) {
       setSelectedFile(null);
       setParsedRows([]);
       setPreviewMode(false);
+      setLocalErrors([]);
       fetchUploadLogs();
     }
   };
@@ -166,14 +205,15 @@ const SellerBulkUploadPage = () => {
     setSelectedFile(null);
     setParsedRows([]);
     setPreviewMode(false);
+    setLocalErrors([]);
     setValidationErrors([]);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const getRowErrors = (rowIndex: number): BulkUploadError[] => {
-    return validationErrors.filter((e) => e.row === rowIndex + 2);
+  const getRowErrors = (rowIndex: number): ValidationError[] => {
+    return localErrors.filter((e) => e.row === rowIndex + 2);
   };
 
   const getStatusBadge = (status: string) => {
@@ -189,22 +229,24 @@ const SellerBulkUploadPage = () => {
     }
   };
 
+  const validRowsCount = parsedRows.length - new Set(localErrors.map(e => e.row)).size;
+
   return (
     <div className="space-y-6">
       {/* Page Header with FANZON branding */}
       <div className="flex items-center gap-3">
-        <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg">
-          <Sparkles className="h-6 w-6 text-primary-foreground" />
+        <div className="p-3 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d5a87] shadow-lg">
+          <Sparkles className="h-6 w-6 text-white" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             Bulk Upload
-            <Badge className="bg-primary/10 text-primary border-0 text-xs font-medium">
+            <Badge className="bg-[#1e3a5f] text-white border-0 text-xs font-bold px-2 py-0.5">
               FANZON
             </Badge>
           </h1>
           <p className="text-muted-foreground">
-            Upload up to 1,000 products at once using our FANZON template
+            Upload up to 1,000 products at once using our official template
           </p>
         </div>
       </div>
@@ -222,101 +264,226 @@ const SellerBulkUploadPage = () => {
         </TabsList>
 
         <TabsContent value="upload" className="space-y-6">
-          {/* Template Download Section - Enhanced FANZON branding */}
-          <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden relative">
-            {/* Decorative element */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
+          {/* How to Use Guide */}
+          <Collapsible open={showGuide} onOpenChange={setShowGuide}>
+            <Card className="border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/20">
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/50">
+                        <HelpCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="text-left">
+                        <CardTitle className="text-lg text-blue-900 dark:text-blue-100">
+                          📖 How to Use Bulk Upload
+                        </CardTitle>
+                        <CardDescription className="text-blue-700 dark:text-blue-300">
+                          Step-by-step guide for successful uploads
+                        </CardDescription>
+                      </div>
+                    </div>
+                    {showGuide ? (
+                      <ChevronUp className="h-5 w-5 text-blue-600" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-blue-600" />
+                    )}
+                  </div>
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="pt-0">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
+                        1
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Download Template</p>
+                        <p className="text-xs text-muted-foreground">Get the official FANZON CSV template</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
+                        2
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Fill Your Data</p>
+                        <p className="text-xs text-muted-foreground">Add products (delete example rows first)</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
+                        3
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Upload & Preview</p>
+                        <p className="text-xs text-muted-foreground">Review your data before confirming</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
+                        4
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">Fix Errors (if any)</p>
+                        <p className="text-xs text-muted-foreground">We'll show exactly what to fix</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg">
+                    <div className="flex gap-2">
+                      <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-amber-800 dark:text-amber-200">
+                        <strong>Pro Tips:</strong>
+                        <ul className="list-disc list-inside mt-1 space-y-0.5 text-amber-700 dark:text-amber-300">
+                          <li>Price must be numbers only (e.g., <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">2500</code> not <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">Rs. 2500</code>)</li>
+                          <li>Use category ID (1-10) or name (e.g., "Electronics")</li>
+                          <li>Image URLs must be direct links starting with https://</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+
+          {/* Template Download Section */}
+          <Card className="border-[#1e3a5f]/30 bg-gradient-to-br from-[#1e3a5f]/10 via-[#1e3a5f]/5 to-transparent overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#1e3a5f]/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#1e3a5f]/10 rounded-full blur-2xl" />
             
             <CardHeader className="relative z-10">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary text-primary-foreground">
+                <div className="p-2 rounded-lg bg-[#1e3a5f] text-white">
                   <FileSpreadsheet className="h-5 w-5" />
                 </div>
                 <div>
                   <CardTitle className="text-lg">Step 1: Download FANZON Template</CardTitle>
                   <CardDescription>
-                    Use our branded template for hassle-free uploads with examples
+                    Official branded template with instructions and category reference
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4 relative z-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <Button onClick={handleDownloadTemplate} className="gap-2 shadow-md">
+                <Button 
+                  onClick={handleDownloadTemplate} 
+                  className="gap-2 shadow-md bg-[#1e3a5f] hover:bg-[#2d5a87]"
+                >
                   <Download size={18} />
                   Download CSV Template
                 </Button>
                 <Button onClick={handleDownloadInstructions} variant="outline" className="gap-2">
                   <FileText size={18} />
-                  Download Instructions
+                  Download Instructions Guide
                 </Button>
               </div>
               
-              {/* Field Legend with better styling */}
+              {/* Field Legend */}
               <div className="grid sm:grid-cols-2 gap-4 mt-4">
-                <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
-                  <p className="font-semibold text-destructive flex items-center gap-2 mb-3">
-                    <span className="h-3 w-3 rounded-full bg-destructive animate-pulse" />
-                    Mandatory Fields (Required)
+                <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl">
+                  <p className="font-semibold text-red-700 dark:text-red-400 flex items-center gap-2 mb-3">
+                    <span className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
+                    Mandatory Fields (Required) *
                   </p>
-                  <ul className="text-sm text-muted-foreground space-y-1.5">
+                  <ul className="text-sm text-red-800 dark:text-red-300 space-y-1.5">
                     <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
-                      Product Name*
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                      <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">Product_Title*</code>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
-                      Price (PKR)*
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                      <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">Category*</code>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
-                      Category*
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                      <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">Price_PKR*</code>
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-destructive" />
-                      Stock*
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                      <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">Stock_Quantity*</code>
                     </li>
                   </ul>
                 </div>
-                <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
-                  <p className="font-semibold text-green-600 dark:text-green-400 flex items-center gap-2 mb-3">
+                <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 rounded-xl">
+                  <p className="font-semibold text-green-700 dark:text-green-400 flex items-center gap-2 mb-3">
                     <span className="h-3 w-3 rounded-full bg-green-500" />
                     Optional Fields
                   </p>
-                  <ul className="text-sm text-muted-foreground space-y-1.5">
+                  <ul className="text-sm text-green-800 dark:text-green-300 space-y-1.5">
                     <li className="flex items-center gap-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      Description
+                      <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">Discount_Price</code>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      Sale Price (PKR)
+                      <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">Brand_Name</code>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      Image URL, Brand, SKU
+                      <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">Product_Description</code>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">Image_URL, SKU</code>
                     </li>
                   </ul>
                 </div>
               </div>
 
-              {/* Valid Categories with better pills */}
-              <div className="p-4 bg-muted/50 rounded-xl border border-border">
-                <p className="text-sm font-medium mb-3 flex items-center gap-2">
-                  <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
-                  Valid Categories:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {["Electronics", "Fashion", "Home & Garden", "Sports", "Beauty", "Books", "Toys", "Automotive", "Health", "Groceries"].map((cat) => (
-                    <Badge key={cat} variant="secondary" className="text-xs px-3 py-1 rounded-full">{cat}</Badge>
-                  ))}
+              {/* Category Reference - Collapsible */}
+              <Collapsible open={showCategoryRef} onOpenChange={setShowCategoryRef}>
+                <div className="p-4 bg-muted/50 rounded-xl border border-border">
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium flex items-center gap-2">
+                        <ListChecks className="h-4 w-4 text-muted-foreground" />
+                        Category Reference (ID or Name)
+                      </p>
+                      {showCategoryRef ? (
+                        <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      {CATEGORY_MAPPINGS.map((cat) => (
+                        <div 
+                          key={cat.id} 
+                          className="p-2 bg-background rounded-lg border border-border text-center"
+                        >
+                          <span className="text-xs font-bold text-[#1e3a5f] dark:text-blue-400">
+                            {cat.id}
+                          </span>
+                          <p className="text-xs font-medium truncate">{cat.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                  {!showCategoryRef && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {CATEGORY_MAPPINGS.slice(0, 5).map((cat) => (
+                        <Badge key={cat.id} variant="secondary" className="text-xs px-2 py-0.5">
+                          {cat.id}={cat.name}
+                        </Badge>
+                      ))}
+                      <Badge variant="outline" className="text-xs px-2 py-0.5">
+                        +{CATEGORY_MAPPINGS.length - 5} more
+                      </Badge>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </Collapsible>
             </CardContent>
           </Card>
 
-          {/* File Upload Section - Enhanced drag & drop */}
+          {/* File Upload Section */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -337,17 +504,16 @@ const SellerBulkUploadPage = () => {
                   className={cn(
                     "border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer relative overflow-hidden",
                     isDragging 
-                      ? "border-primary bg-primary/5 scale-[1.01] shadow-lg" 
-                      : "border-border hover:border-primary/50 hover:bg-muted/30"
+                      ? "border-[#1e3a5f] bg-[#1e3a5f]/5 scale-[1.01] shadow-lg" 
+                      : "border-border hover:border-[#1e3a5f]/50 hover:bg-muted/30"
                   )}
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
-                  {/* Decorative background gradient */}
                   {isDragging && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#1e3a5f]/10 to-transparent pointer-events-none" />
                   )}
                   
                   <input
@@ -359,18 +525,26 @@ const SellerBulkUploadPage = () => {
                   />
                   <div className={cn(
                     "mx-auto w-20 h-20 rounded-2xl flex items-center justify-center mb-4 transition-all",
-                    isDragging ? "bg-primary/20 scale-110" : "bg-muted"
+                    isDragging ? "bg-[#1e3a5f]/20 scale-110" : "bg-muted"
                   )}>
                     <FileDown className={cn(
                       "h-10 w-10 transition-colors",
-                      isDragging ? "text-primary" : "text-muted-foreground"
+                      isDragging ? "text-[#1e3a5f]" : "text-muted-foreground"
                     )} />
                   </div>
+                  
+                  {/* FANZON branding in upload zone */}
+                  <div className="mb-3">
+                    <Badge className="bg-[#1e3a5f] text-white border-0 text-xs font-bold px-3 py-1">
+                      FANZON BULK UPLOAD
+                    </Badge>
+                  </div>
+                  
                   <p className="text-xl font-semibold mb-1">
                     {isDragging ? "Drop your file here!" : "Drag & Drop your CSV file"}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    or <span className="text-primary font-medium underline">click to browse</span>
+                    or <span className="text-[#1e3a5f] dark:text-blue-400 font-medium underline">click to browse</span>
                   </p>
                   <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
@@ -386,13 +560,13 @@ const SellerBulkUploadPage = () => {
                   {/* File Info Card */}
                   <div className="flex items-center justify-between p-4 bg-muted rounded-xl">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <FileSpreadsheet className="h-6 w-6 text-primary" />
+                      <div className="p-2 rounded-lg bg-[#1e3a5f]/10">
+                        <FileSpreadsheet className="h-6 w-6 text-[#1e3a5f] dark:text-blue-400" />
                       </div>
                       <div>
                         <p className="font-medium">{selectedFile?.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {parsedRows.length} products ready to upload
+                          {parsedRows.length} products found • {validRowsCount} valid
                         </p>
                       </div>
                     </div>
@@ -401,19 +575,38 @@ const SellerBulkUploadPage = () => {
                     </Button>
                   </div>
 
-                  {/* Validation Errors */}
-                  {validationErrors.length > 0 && (
+                  {/* Validation Errors - Enhanced */}
+                  {localErrors.length > 0 && (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Fix These Errors Before Uploading</AlertTitle>
+                      <AlertTitle className="flex items-center gap-2">
+                        Fix These Errors Before Uploading
+                        <Badge variant="destructive" className="text-xs">
+                          {localErrors.length} error{localErrors.length > 1 ? 's' : ''}
+                        </Badge>
+                      </AlertTitle>
                       <AlertDescription>
                         <ScrollArea className="h-48 mt-2">
-                          <div className="space-y-1">
-                            {validationErrors.map((error, idx) => (
-                              <p key={idx} className="text-sm font-mono">
-                                <span className="font-bold">Row {error.row}:</span>{" "}
-                                <span className="text-destructive">{error.field}</span> — {error.message}
-                              </p>
+                          <div className="space-y-2">
+                            {localErrors.map((error, idx) => (
+                              <div 
+                                key={idx} 
+                                className="p-2 bg-destructive/10 rounded-lg border border-destructive/20"
+                              >
+                                <p className="text-sm">
+                                  <span className="font-bold text-destructive">
+                                    Row {error.row}:
+                                  </span>{" "}
+                                  <span className="font-medium">{error.field}</span>
+                                  <span className="text-muted-foreground"> — </span>
+                                  {error.message}
+                                </p>
+                                {error.value && (
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Current value: <code className="bg-muted px-1 rounded">{error.value}</code>
+                                  </p>
+                                )}
+                              </div>
                             ))}
                           </div>
                         </ScrollArea>
@@ -421,37 +614,69 @@ const SellerBulkUploadPage = () => {
                     </Alert>
                   )}
 
-                  {/* Preview Table */}
+                  {/* Preview Table with status */}
                   <div>
-                    <h4 className="font-medium mb-2">Preview (first 10 rows)</h4>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">
+                        Data Preview 
+                        <span className="text-muted-foreground font-normal"> (first 10 rows)</span>
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="gap-1">
+                          <CheckCircle2 size={12} className="text-green-500" />
+                          {validRowsCount} valid
+                        </Badge>
+                        {localErrors.length > 0 && (
+                          <Badge variant="destructive" className="gap-1">
+                            <AlertCircle size={12} />
+                            {new Set(localErrors.map(e => e.row)).size} with errors
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
                     <div className="border rounded-lg overflow-hidden">
-                      <ScrollArea className="h-64">
+                      <ScrollArea className="h-72">
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-muted/50">
-                              <TableHead className="w-16">Row</TableHead>
-                              <TableHead>Product Name</TableHead>
-                              <TableHead>Price</TableHead>
-                              <TableHead>Category</TableHead>
-                              <TableHead>Stock</TableHead>
-                              <TableHead className="text-right">Status</TableHead>
+                            <TableRow className="bg-[#1e3a5f] hover:bg-[#1e3a5f]">
+                              <TableHead className="w-16 text-white font-bold">Row</TableHead>
+                              <TableHead className="text-white font-bold">Product Title</TableHead>
+                              <TableHead className="text-white font-bold">Category</TableHead>
+                              <TableHead className="text-white font-bold">Price (PKR)</TableHead>
+                              <TableHead className="text-white font-bold">Stock</TableHead>
+                              <TableHead className="text-right text-white font-bold">Status</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {parsedRows.slice(0, 10).map((row, idx) => {
                               const errors = getRowErrors(idx);
                               return (
-                                <TableRow key={idx} className={errors.length > 0 ? "bg-destructive/10" : ""}>
-                                  <TableCell className="font-mono text-muted-foreground">{idx + 2}</TableCell>
-                                  <TableCell className="max-w-48 truncate font-medium">{row.title}</TableCell>
-                                  <TableCell>Rs. {row.price}</TableCell>
-                                  <TableCell>{row.category}</TableCell>
-                                  <TableCell>{row.stock_quantity}</TableCell>
+                                <TableRow 
+                                  key={idx} 
+                                  className={errors.length > 0 ? "bg-red-50 dark:bg-red-950/20" : ""}
+                                >
+                                  <TableCell className="font-mono text-muted-foreground">
+                                    {idx + 2}
+                                  </TableCell>
+                                  <TableCell className="max-w-48 truncate font-medium">
+                                    {row.title || <span className="text-muted-foreground italic">Empty</span>}
+                                  </TableCell>
+                                  <TableCell>
+                                    {resolveCategory(row.category) || row.category || (
+                                      <span className="text-muted-foreground italic">Empty</span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="font-mono">
+                                    {row.price || <span className="text-muted-foreground italic">Empty</span>}
+                                  </TableCell>
+                                  <TableCell className="font-mono">
+                                    {row.stock_quantity || <span className="text-muted-foreground italic">Empty</span>}
+                                  </TableCell>
                                   <TableCell className="text-right">
                                     {errors.length > 0 ? (
                                       <Badge variant="destructive" className="gap-1">
                                         <AlertCircle size={12} />
-                                        {errors.length} error(s)
+                                        {errors.length} error{errors.length > 1 ? 's' : ''}
                                       </Badge>
                                     ) : (
                                       <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 gap-1">
@@ -468,7 +693,7 @@ const SellerBulkUploadPage = () => {
                       </ScrollArea>
                     </div>
                     {parsedRows.length > 10 && (
-                      <p className="text-sm text-muted-foreground mt-2">
+                      <p className="text-sm text-muted-foreground mt-2 text-center">
                         ...and {parsedRows.length - 10} more rows
                       </p>
                     )}
@@ -476,7 +701,7 @@ const SellerBulkUploadPage = () => {
 
                   {/* Upload Progress */}
                   {isUploading && (
-                    <div className="space-y-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                    <div className="space-y-3 p-4 bg-[#1e3a5f]/5 rounded-lg border border-[#1e3a5f]/20">
                       <div className="flex items-center justify-between text-sm">
                         <span className="font-medium flex items-center gap-2">
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -500,8 +725,8 @@ const SellerBulkUploadPage = () => {
                     </Button>
                     <Button 
                       onClick={handleUpload} 
-                      disabled={isUploading || validationErrors.length > 0}
-                      className="gap-2 flex-1 sm:flex-none"
+                      disabled={isUploading || localErrors.length > 0}
+                      className="gap-2 flex-1 sm:flex-none bg-[#1e3a5f] hover:bg-[#2d5a87]"
                     >
                       {isUploading ? (
                         <>
@@ -511,11 +736,17 @@ const SellerBulkUploadPage = () => {
                       ) : (
                         <>
                           <Upload size={18} />
-                          Upload {parsedRows.length} Products
+                          Upload {validRowsCount} Products
                         </>
                       )}
                     </Button>
                   </div>
+                  
+                  {localErrors.length > 0 && (
+                    <p className="text-sm text-amber-600 dark:text-amber-400 text-center">
+                      ⚠️ Fix the {localErrors.length} error{localErrors.length > 1 ? 's' : ''} above to enable upload
+                    </p>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -548,7 +779,7 @@ const SellerBulkUploadPage = () => {
                 <div className="rounded-md border overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="bg-muted/50">
                         <TableHead>File Name</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead className="text-center">Total</TableHead>
