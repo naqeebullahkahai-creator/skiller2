@@ -6,6 +6,8 @@ import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ProductCard from "@/components/product/ProductCard";
 import RecommendedProducts from "@/components/product/RecommendedProducts";
+import EmptyState from "@/components/ui/empty-state";
+import ProductCardSkeleton from "@/components/ui/product-card-skeleton";
 import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +32,7 @@ import {
 import { categories, brands } from "@/data/mockData";
 import { useActiveProducts } from "@/hooks/useProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Skeleton } from "@/components/ui/skeleton";
+import { fuzzySearch } from "@/utils/fuzzySearch";
 
 const ProductListing = () => {
   const { category } = useParams();
@@ -88,14 +90,13 @@ const ProductListing = () => {
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Filter by search query
+    // Filter by search query with fuzzy matching
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.title.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query) ||
-          p.brand?.toLowerCase().includes(query)
+      filtered = fuzzySearch(
+        filtered,
+        searchQuery,
+        (p) => [p.title, p.category, p.brand || ""],
+        0.5
       );
     }
 
@@ -468,11 +469,7 @@ const ProductListing = () => {
             {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
                 {Array.from({ length: 10 }).map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="h-48 w-full rounded-lg" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
+                  <ProductCardSkeleton key={i} />
                 ))}
               </div>
             ) : filteredProducts.length > 0 ? (
@@ -482,15 +479,14 @@ const ProductListing = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <Package size={48} className="mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">{t("search.no_results_title")}</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t("search.no_results_desc")}
-                </p>
-                <Button variant="outline" onClick={clearFilters}>
-                  {t("filter.clear_all")}
-                </Button>
+              <div>
+                <EmptyState
+                  type="search"
+                  title={t("search.no_results_title")}
+                  description={t("search.no_results_desc")}
+                  actionLabel={t("filter.clear_all")}
+                  onAction={clearFilters}
+                />
                 
                 {/* Recommended Products */}
                 <RecommendedProducts limit={6} />

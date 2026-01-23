@@ -1,7 +1,6 @@
-import { Heart, ShoppingBag } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import EmptyState from "@/components/ui/empty-state";
 
 const WishlistPage = () => {
   // Wishlist functionality would need a wishlist table
@@ -19,19 +18,7 @@ const WishlistPage = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-center py-12">
-          <Heart size={64} className="mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Your wishlist is empty</h2>
-          <p className="text-muted-foreground mb-6">
-            Start adding products you love by clicking the heart icon on product cards.
-          </p>
-          <Button asChild>
-            <Link to="/products">
-              <ShoppingBag size={16} className="mr-2" />
-              Browse Products
-            </Link>
-          </Button>
-        </div>
+        <EmptyState type="wishlist" />
       </CardContent>
     </Card>
   );
