@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import ProductCard from "@/components/product/ProductCard";
+import ProductCardSkeleton from "@/components/ui/product-card-skeleton";
 import { Button } from "@/components/ui/button";
-import { useActiveProducts, DatabaseProduct } from "@/hooks/useProducts";
+import { useActiveProducts } from "@/hooks/useProducts";
 
 const JustForYou = () => {
   const { products, isLoading } = useActiveProducts();
@@ -19,8 +19,12 @@ const JustForYou = () => {
           <div className="bg-primary text-primary-foreground py-3 px-4 md:px-6 rounded-t-lg">
             <h2 className="text-lg md:text-xl font-bold text-center">Just For You</h2>
           </div>
-          <div className="bg-card p-4 rounded-b-lg flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <div className="bg-card p-4 rounded-b-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -55,8 +59,12 @@ const JustForYou = () => {
         {/* Product Grid */}
         <div className="bg-card p-4 rounded-b-lg">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            {displayedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {displayedProducts.map((product, index) => (
+              <ProductCard 
+                key={product.id} 
+                product={product}
+                priority={index < 6} // First 6 products load immediately
+              />
             ))}
           </div>
 

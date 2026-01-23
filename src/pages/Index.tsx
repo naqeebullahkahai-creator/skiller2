@@ -6,6 +6,7 @@ import FlashSaleSection from "@/components/home/FlashSaleSection";
 import Categories from "@/components/home/Categories";
 import JustForYou from "@/components/home/JustForYou";
 import SEOHead from "@/components/seo/SEOHead";
+import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
 
 const Index = () => {
   return (
@@ -15,6 +16,7 @@ const Index = () => {
         description="Shop authentic products at FANZON Pakistan. Best prices in PKR, Cash on Delivery, Easy Returns. Electronics, Fashion, Home & more!"
         url="/"
       />
+      <OrganizationJsonLd />
       <Header />
       
       <main>

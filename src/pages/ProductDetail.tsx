@@ -30,6 +30,8 @@ import ProductGallery from "@/components/product/ProductGallery";
 import MobileStickyBar from "@/components/product/MobileStickyBar";
 import AddToCompareButton from "@/components/comparison/AddToCompareButton";
 import SEOHead from "@/components/seo/SEOHead";
+import ProductJsonLd from "@/components/seo/ProductJsonLd";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbJsonLd";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProduct, useActiveProducts, formatPKR } from "@/hooks/useProducts";
@@ -134,7 +136,14 @@ const ProductDetail = () => {
   // Generate SEO data
   const productUrl = `/product/${product.slug || product.id}`;
   const productImage = images[0];
-  const seoDescription = `Get this ${product.category} for only ${formatPKR(displayPrice)}. Authentic products, fast delivery in Pakistan!`;
+  const seoDescription = `Buy ${product.title} at FANZON Pakistan for only ${formatPKR(displayPrice)}. ${product.brand ? `Original ${product.brand} product.` : ""} Fast delivery, Cash on Delivery available!`;
+  
+  // Breadcrumb items for structured data
+  const breadcrumbItems = [
+    { name: "Home", url: "/" },
+    { name: product.category, url: `/category/${product.category.toLowerCase().replace(/\s+/g, "-")}` },
+    { name: product.title, url: productUrl },
+  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -148,6 +157,12 @@ const ProductDetail = () => {
         availability={availableStock > 0 ? "in stock" : "out of stock"}
         category={product.category}
       />
+      <ProductJsonLd
+        product={product}
+        reviewCount={reviewStats.totalReviews}
+        averageRating={reviewStats.averageRating}
+      />
+      <BreadcrumbJsonLd items={breadcrumbItems} />
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-6 pb-24 md:pb-6">

@@ -1,17 +1,19 @@
 import { Heart, Star, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { DatabaseProduct, formatPKR } from "@/hooks/useProducts";
 import { useCart } from "@/contexts/CartContext";
 import AddToCompareButton from "@/components/comparison/AddToCompareButton";
+import LazyImage from "@/components/ui/lazy-image";
+import PrefetchLink from "@/components/product/PrefetchLink";
 
 interface ProductCardProps {
   product: DatabaseProduct;
   showStockBar?: boolean;
+  priority?: boolean;
 }
 
-const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
+const ProductCard = memo(({ product, showStockBar = false, priority = false }: ProductCardProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { addToCart } = useCart();
   
@@ -31,31 +33,37 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
   // Calculate stock percentage (for display purposes)
   const stockSold = Math.max(0, 100 - product.stock_count);
   const stockPercentage = Math.min(90, stockSold); // Cap at 90% for visual effect
+  
+  // SEO-friendly URL using slug
+  const productUrl = `/product/${product.slug || product.id}`;
 
   return (
-    <Link
-      to={`/product/${product.id}`}
+    <PrefetchLink
+      to={productUrl}
+      productId={product.slug || product.id}
       className="group bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-all duration-300 flex flex-col h-full"
     >
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-muted">
-        <img
+        <LazyImage
           src={image}
           alt={product.title}
-          loading="lazy"
-          decoding="async"
+          priority={priority}
+          width={300}
+          height={300}
+          aspectRatio="square"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
         {/* Discount Badge */}
         {discount > 0 && (
-          <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded">
+          <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded z-10">
             -{discount}%
           </div>
         )}
 
         {/* Compare & Wishlist Buttons */}
-        <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
           <AddToCompareButton product={product} variant="icon" />
           <button
             onClick={(e) => {
@@ -76,7 +84,7 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
 
         {/* Quick Add to Cart - Desktop Only */}
         {product.stock_count > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity hidden md:block z-10">
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -139,8 +147,10 @@ const ProductCard = ({ product, showStockBar = false }: ProductCardProps) => {
           </div>
         )}
       </div>
-    </Link>
+    </PrefetchLink>
   );
-};
+});
+
+ProductCard.displayName = "ProductCard";
 
 export default ProductCard;
