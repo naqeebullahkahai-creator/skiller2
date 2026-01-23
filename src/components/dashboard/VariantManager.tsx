@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Image as ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,11 +17,13 @@ export interface LocalVariant {
   variant_value: string;
   additional_price_pkr: number;
   stock_count: number;
+  image_urls: string[];
 }
 
 interface VariantManagerProps {
   variants: LocalVariant[];
   onChange: (variants: LocalVariant[]) => void;
+  productImages?: string[];
 }
 
 const VARIANT_TYPES = [
@@ -38,14 +40,16 @@ const VARIANT_TYPES = [
 const SIZE_PRESETS = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
 const COLOR_PRESETS = ["Black", "White", "Red", "Blue", "Green", "Navy", "Gray", "Brown", "Beige", "Pink"];
 
-const VariantManager = ({ variants, onChange }: VariantManagerProps) => {
+const VariantManager = ({ variants, onChange, productImages = [] }: VariantManagerProps) => {
   const [newVariant, setNewVariant] = useState<Omit<LocalVariant, "id">>({
     variant_name: "",
     variant_value: "",
     additional_price_pkr: 0,
     stock_count: 0,
+    image_urls: [],
   });
   const [customVariantName, setCustomVariantName] = useState("");
+  const [showImageSelector, setShowImageSelector] = useState<string | null>(null);
 
   const generateId = () => `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -60,6 +64,7 @@ const VariantManager = ({ variants, onChange }: VariantManagerProps) => {
       variant_value: newVariant.variant_value,
       additional_price_pkr: newVariant.additional_price_pkr,
       stock_count: newVariant.stock_count,
+      image_urls: newVariant.image_urls,
     };
 
     onChange([...variants, variant]);
@@ -68,6 +73,7 @@ const VariantManager = ({ variants, onChange }: VariantManagerProps) => {
       variant_value: "",
       additional_price_pkr: 0,
       stock_count: 0,
+      image_urls: [],
     });
   };
 
@@ -75,12 +81,24 @@ const VariantManager = ({ variants, onChange }: VariantManagerProps) => {
     onChange(variants.filter((v) => v.id !== id));
   };
 
-  const handleUpdateVariant = (id: string, field: keyof LocalVariant, value: string | number) => {
+  const handleUpdateVariant = (id: string, field: keyof LocalVariant, value: string | number | string[]) => {
     onChange(
       variants.map((v) =>
         v.id === id ? { ...v, [field]: value } : v
       )
     );
+  };
+
+  const toggleImageForVariant = (variantId: string, imageUrl: string) => {
+    const variant = variants.find(v => v.id === variantId);
+    if (!variant) return;
+
+    const currentImages = variant.image_urls || [];
+    const newImages = currentImages.includes(imageUrl)
+      ? currentImages.filter(url => url !== imageUrl)
+      : [...currentImages, imageUrl];
+    
+    handleUpdateVariant(variantId, "image_urls", newImages);
   };
 
   const getPresets = (variantName: string) => {
@@ -97,6 +115,12 @@ const VariantManager = ({ variants, onChange }: VariantManagerProps) => {
     acc[variant.variant_name].push(variant);
     return acc;
   }, {} as Record<string, LocalVariant[]>);
+
+  const isColorVariant = (variantName: string) => {
+    return variantName.toLowerCase().includes("color") || 
+           variantName.toLowerCase().includes("colour") ||
+           variantName.toLowerCase().includes("style");
+  };
 
   return (
     <div className="space-y-6">
@@ -229,49 +253,128 @@ const VariantManager = ({ variants, onChange }: VariantManagerProps) => {
         <div className="space-y-4">
           {Object.entries(groupedVariants).map(([variantName, variantList]) => (
             <div key={variantName} className="space-y-2">
-              <Label className="text-sm font-medium text-muted-foreground">
-                {variantName} ({variantList.length})
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-muted-foreground">
+                  {variantName} ({variantList.length})
+                </Label>
+                {isColorVariant(variantName) && productImages.length > 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    Tag images to show specific photos for each variant
+                  </span>
+                )}
+              </div>
               <div className="space-y-2">
                 {variantList.map((variant) => (
                   <div
                     key={variant.id}
-                    className="flex items-center gap-3 p-3 border border-border rounded-lg bg-card"
+                    className="p-3 border border-border rounded-lg bg-card space-y-3"
                   >
-                    <div className="flex-1 grid grid-cols-3 gap-3">
-                      <div>
-                        <span className="text-xs text-muted-foreground">Value</span>
-                        <p className="font-medium text-sm">{variant.variant_value}</p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 grid grid-cols-3 gap-3">
+                        <div>
+                          <span className="text-xs text-muted-foreground">Value</span>
+                          <p className="font-medium text-sm">{variant.variant_value}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground">Additional Price</span>
+                          <p className="font-medium text-sm">
+                            {variant.additional_price_pkr > 0
+                              ? `+Rs. ${variant.additional_price_pkr.toLocaleString()}`
+                              : "—"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground">Stock</span>
+                          <Input
+                            type="number"
+                            className="h-8 mt-1"
+                            value={variant.stock_count}
+                            onChange={(e) =>
+                              handleUpdateVariant(variant.id, "stock_count", Number(e.target.value) || 0)
+                            }
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-xs text-muted-foreground">Additional Price</span>
-                        <p className="font-medium text-sm">
-                          {variant.additional_price_pkr > 0
-                            ? `+Rs. ${variant.additional_price_pkr.toLocaleString()}`
-                            : "—"}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-xs text-muted-foreground">Stock</span>
-                        <Input
-                          type="number"
-                          className="h-8 mt-1"
-                          value={variant.stock_count}
-                          onChange={(e) =>
-                            handleUpdateVariant(variant.id, "stock_count", Number(e.target.value) || 0)
-                          }
-                        />
+                      <div className="flex items-center gap-2">
+                        {/* Image Tag Button */}
+                        {isColorVariant(variantName) && productImages.length > 0 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="relative"
+                            onClick={() => setShowImageSelector(
+                              showImageSelector === variant.id ? null : variant.id
+                            )}
+                          >
+                            <ImageIcon size={16} />
+                            {variant.image_urls && variant.image_urls.length > 0 && (
+                              <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center">
+                                {variant.image_urls.length}
+                              </span>
+                            )}
+                          </Button>
+                        )}
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => handleRemoveVariant(variant.id)}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
                       </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => handleRemoveVariant(variant.id)}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
+
+                    {/* Image Selector */}
+                    {showImageSelector === variant.id && productImages.length > 0 && (
+                      <div className="pt-3 border-t border-border">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-medium">
+                            Tag images for "{variant.variant_value}"
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setShowImageSelector(null)}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {productImages.map((imageUrl, idx) => {
+                            const isTagged = variant.image_urls?.includes(imageUrl);
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => toggleImageForVariant(variant.id, imageUrl)}
+                                className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                                  isTagged
+                                    ? "border-primary ring-2 ring-primary/20"
+                                    : "border-border hover:border-muted-foreground"
+                                }`}
+                              >
+                                <img
+                                  src={imageUrl}
+                                  alt={`Product ${idx + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                {isTagged && (
+                                  <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                    <span className="text-primary-foreground text-lg font-bold drop-shadow">✓</span>
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Selected images will be shown when this variant is selected on the product page
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

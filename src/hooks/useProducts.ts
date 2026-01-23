@@ -16,6 +16,7 @@ export interface DatabaseProduct {
   discount_price_pkr: number | null;
   stock_count: number;
   images: string[] | null;
+  video_url: string | null;
   status: "pending" | "active" | "rejected";
   created_at: string;
   updated_at: string;

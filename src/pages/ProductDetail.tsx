@@ -9,8 +9,6 @@ import {
   Truck,
   Shield,
   RotateCcw,
-  ChevronLeft,
-  ChevronRight,
   Store,
   Package,
   MapPin,
@@ -27,6 +25,8 @@ import ChatWithSellerButton from "@/components/messaging/ChatWithSellerButton";
 import VariantSelector from "@/components/product/VariantSelector";
 import SocialShareButtons from "@/components/product/SocialShareButtons";
 import ProductBreadcrumb from "@/components/product/ProductBreadcrumb";
+import ProductGallery from "@/components/product/ProductGallery";
+import MobileStickyBar from "@/components/product/MobileStickyBar";
 import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,11 +45,8 @@ const ProductDetail = () => {
   const { stats: reviewStats } = useProductReviews(id);
   const { groupedVariants, variants } = useProductVariants(id);
 
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariant | null>>({});
 
   // Related products (same category)
@@ -132,22 +129,6 @@ const ProductDetail = () => {
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isZoomed) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setZoomPosition({ x, y });
-  };
-
-  const nextImage = () => {
-    setSelectedImageIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setSelectedImageIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
   // Generate SEO data
   const productUrl = `/product/${product.slug || product.id}`;
   const productImage = images[0];
@@ -176,80 +157,16 @@ const ProductDetail = () => {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left: Image Gallery */}
+          {/* Left: Image Gallery with Video Support */}
           <div className="lg:col-span-5">
-            <div className="sticky top-24">
-              {/* Main Image */}
-              <div
-                className="relative aspect-square bg-muted rounded-lg overflow-hidden mb-4 cursor-zoom-in"
-                onMouseEnter={() => setIsZoomed(true)}
-                onMouseLeave={() => setIsZoomed(false)}
-                onMouseMove={handleMouseMove}
-              >
-                <img
-                  src={images[selectedImageIndex]}
-                  alt={product.title}
-                  className={cn(
-                    "w-full h-full object-cover transition-transform duration-200",
-                    isZoomed && "scale-150"
-                  )}
-                  style={
-                    isZoomed
-                      ? { transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%` }
-                      : undefined
-                  }
-                />
-
-                {/* Navigation Arrows */}
-                {images.length > 1 && (
-                  <>
-                    <button
-                      onClick={prevImage}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card p-2 rounded-full shadow-md"
-                    >
-                      <ChevronLeft size={20} />
-                    </button>
-                    <button
-                      onClick={nextImage}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card p-2 rounded-full shadow-md"
-                    >
-                      <ChevronRight size={20} />
-                    </button>
-                  </>
-                )}
-
-                {/* Discount Badge */}
-                {discount > 0 && (
-                  <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-sm font-bold px-3 py-1 rounded">
-                    -{discount}%
-                  </div>
-                )}
-              </div>
-
-              {/* Thumbnails */}
-              {images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {images.map((img, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className={cn(
-                        "flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-colors",
-                        selectedImageIndex === index
-                          ? "border-primary"
-                          : "border-transparent hover:border-muted-foreground"
-                      )}
-                    >
-                      <img
-                        src={img}
-                        alt={`${product.title} ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ProductGallery
+              images={images}
+              videoUrl={product.video_url}
+              productTitle={product.title}
+              discount={discount}
+              selectedVariant={selectedVariant}
+              variants={variants}
+            />
           </div>
 
           {/* Middle: Product Info */}
@@ -316,7 +233,7 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Variant Selector */}
+            {/* Variant Selector with Stock Sync */}
             {hasVariants && (
               <div className="mb-6">
                 <VariantSelector
@@ -570,6 +487,17 @@ const ProductDetail = () => {
       </main>
 
       <Footer />
+      
+      {/* Mobile Sticky Purchase Bar */}
+      <MobileStickyBar
+        productTitle={product.title}
+        price={displayPrice}
+        originalPrice={product.price_pkr}
+        onBuyNow={handleBuyNow}
+        onAddToCart={handleAddToCart}
+        disabled={availableStock === 0 || needsVariantSelection}
+      />
+      
       <MobileBottomNav />
     </div>
   );
