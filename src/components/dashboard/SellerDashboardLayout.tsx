@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -20,7 +20,9 @@ import {
   Zap,
   Star,
   Ticket,
-  Upload
+  Upload,
+  Menu,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,11 +34,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSellerKyc } from "@/hooks/useSellerKyc";
 import { useUnreadCount } from "@/hooks/useMessaging";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const sellerLinks = [
   { name: "Dashboard", href: "/seller-center", icon: LayoutDashboard },
@@ -61,7 +65,14 @@ const SellerDashboardLayout = () => {
   const { profile, logout } = useAuth();
   const { isVerified, isPending, isRejected, hasSubmittedKyc } = useSellerKyc();
   const { unreadCount } = useUnreadCount();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -99,12 +110,100 @@ const SellerDashboardLayout = () => {
     );
   };
 
+  // Sidebar navigation content (shared between desktop and mobile)
+  const SidebarContent = () => (
+    <>
+      {/* Verification Status Badge */}
+      <div className="p-4 border-b border-slate-700">
+        {getVerificationBadge()}
+      </div>
+
+      {/* Quick Add Product Button - Only for verified sellers */}
+      {isVerified && (
+        <div className="p-4 border-b border-slate-700">
+          <Button 
+            className="w-full bg-primary hover:bg-primary/90"
+            onClick={() => navigate("/seller-center/products/new")}
+          >
+            <Plus size={16} className="mr-2" />
+            Add Product
+          </Button>
+        </div>
+      )}
+
+      {/* KYC Required Alert for unverified sellers */}
+      {!isVerified && !isPending && (
+        <div className="p-4 border-b border-slate-700">
+          <Button 
+            className="w-full"
+            variant="outline"
+            onClick={() => navigate("/seller-center/kyc")}
+          >
+            <ShieldCheck size={16} className="mr-2" />
+            Complete KYC
+          </Button>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {sellerLinks.map((link) => {
+          const isActive = location.pathname === link.href || 
+            (link.href !== "/seller-center" && link.href !== "/seller-center/kyc" && location.pathname.startsWith(link.href));
+          
+          const isKycLink = link.href === "/seller-center/kyc";
+          const showKycHighlight = isKycLink && !isVerified;
+          const isMessagesLink = link.href === "/seller-center/messages";
+          
+          return (
+            <Link
+              key={link.name}
+              to={link.href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-3 rounded-lg transition-colors touch-target",
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : showKycHighlight
+                  ? "text-primary bg-primary/10 hover:bg-primary/20"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+              )}
+            >
+              <link.icon size={20} />
+              <span>{link.name}</span>
+              {showKycHighlight && (
+                <Badge variant="destructive" className="ml-auto text-xs">
+                  Required
+                </Badge>
+              )}
+              {isMessagesLink && unreadCount > 0 && (
+                <Badge className="ml-auto bg-destructive text-destructive-foreground text-xs h-5 min-w-5 flex items-center justify-center">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </Badge>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Bottom Links */}
+      <div className="p-4 border-t border-slate-700">
+        <Link
+          to="/"
+          className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors touch-target"
+        >
+          <Store size={20} />
+          <span>Back to Store</span>
+        </Link>
+      </div>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-muted flex">
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <aside 
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen bg-slate-900 text-white transition-all duration-300",
+          "fixed left-0 top-0 z-40 h-screen bg-slate-900 text-white transition-all duration-300 hidden md:flex md:flex-col",
           sidebarOpen ? "w-64" : "w-20"
         )}
       >

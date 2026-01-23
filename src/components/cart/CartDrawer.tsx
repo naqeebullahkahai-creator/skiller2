@@ -9,7 +9,8 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import EmptyState from "@/components/ui/empty-state";
+import { ShoppingCart, Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { formatPKR } from "@/hooks/useProducts";
 import { useAuth } from "@/contexts/AuthContext";
@@ -65,16 +66,11 @@ const CartDrawer = ({ children }: CartDrawerProps) => {
         </SheetHeader>
 
         {items.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
-            <ShoppingBag size={64} className="text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
-            <p className="text-sm text-muted-foreground mb-6">
-              Add some products to get started
-            </p>
-            <Button asChild onClick={() => setOpen(false)}>
-              <Link to="/products">Continue Shopping</Link>
-            </Button>
-          </div>
+          <EmptyState
+            type="cart"
+            onAction={() => setOpen(false)}
+            className="flex-1"
+          />
         ) : (
           <>
             {/* Cart Items */}
