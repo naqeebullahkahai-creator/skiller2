@@ -50,7 +50,7 @@ export const useAdminFinance = () => {
     },
   });
 
-  // Get all payout requests
+  // Get all payout requests with receipt URLs
   const { data: payoutRequests, isLoading: payoutsLoading } = useQuery({
     queryKey: ['admin-payout-requests'],
     queryFn: async () => {
@@ -60,7 +60,7 @@ export const useAdminFinance = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as PayoutRequest[];
+      return data as (PayoutRequest & { receipt_url?: string })[];
     },
   });
 
