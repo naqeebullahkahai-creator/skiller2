@@ -10,10 +10,12 @@ interface SEOHeadProps {
   currency?: string;
   availability?: "in stock" | "out of stock";
   category?: string;
+  keywords?: string;
+  noindex?: boolean;
 }
 
 const BASE_URL = "https://fanzon.pk";
-const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
+const DEFAULT_IMAGE = `${BASE_URL}/pwa-512x512.png`;
 
 const SEOHead = ({
   title,
@@ -25,6 +27,8 @@ const SEOHead = ({
   currency = "PKR",
   availability,
   category,
+  keywords,
+  noindex = false,
 }: SEOHeadProps) => {
   const pageTitle = title
     ? `${title} | FANZON Pakistan`
@@ -36,16 +40,19 @@ const SEOHead = ({
 
   const pageImage = image || DEFAULT_IMAGE;
   const pageUrl = url ? `${BASE_URL}${url}` : BASE_URL;
+  
+  const defaultKeywords = "online shopping pakistan, cash on delivery, electronics pakistan, fashion pakistan, FANZON";
+  const pageKeywords = keywords ? `${keywords}, ${defaultKeywords}` : defaultKeywords;
 
   return (
     <Helmet>
-      {/* Primary Meta Tags */}
       <title>{pageTitle}</title>
       <meta name="title" content={pageTitle} />
       <meta name="description" content={pageDescription} />
+      <meta name="keywords" content={pageKeywords} />
       <link rel="canonical" href={pageUrl} />
 
-      {/* Open Graph / Facebook / WhatsApp */}
+      {/* Open Graph */}
       <meta property="og:type" content={type === "product" ? "product" : "website"} />
       <meta property="og:url" content={pageUrl} />
       <meta property="og:title" content={pageTitle} />
@@ -63,21 +70,23 @@ const SEOHead = ({
       <meta name="twitter:description" content={pageDescription} />
       <meta name="twitter:image" content={pageImage} />
 
-      {/* Product-specific meta tags */}
+      {/* Product meta tags */}
       {type === "product" && price && (
         <>
           <meta property="product:price:amount" content={price.toString()} />
           <meta property="product:price:currency" content={currency} />
-          {availability && (
-            <meta property="product:availability" content={availability} />
-          )}
+          {availability && <meta property="product:availability" content={availability} />}
           {category && <meta property="product:category" content={category} />}
         </>
       )}
 
-      {/* Additional SEO */}
-      <meta name="robots" content="index, follow" />
-      <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
+      {/* Robots */}
+      <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large"} />
+      <meta name="googlebot" content={noindex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large"} />
+      
+      {/* DNS Prefetch */}
+      <link rel="dns-prefetch" href="//images.unsplash.com" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
     </Helmet>
   );
 };

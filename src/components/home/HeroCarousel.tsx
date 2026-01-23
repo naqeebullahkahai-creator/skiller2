@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { banners } from "@/data/mockData";
 import { cn } from "@/lib/utils";
+import LazyImage from "@/components/ui/lazy-image";
 
-const HeroCarousel = () => {
+const HeroCarousel = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -35,15 +36,17 @@ const HeroCarousel = () => {
               className="flex transition-transform duration-500 ease-out h-full"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
-              {banners.map((banner) => (
+              {banners.map((banner, index) => (
                 <div 
                   key={banner.id} 
                   className="w-full h-full flex-shrink-0 relative"
                 >
-                  <img
+                  <LazyImage
                     src={banner.image}
                     alt={banner.title}
+                    priority={index === 0}
                     className="w-full h-full object-cover"
+                    containerClassName="w-full h-full"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
                     <div className="p-6 md:p-10">
@@ -62,12 +65,14 @@ const HeroCarousel = () => {
             {/* Navigation Arrows */}
             <button
               onClick={goToPrev}
+              aria-label="Previous slide"
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card p-2 rounded-full shadow-md transition-colors"
             >
               <ChevronLeft size={20} />
             </button>
             <button
               onClick={goToNext}
+              aria-label="Next slide"
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card p-2 rounded-full shadow-md transition-colors"
             >
               <ChevronRight size={20} />
@@ -79,6 +84,7 @@ const HeroCarousel = () => {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
+                  aria-label={`Go to slide ${index + 1}`}
                   className={cn(
                     "w-2 h-2 rounded-full transition-colors",
                     currentSlide === index ? "bg-primary" : "bg-card/50"
@@ -109,6 +115,8 @@ const HeroCarousel = () => {
       </div>
     </section>
   );
-};
+});
+
+HeroCarousel.displayName = "HeroCarousel";
 
 export default HeroCarousel;

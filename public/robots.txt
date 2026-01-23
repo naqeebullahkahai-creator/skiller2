@@ -1,6 +1,7 @@
 # FANZON Robots.txt
 # https://fanzon.pk
 
+# Allow all search engines
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 1
@@ -9,6 +10,7 @@ User-agent: Bingbot
 Allow: /
 Crawl-delay: 2
 
+# Social media bots
 User-agent: Twitterbot
 Allow: /
 
@@ -21,14 +23,33 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
+# Default rule for all other bots
 User-agent: *
 Allow: /
 
-# Disallow admin/seller areas
+# Disallow admin and seller dashboard areas
 Disallow: /admin-dashboard
 Disallow: /seller-center
 Disallow: /account
 Disallow: /checkout
+Disallow: /order-success
 
-# Sitemap
+# Disallow API and system paths
+Disallow: /api/
+Disallow: /_next/
+Disallow: /auth
+
+# Allow important assets
+Allow: /images/
+Allow: /assets/
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.webp$
+
+# Sitemap location
 Sitemap: https://fanzon.pk/sitemap.xml
+
+# Host
+Host: https://fanzon.pk
