@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPKR } from "@/hooks/useProducts";
 import { useToast } from "@/hooks/use-toast";
+import { useOrderCancellation } from "@/hooks/useOrderCancellation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,9 +37,11 @@ import {
   PackageCheck,
   Home,
   FileText,
+  XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
+import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
 
 interface OrderItem {
   product_id: string;
@@ -64,6 +67,7 @@ interface Order {
   updated_at: string;
   tracking_id: string | null;
   courier_name: string | null;
+  cancellation_reason?: string | null;
 }
 
 interface Review {
@@ -94,10 +98,12 @@ const OrderDetailPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { canCancelOrder } = useOrderCancellation();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [existingReviews, setExistingReviews] = useState<Record<string, boolean>>({});
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
   
   // Review modal state
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -269,6 +275,7 @@ const OrderDetailPage = () => {
   const currentStepIndex = getCurrentStepIndex();
   const isCancelled = order.order_status === "cancelled";
   const isDelivered = order.order_status === "delivered";
+  const { canCancel, message: cancelMessage } = canCancelOrder(order.order_status);
 
   return (
     <div className="space-y-6">
@@ -294,10 +301,28 @@ const OrderDetailPage = () => {
             </p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={() => generateOrderInvoice(order)}>
-          <FileText className="h-4 w-4 mr-2" />
-          Download Invoice
-        </Button>
+        <div className="flex items-center gap-2">
+          {canCancel && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+              onClick={() => setShowCancelDialog(true)}
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Cancel Order
+            </Button>
+          )}
+          {!canCancel && !isCancelled && order.order_status === "shipped" && (
+            <p className="text-xs text-muted-foreground max-w-[200px]">
+              {cancelMessage}
+            </p>
+          )}
+          <Button variant="outline" size="sm" onClick={() => generateOrderInvoice(order)}>
+            <FileText className="h-4 w-4 mr-2" />
+            Download Invoice
+          </Button>
+        </div>
       </div>
 
       {/* Tracking Info Card - Show when shipped */}
@@ -630,6 +655,23 @@ const OrderDetailPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cancel Order Dialog */}
+      {order && (
+        <CancelOrderDialog
+          open={showCancelDialog}
+          onOpenChange={setShowCancelDialog}
+          orderId={order.id}
+          orderNumber={order.order_number || `#${order.id.slice(0, 8)}`}
+          orderStatus={order.order_status}
+          paymentStatus={order.payment_status}
+          totalAmount={order.total_amount_pkr}
+          role="customer"
+          onCancelled={() => {
+            fetchOrder();
+          }}
+        />
+      )}
     </div>
   );
 };

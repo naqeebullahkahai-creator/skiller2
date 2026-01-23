@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck } from "lucide-react";
+import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,9 +29,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { useOrders, Order } from "@/hooks/useOrders";
+import { useOrderCancellation } from "@/hooks/useOrderCancellation";
 import { formatPKR } from "@/hooks/useProducts";
 import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
 import ShippingDialog from "@/components/orders/ShippingDialog";
+import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
@@ -41,11 +43,14 @@ const OrderManagement = () => {
     role: role as "admin" | "seller",
     sellerId: currentSellerId,
   });
+  const { canCancelOrder } = useOrderCancellation();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
   const [selectedOrderForShipping, setSelectedOrderForShipping] = useState<Order | null>(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [selectedOrderForCancel, setSelectedOrderForCancel] = useState<Order | null>(null);
 
   // Filter orders
   const filteredOrders = orders
@@ -60,6 +65,13 @@ const OrderManagement = () => {
     if (newStatus === "shipped") {
       setSelectedOrderForShipping(order);
       setShippingDialogOpen(true);
+      return;
+    }
+
+    // If changing to cancelled, show the cancel dialog
+    if (newStatus === "cancelled") {
+      setSelectedOrderForCancel(order);
+      setCancelDialogOpen(true);
       return;
     }
     
@@ -312,6 +324,21 @@ const OrderManagement = () => {
                                 </DropdownMenuItem>
                               </>
                             )}
+                            {canCancelOrder(order.order_status).canCancel && (
+                              <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                  className="text-destructive focus:text-destructive"
+                                  onClick={() => {
+                                    setSelectedOrderForCancel(order);
+                                    setCancelDialogOpen(true);
+                                  }}
+                                >
+                                  <XCircle className="h-4 w-4 mr-2" />
+                                  Cancel Order
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -339,6 +366,23 @@ const OrderManagement = () => {
           orderId={selectedOrderForShipping.id}
           orderNumber={selectedOrderForShipping.order_number || `#${selectedOrderForShipping.id.slice(0, 8)}`}
           onConfirm={handleShippingConfirm}
+        />
+      )}
+
+      {/* Cancel Order Dialog */}
+      {selectedOrderForCancel && (
+        <CancelOrderDialog
+          open={cancelDialogOpen}
+          onOpenChange={setCancelDialogOpen}
+          orderId={selectedOrderForCancel.id}
+          orderNumber={selectedOrderForCancel.order_number || `#${selectedOrderForCancel.id.slice(0, 8)}`}
+          orderStatus={selectedOrderForCancel.order_status}
+          paymentStatus={selectedOrderForCancel.payment_status}
+          totalAmount={selectedOrderForCancel.total_amount_pkr}
+          role={role === "admin" ? "admin" : "seller"}
+          onCancelled={() => {
+            refetch();
+          }}
         />
       )}
     </div>
