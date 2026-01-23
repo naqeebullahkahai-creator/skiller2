@@ -41,6 +41,7 @@ export interface PayoutRequest {
   admin_notes: string | null;
   processed_by: string | null;
   processed_at: string | null;
+  receipt_url: string | null;
   created_at: string;
   updated_at: string;
 }
