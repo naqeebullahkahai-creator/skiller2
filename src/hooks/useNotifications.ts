@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-interface Notification {
+export type NotificationType = "order" | "price_drop" | "promotion" | "system" | "wallet" | "stock";
+
+export interface Notification {
   id: string;
   title: string;
   message: string;
-  notification_type: "order" | "price_drop" | "promotion" | "system";
+  notification_type: NotificationType;
   link: string | null;
   is_read: boolean;
   created_at: string;
@@ -48,7 +51,7 @@ export const useNotifications = () => {
           .select("*")
           .eq("user_id", userId)
           .order("created_at", { ascending: false })
-          .limit(20);
+          .limit(50);
 
         if (!error && data) {
           setNotifications(data as Notification[]);
@@ -63,7 +66,7 @@ export const useNotifications = () => {
 
     fetchNotifications();
 
-    // Subscribe to realtime updates
+    // Subscribe to realtime updates for new notifications
     if (userId) {
       const channel = supabase
         .channel(`notifications:${userId}`)
@@ -77,8 +80,11 @@ export const useNotifications = () => {
           },
           (payload) => {
             const newNotification = payload.new as Notification;
-            setNotifications((prev) => [newNotification, ...prev.slice(0, 19)]);
+            setNotifications((prev) => [newNotification, ...prev.slice(0, 49)]);
             setUnreadCount((prev) => prev + 1);
+
+            // Show toast notification
+            showNotificationToast(newNotification);
 
             // Show browser notification if permission granted
             if (Notification.permission === "granted") {
@@ -99,6 +105,49 @@ export const useNotifications = () => {
     }
   }, [userId]);
 
+  // Show toast notification based on type
+  const showNotificationToast = (notification: Notification) => {
+    const toastOptions = {
+      duration: 5000,
+      action: notification.link ? {
+        label: "View",
+        onClick: () => window.location.href = notification.link!,
+      } : undefined,
+    };
+
+    switch (notification.notification_type) {
+      case "order":
+        toast.info(notification.title, {
+          description: notification.message,
+          ...toastOptions,
+        });
+        break;
+      case "wallet":
+        toast.success(notification.title, {
+          description: notification.message,
+          ...toastOptions,
+        });
+        break;
+      case "stock":
+        toast.warning(notification.title, {
+          description: notification.message,
+          ...toastOptions,
+        });
+        break;
+      case "promotion":
+        toast(notification.title, {
+          description: notification.message,
+          ...toastOptions,
+        });
+        break;
+      default:
+        toast(notification.title, {
+          description: notification.message,
+          ...toastOptions,
+        });
+    }
+  };
+
   const markAsRead = async (id: string) => {
     if (!userId) return;
     await supabase.from("notifications").update({ is_read: true }).eq("id", id);
@@ -117,11 +166,82 @@ export const useNotifications = () => {
     setUnreadCount(0);
   };
 
+  const deleteNotification = async (id: string) => {
+    if (!userId) return;
+    const notification = notifications.find(n => n.id === id);
+    await supabase.from("notifications").delete().eq("id", id);
+    setNotifications(prev => prev.filter(n => n.id !== id));
+    if (notification && !notification.is_read) {
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    }
+  };
+
+  const deleteAllNotifications = async () => {
+    if (!userId) return;
+    await supabase.from("notifications").delete().eq("user_id", userId);
+    setNotifications([]);
+    setUnreadCount(0);
+  };
+
+  const refetch = useCallback(async () => {
+    if (!userId) return;
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (!error && data) {
+        setNotifications(data as Notification[]);
+        setUnreadCount(data.filter((n: Notification) => !n.is_read).length);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId]);
+
   return {
     notifications,
     unreadCount,
     isLoading,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
+    deleteAllNotifications,
+    refetch,
   };
+};
+
+// Utility function to create notifications (for use in other hooks/components)
+export const createNotification = async (
+  userId: string,
+  title: string,
+  message: string,
+  type: NotificationType,
+  link?: string
+) => {
+  try {
+    const notificationData: {
+      user_id: string;
+      title: string;
+      message: string;
+      notification_type: "order" | "price_drop" | "promotion" | "system";
+      link: string | null;
+    } = {
+      user_id: userId,
+      title,
+      message,
+      notification_type: type === "wallet" || type === "stock" ? "system" : type,
+      link: link || null,
+    };
+    
+    await supabase.from("notifications").insert(notificationData);
+    return true;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    return false;
+  }
 };
