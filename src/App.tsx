@@ -56,6 +56,7 @@ import SellerAnalyticsPage from "./pages/seller/SellerAnalyticsPage";
 import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
 import SellerFlashSalePage from "./pages/seller/SellerFlashSalePage";
 import SellerReviewsPage from "./pages/seller/SellerReviewsPage";
+import SellerVouchersPage from "./pages/seller/SellerVouchersPage";
 
 // Admin Analytics
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
@@ -168,6 +169,7 @@ const App = () => (
                 <Route path="products/new" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
                 <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
                 <Route path="reviews" element={<SellerReviewsPage />} />
+                <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
                 <Route path="flash-sales" element={<SellerFlashSalePage />} />
                 <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
                 <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
