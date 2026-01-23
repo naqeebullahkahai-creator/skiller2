@@ -68,6 +68,10 @@ import SellerAddProductPage from "./pages/seller/SellerAddProductPage";
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
 import AdminReviewsPage from "./pages/dashboard/AdminReviewsPage";
 import AdminFlashNominations from "./pages/dashboard/AdminFlashNominations";
+import AdminQAModerationPage from "./pages/dashboard/AdminQAModerationPage";
+
+// Seller Q&A
+import SellerQAPage from "./pages/seller/SellerQAPage";
 
 // Customer Messages
 import CustomerMessagesPage from "./pages/account/MessagesPage";
@@ -156,6 +160,7 @@ const App = () => (
                 <Route path="flash-sales" element={<FlashSaleManager />} />
                 <Route path="flash-nominations" element={<AdminFlashNominations />} />
                 <Route path="reviews" element={<AdminReviewsPage />} />
+                <Route path="qa-moderation" element={<AdminQAModerationPage />} />
                 <Route path="vouchers" element={<VoucherManager />} />
                 <Route path="banners" element={<BannerManager />} />
                 <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
@@ -179,6 +184,7 @@ const App = () => (
                 <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
                 <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
                 <Route path="reviews" element={<SellerReviewsPage />} />
+                <Route path="qa" element={<VerifiedSellerGuard><SellerQAPage /></VerifiedSellerGuard>} />
                 <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
                 <Route path="flash-sales" element={<SellerFlashSalePage />} />
                 <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />

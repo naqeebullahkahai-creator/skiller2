@@ -21,6 +21,7 @@ import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ProductCard from "@/components/product/ProductCard";
 import ProductReviews from "@/components/product/ProductReviews";
+import ProductQASection from "@/components/product/ProductQASection";
 import ChatWithSellerButton from "@/components/messaging/ChatWithSellerButton";
 import VariantSelector from "@/components/product/VariantSelector";
 import SocialShareButtons from "@/components/product/SocialShareButtons";
@@ -472,6 +473,13 @@ const ProductDetail = () => {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Product Q&A Section */}
+        <ProductQASection 
+          productId={product.id} 
+          sellerId={product.seller_id} 
+          productTitle={product.title}
+        />
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
