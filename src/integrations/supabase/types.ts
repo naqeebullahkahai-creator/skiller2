@@ -773,6 +773,59 @@ export type Database = {
           },
         ]
       }
+      product_questions: {
+        Row: {
+          answer_text: string | null
+          answered_at: string | null
+          asked_at: string
+          created_at: string
+          customer_id: string
+          id: string
+          is_visible: boolean
+          product_id: string
+          question_text: string
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answer_text?: string | null
+          answered_at?: string | null
+          asked_at?: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          is_visible?: boolean
+          product_id: string
+          question_text: string
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answer_text?: string | null
+          answered_at?: string | null
+          asked_at?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          is_visible?: boolean
+          product_id?: string
+          question_text?: string
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_questions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_reviews: {
         Row: {
           created_at: string

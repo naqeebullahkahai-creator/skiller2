@@ -21,7 +21,8 @@ import {
   Image,
   Star,
   XCircle,
-  RotateCcw
+  RotateCcw,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ const adminLinks = [
   { name: "Product Catalog", href: "/admin-dashboard/products", icon: Package },
   { name: "Category Manager", href: "/admin-dashboard/categories", icon: FolderOpen },
   { name: "Reviews", href: "/admin-dashboard/reviews", icon: Star },
+  { name: "Q&A Moderation", href: "/admin-dashboard/qa-moderation", icon: MessageSquare },
   { name: "Flash Sales", href: "/admin-dashboard/flash-sales", icon: Zap },
   { name: "Vouchers", href: "/admin-dashboard/vouchers", icon: Ticket },
   { name: "Banners", href: "/admin-dashboard/banners", icon: Image },

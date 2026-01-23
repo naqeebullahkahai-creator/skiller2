@@ -45,6 +45,7 @@ const sellerLinks = [
   { name: "Add Product", href: "/seller-center/products/new", icon: Plus },
   { name: "Bulk Upload", href: "/seller-center/bulk-upload", icon: Upload },
   { name: "Orders", href: "/seller-center/orders", icon: ShoppingCart },
+  { name: "Customer Q&A", href: "/seller-center/qa", icon: MessageSquare },
   { name: "Vouchers", href: "/seller-center/vouchers", icon: Ticket },
   { name: "Reviews", href: "/seller-center/reviews", icon: Star },
   { name: "Flash Sales", href: "/seller-center/flash-sales", icon: Zap },
