@@ -45,6 +45,7 @@ const adminLinks = [
   { name: "Flash Sales", href: "/admin-dashboard/flash-sales", icon: Zap },
   { name: "Vouchers", href: "/admin-dashboard/vouchers", icon: Ticket },
   { name: "Banners", href: "/admin-dashboard/banners", icon: Image },
+  { name: "Bulk Uploads", href: "/admin-dashboard/bulk-uploads", icon: Package },
   { name: "Analytics", href: "/admin-dashboard/analytics", icon: BarChart3 },
   { name: "Seller Approvals", href: "/admin-dashboard/approvals", icon: Users },
   { name: "Seller KYC", href: "/admin-dashboard/kyc", icon: ShieldCheck },

@@ -19,7 +19,8 @@ import {
   BarChart3,
   Zap,
   Star,
-  Ticket
+  Ticket,
+  Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +42,7 @@ const sellerLinks = [
   { name: "Dashboard", href: "/seller-center", icon: LayoutDashboard },
   { name: "KYC Verification", href: "/seller-center/kyc", icon: ShieldCheck },
   { name: "My Products", href: "/seller-center/products", icon: Package },
+  { name: "Bulk Upload", href: "/seller-center/bulk-upload", icon: Upload },
   { name: "Reviews", href: "/seller-center/reviews", icon: Star },
   { name: "Vouchers", href: "/seller-center/vouchers", icon: Ticket },
   { name: "Flash Sales", href: "/seller-center/flash-sales", icon: Zap },

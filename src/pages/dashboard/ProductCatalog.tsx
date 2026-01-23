@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
-import { Plus, Search, MoreHorizontal, Edit, Trash2, Eye, Loader2 } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Edit, Trash2, Eye, Loader2, Upload } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -45,6 +47,7 @@ import {
 import { useDashboard } from "@/contexts/DashboardContext";
 import { cn } from "@/lib/utils";
 import AddProductForm from "@/components/dashboard/AddProductForm";
+import BulkActionsToolbar from "@/components/dashboard/BulkActionsToolbar";
 import { useAdminProducts, useSellerProducts, formatPKR } from "@/hooks/useProducts";
 
 const ProductCatalog = () => {
@@ -53,6 +56,7 @@ const ProductCatalog = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
 
   // Use appropriate hook based on role
   const adminProducts = useAdminProducts();
@@ -86,6 +90,22 @@ const ProductCatalog = () => {
     }
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedProductIds(filteredProducts.map((p) => p.id));
+    } else {
+      setSelectedProductIds([]);
+    }
+  };
+
+  const handleSelectProduct = (productId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedProductIds((prev) => [...prev, productId]);
+    } else {
+      setSelectedProductIds((prev) => prev.filter((id) => id !== productId));
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const styles: Record<string, { class: string; label: string }> = {
       active: { class: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400", label: "Active" },
@@ -102,6 +122,9 @@ const ProductCatalog = () => {
     return "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop";
   };
 
+  const isAllSelected = filteredProducts.length > 0 && selectedProductIds.length === filteredProducts.length;
+  const isSomeSelected = selectedProductIds.length > 0 && selectedProductIds.length < filteredProducts.length;
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -114,11 +137,33 @@ const ProductCatalog = () => {
             Manage {role === "seller" ? "your " : "all "}products
           </p>
         </div>
-        <Button onClick={() => setShowAddProduct(true)} className="gap-2">
-          <Plus size={18} />
-          Add New Product
-        </Button>
+        <div className="flex gap-2">
+          {role === "seller" && (
+            <Button variant="outline" asChild className="gap-2">
+              <Link to="/seller-dashboard/bulk-upload">
+                <Upload size={18} />
+                Bulk Upload
+              </Link>
+            </Button>
+          )}
+          <Button onClick={() => setShowAddProduct(true)} className="gap-2">
+            <Plus size={18} />
+            Add New Product
+          </Button>
+        </div>
       </div>
+
+      {/* Bulk Actions Toolbar */}
+      {role === "seller" && (
+        <BulkActionsToolbar
+          selectedIds={selectedProductIds}
+          onClearSelection={() => setSelectedProductIds([])}
+          onActionComplete={() => {
+            refetch();
+            setSelectedProductIds([]);
+          }}
+        />
+      )}
 
       {/* Filters */}
       <Card>
@@ -165,6 +210,16 @@ const ProductCatalog = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    {role === "seller" && (
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={isAllSelected}
+                          onCheckedChange={handleSelectAll}
+                          aria-label="Select all"
+                          className={isSomeSelected ? "data-[state=checked]:bg-primary" : ""}
+                        />
+                      </TableHead>
+                    )}
                     <TableHead>Product</TableHead>
                     <TableHead>SKU</TableHead>
                     <TableHead>Category</TableHead>
@@ -177,8 +232,18 @@ const ProductCatalog = () => {
                 <TableBody>
                   {filteredProducts.map((product) => {
                     const statusInfo = getStatusBadge(product.status);
+                    const isSelected = selectedProductIds.includes(product.id);
                     return (
-                      <TableRow key={product.id}>
+                      <TableRow key={product.id} className={isSelected ? "bg-muted/50" : ""}>
+                        {role === "seller" && (
+                          <TableCell>
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={(checked) => handleSelectProduct(product.id, !!checked)}
+                              aria-label={`Select ${product.title}`}
+                            />
+                          </TableCell>
+                        )}
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <img
@@ -268,7 +333,7 @@ const ProductCatalog = () => {
                   })}
                   {filteredProducts.length === 0 && !isLoading && (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={role === "seller" ? 8 : 7} className="text-center py-8 text-muted-foreground">
                         No products found
                       </TableCell>
                     </TableRow>

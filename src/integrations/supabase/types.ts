@@ -41,6 +41,45 @@ export type Database = {
         }
         Relationships: []
       }
+      bulk_upload_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_log: Json | null
+          failed_rows: number
+          file_name: string
+          id: string
+          seller_id: string
+          status: string
+          successful_rows: number
+          total_rows: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_log?: Json | null
+          failed_rows?: number
+          file_name: string
+          id?: string
+          seller_id: string
+          status?: string
+          successful_rows?: number
+          total_rows?: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_log?: Json | null
+          failed_rows?: number
+          file_name?: string
+          id?: string
+          seller_id?: string
+          status?: string
+          successful_rows?: number
+          total_rows?: number
+        }
+        Relationships: []
+      }
       collected_vouchers: {
         Row: {
           collected_at: string

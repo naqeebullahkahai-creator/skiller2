@@ -46,6 +46,7 @@ import AdminPayoutManagement from "./pages/dashboard/AdminPayoutManagement";
 import FlashSaleManager from "./pages/dashboard/FlashSaleManager";
 import VoucherManager from "./pages/dashboard/VoucherManager";
 import BannerManager from "./pages/dashboard/BannerManager";
+import AdminBulkUploadLogs from "./pages/dashboard/AdminBulkUploadLogs";
 
 // Seller Dashboard
 import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
@@ -57,6 +58,7 @@ import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
 import SellerFlashSalePage from "./pages/seller/SellerFlashSalePage";
 import SellerReviewsPage from "./pages/seller/SellerReviewsPage";
 import SellerVouchersPage from "./pages/seller/SellerVouchersPage";
+import SellerBulkUploadPage from "./pages/seller/SellerBulkUploadPage";
 
 // Admin Analytics
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
@@ -150,6 +152,7 @@ const App = () => (
                 <Route path="reviews" element={<AdminReviewsPage />} />
                 <Route path="vouchers" element={<VoucherManager />} />
                 <Route path="banners" element={<BannerManager />} />
+                <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
                 <Route path="analytics" element={<AdminAnalyticsPage />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
@@ -170,6 +173,7 @@ const App = () => (
                 <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
                 <Route path="reviews" element={<SellerReviewsPage />} />
                 <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
+                <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
                 <Route path="flash-sales" element={<SellerFlashSalePage />} />
                 <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
                 <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
