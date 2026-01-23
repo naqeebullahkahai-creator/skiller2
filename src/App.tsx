@@ -61,6 +61,8 @@ import SellerFlashSalePage from "./pages/seller/SellerFlashSalePage";
 import SellerReviewsPage from "./pages/seller/SellerReviewsPage";
 import SellerVouchersPage from "./pages/seller/SellerVouchersPage";
 import SellerBulkUploadPage from "./pages/seller/SellerBulkUploadPage";
+import SellerProductsPage from "./pages/seller/SellerProductsPage";
+import SellerAddProductPage from "./pages/seller/SellerAddProductPage";
 
 // Admin Analytics
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
@@ -172,11 +174,11 @@ const App = () => (
               >
                 <Route index element={<VerifiedSellerGuard><AdminDashboardHome /></VerifiedSellerGuard>} />
                 <Route path="kyc" element={<SellerKyc />} />
-                <Route path="products" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
-                <Route path="products/new" element={<VerifiedSellerGuard><AdminProductCatalog /></VerifiedSellerGuard>} />
+                <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
+                <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
                 <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
-                <Route path="reviews" element={<SellerReviewsPage />} />
                 <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
+                <Route path="reviews" element={<SellerReviewsPage />} />
                 <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
                 <Route path="flash-sales" element={<SellerFlashSalePage />} />
                 <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
