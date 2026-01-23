@@ -645,6 +645,7 @@ export type Database = {
           customer_id: string | null
           customer_name: string
           customer_phone: string | null
+          delivery_instructions: string | null
           id: string
           items: Json
           order_number: string | null
@@ -666,6 +667,7 @@ export type Database = {
           customer_id?: string | null
           customer_name: string
           customer_phone?: string | null
+          delivery_instructions?: string | null
           id?: string
           items?: Json
           order_number?: string | null
@@ -687,6 +689,7 @@ export type Database = {
           customer_id?: string | null
           customer_name?: string
           customer_phone?: string | null
+          delivery_instructions?: string | null
           id?: string
           items?: Json
           order_number?: string | null
@@ -1226,6 +1229,7 @@ export type Database = {
           full_name: string
           id: string
           is_default: boolean
+          label: string | null
           phone: string
           province: string
           updated_at: string
@@ -1239,6 +1243,7 @@ export type Database = {
           full_name: string
           id?: string
           is_default?: boolean
+          label?: string | null
           phone: string
           province: string
           updated_at?: string
@@ -1252,6 +1257,7 @@ export type Database = {
           full_name?: string
           id?: string
           is_default?: boolean
+          label?: string | null
           phone?: string
           province?: string
           updated_at?: string

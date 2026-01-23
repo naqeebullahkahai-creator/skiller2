@@ -52,6 +52,7 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
     images: [] as string[],
     description: "",
     specifications: [{ key: "", value: "" }],
+    videoUrl: "",
   });
   const [variants, setVariants] = useState<LocalVariant[]>([]);
 
@@ -203,6 +204,7 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
           stock_count: Number(formData.stock),
           images: formData.images,
           status: "pending",
+          video_url: formData.videoUrl || null,
         })
         .select("id")
         .single();
@@ -432,52 +434,74 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
 
         {/* Step 3: Media */}
         {currentStep === 3 && (
-          <div className="space-y-4">
-            <Label>Product Images</Label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={handleImageUpload}
-            />
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {formData.images.map((img, index) => (
-                <div key={index} className="relative aspect-square">
-                  <img
-                    src={img}
-                    alt={`Product ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-              {formData.images.length < 6 && (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="aspect-square border-2 border-dashed border-muted-foreground/30 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary hover:bg-primary/5 transition-colors disabled:opacity-50"
-                >
-                  {isUploading ? (
-                    <Loader2 size={24} className="text-muted-foreground animate-spin" />
-                  ) : (
-                    <Upload size={24} className="text-muted-foreground" />
-                  )}
-                  <span className="text-xs text-muted-foreground">
-                    {isUploading ? "Uploading..." : "Upload"}
-                  </span>
-                </button>
-              )}
+          <div className="space-y-6">
+            {/* Video URL */}
+            <div className="space-y-2">
+              <Label htmlFor="videoUrl">Product Video (Optional)</Label>
+              <Input
+                id="videoUrl"
+                placeholder="YouTube, TikTok, or direct video URL"
+                value={formData.videoUrl}
+                onChange={(e) => updateFormData("videoUrl", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Add a short video (max 15 seconds) to showcase your product. Supports YouTube, TikTok, or direct video links.
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Upload up to 6 images (max 5MB each). First image will be the cover.
-            </p>
+
+            {/* Product Images */}
+            <div className="space-y-2">
+              <Label>Product Images</Label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {formData.images.map((img, index) => (
+                  <div key={index} className="relative aspect-square">
+                    <img
+                      src={img}
+                      alt={`Product ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => removeImage(index)}
+                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
+                    >
+                      <X size={14} />
+                    </button>
+                    {index === 0 && (
+                      <span className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
+                        Cover
+                      </span>
+                    )}
+                  </div>
+                ))}
+                {formData.images.length < 6 && (
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="aspect-square border-2 border-dashed border-muted-foreground/30 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary hover:bg-primary/5 transition-colors disabled:opacity-50"
+                  >
+                    {isUploading ? (
+                      <Loader2 size={24} className="text-muted-foreground animate-spin" />
+                    ) : (
+                      <Upload size={24} className="text-muted-foreground" />
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      {isUploading ? "Uploading..." : "Upload"}
+                    </span>
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Upload up to 6 images (max 5MB each). First image will be the cover.
+              </p>
+            </div>
           </div>
         )}
 

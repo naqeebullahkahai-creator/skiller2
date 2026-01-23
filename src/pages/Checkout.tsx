@@ -7,6 +7,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import {
@@ -34,7 +35,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPKR } from "@/hooks/useProducts";
-import { useUserAddresses, UserAddress, PROVINCES, CITIES_BY_PROVINCE } from "@/hooks/useAddresses";
+import { useUserAddresses, UserAddress, PROVINCES, CITIES_BY_PROVINCE, ADDRESS_LABELS } from "@/hooks/useAddresses";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -51,6 +52,10 @@ import {
   Phone,
   User,
   Trash2,
+  Building2,
+  MoreHorizontal,
+  Star,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +69,7 @@ const addressSchema = z.object({
   area: z.string().optional(),
   full_address: z.string().min(10, "Address must be at least 10 characters").max(500),
   is_default: z.boolean().default(false),
+  label: z.string().default("Home"),
 });
 
 type AddressFormData = z.infer<typeof addressSchema>;
@@ -75,6 +81,17 @@ const PAYMENT_METHODS = [
 ];
 
 const SHIPPING_FEE = 150;
+
+const getLabelIcon = (label: string) => {
+  switch (label) {
+    case "Office":
+      return Building2;
+    case "Other":
+      return MoreHorizontal;
+    default:
+      return Home;
+  }
+};
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -89,6 +106,7 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState("");
+  const [deliveryInstructions, setDeliveryInstructions] = useState("");
 
   const form = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
@@ -100,6 +118,7 @@ const Checkout = () => {
       area: "",
       full_address: "",
       is_default: false,
+      label: "Home",
     },
   });
 
@@ -150,6 +169,7 @@ const Checkout = () => {
       area: data.area || "",
       full_address: data.full_address,
       is_default: data.is_default,
+      label: data.label,
     });
     if (newAddress) {
       setSelectedAddressId(newAddress.id);
@@ -227,6 +247,7 @@ const Checkout = () => {
           items: orderItems,
           order_status: "pending" as const,
           payment_status: "unpaid" as const,
+          delivery_instructions: deliveryInstructions || null,
         }])
         .select("id, order_number")
         .single();
@@ -347,7 +368,7 @@ const Checkout = () => {
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold flex items-center gap-2">
                       <MapPin size={20} />
-                      Delivery Address
+                      Select Delivery Address
                     </h2>
                     <Button
                       variant="outline"
@@ -378,53 +399,84 @@ const Checkout = () => {
                       onValueChange={setSelectedAddressId}
                       className="space-y-3"
                     >
-                      {addresses.map((address) => (
-                        <div
-                          key={address.id}
-                          className={cn(
-                            "relative flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-colors",
-                            selectedAddressId === address.id
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-muted-foreground"
-                          )}
-                        >
-                          <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
-                          <Label htmlFor={address.id} className="flex-1 cursor-pointer">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-semibold">{address.full_name}</span>
-                              {address.is_default && (
-                                <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                                  Default
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground flex items-center gap-1">
-                              <Phone size={12} />
-                              {address.phone}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {address.full_address}
-                              {address.area && `, ${address.area}`}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {address.city}, {address.province}
-                            </p>
-                          </Label>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-2 right-2 h-8 w-8 text-muted-foreground hover:text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteAddress(address.id);
-                            }}
+                      {addresses.map((address) => {
+                        const LabelIcon = getLabelIcon(address.label || "Home");
+                        return (
+                          <div
+                            key={address.id}
+                            className={cn(
+                              "relative flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-all",
+                              selectedAddressId === address.id
+                                ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                                : "border-border hover:border-muted-foreground"
+                            )}
                           >
-                            <Trash2 size={16} />
-                          </Button>
-                        </div>
-                      ))}
+                            <RadioGroupItem value={address.id} id={address.id} className="mt-1" />
+                            <Label htmlFor={address.id} className="flex-1 cursor-pointer">
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className={cn(
+                                  "p-1 rounded",
+                                  selectedAddressId === address.id ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                                )}>
+                                  <LabelIcon size={12} />
+                                </div>
+                                <span className="text-xs font-medium text-muted-foreground uppercase">
+                                  {address.label || "Home"}
+                                </span>
+                                {address.is_default && (
+                                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <Star size={10} />
+                                    Default
+                                  </span>
+                                )}
+                              </div>
+                              <p className="font-semibold">{address.full_name}</p>
+                              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                <Phone size={12} />
+                                {address.phone}
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {address.full_address}
+                                {address.area && `, ${address.area}`}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {address.city}, {address.province}
+                              </p>
+                            </Label>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-2 right-2 h-8 w-8 text-muted-foreground hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteAddress(address.id);
+                              }}
+                            >
+                              <Trash2 size={16} />
+                            </Button>
+                          </div>
+                        );
+                      })}
                     </RadioGroup>
                   )}
+                </div>
+
+                {/* Delivery Instructions */}
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <h3 className="text-sm font-semibold flex items-center gap-2 mb-3">
+                    <MessageSquare size={16} />
+                    Delivery Instructions (Optional)
+                  </h3>
+                  <Textarea
+                    placeholder="e.g., Ghar ki bell kharab hai, Please deliver after 2 PM, Leave at the door..."
+                    value={deliveryInstructions}
+                    onChange={(e) => setDeliveryInstructions(e.target.value)}
+                    rows={3}
+                    className="resize-none"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Add any special instructions for the delivery person
+                  </p>
                 </div>
 
                 {/* Selected Address Summary */}
@@ -527,6 +579,12 @@ const Checkout = () => {
                       {selectedAddress.area && `, ${selectedAddress.area}`}, {selectedAddress.city}, {selectedAddress.province}
                     </p>
                   </div>
+                  {deliveryInstructions && (
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Delivery Instructions:</p>
+                      <p className="text-sm italic">"{deliveryInstructions}"</p>
+                    </div>
+                  )}
                   <p className="text-xs text-primary mt-3">
                     📦 Estimated Delivery: {getEstimatedDelivery()}
                   </p>
@@ -677,6 +735,36 @@ const Checkout = () => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleAddAddress)} className="space-y-4">
+              {/* Address Label */}
+              <FormField
+                control={form.control}
+                name="label"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address Label</FormLabel>
+                    <div className="flex gap-2">
+                      {ADDRESS_LABELS.map((label) => {
+                        const Icon = getLabelIcon(label);
+                        return (
+                          <Button
+                            key={label}
+                            type="button"
+                            variant={field.value === label ? "default" : "outline"}
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => field.onChange(label)}
+                          >
+                            <Icon size={14} className="mr-1" />
+                            {label}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="full_name"

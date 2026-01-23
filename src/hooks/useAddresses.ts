@@ -13,6 +13,7 @@ export interface UserAddress {
   area: string | null;
   full_address: string;
   is_default: boolean;
+  label: string;
   created_at: string;
   updated_at: string;
 }
@@ -25,7 +26,10 @@ export interface AddressFormData {
   area: string;
   full_address: string;
   is_default: boolean;
+  label: string;
 }
+
+export const ADDRESS_LABELS = ["Home", "Office", "Other"] as const;
 
 const PROVINCES = [
   "Punjab",
@@ -104,6 +108,7 @@ export const useUserAddresses = () => {
           area: addressData.area || null,
           full_address: addressData.full_address,
           is_default: addressData.is_default || addresses.length === 0, // First address is default
+          label: addressData.label || "Home",
         }])
         .select()
         .single();
