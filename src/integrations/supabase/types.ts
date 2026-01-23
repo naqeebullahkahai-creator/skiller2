@@ -841,6 +841,7 @@ export type Database = {
           additional_price_pkr: number
           created_at: string
           id: string
+          image_urls: string[] | null
           product_id: string
           stock_count: number
           updated_at: string
@@ -851,6 +852,7 @@ export type Database = {
           additional_price_pkr?: number
           created_at?: string
           id?: string
+          image_urls?: string[] | null
           product_id: string
           stock_count?: number
           updated_at?: string
@@ -861,6 +863,7 @@ export type Database = {
           additional_price_pkr?: number
           created_at?: string
           id?: string
+          image_urls?: string[] | null
           product_id?: string
           stock_count?: number
           updated_at?: string
@@ -894,6 +897,7 @@ export type Database = {
           stock_count: number
           title: string
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           brand?: string | null
@@ -911,6 +915,7 @@ export type Database = {
           stock_count?: number
           title: string
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           brand?: string | null
@@ -928,6 +933,7 @@ export type Database = {
           stock_count?: number
           title?: string
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }

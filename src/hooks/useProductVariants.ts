@@ -9,6 +9,7 @@ export interface ProductVariant {
   variant_value: string;
   additional_price_pkr: number;
   stock_count: number;
+  image_urls: string[];
   created_at: string;
   updated_at: string;
 }
