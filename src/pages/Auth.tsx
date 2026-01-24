@@ -10,6 +10,7 @@ import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
+import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -42,6 +43,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Role-based redirection - Admin/Seller go to their dashboards IMMEDIATELY
   useEffect(() => {
@@ -310,7 +312,11 @@ const Auth = () => {
 
             {mode === "login" && (
               <div className="flex justify-end">
-                <button type="button" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
+                <button 
+                  type="button" 
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+                >
                   Forgot Password?
                 </button>
               </div>
@@ -377,6 +383,13 @@ const Auth = () => {
           By continuing, you agree to FANZON's Terms of Service and Privacy Policy
         </p>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal 
+        open={showForgotPassword} 
+        onOpenChange={setShowForgotPassword}
+        userType="customer"
+      />
     </div>
   );
 };

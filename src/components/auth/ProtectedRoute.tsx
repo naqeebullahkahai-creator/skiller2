@@ -1,7 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth, UserRole, SUPER_ADMIN_EMAIL } from "@/contexts/AuthContext";
+import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -12,6 +13,37 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: ProtectedRouteProps) => {
   const { isAuthenticated, isLoading, role, user, isSuperAdmin } = useAuth();
   const location = useLocation();
+  const { toast } = useToast();
+  const hasShownToast = useRef(false);
+
+  // Show permission denied toast when user tries to access unauthorized route
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && !hasShownToast.current) {
+      // Check for admin route access by non-super-admin
+      if (location.pathname.startsWith("/admin") && !isSuperAdmin) {
+        hasShownToast.current = true;
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to access the Admin Dashboard.",
+          variant: "destructive",
+        });
+      }
+      // Check for seller route access by customer
+      else if (location.pathname.startsWith("/seller") && role === "customer") {
+        hasShownToast.current = true;
+        toast({
+          title: "Access Denied",
+          description: "This section is for sellers only. Please use the customer area.",
+          variant: "destructive",
+        });
+      }
+    }
+  }, [isLoading, isAuthenticated, location.pathname, isSuperAdmin, role, toast]);
+
+  // Reset toast flag when location changes
+  useEffect(() => {
+    hasShownToast.current = false;
+  }, [location.pathname]);
 
   if (isLoading) {
     return (
