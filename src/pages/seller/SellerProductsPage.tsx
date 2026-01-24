@@ -147,12 +147,12 @@ const SellerProductsPage = () => {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild className="gap-2">
-            <Link to="/seller-center/bulk-upload">
+            <Link to="/seller/bulk-upload">
               <Upload size={18} />
               Bulk Upload
             </Link>
           </Button>
-          <Button onClick={() => navigate("/seller-center/products/new")} className="gap-2">
+          <Button onClick={() => navigate("/seller/products/new")} className="gap-2">
             <Plus size={18} />
             Add New Product
           </Button>
@@ -216,7 +216,7 @@ const SellerProductsPage = () => {
               <p className="text-muted-foreground mb-4">
                 Start selling by adding your first product
               </p>
-              <Button onClick={() => navigate("/seller-center/products/new")} className="gap-2">
+              <Button onClick={() => navigate("/seller/products/new")} className="gap-2">
                 <Plus size={18} />
                 Add Your First Product
               </Button>

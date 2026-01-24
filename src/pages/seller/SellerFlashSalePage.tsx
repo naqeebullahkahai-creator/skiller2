@@ -142,7 +142,7 @@ const SellerFlashSalePage = () => {
                   <AlertDescription className="flex items-center justify-between">
                     <span>Current Balance: {formatPKR(walletBalance)}</span>
                     {hasInsufficientBalance && (
-                      <Link to="/seller-center/wallet">
+                      <Link to="/seller/wallet">
                         <Button size="sm" variant="outline">Top Up</Button>
                       </Link>
                     )}

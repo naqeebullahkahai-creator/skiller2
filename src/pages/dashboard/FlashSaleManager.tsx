@@ -153,7 +153,7 @@ const FlashSaleManager = () => {
       title: "Flash Sale Application Rejected",
       message: rejectReason || "Your flash sale application was not approved.",
       notification_type: "promotion",
-      link: "/seller-center/flash-sales",
+      link: "/seller/flash-sale",
     });
 
     setShowRejectDialog(false);

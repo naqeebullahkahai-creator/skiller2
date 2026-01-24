@@ -116,14 +116,14 @@ const SellerDashboardHome = () => {
       icon: <Package className="w-6 h-6 text-white" />,
       title: "My Products",
       description: `${totalStats.totalOrders} active listings`,
-      href: "/seller-center/products",
+      href: "/seller/products",
       color: "bg-blue-500"
     },
     {
       icon: <Plus className="w-6 h-6 text-white" />,
       title: "Add New Product",
       description: "List a new item",
-      href: "/seller-center/products/new",
+      href: "/seller/products/new",
       color: "bg-emerald-500"
     },
     {
@@ -131,70 +131,70 @@ const SellerDashboardHome = () => {
       title: "Manage Orders",
       badge: pendingOrders > 0 ? `${pendingOrders} pending` : undefined,
       badgeVariant: "destructive",
-      href: "/seller-center/orders",
+      href: "/seller/orders",
       color: "bg-purple-500"
     },
     {
       icon: <Wallet className="w-6 h-6 text-white" />,
       title: "Wallet & Earnings",
       description: formatPKR(wallet?.current_balance || 0),
-      href: "/seller-center/wallet",
+      href: "/seller/wallet",
       color: "bg-primary"
     },
     {
       icon: <Zap className="w-6 h-6 text-white" />,
       title: "Flash Sale",
       description: "Join promotions",
-      href: "/seller-center/flash-sale",
+      href: "/seller/flash-sale",
       color: "bg-amber-500"
     },
     {
       icon: <FileCheck className="w-6 h-6 text-white" />,
       title: "KYC Verification",
       description: "Update documents",
-      href: "/seller-center/kyc",
+      href: "/seller/kyc",
       color: "bg-teal-500"
     },
     {
       icon: <Tags className="w-6 h-6 text-white" />,
       title: "My Vouchers",
       description: "Create discounts",
-      href: "/seller-center/vouchers",
+      href: "/seller/vouchers",
       color: "bg-pink-500"
     },
     {
       icon: <Upload className="w-6 h-6 text-white" />,
       title: "Bulk Upload",
       description: "Import products",
-      href: "/seller-center/bulk-upload",
+      href: "/seller/bulk-upload",
       color: "bg-indigo-500"
     },
     {
       icon: <MessageSquare className="w-6 h-6 text-white" />,
       title: "Customer Messages",
       description: "Chat with buyers",
-      href: "/seller-center/messages",
+      href: "/seller/messages",
       color: "bg-cyan-500"
     },
     {
       icon: <BarChart3 className="w-6 h-6 text-white" />,
       title: "Analytics",
       description: "Sales insights",
-      href: "/seller-center/analytics",
+      href: "/seller/analytics",
       color: "bg-violet-500"
     },
     {
       icon: <Star className="w-6 h-6 text-white" />,
       title: "Reviews",
       description: "Customer feedback",
-      href: "/seller-center/reviews",
+      href: "/seller/reviews",
       color: "bg-yellow-500"
     },
     {
       icon: <RotateCcw className="w-6 h-6 text-white" />,
       title: "Returns",
       description: "Handle returns",
-      href: "/seller-center/returns",
+      href: "/seller/returns",
       color: "bg-rose-500"
     }
   ];

@@ -13,7 +13,14 @@ import {
   User,
   Bell,
   Search,
-  Settings
+  Settings,
+  Zap,
+  BarChart3,
+  Ticket,
+  MessageSquare,
+  Star,
+  RotateCcw,
+  ShieldCheck
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -48,26 +55,26 @@ const MobileSellerLayout = () => {
 
   // Bottom navigation for mobile
   const bottomNavItems = [
-    { icon: Home, label: "Home", href: "/seller-center" },
-    { icon: Package, label: "Products", href: "/seller-center/products" },
-    { icon: ShoppingCart, label: "Orders", href: "/seller-center/orders" },
-    { icon: Wallet, label: "Wallet", href: "/seller-center/wallet" },
+    { icon: Home, label: "Home", href: "/seller/dashboard" },
+    { icon: Package, label: "Products", href: "/seller/products" },
+    { icon: ShoppingCart, label: "Orders", href: "/seller/orders" },
+    { icon: Wallet, label: "Wallet", href: "/seller/wallet" },
   ];
 
   // Sidebar links
   const sidebarLinks = [
-    { name: "Dashboard", href: "/seller-center", icon: Home },
-    { name: "My Products", href: "/seller-center/products", icon: Package },
-    { name: "Orders", href: "/seller-center/orders", icon: ShoppingCart },
-    { name: "Wallet", href: "/seller-center/wallet", icon: Wallet },
-    { name: "Flash Sale", href: "/seller-center/flash-sale", icon: Package },
-    { name: "Analytics", href: "/seller-center/analytics", icon: Package },
-    { name: "Vouchers", href: "/seller-center/vouchers", icon: Package },
-    { name: "Messages", href: "/seller-center/messages", icon: Package },
-    { name: "Reviews", href: "/seller-center/reviews", icon: Package },
-    { name: "Returns", href: "/seller-center/returns", icon: Package },
-    { name: "KYC", href: "/seller-center/kyc", icon: Package },
-    { name: "Settings", href: "/seller-center/settings", icon: Settings },
+    { name: "Dashboard", href: "/seller/dashboard", icon: Home },
+    { name: "My Products", href: "/seller/products", icon: Package },
+    { name: "Orders", href: "/seller/orders", icon: ShoppingCart },
+    { name: "Wallet", href: "/seller/wallet", icon: Wallet },
+    { name: "Flash Sale", href: "/seller/flash-sale", icon: Zap },
+    { name: "Analytics", href: "/seller/analytics", icon: BarChart3 },
+    { name: "Vouchers", href: "/seller/vouchers", icon: Ticket },
+    { name: "Messages", href: "/seller/messages", icon: MessageSquare },
+    { name: "Reviews", href: "/seller/reviews", icon: Star },
+    { name: "Returns", href: "/seller/returns", icon: RotateCcw },
+    { name: "KYC", href: "/seller/kyc", icon: ShieldCheck },
+    { name: "Settings", href: "/seller/settings", icon: Settings },
   ];
 
   const getVerificationBadge = () => {
@@ -84,7 +91,7 @@ const MobileSellerLayout = () => {
   };
 
   const isActive = (href: string) => {
-    if (href === "/seller-center") return location.pathname === href;
+    if (href === "/seller/dashboard") return location.pathname === href;
     return location.pathname.startsWith(href);
   };
 
@@ -219,7 +226,7 @@ const MobileSellerLayout = () => {
       >
         {/* Logo */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
-          <Link to="/seller-center" className="flex items-center gap-2">
+          <Link to="/seller/dashboard" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Store size={18} className="text-white" />
             </div>
@@ -324,7 +331,7 @@ const MobileSellerLayout = () => {
                   <User className="h-4 w-4 mr-2" />
                   My Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/seller-center/settings")}>
+                <DropdownMenuItem onClick={() => navigate("/seller/settings")}>
                   <Settings className="h-4 w-4 mr-2" />
                   Settings
                 </DropdownMenuItem>

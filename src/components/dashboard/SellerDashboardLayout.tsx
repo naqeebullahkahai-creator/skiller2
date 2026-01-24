@@ -22,7 +22,8 @@ import {
   Ticket,
   Upload,
   Menu,
-  X
+  X,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,20 +44,21 @@ import { useUnreadCount } from "@/hooks/useMessaging";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const sellerLinks = [
-  { name: "Dashboard", href: "/seller-center", icon: LayoutDashboard },
-  { name: "KYC Verification", href: "/seller-center/kyc", icon: ShieldCheck },
-  { name: "My Products", href: "/seller-center/products", icon: Package },
-  { name: "Add Product", href: "/seller-center/products/new", icon: Plus },
-  { name: "Bulk Upload", href: "/seller-center/bulk-upload", icon: Upload },
-  { name: "Orders", href: "/seller-center/orders", icon: ShoppingCart },
-  { name: "Customer Q&A", href: "/seller-center/qa", icon: MessageSquare },
-  { name: "Vouchers", href: "/seller-center/vouchers", icon: Ticket },
-  { name: "Reviews", href: "/seller-center/reviews", icon: Star },
-  { name: "Flash Sales", href: "/seller-center/flash-sales", icon: Zap },
-  { name: "Analytics", href: "/seller-center/analytics", icon: BarChart3 },
-  { name: "Messages", href: "/seller-center/messages", icon: MessageSquare },
-  { name: "Wallet", href: "/seller-center/wallet", icon: Wallet },
-  { name: "Settings", href: "/seller-center/settings", icon: Settings },
+  { name: "Dashboard", href: "/seller/dashboard", icon: LayoutDashboard },
+  { name: "KYC Verification", href: "/seller/kyc", icon: ShieldCheck },
+  { name: "My Products", href: "/seller/products", icon: Package },
+  { name: "Add Product", href: "/seller/products/new", icon: Plus },
+  { name: "Bulk Upload", href: "/seller/bulk-upload", icon: Upload },
+  { name: "Orders", href: "/seller/orders", icon: ShoppingCart },
+  { name: "Customer Q&A", href: "/seller/qa", icon: MessageSquare },
+  { name: "Vouchers", href: "/seller/vouchers", icon: Ticket },
+  { name: "Reviews", href: "/seller/reviews", icon: Star },
+  { name: "Flash Sales", href: "/seller/flash-sale", icon: Zap },
+  { name: "Analytics", href: "/seller/analytics", icon: BarChart3 },
+  { name: "Messages", href: "/seller/messages", icon: MessageSquare },
+  { name: "Wallet", href: "/seller/wallet", icon: Wallet },
+  { name: "Returns", href: "/seller/returns", icon: RotateCcw },
+  { name: "Settings", href: "/seller/settings", icon: Settings },
 ];
 
 const SellerDashboardLayout = () => {
@@ -123,7 +125,7 @@ const SellerDashboardLayout = () => {
         <div className="p-4 border-b border-slate-700">
           <Button 
             className="w-full bg-primary hover:bg-primary/90"
-            onClick={() => navigate("/seller-center/products/new")}
+            onClick={() => navigate("/seller/products/new")}
           >
             <Plus size={16} className="mr-2" />
             Add Product
@@ -137,7 +139,7 @@ const SellerDashboardLayout = () => {
           <Button 
             className="w-full"
             variant="outline"
-            onClick={() => navigate("/seller-center/kyc")}
+            onClick={() => navigate("/seller/kyc")}
           >
             <ShieldCheck size={16} className="mr-2" />
             Complete KYC
@@ -149,11 +151,11 @@ const SellerDashboardLayout = () => {
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {sellerLinks.map((link) => {
           const isActive = location.pathname === link.href || 
-            (link.href !== "/seller-center" && link.href !== "/seller-center/kyc" && location.pathname.startsWith(link.href));
+            (link.href !== "/seller/dashboard" && link.href !== "/seller/kyc" && location.pathname.startsWith(link.href));
           
-          const isKycLink = link.href === "/seller-center/kyc";
+          const isKycLink = link.href === "/seller/kyc";
           const showKycHighlight = isKycLink && !isVerified;
-          const isMessagesLink = link.href === "/seller-center/messages";
+          const isMessagesLink = link.href === "/seller/messages";
           
           return (
             <Link
@@ -230,11 +232,11 @@ const SellerDashboardLayout = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigate("/seller-center/kyc")}>
+            <DropdownMenuItem onClick={() => navigate("/seller/kyc")}>
               <ShieldCheck size={16} className="mr-2" />
               KYC Status
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/seller-center/settings")}>
+            <DropdownMenuItem onClick={() => navigate("/seller/settings")}>
               <Settings size={16} className="mr-2" />
               Settings
             </DropdownMenuItem>
@@ -281,7 +283,7 @@ const SellerDashboardLayout = () => {
           <div className="p-4 border-b border-slate-700">
             <Button 
               className="w-full bg-primary hover:bg-primary/90"
-              onClick={() => navigate("/seller-center/products/new")}
+              onClick={() => navigate("/seller/products/new")}
             >
               <Plus size={16} className="mr-2" />
               Add Product
@@ -295,7 +297,7 @@ const SellerDashboardLayout = () => {
             <Button 
               className="w-full"
               variant="outline"
-              onClick={() => navigate("/seller-center/kyc")}
+              onClick={() => navigate("/seller/kyc")}
             >
               <ShieldCheck size={16} className="mr-2" />
               Complete KYC
