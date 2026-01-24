@@ -61,6 +61,22 @@ const AdminSellerDetail = () => {
     enabled: !!sellerId,
   });
 
+  // Get seller email for notifications
+  const { data: sellerProfile } = useQuery({
+    queryKey: ["seller-user-profile", seller?.user_id],
+    queryFn: async () => {
+      if (!seller?.user_id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("email, full_name")
+        .eq("id", seller.user_id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!seller?.user_id,
+  });
+
   const updateStatus = useMutation({
     mutationFn: async ({
       status,
@@ -88,12 +104,32 @@ const AdminSellerDetail = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return { data, status, reason };
     },
-    onSuccess: (_, variables) => {
+    onSuccess: async (result) => {
+      const { status, reason } = result;
       toast.success(
-        `Seller ${variables.status === "verified" ? "approved" : "rejected"} successfully`
+        `Seller ${status === "verified" ? "approved" : "rejected"} successfully`
       );
+      
+      // Send email notification
+      if (sellerProfile?.email) {
+        try {
+          await supabase.functions.invoke("send-kyc-status-email", {
+            body: {
+              email: sellerProfile.email,
+              sellerName: seller?.legal_name || sellerProfile.full_name || "Seller",
+              status,
+              rejectionReason: status === "rejected" ? reason : undefined,
+            },
+          });
+          toast.success("Email notification sent to seller");
+        } catch (emailError) {
+          console.error("Failed to send email:", emailError);
+          // Don't show error toast - email is secondary
+        }
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["seller-profile", sellerId] });
       queryClient.invalidateQueries({ queryKey: ["admin-seller-profiles"] });
       setShowRejectDialog(false);
