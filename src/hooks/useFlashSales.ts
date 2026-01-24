@@ -1,7 +1,20 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+
+export interface FlashSaleSession {
+  id: string;
+  campaign_name: string;
+  start_date: string;
+  end_date: string;
+  application_deadline: string | null;
+  fee_per_product_pkr: number;
+  status: 'draft' | 'accepting_applications' | 'active' | 'ended';
+  is_active: boolean;
+  created_at: string;
+}
 
 export interface FlashSaleNomination {
   id: string;
@@ -15,6 +28,9 @@ export interface FlashSaleNomination {
   time_slot_end: string;
   status: "pending" | "approved" | "rejected";
   admin_notes: string | null;
+  total_fee_pkr: number;
+  fee_deducted: boolean;
+  fee_deducted_at: string | null;
   created_at: string;
   product?: {
     id: string;
@@ -24,6 +40,7 @@ export interface FlashSaleNomination {
     category: string;
   };
   seller?: { full_name: string; email: string };
+  flash_sale?: FlashSaleSession;
 }
 
 export interface ActiveFlashSaleProduct {
@@ -54,7 +71,41 @@ export interface ActiveFlashSaleProduct {
   };
 }
 
-// Hook for sellers to manage their flash sale nominations
+// Hook to get active flash sale sessions accepting applications
+export const useActiveFlashSaleSessions = () => {
+  return useQuery({
+    queryKey: ["active-flash-sale-sessions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("flash_sales")
+        .select("*")
+        .eq("status", "accepting_applications")
+        .order("start_date", { ascending: true });
+
+      if (error) throw error;
+      return data as FlashSaleSession[];
+    },
+  });
+};
+
+// Hook to get flash sale fee setting
+export const useFlashSaleFee = () => {
+  return useQuery({
+    queryKey: ["flash-sale-fee"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("admin_settings")
+        .select("setting_value")
+        .eq("setting_key", "flash_sale_fee_per_product")
+        .single();
+
+      if (error) return 10; // Default fee
+      return parseFloat(data.setting_value) || 10;
+    },
+  });
+};
+
+// Hook for sellers to manage their flash sale nominations with wallet integration
 export const useSellerFlashNominations = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -72,32 +123,66 @@ export const useSellerFlashNominations = () => {
 
       if (error) throw error;
       
-      // Fetch products separately
+      // Fetch products and flash sales separately
       const productIds = data.map(n => n.product_id);
-      const { data: products } = await supabase
-        .from("products")
-        .select("id, title, images, price_pkr, category")
-        .in("id", productIds);
+      const flashSaleIds = data.map(n => n.flash_sale_id).filter(Boolean);
+      
+      const [productsRes, flashSalesRes] = await Promise.all([
+        supabase.from("products").select("id, title, images, price_pkr, category").in("id", productIds),
+        flashSaleIds.length > 0 
+          ? supabase.from("flash_sales").select("*").in("id", flashSaleIds)
+          : Promise.resolve({ data: [] }),
+      ]);
 
-      const productMap = new Map(products?.map(p => [p.id, p]) || []);
+      const productMap = new Map(productsRes.data?.map(p => [p.id, p]) || []);
+      const flashSaleMap = new Map((flashSalesRes.data || []).map((fs: any) => [fs.id, fs]));
       
       return data.map(nom => ({
         ...nom,
         product: productMap.get(nom.product_id),
+        flash_sale: nom.flash_sale_id ? flashSaleMap.get(nom.flash_sale_id) : undefined,
       })) as FlashSaleNomination[];
     },
     enabled: !!user,
   });
 
+  // Get seller wallet balance
+  const { data: walletData } = useQuery({
+    queryKey: ["seller-wallet-balance", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("seller_wallets")
+        .select("id, current_balance")
+        .eq("seller_id", user.id)
+        .maybeSingle();
+      if (error) return null;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const createNomination = async (data: {
+    flash_sale_id: string;
     product_id: string;
     proposed_price_pkr: number;
     original_price_pkr: number;
     stock_limit: number;
     time_slot_start: string;
     time_slot_end: string;
+    total_fee_pkr: number;
   }) => {
     if (!user) return false;
+
+    // Check wallet balance
+    if (!walletData || walletData.current_balance < data.total_fee_pkr) {
+      toast({
+        title: "Insufficient Balance",
+        description: `You need Rs. ${data.total_fee_pkr} in your wallet. Current balance: Rs. ${walletData?.current_balance || 0}`,
+        variant: "destructive",
+      });
+      return false;
+    }
 
     const { error } = await supabase.from("flash_sale_nominations").insert([{
       ...data,
@@ -115,7 +200,7 @@ export const useSellerFlashNominations = () => {
       return false;
     }
 
-    toast({ title: "Success", description: "Nomination submitted for approval!" });
+    toast({ title: "Success", description: "Application submitted! Fee will be deducted upon approval." });
     queryClient.invalidateQueries({ queryKey: ["seller-flash-nominations"] });
     return true;
   };
@@ -135,7 +220,13 @@ export const useSellerFlashNominations = () => {
     return true;
   };
 
-  return { nominations, isLoading, createNomination, deleteNomination };
+  return { 
+    nominations, 
+    isLoading, 
+    createNomination, 
+    deleteNomination,
+    walletBalance: walletData?.current_balance || 0,
+  };
 };
 
 // Hook for admin to manage flash sale nominations
@@ -221,7 +312,7 @@ export const useAdminFlashNominations = () => {
     return true;
   };
 
-  return { nominations, isLoading, approveNomination, rejectNomination };
+  return { nominations, isLoading, approveNomination, rejectNomination, refetch: () => queryClient.invalidateQueries({ queryKey: ["admin-flash-nominations"] }) };
 };
 
 // Hook for getting active flash sale products (customer-facing)

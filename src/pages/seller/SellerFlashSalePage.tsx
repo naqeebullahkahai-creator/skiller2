@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { Zap, Plus, Trash2, Clock, AlertCircle, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Zap, Plus, Trash2, Clock, AlertCircle, CheckCircle, XCircle, Loader2, Wallet, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,49 +29,57 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useSellerFlashNominations } from "@/hooks/useFlashSales";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useSellerFlashNominations, useActiveFlashSaleSessions, useFlashSaleFee } from "@/hooks/useFlashSales";
 import { useSellerProducts, formatPKR } from "@/hooks/useProducts";
 import VerifiedSellerGuard from "@/components/seller/VerifiedSellerGuard";
+import { Link } from "react-router-dom";
 
 const SellerFlashSalePage = () => {
-  const { nominations, isLoading, createNomination, deleteNomination } = useSellerFlashNominations();
+  const { nominations, isLoading, createNomination, deleteNomination, walletBalance } = useSellerFlashNominations();
   const { products: sellerProducts } = useSellerProducts();
+  const { data: activeSessions = [] } = useActiveFlashSaleSessions();
+  const { data: feePerProduct = 10 } = useFlashSaleFee();
 
   const [showNominateDialog, setShowNominateDialog] = useState(false);
   const [formData, setFormData] = useState({
+    flash_sale_id: "",
     product_id: "",
     proposed_price_pkr: "",
     stock_limit: "50",
-    time_slot_start: "",
-    time_slot_end: "",
   });
 
+  const selectedSession = activeSessions.find(s => s.id === formData.flash_sale_id);
   const selectedProduct = sellerProducts.find(p => p.id === formData.product_id);
+  
   const discountPercentage = selectedProduct && formData.proposed_price_pkr
     ? Math.round(((selectedProduct.price_pkr - parseFloat(formData.proposed_price_pkr)) / selectedProduct.price_pkr) * 100)
     : 0;
 
+  const totalFee = feePerProduct; // Fee per product
+  const hasInsufficientBalance = walletBalance < totalFee;
+
   const handleSubmit = async () => {
-    if (!selectedProduct || !formData.proposed_price_pkr || !formData.time_slot_start || !formData.time_slot_end) return;
+    if (!selectedProduct || !formData.proposed_price_pkr || !selectedSession) return;
 
     const success = await createNomination({
+      flash_sale_id: formData.flash_sale_id,
       product_id: formData.product_id,
       proposed_price_pkr: parseFloat(formData.proposed_price_pkr),
       original_price_pkr: selectedProduct.price_pkr,
       stock_limit: parseInt(formData.stock_limit) || 50,
-      time_slot_start: new Date(formData.time_slot_start).toISOString(),
-      time_slot_end: new Date(formData.time_slot_end).toISOString(),
+      time_slot_start: selectedSession.start_date,
+      time_slot_end: selectedSession.end_date,
+      total_fee_pkr: totalFee,
     });
 
     if (success) {
       setShowNominateDialog(false);
       setFormData({
+        flash_sale_id: "",
         product_id: "",
         proposed_price_pkr: "",
         stock_limit: "50",
-        time_slot_start: "",
-        time_slot_end: "",
       });
     }
   };
@@ -100,39 +108,74 @@ const SellerFlashSalePage = () => {
   return (
     <VerifiedSellerGuard>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Zap className="h-6 w-6 text-destructive" />
-              Flash Sale Nominations
+              Flash Sale Applications
             </h1>
             <p className="text-muted-foreground">
-              Nominate your products for flash sales with at least 20% discount
+              Apply to feature your products in flash sales
             </p>
           </div>
 
           <Dialog open={showNominateDialog} onOpenChange={setShowNominateDialog}>
             <DialogTrigger asChild>
-              <Button>
+              <Button disabled={activeSessions.length === 0}>
                 <Plus size={18} className="mr-2" />
-                Nominate Product
+                Apply for Flash Sale
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg">
               <DialogHeader>
-                <DialogTitle>Nominate Product for Flash Sale</DialogTitle>
+                <DialogTitle>Apply for Flash Sale</DialogTitle>
                 <DialogDescription>
-                  Submit your product for admin approval. Minimum 20% discount required.
+                  Select a flash sale session and product. Fee: Rs. {feePerProduct} per product.
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Flash sale products must have at least 20% discount to participate.
+                {/* Wallet Balance Check */}
+                <Alert variant={hasInsufficientBalance ? "destructive" : "default"}>
+                  <Wallet className="h-4 w-4" />
+                  <AlertTitle>Wallet Balance</AlertTitle>
+                  <AlertDescription className="flex items-center justify-between">
+                    <span>Current Balance: {formatPKR(walletBalance)}</span>
+                    {hasInsufficientBalance && (
+                      <Link to="/seller-center/wallet">
+                        <Button size="sm" variant="outline">Top Up</Button>
+                      </Link>
+                    )}
                   </AlertDescription>
                 </Alert>
+
+                {hasInsufficientBalance && (
+                  <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      Insufficient balance. Please top up your wallet to apply. Required: Rs. {totalFee}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <div>
+                  <Label>Select Flash Sale Session</Label>
+                  <Select
+                    value={formData.flash_sale_id}
+                    onValueChange={(v) => setFormData({ ...formData, flash_sale_id: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a session" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {activeSessions.map((session) => (
+                        <SelectItem key={session.id} value={session.id}>
+                          {session.campaign_name} ({format(new Date(session.start_date), "MMM d")} - {format(new Date(session.end_date), "MMM d")})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
                 <div>
                   <Label>Select Product</Label>
@@ -181,39 +224,73 @@ const SellerFlashSalePage = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Start Time</Label>
-                    <Input
-                      type="datetime-local"
-                      value={formData.time_slot_start}
-                      onChange={(e) => setFormData({ ...formData, time_slot_start: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label>End Time</Label>
-                    <Input
-                      type="datetime-local"
-                      value={formData.time_slot_end}
-                      onChange={(e) => setFormData({ ...formData, time_slot_end: e.target.value })}
-                    />
-                  </div>
-                </div>
+                {/* Fee Summary */}
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Application Fee:</span>
+                      <span className="font-bold text-lg">{formatPKR(totalFee)}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Fee will be deducted from your wallet upon admin approval.
+                    </p>
+                  </CardContent>
+                </Card>
 
                 <Button 
                   onClick={handleSubmit} 
                   className="w-full"
-                  disabled={!formData.product_id || !formData.proposed_price_pkr || discountPercentage < 20}
+                  disabled={
+                    !formData.flash_sale_id || 
+                    !formData.product_id || 
+                    !formData.proposed_price_pkr || 
+                    discountPercentage < 20 ||
+                    hasInsufficientBalance
+                  }
                 >
-                  Submit for Approval
+                  Submit Application
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
         </div>
 
+        {/* Active Sessions Alert */}
+        {activeSessions.length > 0 && (
+          <Alert className="border-primary/50 bg-primary/5">
+            <Zap className="h-4 w-4 text-primary" />
+            <AlertTitle className="text-primary">Flash Sales Open for Applications!</AlertTitle>
+            <AlertDescription>
+              {activeSessions.length} session(s) accepting applications. Apply now to feature your products!
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {activeSessions.length === 0 && (
+          <Alert>
+            <Clock className="h-4 w-4" />
+            <AlertTitle>No Active Sessions</AlertTitle>
+            <AlertDescription>
+              There are no flash sale sessions currently accepting applications. Check back later!
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-lg bg-primary/10">
+                  <Wallet className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Wallet</p>
+                  <p className="text-xl font-bold">{formatPKR(walletBalance)}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
@@ -264,16 +341,16 @@ const SellerFlashSalePage = () => {
         {/* Nominations Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Your Nominations</CardTitle>
-            <CardDescription>Track the status of your flash sale nominations</CardDescription>
+            <CardTitle>Your Applications</CardTitle>
+            <CardDescription>Track the status of your flash sale applications</CardDescription>
           </CardHeader>
           <CardContent>
             {nominations.length === 0 ? (
               <div className="text-center py-8">
                 <Zap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="font-medium mb-2">No nominations yet</h3>
+                <h3 className="font-medium mb-2">No applications yet</h3>
                 <p className="text-muted-foreground text-sm">
-                  Nominate your first product for a flash sale!
+                  Apply for a flash sale to boost your product visibility!
                 </p>
               </div>
             ) : (
@@ -281,10 +358,9 @@ const SellerFlashSalePage = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
-                    <TableHead>Original Price</TableHead>
                     <TableHead>Flash Price</TableHead>
                     <TableHead>Discount</TableHead>
-                    <TableHead>Time Slot</TableHead>
+                    <TableHead>Fee</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead></TableHead>
                   </TableRow>
@@ -303,11 +379,13 @@ const SellerFlashSalePage = () => {
                                 className="w-10 h-10 object-cover rounded"
                               />
                             )}
-                            <span className="line-clamp-1">{nom.product?.title || "Unknown"}</span>
+                            <div>
+                              <span className="line-clamp-1">{nom.product?.title || "Unknown"}</span>
+                              <span className="text-xs text-muted-foreground line-through block">
+                                {formatPKR(nom.original_price_pkr)}
+                              </span>
+                            </div>
                           </div>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground line-through">
-                          {formatPKR(nom.original_price_pkr)}
                         </TableCell>
                         <TableCell className="font-semibold text-destructive">
                           {formatPKR(nom.proposed_price_pkr)}
@@ -315,13 +393,13 @@ const SellerFlashSalePage = () => {
                         <TableCell>
                           <Badge variant="destructive">-{discount}%</Badge>
                         </TableCell>
-                        <TableCell className="text-sm">
-                          <div>
-                            {format(new Date(nom.time_slot_start), "MMM d, HH:mm")}
-                          </div>
-                          <div className="text-muted-foreground">
-                            to {format(new Date(nom.time_slot_end), "MMM d, HH:mm")}
-                          </div>
+                        <TableCell>
+                          <span className={nom.fee_deducted ? "text-green-600" : ""}>
+                            {formatPKR(nom.total_fee_pkr)}
+                          </span>
+                          {nom.fee_deducted && (
+                            <Badge variant="outline" className="ml-2 text-xs">Paid</Badge>
+                          )}
                         </TableCell>
                         <TableCell>{getStatusBadge(nom.status)}</TableCell>
                         <TableCell>
