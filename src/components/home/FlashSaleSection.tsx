@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Zap, ChevronRight, ChevronLeft, Loader2, Clock } from "lucide-react";
+import { Zap, ChevronRight, ChevronLeft, Loader2, Clock, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useActiveFlashSaleProducts } from "@/hooks/useFlashSales";
 import FlashSaleProductCard from "./FlashSaleProductCard";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 const FlashSaleSection = () => {
   const { products, isLoading, endTime } = useActiveFlashSaleProducts();
@@ -68,6 +69,7 @@ const FlashSaleSection = () => {
   }
 
   const isExpired = timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0;
+  const isUrgent = timeLeft.hours < 2;
 
   if (isExpired) return null;
 
@@ -79,13 +81,19 @@ const FlashSaleSection = () => {
       <div className="container mx-auto relative">
         {/* Header */}
         <div className="flex items-center justify-between mb-5 px-4 md:px-0">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Zap className="w-6 h-6 text-destructive fill-destructive animate-pulse" />
                 <div className="absolute inset-0 bg-destructive/30 blur-lg rounded-full" />
               </div>
               <h2 className="text-xl md:text-2xl font-bold text-foreground">Flash Sale</h2>
+              {isUrgent && (
+                <Badge variant="destructive" className="animate-pulse flex items-center gap-1">
+                  <Flame size={12} />
+                  Ending Soon!
+                </Badge>
+              )}
             </div>
             
             {/* Countdown Timer */}
@@ -93,15 +101,30 @@ const FlashSaleSection = () => {
               <Clock className="w-4 h-4 text-destructive" />
               <span className="text-xs text-muted-foreground hidden sm:inline">Ends in:</span>
               <div className="flex items-center gap-1">
-                <span className="bg-destructive text-destructive-foreground px-2 py-1 rounded text-sm font-mono font-bold min-w-[32px] text-center">
+                <span className={cn(
+                  "px-2 py-1 rounded text-sm font-mono font-bold min-w-[32px] text-center",
+                  isUrgent 
+                    ? "bg-destructive text-destructive-foreground animate-pulse" 
+                    : "bg-primary text-primary-foreground"
+                )}>
                   {formatTime(timeLeft.hours)}
                 </span>
                 <span className="text-destructive font-bold">:</span>
-                <span className="bg-destructive text-destructive-foreground px-2 py-1 rounded text-sm font-mono font-bold min-w-[32px] text-center">
+                <span className={cn(
+                  "px-2 py-1 rounded text-sm font-mono font-bold min-w-[32px] text-center",
+                  isUrgent 
+                    ? "bg-destructive text-destructive-foreground animate-pulse" 
+                    : "bg-primary text-primary-foreground"
+                )}>
                   {formatTime(timeLeft.minutes)}
                 </span>
                 <span className="text-destructive font-bold">:</span>
-                <span className="bg-destructive text-destructive-foreground px-2 py-1 rounded text-sm font-mono font-bold min-w-[32px] text-center animate-pulse">
+                <span className={cn(
+                  "px-2 py-1 rounded text-sm font-mono font-bold min-w-[32px] text-center animate-pulse",
+                  isUrgent 
+                    ? "bg-destructive text-destructive-foreground" 
+                    : "bg-primary text-primary-foreground"
+                )}>
                   {formatTime(timeLeft.seconds)}
                 </span>
               </div>
@@ -161,6 +184,13 @@ const FlashSaleSection = () => {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Total items info */}
+        <div className="text-center mt-2">
+          <span className="text-sm text-muted-foreground">
+            {products.length} products on sale · Limited stock available
+          </span>
         </div>
       </div>
     </section>

@@ -197,6 +197,10 @@ export const useAdminFlashSales = () => {
     return true;
   };
 
+  const refetch = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-flash-sales"] });
+  };
+
   return {
     flashSales,
     isLoading,
@@ -204,6 +208,7 @@ export const useAdminFlashSales = () => {
     addProductToSale,
     removeProductFromSale,
     toggleFlashSaleActive,
+    refetch,
   };
 };
 

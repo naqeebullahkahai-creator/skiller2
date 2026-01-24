@@ -450,6 +450,8 @@ export type Database = {
         Row: {
           admin_notes: string | null
           created_at: string
+          fee_deducted: boolean
+          fee_deducted_at: string | null
           flash_sale_id: string | null
           id: string
           original_price_pkr: number
@@ -460,11 +462,14 @@ export type Database = {
           stock_limit: number
           time_slot_end: string
           time_slot_start: string
+          total_fee_pkr: number
           updated_at: string
         }
         Insert: {
           admin_notes?: string | null
           created_at?: string
+          fee_deducted?: boolean
+          fee_deducted_at?: string | null
           flash_sale_id?: string | null
           id?: string
           original_price_pkr: number
@@ -475,11 +480,14 @@ export type Database = {
           stock_limit?: number
           time_slot_end: string
           time_slot_start: string
+          total_fee_pkr?: number
           updated_at?: string
         }
         Update: {
           admin_notes?: string | null
           created_at?: string
+          fee_deducted?: boolean
+          fee_deducted_at?: string | null
           flash_sale_id?: string | null
           id?: string
           original_price_pkr?: number
@@ -490,6 +498,7 @@ export type Database = {
           stock_limit?: number
           time_slot_end?: string
           time_slot_start?: string
+          total_fee_pkr?: number
           updated_at?: string
         }
         Relationships: [
@@ -552,30 +561,39 @@ export type Database = {
       }
       flash_sales: {
         Row: {
+          application_deadline: string | null
           campaign_name: string
           created_at: string
           end_date: string
+          fee_per_product_pkr: number
           id: string
           is_active: boolean
           start_date: string
+          status: string
           updated_at: string
         }
         Insert: {
+          application_deadline?: string | null
           campaign_name: string
           created_at?: string
           end_date: string
+          fee_per_product_pkr?: number
           id?: string
           is_active?: boolean
           start_date: string
+          status?: string
           updated_at?: string
         }
         Update: {
+          application_deadline?: string | null
           campaign_name?: string
           created_at?: string
           end_date?: string
+          fee_per_product_pkr?: number
           id?: string
           is_active?: boolean
           start_date?: string
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -1762,6 +1780,10 @@ export type Database = {
         Args: { p_quantity: number; p_variant_id: string }
         Returns: boolean
       }
+      deduct_flash_sale_fee: {
+        Args: { p_admin_id: string; p_nomination_id: string }
+        Returns: Json
+      }
       generate_order_number: { Args: never; Returns: string }
       generate_product_slug: { Args: { title: string }; Returns: string }
       get_user_permissions: {
@@ -1821,6 +1843,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      notify_sellers_flash_sale: {
+        Args: { p_flash_sale_id: string }
+        Returns: number
       }
       process_customer_refund: {
         Args: { p_admin_id: string; p_return_request_id: string }
