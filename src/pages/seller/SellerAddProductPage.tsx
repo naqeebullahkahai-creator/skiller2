@@ -211,7 +211,7 @@ const SellerAddProductPage = () => {
       });
 
       // Redirect back to products list
-      navigate("/seller-center/products");
+      navigate("/seller/products");
     } catch (err: any) {
       console.error("Error creating product:", err);
       toast({
@@ -231,7 +231,7 @@ const SellerAddProductPage = () => {
         <Button 
           variant="ghost" 
           size="icon" 
-          onClick={() => navigate("/seller-center/products")}
+          onClick={() => navigate("/seller/products")}
           className="shrink-0"
         >
           <ArrowLeft size={20} />
