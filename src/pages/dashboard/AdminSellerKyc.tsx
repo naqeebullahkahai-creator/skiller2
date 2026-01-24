@@ -245,7 +245,7 @@ const AdminSellerKyc = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => navigate(`/admin-dashboard/kyc/${seller.id}`)}
+                            onClick={() => navigate(`/admin/seller-kyc/${seller.id}`)}
                           >
                             <Eye className="w-4 h-4 mr-1" />
                             View

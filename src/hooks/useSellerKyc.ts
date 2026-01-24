@@ -232,6 +232,25 @@ export const useSellerKyc = () => {
         .single();
 
       if (error) throw error;
+      
+      // Notify all admins about new KYC submission
+      const { data: admins } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'admin');
+      
+      if (admins && admins.length > 0) {
+        const notifications = admins.map(admin => ({
+          user_id: admin.user_id,
+          title: '🆕 New Seller KYC Application',
+          message: `${formData.shop_name} (${formData.legal_name}) has submitted a KYC application for verification.`,
+          notification_type: 'system' as const,
+          link: '/admin/seller-kyc'
+        }));
+        
+        await supabase.from('notifications').insert(notifications);
+      }
+      
       return data;
     },
     onSuccess: () => {
