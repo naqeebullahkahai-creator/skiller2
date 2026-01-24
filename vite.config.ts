@@ -116,10 +116,10 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
-          // Supabase API - stale-while-revalidate for data
+          // Supabase API - network first with timeout for data
           {
             urlPattern: /^https:\/\/.*supabase\.co\/rest\/.*/i,
-            handler: "StaleWhileRevalidate",
+            handler: "NetworkFirst",
             options: {
               cacheName: "supabase-api",
               expiration: {
