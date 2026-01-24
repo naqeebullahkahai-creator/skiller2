@@ -20,6 +20,7 @@ import VisualEditToggle from "./components/admin/VisualEditToggle";
 import BackToDashboardBar from "./components/navigation/BackToDashboardBar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import SellerAuth from "./pages/seller/SellerAuth";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
 import ComparePage from "./pages/ComparePage";
@@ -144,8 +145,14 @@ const App = () => (
                           <ComparisonBar />
                           <VisualEditToggle />
                           <Routes>
-                            <Route path="/" element={<Index />} />
+                          <Route path="/" element={<Index />} />
                           <Route path="/auth" element={<Auth />} />
+                          
+                          {/* Seller Auth Routes */}
+                          <Route path="/seller/login" element={<SellerAuth />} />
+                          <Route path="/seller/signup" element={<SellerAuth />} />
+                          
+                          <Route path="/products" element={<ProductListing />} />
                           <Route path="/products" element={<ProductListing />} />
                           <Route path="/category/:category" element={<ProductListing />} />
                           <Route path="/search" element={<ProductListing />} />
