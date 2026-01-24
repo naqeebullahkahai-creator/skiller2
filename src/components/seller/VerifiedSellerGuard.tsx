@@ -6,10 +6,11 @@ import VerificationPending from "./VerificationPending";
 
 interface VerifiedSellerGuardProps {
   children: ReactNode;
+  featureName?: string;
 }
 
-const VerifiedSellerGuard = ({ children }: VerifiedSellerGuardProps) => {
-  const { sellerProfile, isLoading, isVerified, hasSubmittedKyc } = useSellerKyc();
+const VerifiedSellerGuard = ({ children, featureName }: VerifiedSellerGuardProps) => {
+  const { sellerProfile, isLoading, isVerified, hasSubmittedKyc, isRejected, isPending } = useSellerKyc();
 
   if (isLoading) {
     return (
@@ -21,11 +22,23 @@ const VerifiedSellerGuard = ({ children }: VerifiedSellerGuardProps) => {
 
   // Not submitted KYC yet
   if (!hasSubmittedKyc) {
+    return (
+      <KycRequiredAlert 
+        message={featureName 
+          ? `Complete your seller verification to access ${featureName}.` 
+          : undefined
+        } 
+      />
+    );
+  }
+
+  // KYC rejected - show restriction with resubmit option
+  if (isRejected && sellerProfile) {
     return <KycRequiredAlert />;
   }
 
-  // KYC submitted but not verified
-  if (!isVerified && sellerProfile) {
+  // KYC submitted but pending review
+  if (isPending && sellerProfile) {
     return <VerificationPending sellerProfile={sellerProfile} />;
   }
 

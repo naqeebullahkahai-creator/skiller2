@@ -65,7 +65,7 @@ const VerificationPending = ({ sellerProfile }: VerificationPendingProps) => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <Card>
+      <Card className={isRejected ? "border-destructive/30" : ""}>
         <CardHeader className="text-center pb-2">
           <div className="mx-auto mb-4">
             {isRejected ? (
@@ -78,12 +78,12 @@ const VerificationPending = ({ sellerProfile }: VerificationPendingProps) => {
               </div>
             )}
           </div>
-          <CardTitle className="text-2xl">
-            {isRejected ? "Verification Rejected" : "Verification Pending"}
+          <CardTitle className={cn("text-2xl", isRejected && "text-destructive")}>
+            {isRejected ? "⚠️ Account Restricted" : "Verification Pending"}
           </CardTitle>
           <p className="text-muted-foreground mt-2">
             {isRejected
-              ? "Unfortunately, your KYC application was not approved."
+              ? "Your account features are restricted. You cannot add products, manage inventory, or apply for flash sales."
               : "Your application is being reviewed. This usually takes 1-2 business days."}
           </p>
         </CardHeader>
@@ -194,7 +194,7 @@ const VerificationPending = ({ sellerProfile }: VerificationPendingProps) => {
             </Button>
             {isRejected && (
               <Button className="flex-1" asChild>
-                <Link to="/seller-center/kyc">Resubmit Application</Link>
+                <Link to="/seller/kyc">Resubmit Application</Link>
               </Button>
             )}
           </div>
