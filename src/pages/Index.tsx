@@ -6,7 +6,6 @@ import HeroCarousel from "@/components/home/HeroCarousel";
 import Categories from "@/components/home/Categories";
 import SEOHead from "@/components/seo/SEOHead";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
-import { useViewMode } from "@/contexts/ViewModeContext";
 import ProductCardSkeleton from "@/components/ui/product-card-skeleton";
 
 // Lazy load below-fold components for faster initial paint
@@ -30,19 +29,14 @@ const SectionSkeleton = () => (
 );
 
 const Index = () => {
-  const { isCustomerView } = useViewMode();
-
   return (
     <div className="min-h-screen bg-secondary">
       <SEOHead
-        title="Pakistan's Premium Multi-Vendor Store"
+        title="FANZON - Pakistan's Premium Multi-Vendor Store"
         description="Shop authentic products at FANZON Pakistan. Best prices in PKR, Cash on Delivery, Easy Returns. Electronics, Fashion, Home & more!"
         url="/"
       />
       <OrganizationJsonLd />
-      
-      {/* Add padding when admin/seller view bar is visible */}
-      {isCustomerView && <div className="h-12" />}
       
       <Header />
       
