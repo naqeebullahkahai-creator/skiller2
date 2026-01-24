@@ -435,17 +435,19 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
         {/* Step 3: Media */}
         {currentStep === 3 && (
           <div className="space-y-6">
-            {/* Video URL */}
+            {/* YouTube/Video URL */}
             <div className="space-y-2">
-              <Label htmlFor="videoUrl">Product Video (Optional)</Label>
+              <Label htmlFor="videoUrl" className="flex items-center gap-2">
+                Product Video (YouTube URL)
+              </Label>
               <Input
                 id="videoUrl"
-                placeholder="YouTube, TikTok, or direct video URL"
+                placeholder="https://www.youtube.com/watch?v=..."
                 value={formData.videoUrl}
                 onChange={(e) => updateFormData("videoUrl", e.target.value)}
               />
               <p className="text-xs text-muted-foreground">
-                Add a short video (max 15 seconds) to showcase your product. Supports YouTube, TikTok, or direct video links.
+                Add a YouTube video URL to showcase your product. The video will be displayed on the product detail page.
               </p>
             </div>
 

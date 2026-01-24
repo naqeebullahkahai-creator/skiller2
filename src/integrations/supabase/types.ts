@@ -1313,6 +1313,42 @@ export type Database = {
           },
         ]
       }
+      seller_commissions: {
+        Row: {
+          created_at: string
+          custom_commission_percentage: number | null
+          grace_commission_percentage: number | null
+          grace_period_months: number | null
+          grace_start_date: string | null
+          id: string
+          notes: string | null
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custom_commission_percentage?: number | null
+          grace_commission_percentage?: number | null
+          grace_period_months?: number | null
+          grace_start_date?: string | null
+          id?: string
+          notes?: string | null
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custom_commission_percentage?: number | null
+          grace_commission_percentage?: number | null
+          grace_period_months?: number | null
+          grace_start_date?: string | null
+          id?: string
+          notes?: string | null
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seller_profiles: {
         Row: {
           account_title: string
@@ -1822,6 +1858,10 @@ export type Database = {
       }
       generate_order_number: { Args: never; Returns: string }
       generate_product_slug: { Args: { title: string }; Returns: string }
+      get_seller_commission_rate: {
+        Args: { p_seller_id: string }
+        Returns: number
+      }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
