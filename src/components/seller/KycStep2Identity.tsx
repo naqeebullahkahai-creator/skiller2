@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Upload, X, Image as ImageIcon, Calendar, AlertTriangle } from "lucide-react";
+import { Shield, Upload, X, Image as ImageIcon, Calendar, AlertTriangle, Camera, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GENDER_OPTIONS, calculateCnicExpiry, isAtLeast18 } from "@/hooks/useSellerKyc";
 
@@ -36,11 +36,13 @@ const FileUploadZone = ({
   value,
   onChange,
   error,
+  aspectSquare = false,
 }: {
   label: string;
   value: File | null;
   onChange: (file: File | null) => void;
   error?: string;
+  aspectSquare?: boolean;
 }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -75,11 +77,17 @@ const FileUploadZone = ({
     <div className="space-y-2">
       <label className="text-sm font-medium">{label} *</label>
       {preview ? (
-        <div className="relative rounded-lg border overflow-hidden">
+        <div className={cn(
+          "relative rounded-lg border overflow-hidden",
+          aspectSquare ? "aspect-square w-40 mx-auto" : "w-full"
+        )}>
           <img
             src={preview}
             alt={label}
-            className="w-full h-40 object-cover"
+            className={cn(
+              "object-cover",
+              aspectSquare ? "w-full h-full aspect-square" : "w-full h-40"
+            )}
           />
           <button
             type="button"
@@ -99,6 +107,7 @@ const FileUploadZone = ({
           onDrop={handleDrop}
           className={cn(
             "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
+            aspectSquare && "aspect-square w-40 mx-auto flex items-center justify-center",
             dragActive
               ? "border-primary bg-primary/5"
               : "border-muted-foreground/30 hover:border-primary/50",
@@ -115,11 +124,15 @@ const FileUploadZone = ({
           <label htmlFor={`upload-${label}`} className="cursor-pointer">
             <div className="flex flex-col items-center gap-2">
               <div className="p-3 bg-muted rounded-full">
-                <Upload className="w-6 h-6 text-muted-foreground" />
+                {aspectSquare ? (
+                  <Camera className="w-6 h-6 text-muted-foreground" />
+                ) : (
+                  <Upload className="w-6 h-6 text-muted-foreground" />
+                )}
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  Drag & drop or click to upload
+                  {aspectSquare ? "Take or Upload Selfie" : "Drag & drop or click to upload"}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   PNG, JPG up to 5MB
@@ -160,6 +173,32 @@ const KycStep2Identity = ({ form }: KycStep2Props) => {
             We need to verify your identity
           </p>
         </div>
+      </div>
+
+      {/* Selfie/Profile Photo */}
+      <div className="p-4 bg-muted/50 rounded-lg border border-dashed">
+        <div className="flex items-center gap-2 mb-4">
+          <User className="w-5 h-5 text-primary" />
+          <h4 className="font-medium">Profile Photo / Live Selfie</h4>
+        </div>
+        <FormField
+          control={form.control}
+          name="selfie"
+          render={({ field }) => (
+            <FormItem>
+              <FileUploadZone
+                label="Your Selfie"
+                value={field.value}
+                onChange={field.onChange}
+                error={form.formState.errors.selfie?.message as string}
+                aspectSquare
+              />
+              <FormDescription className="text-center mt-2">
+                Take a clear selfie showing your face for verification
+              </FormDescription>
+            </FormItem>
+          )}
+        />
       </div>
 
       {/* Personal Identity Fields */}

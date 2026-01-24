@@ -13,6 +13,7 @@ export interface SellerProfile {
   cnic_number: string;
   cnic_front_url: string | null;
   cnic_back_url: string | null;
+  selfie_url: string | null;
   bank_name: string;
   account_title: string;
   iban: string;
@@ -52,6 +53,7 @@ export interface KycFormData {
   cnic_expiry_date: string;
   cnic_front: File | null;
   cnic_back: File | null;
+  selfie: File | null;
   // Step 3: Banking
   bank_name: string;
   account_title: string;
@@ -165,6 +167,7 @@ export const useSellerKyc = () => {
       let cnic_front_url = null;
       let cnic_back_url = null;
       let bank_cheque_url = null;
+      let selfie_url = null;
 
       if (formData.cnic_front) {
         const ext = formData.cnic_front.name.split('.').pop();
@@ -179,6 +182,14 @@ export const useSellerKyc = () => {
         cnic_back_url = await uploadDocument(
           formData.cnic_back, 
           `${user.id}/cnic_back.${ext}`
+        );
+      }
+
+      if (formData.selfie) {
+        const ext = formData.selfie.name.split('.').pop();
+        selfie_url = await uploadDocument(
+          formData.selfie, 
+          `${user.id}/selfie.${ext}`
         );
       }
 
@@ -210,6 +221,7 @@ export const useSellerKyc = () => {
           cnic_expiry_date: formData.cnic_expiry_date,
           cnic_front_url,
           cnic_back_url,
+          selfie_url,
           bank_name: formData.bank_name,
           account_title: formData.account_title,
           iban: formData.iban,

@@ -17,7 +17,8 @@ import {
   RotateCcw,
   MessageSquare,
   UserCircle,
-  Shield
+  Shield,
+  Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -49,8 +50,9 @@ const allAdminLinks: NavLink[] = [
   { name: "Bulk Uploads", href: "/admin-dashboard/bulk-uploads", icon: Package, feature: 'products' },
   { name: "Analytics", href: "/admin-dashboard/analytics", icon: BarChart3, feature: 'analytics' },
   { name: "Seller Approvals", href: "/admin-dashboard/approvals", icon: Users, feature: 'users' },
-  { name: "Seller KYC", href: "/admin-dashboard/kyc", icon: ShieldCheck, feature: 'users' },
+  { name: "Seller KYC", href: "/admin-dashboard/seller-kyc", icon: ShieldCheck, feature: 'users' },
   { name: "Payouts", href: "/admin-dashboard/payouts", icon: Wallet, feature: 'payouts' },
+  { name: "Site Settings", href: "/admin-dashboard/site-settings", icon: Globe, feature: 'settings' },
   { name: "Settings", href: "/admin-dashboard/settings", icon: Settings, feature: 'settings' },
 ];
 

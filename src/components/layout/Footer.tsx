@@ -7,14 +7,37 @@ import {
   CreditCard,
   Truck,
   Shield,
-  Headphones
+  Headphones,
+  Music2,
+  MessageCircle
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+
+const socialIconMap: Record<string, React.ReactNode> = {
+  social_facebook: <Facebook size={18} />,
+  social_instagram: <Instagram size={18} />,
+  social_twitter: <Twitter size={18} />,
+  social_youtube: <Youtube size={18} />,
+  social_tiktok: <Music2 size={18} />,
+  social_whatsapp: <MessageCircle size={18} />,
+};
 
 const Footer = () => {
   const { t } = useLanguage();
+  const { getSocialLinks, isLoading } = useSiteSettings();
+  
+  const socialLinks = getSocialLinks();
+
+  const getSocialUrl = (setting: { setting_key: string; setting_value: string | null }) => {
+    if (setting.setting_key === 'social_whatsapp') {
+      const phone = setting.setting_value?.replace(/\D/g, '') || '';
+      return `https://wa.me/${phone}`;
+    }
+    return setting.setting_value || '#';
+  };
   
   return (
     <footer className="bg-fanzon-dark text-secondary mt-8 pb-20 md:pb-0">
@@ -123,20 +146,40 @@ const Footer = () => {
                 {t("footer.subscribe")}
               </Button>
             </div>
-            <div className="flex gap-3 mt-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Facebook size={18} />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter size={18} />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Instagram size={18} />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Youtube size={18} />
-              </a>
-            </div>
+            {/* Dynamic Social Links */}
+            {!isLoading && socialLinks.length > 0 && (
+              <div className="flex gap-3 mt-4">
+                {socialLinks.map((setting) => (
+                  <a 
+                    key={setting.setting_key}
+                    href={getSocialUrl(setting)} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                    aria-label={setting.setting_key.replace('social_', '')}
+                  >
+                    {socialIconMap[setting.setting_key]}
+                  </a>
+                ))}
+              </div>
+            )}
+            {/* Fallback static links if loading or no settings */}
+            {(isLoading || socialLinks.length === 0) && (
+              <div className="flex gap-3 mt-4">
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Facebook size={18} />
+                </a>
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Twitter size={18} />
+                </a>
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Instagram size={18} />
+                </a>
+                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Youtube size={18} />
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>
