@@ -34,8 +34,8 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { SellerProfile, isCnicExpired } from "@/hooks/useSellerKyc";
-
 import { generateSellerDossierPDF } from "@/utils/generateSellerPDF";
+import SellerCommissionManager from "@/components/admin/SellerCommissionManager";
 
 const AdminSellerDetail = () => {
   const { sellerId } = useParams();
@@ -409,6 +409,14 @@ const AdminSellerDetail = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Commission Management Section */}
+      {seller.verification_status === "verified" && (
+        <SellerCommissionManager 
+          sellerId={seller.user_id} 
+          sellerName={seller.shop_name}
+        />
+      )}
 
       {/* Action Buttons */}
       {seller.verification_status === "pending" && (
