@@ -38,7 +38,7 @@ import WishlistPage from "./pages/account/WishlistPage";
 import AddressesPage from "./pages/account/AddressesPage";
 
 // Admin Dashboard
-import AdminDashboardLayout from "./components/dashboard/AdminDashboardLayout";
+import MobileAdminLayout from "./components/dashboard/MobileAdminLayout";
 import AdminDashboardHome from "./pages/dashboard/AdminDashboardHome";
 import AdminOrderManagement from "./pages/dashboard/OrderManagement";
 import AdminProductCatalog from "./pages/dashboard/ProductCatalog";
@@ -58,7 +58,8 @@ import AdminUserDirectory from "./pages/dashboard/AdminUserDirectory";
 import AdminRolesPage from "./pages/dashboard/AdminRolesPage";
 
 // Seller Dashboard
-import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
+import MobileSellerLayout from "./components/dashboard/MobileSellerLayout";
+import SellerDashboardHome from "./pages/seller/SellerDashboardHome";
 import SellerKyc from "./pages/seller/SellerKyc";
 import SellerWalletPage from "./pages/seller/SellerWalletPage";
 import SellerMessagesPage from "./pages/seller/SellerMessagesPage";
@@ -70,6 +71,7 @@ import SellerVouchersPage from "./pages/seller/SellerVouchersPage";
 import SellerBulkUploadPage from "./pages/seller/SellerBulkUploadPage";
 import SellerProductsPage from "./pages/seller/SellerProductsPage";
 import SellerAddProductPage from "./pages/seller/SellerAddProductPage";
+import SellerReturnsPage from "./pages/seller/SellerReturnsPage";
 
 // Admin Analytics
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
@@ -155,7 +157,7 @@ const App = () => (
                 path="/admin-dashboard" 
                 element={
                   <ProtectedRoute allowedRoles={["admin"]}>
-                    <AdminDashboardLayout />
+                    <MobileAdminLayout />
                   </ProtectedRoute>
                 }
               >
@@ -168,13 +170,13 @@ const App = () => (
                 <Route path="products" element={<AdminProductCatalog />} />
                 <Route path="categories" element={<AdminCategoryManager />} />
                 <Route path="approvals" element={<SellerApprovals />} />
-                <Route path="kyc" element={<AdminSellerKyc />} />
-                <Route path="kyc/:sellerId" element={<AdminSellerDetail />} />
+                <Route path="seller-kyc" element={<AdminSellerKyc />} />
+                <Route path="seller-kyc/:sellerId" element={<AdminSellerDetail />} />
                 <Route path="payouts" element={<AdminPayoutManagement />} />
                 <Route path="flash-sales" element={<FlashSaleManager />} />
                 <Route path="flash-nominations" element={<AdminFlashNominations />} />
                 <Route path="reviews" element={<AdminReviewsPage />} />
-                <Route path="qa-moderation" element={<AdminQAModerationPage />} />
+                <Route path="qa" element={<AdminQAModerationPage />} />
                 <Route path="vouchers" element={<VoucherManager />} />
                 <Route path="banners" element={<BannerManager />} />
                 <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
@@ -187,11 +189,11 @@ const App = () => (
                 path="/seller-center" 
                 element={
                   <ProtectedRoute allowedRoles={["seller"]}>
-                    <SellerDashboardLayout />
+                    <MobileSellerLayout />
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<VerifiedSellerGuard><AdminDashboardHome /></VerifiedSellerGuard>} />
+                <Route index element={<SellerDashboardHome />} />
                 <Route path="kyc" element={<SellerKyc />} />
                 <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
                 <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
@@ -200,10 +202,11 @@ const App = () => (
                 <Route path="reviews" element={<SellerReviewsPage />} />
                 <Route path="qa" element={<VerifiedSellerGuard><SellerQAPage /></VerifiedSellerGuard>} />
                 <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
-                <Route path="flash-sales" element={<SellerFlashSalePage />} />
+                <Route path="flash-sale" element={<SellerFlashSalePage />} />
                 <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
                 <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
                 <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
+                <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
               

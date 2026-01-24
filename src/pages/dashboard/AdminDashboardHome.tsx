@@ -1,37 +1,30 @@
-import {
-  DollarSign,
-  ShoppingCart,
-  Package,
-  UserCheck,
+import { useNavigate } from "react-router-dom";
+import { 
+  Users, 
+  Package, 
+  ShoppingCart, 
+  Wallet, 
+  Image, 
+  Zap, 
+  Shield, 
+  BarChart3,
+  Settings,
+  Tags,
+  MessageSquare,
+  RotateCcw,
+  Star,
+  FileCheck,
   TrendingUp,
-  TrendingDown,
-  RefreshCw,
+  DollarSign,
+  UserCheck,
+  ChevronRight,
+  AlertTriangle
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { useAdminDashboardAnalytics } from "@/hooks/useAdminDashboardAnalytics";
 import { cn } from "@/lib/utils";
-import AdminGlobalNotification from "@/components/dashboard/AdminGlobalNotification";
-import DataSanitization from "@/components/dashboard/DataSanitization";
+import { useAdminDashboardAnalytics } from "@/hooks/useAdminDashboardAnalytics";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const formatPKR = (amount: number) => {
   return new Intl.NumberFormat("en-PK", {
@@ -42,239 +35,260 @@ const formatPKR = (amount: number) => {
   }).format(amount);
 };
 
-const AdminDashboardHome = () => {
-  const { stats, recentOrders, salesData, isLoading, refetch } = useAdminDashboardAnalytics();
+interface CommandCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description?: string;
+  badge?: string;
+  badgeVariant?: "default" | "destructive" | "outline" | "secondary";
+  href: string;
+  color: string;
+}
 
-  const statCards = [
+const CommandCard = ({ 
+  icon, 
+  title, 
+  description, 
+  badge, 
+  badgeVariant = "default",
+  href, 
+  color 
+}: CommandCardProps) => {
+  const navigate = useNavigate();
+  
+  return (
+    <Card 
+      className="cursor-pointer transition-all duration-200 hover:shadow-lg active:scale-[0.98] border-0 shadow-sm"
+      onClick={() => navigate(href)}
+    >
+      <CardContent className="p-4 flex items-center gap-4">
+        <div className={cn("p-3 rounded-xl", color)}>
+          {icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-foreground truncate">{title}</h3>
+            {badge && (
+              <Badge variant={badgeVariant} className="text-xs shrink-0">
+                {badge}
+              </Badge>
+            )}
+          </div>
+          {description && (
+            <p className="text-sm text-muted-foreground truncate">{description}</p>
+          )}
+        </div>
+        <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+      </CardContent>
+    </Card>
+  );
+};
+
+const AdminDashboardHome = () => {
+  const navigate = useNavigate();
+  const { stats, isLoading } = useAdminDashboardAnalytics();
+
+  const quickStats = [
     {
-      title: "Total Revenue",
+      label: "Revenue",
       value: stats ? formatPKR(stats.totalRevenue) : "—",
-      icon: DollarSign,
-      change: stats ? `${stats.revenueChange >= 0 ? "+" : ""}${stats.revenueChange}%` : "—",
-      trend: stats ? (stats.revenueChange >= 0 ? "up" : "down") : "up",
-      color: "text-emerald-500",
+      icon: <DollarSign className="w-4 h-4" />,
+      change: stats?.revenueChange,
+      color: "text-emerald-500"
     },
     {
-      title: "Total Orders",
+      label: "Orders",
       value: stats?.totalOrders?.toLocaleString() || "—",
-      icon: ShoppingCart,
-      change: stats ? `${stats.ordersChange >= 0 ? "+" : ""}${stats.ordersChange}%` : "—",
-      trend: stats ? (stats.ordersChange >= 0 ? "up" : "down") : "up",
-      color: "text-blue-500",
+      icon: <ShoppingCart className="w-4 h-4" />,
+      change: stats?.ordersChange,
+      color: "text-blue-500"
     },
     {
-      title: "Active Products",
-      value: stats?.activeProducts?.toLocaleString() || "—",
-      icon: Package,
-      change: stats ? `${stats.productsChange >= 0 ? "+" : ""}${stats.productsChange}%` : "—",
-      trend: stats ? (stats.productsChange >= 0 ? "up" : "down") : "up",
-      color: "text-purple-500",
-    },
-    {
-      title: "Pending Approvals",
-      value: stats?.pendingApprovals?.toLocaleString() || "—",
-      icon: UserCheck,
-      change: "Requires action",
-      trend: "neutral",
-      color: "text-amber-500",
-    },
+      label: "Pending",
+      value: stats?.pendingApprovals?.toLocaleString() || "0",
+      icon: <AlertTriangle className="w-4 h-4" />,
+      color: (stats?.pendingApprovals || 0) > 0 ? "text-amber-500" : "text-muted-foreground"
+    }
   ];
 
-  const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
-      processing: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-      shipped: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-      delivered: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-      cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    };
-    return styles[status] || styles.pending;
-  };
+  const commandCenterActions: CommandCardProps[] = [
+    {
+      icon: <UserCheck className="w-6 h-6 text-white" />,
+      title: "Approve Sellers",
+      badge: (stats?.pendingApprovals || 0) > 0 ? `${stats?.pendingApprovals} pending` : undefined,
+      badgeVariant: "destructive",
+      description: "KYC & Seller Applications",
+      href: "/admin-dashboard/seller-kyc",
+      color: "bg-primary"
+    },
+    {
+      icon: <BarChart3 className="w-6 h-6 text-white" />,
+      title: "Platform Stats",
+      description: "Analytics & Insights",
+      href: "/admin-dashboard/analytics",
+      color: "bg-violet-500"
+    },
+    {
+      icon: <Image className="w-6 h-6 text-white" />,
+      title: "Edit Banners",
+      description: "Homepage Carousel",
+      href: "/admin-dashboard/banners",
+      color: "bg-pink-500"
+    },
+    {
+      icon: <Shield className="w-6 h-6 text-white" />,
+      title: "Role Management",
+      description: "Staff & Permissions",
+      href: "/admin-dashboard/roles",
+      color: "bg-slate-700"
+    }
+  ];
+
+  const managementActions: CommandCardProps[] = [
+    {
+      icon: <ShoppingCart className="w-6 h-6 text-white" />,
+      title: "Order Management",
+      description: "View & update orders",
+      href: "/admin-dashboard/orders",
+      color: "bg-blue-500"
+    },
+    {
+      icon: <Package className="w-6 h-6 text-white" />,
+      title: "Product Catalog",
+      description: "Approve & manage products",
+      href: "/admin-dashboard/products",
+      color: "bg-emerald-500"
+    },
+    {
+      icon: <Users className="w-6 h-6 text-white" />,
+      title: "User Directory",
+      description: "Customers & Sellers",
+      href: "/admin-dashboard/users",
+      color: "bg-cyan-500"
+    },
+    {
+      icon: <Wallet className="w-6 h-6 text-white" />,
+      title: "Payout Management",
+      description: "Seller withdrawals",
+      href: "/admin-dashboard/payouts",
+      color: "bg-amber-500"
+    },
+    {
+      icon: <Zap className="w-6 h-6 text-white" />,
+      title: "Flash Sales",
+      description: "Campaigns & Nominations",
+      href: "/admin-dashboard/flash-sales",
+      color: "bg-rose-500"
+    },
+    {
+      icon: <Tags className="w-6 h-6 text-white" />,
+      title: "Categories",
+      description: "Manage categories",
+      href: "/admin-dashboard/categories",
+      color: "bg-indigo-500"
+    },
+    {
+      icon: <RotateCcw className="w-6 h-6 text-white" />,
+      title: "Returns",
+      description: "Handle returns",
+      href: "/admin-dashboard/returns",
+      color: "bg-orange-500"
+    },
+    {
+      icon: <Star className="w-6 h-6 text-white" />,
+      title: "Reviews",
+      description: "Moderate reviews",
+      href: "/admin-dashboard/reviews",
+      color: "bg-yellow-500"
+    },
+    {
+      icon: <MessageSquare className="w-6 h-6 text-white" />,
+      title: "Q&A Moderation",
+      description: "Product questions",
+      href: "/admin-dashboard/qa",
+      color: "bg-teal-500"
+    },
+    {
+      icon: <FileCheck className="w-6 h-6 text-white" />,
+      title: "Cancellations",
+      description: "Order cancellations",
+      href: "/admin-dashboard/cancellations",
+      color: "bg-red-500"
+    },
+    {
+      icon: <Tags className="w-6 h-6 text-white" />,
+      title: "Vouchers",
+      description: "Discount codes",
+      href: "/admin-dashboard/vouchers",
+      color: "bg-purple-500"
+    },
+    {
+      icon: <Settings className="w-6 h-6 text-white" />,
+      title: "Settings",
+      description: "Platform configuration",
+      href: "/admin-dashboard/settings",
+      color: "bg-slate-500"
+    }
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Real-time overview of your marketplace performance
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isLoading}
-          >
-            <RefreshCw className={cn("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-            Refresh
-          </Button>
-          <DataSanitization />
-          <AdminGlobalNotification />
-        </div>
+    <div className="space-y-6 pb-6">
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-5 text-white">
+        <h1 className="text-xl font-bold mb-1">Admin Control Center</h1>
+        <p className="text-white/80 text-sm">Platform management & oversight</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat) => (
-          <Card key={stat.title}>
-            <CardContent className="p-6">
+      {/* Quick Stats Bar */}
+      <div className="grid grid-cols-3 gap-3">
+        {quickStats.map((stat, index) => (
+          <Card key={index} className="border-0 shadow-sm">
+            <CardContent className="p-3 text-center">
               {isLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-8 w-32" />
-                  <Skeleton className="h-3 w-20" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-16 mx-auto" />
+                  <Skeleton className="h-6 w-20 mx-auto" />
                 </div>
               ) : (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{stat.title}</p>
-                    <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      {stat.trend === "up" ? (
-                        <TrendingUp size={14} className="text-emerald-500" />
-                      ) : stat.trend === "down" ? (
-                        <TrendingDown size={14} className="text-destructive" />
-                      ) : null}
-                      <span
-                        className={cn(
-                          "text-xs font-medium",
-                          stat.trend === "up" ? "text-emerald-500" : 
-                          stat.trend === "down" ? "text-destructive" : 
-                          "text-muted-foreground"
-                        )}
-                      >
-                        {stat.change}
+                <>
+                  <div className={cn("flex items-center justify-center gap-1 mb-1", stat.color)}>
+                    {stat.icon}
+                    <span className="text-xs text-muted-foreground">{stat.label}</span>
+                  </div>
+                  <p className={cn("text-lg font-bold", stat.color)}>{stat.value}</p>
+                  {stat.change !== undefined && (
+                    <div className="flex items-center justify-center gap-1">
+                      <TrendingUp className={cn("w-3 h-3", stat.change >= 0 ? "text-emerald-500" : "text-red-500")} />
+                      <span className={cn("text-xs", stat.change >= 0 ? "text-emerald-500" : "text-red-500")}>
+                        {stat.change >= 0 ? "+" : ""}{stat.change}%
                       </span>
-                      {stat.trend !== "neutral" && (
-                        <span className="text-xs text-muted-foreground">vs last month</span>
-                      )}
                     </div>
-                  </div>
-                  <div className={cn("p-3 rounded-lg bg-muted", stat.color)}>
-                    <stat.icon size={24} />
-                  </div>
-                </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Charts & Tables */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Sales Growth Chart */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-lg">Sales Growth (Last 6 Months)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="h-72 flex items-center justify-center">
-                <div className="text-center">
-                  <RefreshCw className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground mt-2">Loading chart data...</p>
-                </div>
-              </div>
-            ) : salesData.length === 0 ? (
-              <div className="h-72 flex items-center justify-center">
-                <p className="text-muted-foreground">No sales data available yet</p>
-              </div>
-            ) : (
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={salesData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis
-                      dataKey="month"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <YAxis
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
-                      formatter={(value: number) => [formatPKR(value), "Revenue"]}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Command Center - Priority Actions */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-foreground px-1">Command Center</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {commandCenterActions.map((action, index) => (
+            <CommandCard key={index} {...action} />
+          ))}
+        </div>
+      </div>
 
-        {/* Recent Orders */}
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-lg">Recent Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-10 w-20" />
-                    <Skeleton className="h-10 flex-1" />
-                    <Skeleton className="h-10 w-24" />
-                    <Skeleton className="h-6 w-20" />
-                  </div>
-                ))}
-              </div>
-            ) : recentOrders.length === 0 ? (
-              <div className="h-48 flex items-center justify-center">
-                <p className="text-muted-foreground">No orders yet</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Order ID</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentOrders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-medium text-sm">
-                          {order.orderNumber}
-                        </TableCell>
-                        <TableCell className="text-sm">{order.customerName}</TableCell>
-                        <TableCell className="text-sm font-medium">
-                          {formatPKR(order.totalAmount)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={cn("capitalize", getStatusBadge(order.status))}>
-                            {order.status}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Full Management Grid */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-foreground px-1">Management</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {managementActions.map((action, index) => (
+            <CommandCard key={index} {...action} />
+          ))}
+        </div>
       </div>
     </div>
   );
