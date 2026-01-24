@@ -26,6 +26,7 @@ import OrderSuccess from "./pages/OrderSuccess";
 import NotFound from "./pages/NotFound";
 import Forbidden from "./pages/Forbidden";
 import HelpCenter from "./pages/HelpCenter";
+import ContactUs from "./pages/ContactUs";
 import ChatWidget from "./components/chat/ChatWidget";
 import InstallPrompt from "./components/pwa/InstallPrompt";
 import NotificationPermissionBanner from "./components/notifications/NotificationPermissionBanner";
@@ -121,6 +122,7 @@ const App = () => (
               <Route path="/compare" element={<ComparePage />} />
               {/* Slug-based product URLs also supported via the same route */}
               <Route path="/help" element={<HelpCenter />} />
+              <Route path="/contact" element={<ContactUs />} />
               
               {/* Checkout Routes */}
               <Route 
