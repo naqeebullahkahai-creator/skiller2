@@ -12,7 +12,7 @@ const TopBar = () => {
         <div className="flex items-center justify-between h-8 text-xs text-muted-foreground">
           <div className="flex items-center gap-4">
             <Link 
-              to="/sell" 
+              to="/seller/signup" 
               className="flex items-center gap-1 hover:text-primary transition-colors"
             >
               <Store size={12} />

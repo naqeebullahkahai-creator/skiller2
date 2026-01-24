@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Menu, X, Settings, HelpCircle, Globe } from "lucide-react";
+import { Search, Menu, X, Settings, HelpCircle, Globe, Store } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ const MobileHeader = () => {
   };
 
   const sidebarLinks = [
+    { icon: Store, label: "Sell on FANZON", path: "/seller/signup" },
     { icon: HelpCircle, label: t("nav.help"), path: "/help" },
     { icon: Settings, label: t("nav.settings"), path: "/account/profile" },
   ];
