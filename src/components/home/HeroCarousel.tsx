@@ -96,7 +96,9 @@ const HeroCarousel = memo(() => {
                   <LazyImage
                     src={banner.image_url}
                     alt={banner.title}
-                    priority={index === 0}
+                    priority={index === 0} // First banner loads immediately - critical path
+                    width={1200}
+                    height={400}
                     className="w-full h-full object-cover"
                     containerClassName="w-full h-full"
                   />

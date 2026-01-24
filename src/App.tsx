@@ -88,7 +88,17 @@ import SellerAddProductPage from "./pages/seller/SellerAddProductPage";
 import SellerReturnsPage from "./pages/seller/SellerReturnsPage";
 import SellerQAPage from "./pages/seller/SellerQAPage";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Global stale-while-revalidate defaults
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 30 * 60 * 1000, // 30 minutes cache
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 // Admin page wrapper component
 const AdminPageWrapper = ({ children, title }: { children: React.ReactNode; title: string }) => (

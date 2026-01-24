@@ -50,17 +50,50 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB limit
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,webp}"],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api/, /^\/admin/],
+        // Precache critical assets
+        additionalManifestEntries: [
+          { url: "/favicon.ico", revision: "1" },
+          { url: "/pwa-192x192.png", revision: "1" },
+          { url: "/pwa-512x512.png", revision: "1" },
+        ],
         runtimeCaching: [
+          // Cache Google Fonts
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "google-fonts-stylesheets",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "google-fonts-webfonts",
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // Unsplash images - aggressive caching
           {
             urlPattern: /^https:\/\/images\.unsplash\.com\/.*/i,
             handler: "CacheFirst",
             options: {
               cacheName: "unsplash-images",
               expiration: {
-                maxEntries: 100,
+                maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
               },
               cacheableResponse: {
@@ -68,13 +101,14 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
+          // Supabase storage - product images
           {
             urlPattern: /^https:\/\/.*supabase\.co\/storage\/.*/i,
             handler: "CacheFirst",
             options: {
               cacheName: "supabase-storage",
               expiration: {
-                maxEntries: 200,
+                maxEntries: 500,
                 maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
               },
               cacheableResponse: {
@@ -82,16 +116,29 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
+          // Supabase API - stale-while-revalidate for data
           {
             urlPattern: /^https:\/\/.*supabase\.co\/rest\/.*/i,
-            handler: "NetworkFirst",
+            handler: "StaleWhileRevalidate",
             options: {
               cacheName: "supabase-api",
               expiration: {
-                maxEntries: 50,
+                maxEntries: 100,
                 maxAgeSeconds: 60 * 5, // 5 minutes
               },
-              networkTimeoutSeconds: 10,
+              networkTimeoutSeconds: 5,
+            },
+          },
+          // Static assets - cache first
+          {
+            urlPattern: /\.(?:js|css|woff2?)$/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "static-assets",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
             },
           },
         ],
