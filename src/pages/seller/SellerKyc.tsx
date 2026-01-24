@@ -37,6 +37,7 @@ const step2Schema = z.object({
   cnic_expiry_date: z.string(),
   cnic_front: z.custom<File>((val) => val instanceof File, "CNIC front image is required"),
   cnic_back: z.custom<File>((val) => val instanceof File, "CNIC back image is required"),
+  selfie: z.custom<File>((val) => val instanceof File, "Profile selfie is required"),
 });
 
 const step3Schema = z.object({
@@ -79,6 +80,7 @@ const SellerKyc = () => {
       cnic_expiry_date: "",
       cnic_front: null,
       cnic_back: null,
+      selfie: null,
       bank_name: "",
       account_title: "",
       iban: "",
@@ -98,7 +100,7 @@ const SellerKyc = () => {
         ];
         break;
       case 2:
-        fieldsToValidate = ["gender", "date_of_birth", "cnic_number", "cnic_issue_date", "cnic_front", "cnic_back"];
+        fieldsToValidate = ["gender", "date_of_birth", "cnic_number", "cnic_issue_date", "cnic_front", "cnic_back", "selfie"];
         break;
       case 3:
         fieldsToValidate = ["bank_name", "account_title", "iban"];

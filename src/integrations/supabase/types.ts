@@ -1336,6 +1336,7 @@ export type Database = {
           legal_name: string
           ntn_number: string | null
           rejection_reason: string | null
+          selfie_url: string | null
           shop_name: string
           submitted_at: string
           updated_at: string
@@ -1365,6 +1366,7 @@ export type Database = {
           legal_name: string
           ntn_number?: string | null
           rejection_reason?: string | null
+          selfie_url?: string | null
           shop_name: string
           submitted_at?: string
           updated_at?: string
@@ -1394,6 +1396,7 @@ export type Database = {
           legal_name?: string
           ntn_number?: string | null
           rejection_reason?: string | null
+          selfie_url?: string | null
           shop_name?: string
           submitted_at?: string
           updated_at?: string
@@ -1432,6 +1435,39 @@ export type Database = {
           seller_id?: string
           total_earnings?: number
           total_withdrawn?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_enabled: boolean
+          setting_key: string
+          setting_type: string
+          setting_value: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_enabled?: boolean
+          setting_key: string
+          setting_type?: string
+          setting_value?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_enabled?: boolean
+          setting_key?: string
+          setting_type?: string
+          setting_value?: string | null
           updated_at?: string
         }
         Relationships: []

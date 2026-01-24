@@ -27,10 +27,14 @@ import {
   CreditCard,
   FileText,
   Calendar,
+  ZoomIn,
+  X,
+  Camera,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { SellerProfile, isCnicExpired } from "@/hooks/useSellerKyc";
+
 import { generateSellerDossierPDF } from "@/utils/generateSellerPDF";
 
 const AdminSellerDetail = () => {
@@ -40,6 +44,7 @@ const AdminSellerDetail = () => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [fullSizeImage, setFullSizeImage] = useState<{ url: string; label: string } | null>(null);
 
   const { data: seller, isLoading } = useQuery({
     queryKey: ["seller-profile", sellerId],
@@ -317,19 +322,54 @@ const AdminSellerDetail = () => {
         </Card>
       </div>
 
-      {/* Documents */}
+      {/* Identity Verification Section */}
+      <Card className="border-primary/20">
+        <CardHeader className="bg-primary/5">
+          <CardTitle className="flex items-center gap-2">
+            <Camera className="w-5 h-5 text-primary" />
+            Identity Verification - Cross Reference
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <p className="text-sm text-muted-foreground mb-4">
+            Compare the seller's selfie with their CNIC photo for verification. Click any image to view full size.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
+            <DocumentPreview 
+              label="Seller Selfie" 
+              url={seller.selfie_url} 
+              onViewFullSize={setFullSizeImage}
+              aspectSquare
+            />
+            <DocumentPreview 
+              label="CNIC Front" 
+              url={seller.cnic_front_url} 
+              onViewFullSize={setFullSizeImage}
+            />
+            <DocumentPreview 
+              label="CNIC Back" 
+              url={seller.cnic_back_url} 
+              onViewFullSize={setFullSizeImage}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Banking Documents */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            Uploaded Documents
+            Banking Documents
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 gap-6">
-            <DocumentPreview label="CNIC Front" url={seller.cnic_front_url} />
-            <DocumentPreview label="CNIC Back" url={seller.cnic_back_url} />
-            <DocumentPreview label="Bank Cheque/Statement" url={seller.bank_cheque_url} />
+          <div className="max-w-sm">
+            <DocumentPreview 
+              label="Bank Cheque/Statement" 
+              url={seller.bank_cheque_url} 
+              onViewFullSize={setFullSizeImage}
+            />
           </div>
         </CardContent>
       </Card>
@@ -399,6 +439,33 @@ const AdminSellerDetail = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Full Size Image Viewer */}
+      <Dialog open={!!fullSizeImage} onOpenChange={() => setFullSizeImage(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden">
+          <DialogHeader className="p-4 border-b">
+            <DialogTitle className="flex items-center justify-between">
+              <span>{fullSizeImage?.label}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setFullSizeImage(null)}
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          {fullSizeImage && (
+            <div className="p-4 flex items-center justify-center bg-muted/50 max-h-[70vh] overflow-auto">
+              <img
+                src={fullSizeImage.url}
+                alt={fullSizeImage.label}
+                className="max-w-full max-h-full object-contain rounded-lg"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -423,22 +490,50 @@ const InfoRow = ({
   </div>
 );
 
-const DocumentPreview = ({ label, url }: { label: string; url: string | null }) => (
+const DocumentPreview = ({ 
+  label, 
+  url, 
+  onViewFullSize,
+  aspectSquare = false,
+}: { 
+  label: string; 
+  url: string | null;
+  onViewFullSize?: (data: { url: string; label: string }) => void;
+  aspectSquare?: boolean;
+}) => (
   <div className="space-y-2">
     <p className="text-sm font-medium">{label}</p>
     {url ? (
-      <a href={url} target="_blank" rel="noopener noreferrer">
+      <div 
+        className={cn(
+          "relative group cursor-pointer",
+          aspectSquare && "w-40 mx-auto"
+        )}
+        onClick={() => onViewFullSize?.({ url, label })}
+      >
         <img
           src={url}
           alt={label}
-          className="w-full h-40 object-cover rounded-lg border hover:opacity-80 transition-opacity cursor-pointer"
+          className={cn(
+            "rounded-lg border hover:opacity-90 transition-opacity object-cover",
+            aspectSquare ? "w-full aspect-square" : "w-full h-40"
+          )}
           onError={(e) => {
             (e.target as HTMLImageElement).src = "/placeholder.svg";
           }}
         />
-      </a>
+        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+          <div className="flex items-center gap-2 text-white text-sm font-medium">
+            <ZoomIn className="w-5 h-5" />
+            View Full Size
+          </div>
+        </div>
+      </div>
     ) : (
-      <div className="w-full h-40 bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
+      <div className={cn(
+        "bg-muted rounded-lg flex items-center justify-center text-muted-foreground",
+        aspectSquare ? "w-40 mx-auto aspect-square" : "w-full h-40"
+      )}>
         No document uploaded
       </div>
     )}

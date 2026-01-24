@@ -56,6 +56,7 @@ import AdminCancellationsPage from "./pages/dashboard/AdminCancellationsPage";
 import AdminReturnsPage from "./pages/dashboard/AdminReturnsPage";
 import AdminUserDirectory from "./pages/dashboard/AdminUserDirectory";
 import AdminRolesPage from "./pages/dashboard/AdminRolesPage";
+import SocialSettingsPage from "./pages/dashboard/SocialSettingsPage";
 
 // Seller Dashboard
 import MobileSellerLayout from "./components/dashboard/MobileSellerLayout";
@@ -181,6 +182,7 @@ const App = () => (
                 <Route path="banners" element={<BannerManager />} />
                 <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
                 <Route path="analytics" element={<AdminAnalyticsPage />} />
+                <Route path="site-settings" element={<SocialSettingsPage />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>
 
