@@ -24,33 +24,34 @@
   }
 }
 
-/* FANZON Design System - Daraz-inspired e-commerce theme
+/* FANZON Design System - Premium Minimalist Theme
+   Deep Charcoal + Electric Blue Accent
    All colors MUST be HSL.
 */
 
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 220 13% 13%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 13%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 13% 13%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary: FANZON Orange #f85606 */
-    --primary: 21 95% 50%;
+    /* Primary: Electric Blue #3B82F6 */
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Light gray backgrounds */
+    /* Secondary: Cool gray */
     --secondary: 220 14% 96%;
-    --secondary-foreground: 220 13% 13%;
+    --secondary-foreground: 222 47% 11%;
 
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 21 95% 50%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -58,78 +59,82 @@
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 21 95% 50%;
+    --ring: 217 91% 60%;
 
-    --radius: 0.25rem;
+    --radius: 0.5rem;
 
-    /* Custom FANZON tokens */
-    --fanzon-orange: 21 95% 50%;
-    --fanzon-orange-hover: 21 95% 45%;
-    --fanzon-orange-light: 21 95% 95%;
-    --fanzon-dark: 220 13% 13%;
+    /* Custom FANZON tokens - Premium palette */
+    --fanzon-primary: 217 91% 60%;
+    --fanzon-primary-hover: 217 91% 55%;
+    --fanzon-primary-light: 217 91% 95%;
+    --fanzon-dark: 222 47% 11%;
+    --fanzon-charcoal: 222 47% 15%;
     --fanzon-gray: 220 9% 46%;
     --fanzon-light-gray: 220 14% 96%;
     --fanzon-success: 142 71% 45%;
     --fanzon-warning: 38 92% 50%;
     --fanzon-star: 45 93% 47%;
+    --fanzon-emerald: 160 84% 39%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 21 95% 50%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 47% 18%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 222 47% 20%;
+    --sidebar-ring: 217 91% 60%;
   }
 
   .dark {
-    --background: 220 13% 8%;
+    --background: 222 47% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 220 13% 10%;
+    --card: 222 47% 10%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 220 13% 10%;
+    --popover: 222 47% 10%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 21 95% 50%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 13% 15%;
+    --secondary: 222 47% 15%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 220 13% 15%;
+    --muted: 222 47% 15%;
     --muted-foreground: 220 9% 65%;
 
-    --accent: 21 95% 50%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 30%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 13% 20%;
-    --input: 220 13% 20%;
-    --ring: 21 95% 50%;
+    --border: 222 47% 20%;
+    --input: 222 47% 20%;
+    --ring: 217 91% 60%;
 
-    --fanzon-orange: 21 95% 50%;
-    --fanzon-orange-hover: 21 95% 55%;
-    --fanzon-orange-light: 21 50% 15%;
+    --fanzon-primary: 217 91% 60%;
+    --fanzon-primary-hover: 217 91% 65%;
+    --fanzon-primary-light: 217 50% 20%;
     --fanzon-dark: 0 0% 98%;
+    --fanzon-charcoal: 222 47% 15%;
     --fanzon-gray: 220 9% 65%;
-    --fanzon-light-gray: 220 13% 15%;
+    --fanzon-light-gray: 222 47% 15%;
     --fanzon-success: 142 71% 45%;
     --fanzon-warning: 38 92% 50%;
     --fanzon-star: 45 93% 47%;
+    --fanzon-emerald: 160 84% 39%;
 
-    --sidebar-background: 220 13% 10%;
+    --sidebar-background: 222 47% 8%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 21 95% 50%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 13% 15%;
+    --sidebar-accent: 222 47% 15%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 13% 20%;
-    --sidebar-ring: 21 95% 50%;
+    --sidebar-border: 222 47% 20%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
@@ -141,6 +146,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overscroll-behavior-y: contain;
   }
   
@@ -319,12 +325,50 @@
     @apply relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-current after:transition-all after:duration-200 hover:after:w-full;
   }
 
-  /* Global Avatar Image Fix - Prevent stretching */
+  /* Global Image Fix - Prevent stretching */
   [data-radix-avatar-image],
   .avatar-image,
   img[class*="avatar"],
-  [class*="Avatar"] img {
+  [class*="Avatar"] img,
+  .product-image,
+  .gallery-image,
+  .kyc-image {
     object-fit: cover !important;
+  }
+
+  /* Aspect ratio utilities for images */
+  .aspect-product {
     aspect-ratio: 1 / 1;
+  }
+
+  .aspect-banner {
+    aspect-ratio: 16 / 9;
+  }
+
+  .aspect-document {
+    aspect-ratio: 3 / 2;
+  }
+
+  /* Glassmorphism effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-md border border-white/10;
+  }
+
+  /* Premium card styles */
+  .card-elevated {
+    @apply bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  .card-interactive {
+    @apply bg-card rounded-xl border border-border shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 cursor-pointer;
+  }
+
+  /* Dashboard action cards */
+  .action-card {
+    @apply bg-card rounded-xl border border-border p-4 min-h-[100px] flex flex-col justify-center cursor-pointer hover:shadow-lg hover:border-primary/30 active:scale-[0.98] transition-all duration-200;
   }
 }

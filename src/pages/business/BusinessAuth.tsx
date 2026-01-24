@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2, TrendingUp, ShieldCheck, Wallet, Package, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2, TrendingUp, ShieldCheck, Wallet, Package, AlertCircle, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,14 +27,13 @@ const signupSchema = z.object({
   path: ["confirmPassword"],
 });
 
-const SellerAuth = () => {
+const BusinessAuth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, signup, isAuthenticated, role, isLoading, isSuperAdmin, user } = useAuth();
   const { toast } = useToast();
   
-  // Determine mode from URL
-  const isLoginMode = location.pathname === "/seller/login";
+  const isLoginMode = location.pathname === "/business/login";
   const [mode, setMode] = useState<"login" | "signup">(isLoginMode ? "login" : "signup");
   
   const [formData, setFormData] = useState({
@@ -50,21 +49,18 @@ const SellerAuth = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showLoggedInWarning, setShowLoggedInWarning] = useState(false);
 
-  // Update mode when URL changes
   useEffect(() => {
-    setMode(location.pathname === "/seller/login" ? "login" : "signup");
+    setMode(location.pathname === "/business/login" ? "login" : "signup");
     setErrors({});
     setFormData({ name: "", email: "", password: "", confirmPassword: "" });
   }, [location.pathname]);
 
-  // Check if customer is already logged in
   useEffect(() => {
     if (!isLoading && isAuthenticated && role === "customer") {
       setShowLoggedInWarning(true);
     }
   }, [isAuthenticated, role, isLoading]);
 
-  // Role-based redirection
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
       if (isSuperAdmin || role === "admin") {
@@ -72,7 +68,6 @@ const SellerAuth = () => {
       } else if (role === "seller") {
         navigate("/seller/dashboard", { replace: true });
       }
-      // Customer case is handled by the warning modal
     }
   }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
 
@@ -123,11 +118,9 @@ const SellerAuth = () => {
     setIsSubmitting(true);
     try {
       if (mode === "login") {
-        // First, check if user is a seller before attempting login
         const result = await login(formData.email, formData.password);
         
         if (result.success) {
-          // After successful login, verify the role
           const { data: roleData } = await supabase
             .from("user_roles")
             .select("role")
@@ -135,11 +128,10 @@ const SellerAuth = () => {
             .maybeSingle();
           
           if (roleData?.role !== "seller" && roleData?.role !== "admin") {
-            // Not a seller - sign out and show error
             await supabase.auth.signOut();
             toast({
               title: "Access Denied",
-              description: "This account is not a Seller account. Please use the Customer Login.",
+              description: "This account is not a Business Partner account. Please use the Customer Login.",
               variant: "destructive",
             });
             setIsSubmitting(false);
@@ -147,8 +139,8 @@ const SellerAuth = () => {
           }
           
           toast({
-            title: "Welcome back, Seller!",
-            description: "You have successfully logged in to your Seller account.",
+            title: "Welcome back, Partner!",
+            description: "Redirecting to your dashboard...",
           });
         } else {
           toast({
@@ -158,13 +150,12 @@ const SellerAuth = () => {
           });
         }
       } else {
-        // Signup - always as seller (isSeller = true)
         const result = await signup(formData.name, formData.email, formData.password, true);
         
         if (result.success) {
           toast({
-            title: "Seller Account Created! 🎉",
-            description: "Welcome to FANZON! Your seller account has been created. Start listing your products.",
+            title: "Partner Account Created! 🎉",
+            description: "Welcome to FANZON Business! Start listing your products.",
           });
           setFormData({ name: "", email: "", password: "", confirmPassword: "" });
         } else {
@@ -187,43 +178,38 @@ const SellerAuth = () => {
   };
 
   const switchMode = () => {
-    if (mode === "login") {
-      navigate("/business/signup");
-    } else {
-      navigate("/business/login");
-    }
+    navigate(mode === "login" ? "/business/signup" : "/business/login");
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-fanzon-dark">
         <div className="text-3xl font-bold text-primary tracking-tight mb-4">FANZON</div>
         <FanzonSpinner size="lg" />
-        <p className="text-sm text-slate-400 mt-4 animate-pulse">Loading...</p>
+        <p className="text-sm text-muted-foreground mt-4 animate-pulse">Loading...</p>
       </div>
     );
   }
 
-  // Show warning if customer is logged in
   if (showLoggedInWarning) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-fanzon-dark flex items-center justify-center p-4">
         <div className="w-full max-w-md animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+          <div className="bg-card rounded-2xl shadow-2xl p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-4">
               <AlertCircle className="h-8 w-8 text-amber-600" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">Already Logged In</h2>
             <p className="text-muted-foreground text-sm mb-6">
               You are currently logged in as a Customer ({user?.email}). 
-              Please logout to access the Seller Portal.
+              Please logout to access the Business Portal.
             </p>
             <div className="space-y-3">
               <Button 
                 onClick={handleLogoutAndContinue}
-                className="w-full bg-primary hover:bg-primary/90"
+                className="w-full"
               >
-                Logout & Continue to Seller Portal
+                Logout & Continue to Business Portal
               </Button>
               <Button 
                 variant="outline"
@@ -240,21 +226,23 @@ const SellerAuth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex safe-area-top safe-area-bottom">
+    <div className="min-h-screen bg-fanzon-dark flex safe-area-top safe-area-bottom">
       {/* Left Side - Branding (Desktop Only) */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-center p-12 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-72 h-72 bg-primary rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-fanzon-emerald rounded-full blur-3xl"></div>
         </div>
         
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-              <span className="text-xl font-bold text-white">F</span>
+              <Briefcase className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold text-white">FANZON</span>
+            <div>
+              <span className="text-2xl font-bold text-white">FANZON</span>
+              <span className="block text-xs text-primary font-medium">Business Partner</span>
+            </div>
           </div>
           
           <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
@@ -262,31 +250,30 @@ const SellerAuth = () => {
             <span className="text-primary">with FANZON</span>
           </h1>
           
-          <p className="text-slate-300 text-lg mb-10 max-w-md">
+          <p className="text-muted-foreground text-lg mb-10 max-w-md">
             Join Pakistan's fastest-growing marketplace and reach millions of customers nationwide.
           </p>
           
-          {/* Benefits Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
               <TrendingUp className="h-8 w-8 text-primary mb-3" />
               <h3 className="text-white font-semibold mb-1">Grow Sales</h3>
-              <p className="text-slate-400 text-sm">Access millions of active buyers</p>
+              <p className="text-muted-foreground text-sm">Access millions of active buyers</p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-              <ShieldCheck className="h-8 w-8 text-emerald-400 mb-3" />
+              <ShieldCheck className="h-8 w-8 text-fanzon-emerald mb-3" />
               <h3 className="text-white font-semibold mb-1">Secure Payments</h3>
-              <p className="text-slate-400 text-sm">Guaranteed payment protection</p>
+              <p className="text-muted-foreground text-sm">Guaranteed payment protection</p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-              <Wallet className="h-8 w-8 text-blue-400 mb-3" />
+              <Wallet className="h-8 w-8 text-fanzon-warning mb-3" />
               <h3 className="text-white font-semibold mb-1">Easy Withdrawals</h3>
-              <p className="text-slate-400 text-sm">Direct bank transfers</p>
+              <p className="text-muted-foreground text-sm">Direct bank transfers</p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
               <Package className="h-8 w-8 text-purple-400 mb-3" />
               <h3 className="text-white font-semibold mb-1">Free Listings</h3>
-              <p className="text-slate-400 text-sm">No upfront costs</p>
+              <p className="text-muted-foreground text-sm">No upfront costs</p>
             </div>
           </div>
         </div>
@@ -298,23 +285,21 @@ const SellerAuth = () => {
           {/* Mobile Logo */}
           <div className="text-center mb-8 lg:hidden">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4 shadow-lg shadow-primary/25">
-              <Building2 className="h-8 w-8 text-white" />
+              <Briefcase className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold text-white tracking-tight">FANZON</h1>
-            <p className="text-primary mt-1 text-sm font-medium">Seller Center</p>
-            <p className="text-slate-400 mt-2 text-sm">Grow Your Business with FANZON</p>
+            <p className="text-primary mt-1 text-sm font-medium">Business Partner Portal</p>
           </div>
 
           {/* Auth Card */}
-          <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
-            {/* Header */}
+          <div className="bg-card rounded-2xl shadow-2xl p-6 sm:p-8">
             <div className="text-center mb-6">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-semibold mb-3">
                 <Building2 className="h-3 w-3" />
                 Business Partner Portal
               </div>
               <h2 className="text-xl font-semibold text-foreground">
-                {mode === "login" ? "Seller Login" : "Become a Seller"}
+                {mode === "login" ? "Partner Login" : "Become a Partner"}
               </h2>
               <p className="text-muted-foreground text-sm mt-1">
                 {mode === "login" 
@@ -326,19 +311,19 @@ const SellerAuth = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === "signup" && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="name" className="text-sm font-medium">Full Name / Business Name</Label>
+                  <Label htmlFor="name" className="text-sm font-medium">Business Name</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="name"
                       name="name"
                       type="text"
-                      placeholder="Your Name or Business Name"
+                      placeholder="Your Business Name"
                       value={formData.name}
                       onChange={handleInputChange}
                       className={cn(
-                        "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
-                        errors.name && "border-destructive focus:ring-destructive"
+                        "pl-10 h-12 text-base bg-secondary border-border focus:border-primary transition-colors touch-target",
+                        errors.name && "border-destructive"
                       )}
                     />
                   </div>
@@ -356,12 +341,12 @@ const SellerAuth = () => {
                     type="email"
                     inputMode="email"
                     autoComplete="email"
-                    placeholder="seller@business.com"
+                    placeholder="partner@business.com"
                     value={formData.email}
                     onChange={handleInputChange}
                     className={cn(
-                      "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
-                      errors.email && "border-destructive focus:ring-destructive"
+                      "pl-10 h-12 text-base bg-secondary border-border focus:border-primary transition-colors touch-target",
+                      errors.email && "border-destructive"
                     )}
                   />
                 </div>
@@ -381,15 +366,14 @@ const SellerAuth = () => {
                     value={formData.password}
                     onChange={handleInputChange}
                     className={cn(
-                      "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
-                      errors.password && "border-destructive focus:ring-destructive"
+                      "pl-10 pr-10 h-12 text-base bg-secondary border-border focus:border-primary transition-colors touch-target",
+                      errors.password && "border-destructive"
                     )}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -411,15 +395,14 @@ const SellerAuth = () => {
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
                       className={cn(
-                        "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
-                        errors.confirmPassword && "border-destructive focus:ring-destructive"
+                        "pl-10 pr-10 h-12 text-base bg-secondary border-border focus:border-primary transition-colors touch-target",
+                        errors.confirmPassword && "border-destructive"
                       )}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
-                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                     >
                       {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -442,7 +425,7 @@ const SellerAuth = () => {
 
               <Button
                 type="submit"
-                className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/25 transition-all touch-target"
+                className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/25 transition-all touch-target"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -452,43 +435,40 @@ const SellerAuth = () => {
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    {mode === "login" ? "Sign In as Seller" : "Create Seller Account"}
+                    {mode === "login" ? "Sign In" : "Create Partner Account"}
                     <ArrowRight size={18} />
                   </span>
                 )}
               </Button>
             </form>
 
-            {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-white px-3 text-xs text-muted-foreground uppercase tracking-wider">Or</span>
+                <span className="bg-card px-3 text-xs text-muted-foreground">Or</span>
               </div>
             </div>
 
-            {/* Switch Mode */}
             <p className="text-center text-sm text-muted-foreground">
-              {mode === "login" ? "New to selling on FANZON?" : "Already have a seller account?"}{" "}
+              {mode === "login" ? "Don't have a partner account?" : "Already have an account?"}{" "}
               <button
                 type="button"
                 onClick={switchMode}
                 className="text-primary font-semibold hover:text-primary/80 transition-colors"
               >
-                {mode === "login" ? "Register Now" : "Sign In"}
+                {mode === "login" ? "Sign Up" : "Sign In"}
               </button>
             </p>
           </div>
 
-          {/* Customer Link */}
           <div className="text-center mt-6">
-            <p className="text-xs text-slate-400 mb-2">
+            <p className="text-xs text-muted-foreground mb-2">
               Looking to shop instead?
             </p>
             <Link
-              to="/auth"
+              to="/auth/login"
               className="text-sm text-primary font-medium hover:text-primary/80 transition-colors inline-flex items-center gap-1"
             >
               Go to Customer Login
@@ -496,14 +476,12 @@ const SellerAuth = () => {
             </Link>
           </div>
 
-          {/* Footer */}
-          <p className="text-center text-xs text-slate-500 mt-4">
-            By continuing, you agree to FANZON's Seller Terms of Service and Privacy Policy
+          <p className="text-center text-xs text-muted-foreground mt-4">
+            By continuing, you agree to FANZON's Terms of Service and Privacy Policy
           </p>
         </div>
       </div>
 
-      {/* Forgot Password Modal */}
       <ForgotPasswordModal 
         open={showForgotPassword} 
         onOpenChange={setShowForgotPassword}
@@ -513,4 +491,4 @@ const SellerAuth = () => {
   );
 };
 
-export default SellerAuth;
+export default BusinessAuth;

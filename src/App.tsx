@@ -21,6 +21,8 @@ import BackToDashboardBar from "./components/navigation/BackToDashboardBar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import SellerAuth from "./pages/seller/SellerAuth";
+import BusinessAuth from "./pages/business/BusinessAuth";
+import CustomerAuth from "./pages/auth/CustomerAuth";
 import ResetPassword from "./pages/ResetPassword";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
@@ -149,9 +151,20 @@ const App = () => (
                           <Route path="/" element={<Index />} />
                           <Route path="/auth" element={<Auth />} />
                           
-                          {/* Seller Auth Routes */}
+                          {/* Customer Auth Routes - /auth/* */}
+                          <Route path="/auth/login" element={<CustomerAuth />} />
+                          <Route path="/auth/signup" element={<CustomerAuth />} />
+                          
+                          {/* Business Partner Auth Routes - /business/* */}
+                          <Route path="/business/login" element={<BusinessAuth />} />
+                          <Route path="/business/signup" element={<BusinessAuth />} />
+                          
+                          {/* Legacy Seller Auth Routes - Redirect to /business/* */}
                           <Route path="/seller/login" element={<SellerAuth />} />
                           <Route path="/seller/signup" element={<SellerAuth />} />
+                          
+                          {/* Password Reset Route */}
+                          <Route path="/reset-password" element={<ResetPassword />} />
                           
                           {/* Password Reset Route */}
                           <Route path="/reset-password" element={<ResetPassword />} />
