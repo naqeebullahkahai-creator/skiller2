@@ -21,6 +21,7 @@ import BackToDashboardBar from "./components/navigation/BackToDashboardBar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import SellerAuth from "./pages/seller/SellerAuth";
+import ResetPassword from "./pages/ResetPassword";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
 import ComparePage from "./pages/ComparePage";
@@ -151,6 +152,9 @@ const App = () => (
                           {/* Seller Auth Routes */}
                           <Route path="/seller/login" element={<SellerAuth />} />
                           <Route path="/seller/signup" element={<SellerAuth />} />
+                          
+                          {/* Password Reset Route */}
+                          <Route path="/reset-password" element={<ResetPassword />} />
                           
                           <Route path="/products" element={<ProductListing />} />
                           <Route path="/products" element={<ProductListing />} />

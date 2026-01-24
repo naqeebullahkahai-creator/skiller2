@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, Store, ArrowRight, Building2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2, TrendingUp, ShieldCheck, Wallet, Package, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
+import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -29,7 +30,7 @@ const signupSchema = z.object({
 const SellerAuth = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, signup, isAuthenticated, role, isLoading, isSuperAdmin } = useAuth();
+  const { login, signup, isAuthenticated, role, isLoading, isSuperAdmin, user } = useAuth();
   const { toast } = useToast();
   
   // Determine mode from URL
@@ -46,6 +47,8 @@ const SellerAuth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showLoggedInWarning, setShowLoggedInWarning] = useState(false);
 
   // Update mode when URL changes
   useEffect(() => {
@@ -54,6 +57,13 @@ const SellerAuth = () => {
     setFormData({ name: "", email: "", password: "", confirmPassword: "" });
   }, [location.pathname]);
 
+  // Check if customer is already logged in
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && role === "customer") {
+      setShowLoggedInWarning(true);
+    }
+  }, [isAuthenticated, role, isLoading]);
+
   // Role-based redirection
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
@@ -61,17 +71,19 @@ const SellerAuth = () => {
         navigate("/admin/dashboard", { replace: true });
       } else if (role === "seller") {
         navigate("/seller/dashboard", { replace: true });
-      } else {
-        // Customer trying to access seller auth - show error and redirect
-        toast({
-          title: "Wrong Portal",
-          description: "This is the Seller Portal. Please use the Customer Login.",
-          variant: "destructive",
-        });
-        navigate("/auth", { replace: true });
       }
+      // Customer case is handled by the warning modal
     }
-  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate, toast]);
+  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
+
+  const handleLogoutAndContinue = async () => {
+    await supabase.auth.signOut();
+    setShowLoggedInWarning(false);
+    toast({
+      title: "Logged Out",
+      description: "You can now sign up or log in as a seller.",
+    });
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -184,234 +196,319 @@ const SellerAuth = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-primary/5 to-background">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="text-3xl font-bold text-primary tracking-tight mb-4">FANZON</div>
         <FanzonSpinner size="lg" />
-        <p className="text-sm text-muted-foreground mt-4 animate-pulse">Loading...</p>
+        <p className="text-sm text-slate-400 mt-4 animate-pulse">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show warning if customer is logged in
+  if (showLoggedInWarning) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="w-full max-w-md animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-4">
+              <AlertCircle className="h-8 w-8 text-amber-600" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">Already Logged In</h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              You are currently logged in as a Customer ({user?.email}). 
+              Please logout to access the Seller Portal.
+            </p>
+            <div className="space-y-3">
+              <Button 
+                onClick={handleLogoutAndContinue}
+                className="w-full bg-primary hover:bg-primary/90"
+              >
+                Logout & Continue to Seller Portal
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => navigate("/")}
+                className="w-full"
+              >
+                Back to Shopping
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/10 via-primary/5 to-background flex items-center justify-center p-4 safe-area-top safe-area-bottom">
-      <div className="w-full max-w-md animate-fade-in">
-        {/* Seller Logo Section */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4 shadow-lg shadow-primary/25">
-            <Building2 className="h-8 w-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-3xl font-bold text-primary tracking-tight">FANZON</h1>
-          <p className="text-muted-foreground mt-1 text-sm font-medium">Seller Center</p>
-          <p className="text-primary/80 mt-2 text-xs">Start Your Business Today</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex safe-area-top safe-area-bottom">
+      {/* Left Side - Branding (Desktop Only) */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center p-12 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-primary rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
         </div>
-
-        {/* Auth Card */}
-        <div className="bg-card rounded-2xl shadow-xl border border-primary/20 p-6 sm:p-8">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold mb-3">
-              <Store className="h-3 w-3" />
-              Seller Portal
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+              <span className="text-xl font-bold text-white">F</span>
             </div>
-            <h2 className="text-xl font-semibold text-foreground">
-              {mode === "login" ? "Seller Login" : "Become a Seller"}
-            </h2>
-            <p className="text-muted-foreground text-sm mt-1">
-              {mode === "login" 
-                ? "Access your seller dashboard" 
-                : "Join thousands of successful sellers"}
-            </p>
+            <span className="text-2xl font-bold text-white">FANZON</span>
+          </div>
+          
+          <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
+            Grow Your Business<br />
+            <span className="text-primary">with FANZON</span>
+          </h1>
+          
+          <p className="text-slate-300 text-lg mb-10 max-w-md">
+            Join Pakistan's fastest-growing marketplace and reach millions of customers nationwide.
+          </p>
+          
+          {/* Benefits Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+              <TrendingUp className="h-8 w-8 text-primary mb-3" />
+              <h3 className="text-white font-semibold mb-1">Grow Sales</h3>
+              <p className="text-slate-400 text-sm">Access millions of active buyers</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+              <ShieldCheck className="h-8 w-8 text-emerald-400 mb-3" />
+              <h3 className="text-white font-semibold mb-1">Secure Payments</h3>
+              <p className="text-slate-400 text-sm">Guaranteed payment protection</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+              <Wallet className="h-8 w-8 text-blue-400 mb-3" />
+              <h3 className="text-white font-semibold mb-1">Easy Withdrawals</h3>
+              <p className="text-slate-400 text-sm">Direct bank transfers</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+              <Package className="h-8 w-8 text-purple-400 mb-3" />
+              <h3 className="text-white font-semibold mb-1">Free Listings</h3>
+              <p className="text-slate-400 text-sm">No upfront costs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Auth Form */}
+      <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
+        <div className="w-full max-w-md animate-fade-in">
+          {/* Mobile Logo */}
+          <div className="text-center mb-8 lg:hidden">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4 shadow-lg shadow-primary/25">
+              <Building2 className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-white tracking-tight">FANZON</h1>
+            <p className="text-primary mt-1 text-sm font-medium">Seller Center</p>
+            <p className="text-slate-400 mt-2 text-sm">Grow Your Business with FANZON</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "signup" && (
+          {/* Auth Card */}
+          <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-semibold mb-3">
+                <Building2 className="h-3 w-3" />
+                Business Partner Portal
+              </div>
+              <h2 className="text-xl font-semibold text-foreground">
+                {mode === "login" ? "Seller Login" : "Become a Seller"}
+              </h2>
+              <p className="text-muted-foreground text-sm mt-1">
+                {mode === "login" 
+                  ? "Access your seller dashboard" 
+                  : "Start selling on Pakistan's #1 marketplace"}
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {mode === "signup" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="name" className="text-sm font-medium">Full Name / Business Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="Your Name or Business Name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className={cn(
+                        "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
+                        errors.name && "border-destructive focus:ring-destructive"
+                      )}
+                    />
+                  </div>
+                  {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
+                </div>
+              )}
+
               <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-sm font-medium">Full Name / Business Name</Label>
+                <Label htmlFor="email" className="text-sm font-medium">Business Email</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="Your Name or Business Name"
-                    value={formData.name}
+                    id="email"
+                    name="email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    placeholder="seller@business.com"
+                    value={formData.email}
                     onChange={handleInputChange}
                     className={cn(
                       "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
-                      errors.name && "border-destructive focus:ring-destructive"
+                      errors.email && "border-destructive focus:ring-destructive"
                     )}
                   />
                 </div>
-                {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
+                {errors.email && <p className="text-destructive text-xs">{errors.email}</p>}
               </div>
-            )}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium">Business Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  placeholder="seller@business.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={cn(
-                    "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
-                    errors.email && "border-destructive focus:ring-destructive"
-                  )}
-                />
-              </div>
-              {errors.email && <p className="text-destructive text-xs">{errors.email}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete={mode === "login" ? "current-password" : "new-password"}
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={cn(
-                    "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
-                    errors.password && "border-destructive focus:ring-destructive"
-                  )}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-              {errors.password && <p className="text-destructive text-xs">{errors.password}</p>}
-            </div>
-
-            {mode === "signup" && (
               <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    autoComplete="new-password"
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete={mode === "login" ? "current-password" : "new-password"}
                     placeholder="••••••••"
-                    value={formData.confirmPassword}
+                    value={formData.password}
                     onChange={handleInputChange}
                     className={cn(
                       "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
-                      errors.confirmPassword && "border-destructive focus:ring-destructive"
+                      errors.password && "border-destructive focus:ring-destructive"
                     )}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-                {errors.confirmPassword && <p className="text-destructive text-xs">{errors.confirmPassword}</p>}
+                {errors.password && <p className="text-destructive text-xs">{errors.password}</p>}
               </div>
-            )}
 
-            {mode === "signup" && (
-              <div className="bg-primary/5 p-3 rounded-lg border border-primary/20 space-y-2">
-                <p className="text-xs font-medium text-primary flex items-center gap-2">
-                  <Store className="h-3 w-3" />
-                  Seller Benefits
-                </p>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  <li className="flex items-center gap-2">✓ List unlimited products</li>
-                  <li className="flex items-center gap-2">✓ Access seller analytics</li>
-                  <li className="flex items-center gap-2">✓ Manage orders & returns</li>
-                  <li className="flex items-center gap-2">✓ Withdraw earnings anytime</li>
-                </ul>
-              </div>
-            )}
-
-            {mode === "login" && (
-              <div className="flex justify-end">
-                <button type="button" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
-                  Forgot Password?
-                </button>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/25 transition-all touch-target"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center gap-2">
-                  <span className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent"></span>
-                  Please wait...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  {mode === "login" ? "Sign In as Seller" : "Create Seller Account"}
-                  <ArrowRight size={18} />
-                </span>
+              {mode === "signup" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      className={cn(
+                        "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background focus:border-primary transition-colors touch-target",
+                        errors.confirmPassword && "border-destructive focus:ring-destructive"
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && <p className="text-destructive text-xs">{errors.confirmPassword}</p>}
+                </div>
               )}
-            </Button>
-          </form>
 
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
+              {mode === "login" && (
+                <div className="flex justify-end">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/25 transition-all touch-target"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent"></span>
+                    Please wait...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    {mode === "login" ? "Sign In as Seller" : "Create Seller Account"}
+                    <ArrowRight size={18} />
+                  </span>
+                )}
+              </Button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-white px-3 text-xs text-muted-foreground uppercase tracking-wider">Or</span>
+              </div>
             </div>
-            <div className="relative flex justify-center">
-              <span className="bg-card px-3 text-xs text-muted-foreground uppercase tracking-wider">Or</span>
-            </div>
+
+            {/* Switch Mode */}
+            <p className="text-center text-sm text-muted-foreground">
+              {mode === "login" ? "New to selling on FANZON?" : "Already have a seller account?"}{" "}
+              <button
+                type="button"
+                onClick={switchMode}
+                className="text-primary font-semibold hover:text-primary/80 transition-colors"
+              >
+                {mode === "login" ? "Register Now" : "Sign In"}
+              </button>
+            </p>
           </div>
 
-          {/* Switch Mode */}
-          <p className="text-center text-sm text-muted-foreground">
-            {mode === "login" ? "New to selling on FANZON?" : "Already have a seller account?"}{" "}
-            <button
-              type="button"
-              onClick={switchMode}
-              className="text-primary font-semibold hover:text-primary/80 transition-colors"
+          {/* Customer Link */}
+          <div className="text-center mt-6">
+            <p className="text-xs text-slate-400 mb-2">
+              Looking to shop instead?
+            </p>
+            <Link
+              to="/auth"
+              className="text-sm text-primary font-medium hover:text-primary/80 transition-colors inline-flex items-center gap-1"
             >
-              {mode === "login" ? "Register Now" : "Sign In"}
-            </button>
+              Go to Customer Login
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          {/* Footer */}
+          <p className="text-center text-xs text-slate-500 mt-4">
+            By continuing, you agree to FANZON's Seller Terms of Service and Privacy Policy
           </p>
         </div>
-
-        {/* Customer Link */}
-        <div className="text-center mt-6">
-          <p className="text-xs text-muted-foreground mb-2">
-            Looking to shop instead?
-          </p>
-          <Link
-            to="/auth"
-            className="text-sm text-primary font-medium hover:text-primary/80 transition-colors inline-flex items-center gap-1"
-          >
-            Go to Customer Login
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-
-        {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground mt-4">
-          By continuing, you agree to FANZON's Seller Terms of Service and Privacy Policy
-        </p>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal 
+        open={showForgotPassword} 
+        onOpenChange={setShowForgotPassword}
+        userType="seller"
+      />
     </div>
   );
 };
