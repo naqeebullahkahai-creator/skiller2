@@ -1,30 +1,13 @@
 import { useState } from "react";
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  FolderOpen, 
-  Users, 
-  Settings,
   ChevronLeft,
   ChevronRight,
   LogOut,
   Bell,
   Search,
   Store,
-  ShieldCheck,
-  Wallet,
-  Zap,
-  BarChart3,
-  Ticket,
-  Image,
-  Star,
-  XCircle,
-  RotateCcw,
-  MessageSquare,
-  Eye,
-  UserCircle
+  Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,34 +23,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardProvider } from "@/contexts/DashboardContext";
-
-const adminLinks = [
-  { name: "Dashboard", href: "/admin-dashboard", icon: LayoutDashboard },
-  { name: "User Directory", href: "/admin-dashboard/users", icon: UserCircle },
-  { name: "Order Management", href: "/admin-dashboard/orders", icon: ShoppingCart },
-  { name: "Cancellations", href: "/admin-dashboard/cancellations", icon: XCircle },
-  { name: "Returns", href: "/admin-dashboard/returns", icon: RotateCcw },
-  { name: "Product Catalog", href: "/admin-dashboard/products", icon: Package },
-  { name: "Category Manager", href: "/admin-dashboard/categories", icon: FolderOpen },
-  { name: "Reviews", href: "/admin-dashboard/reviews", icon: Star },
-  { name: "Q&A Moderation", href: "/admin-dashboard/qa-moderation", icon: MessageSquare },
-  { name: "Flash Sales", href: "/admin-dashboard/flash-sales", icon: Zap },
-  { name: "Vouchers", href: "/admin-dashboard/vouchers", icon: Ticket },
-  { name: "Banners", href: "/admin-dashboard/banners", icon: Image },
-  { name: "Bulk Uploads", href: "/admin-dashboard/bulk-uploads", icon: Package },
-  { name: "Analytics", href: "/admin-dashboard/analytics", icon: BarChart3 },
-  { name: "Seller Approvals", href: "/admin-dashboard/approvals", icon: Users },
-  { name: "Seller KYC", href: "/admin-dashboard/kyc", icon: ShieldCheck },
-  { name: "Payouts", href: "/admin-dashboard/payouts", icon: Wallet },
-  { name: "Settings", href: "/admin-dashboard/settings", icon: Settings },
-];
+import { PermissionsProvider } from "@/contexts/PermissionsContext";
+import DynamicAdminSidebar from "@/components/admin/DynamicAdminSidebar";
 
 const AdminDashboardLayout = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isBuyerView, setIsBuyerView] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -75,78 +37,57 @@ const AdminDashboardLayout = () => {
   };
 
   const handleBuyerView = () => {
-    setIsBuyerView(true);
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen bg-muted flex">
-      {/* Sidebar */}
-      <aside 
-        className={cn(
-          "fixed left-0 top-0 z-40 h-screen bg-slate-900 text-white transition-all duration-300",
-          sidebarOpen ? "w-64" : "w-20"
-        )}
-      >
-        {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-slate-700">
-          {sidebarOpen && (
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-bold text-primary">FANZON</span>
-            </Link>
+    <PermissionsProvider>
+      <div className="min-h-screen bg-muted flex">
+        {/* Sidebar */}
+        <aside 
+          className={cn(
+            "fixed left-0 top-0 z-40 h-screen bg-slate-900 text-white transition-all duration-300 flex flex-col",
+            sidebarOpen ? "w-64" : "w-20"
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-white hover:bg-slate-800"
-          >
-            {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-          </Button>
-        </div>
-
-        {/* Role Badge */}
-        <div className="p-4 border-b border-slate-700">
-          <Badge className="bg-red-500 text-white hover:bg-red-600">
-            {sidebarOpen ? "Admin Panel" : "A"}
-          </Badge>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
-          {adminLinks.map((link) => {
-            const isActive = location.pathname === link.href || 
-              (link.href !== "/admin-dashboard" && location.pathname.startsWith(link.href));
-            
-            return (
-              <Link
-                key={link.name}
-                to={link.href}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
-                )}
-              >
-                <link.icon size={20} />
-                {sidebarOpen && <span>{link.name}</span>}
+        >
+          {/* Logo */}
+          <div className="flex h-16 items-center justify-between px-4 border-b border-slate-700">
+            {sidebarOpen && (
+              <Link to="/" className="flex items-center gap-2">
+                <span className="text-xl font-bold text-primary">FANZON</span>
               </Link>
-            );
-          })}
-        </nav>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="text-white hover:bg-slate-800"
+            >
+              {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+            </Button>
+          </div>
 
-        {/* Bottom Links */}
-        <div className="p-4 border-t border-slate-700">
-          <Link
-            to="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-          >
-            <Store size={20} />
-            {sidebarOpen && <span>Back to Store</span>}
-          </Link>
-        </div>
-      </aside>
+          {/* Role Badge */}
+          <div className="p-4 border-b border-slate-700">
+            <Badge className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {sidebarOpen ? "Admin Panel" : "A"}
+            </Badge>
+          </div>
+
+          {/* Dynamic Navigation based on permissions */}
+          <DynamicAdminSidebar sidebarOpen={sidebarOpen} />
+
+          {/* Bottom Links */}
+          <div className="p-4 border-t border-slate-700">
+            <Link
+              to="/"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              <Store size={20} />
+              {sidebarOpen && <span>Back to Store</span>}
+            </Link>
+          </div>
+        </aside>
 
       {/* Main Content */}
       <div className={cn(
@@ -230,7 +171,8 @@ const AdminDashboardLayout = () => {
           </DashboardProvider>
         </main>
       </div>
-    </div>
+      </div>
+    </PermissionsProvider>
   );
 };
 

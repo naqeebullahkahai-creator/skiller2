@@ -55,6 +55,7 @@ import AdminBulkUploadLogs from "./pages/dashboard/AdminBulkUploadLogs";
 import AdminCancellationsPage from "./pages/dashboard/AdminCancellationsPage";
 import AdminReturnsPage from "./pages/dashboard/AdminReturnsPage";
 import AdminUserDirectory from "./pages/dashboard/AdminUserDirectory";
+import AdminRolesPage from "./pages/dashboard/AdminRolesPage";
 
 // Seller Dashboard
 import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
@@ -160,6 +161,7 @@ const App = () => (
               >
                 <Route index element={<AdminDashboardHome />} />
                 <Route path="users" element={<AdminUserDirectory />} />
+                <Route path="roles" element={<AdminRolesPage />} />
                 <Route path="orders" element={<AdminOrderManagement />} />
                 <Route path="cancellations" element={<AdminCancellationsPage />} />
                 <Route path="returns" element={<AdminReturnsPage />} />
