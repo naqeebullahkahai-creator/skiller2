@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
+import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -139,23 +140,28 @@ const Auth = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-secondary/30 to-background">
+        <div className="text-3xl font-bold text-primary tracking-tight mb-4">FANZON</div>
+        <FanzonSpinner size="lg" />
+        <p className="text-sm text-muted-foreground mt-4 animate-pulse">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
+    <div className="min-h-screen bg-gradient-to-b from-secondary/30 via-background to-background flex items-center justify-center p-4 safe-area-top safe-area-bottom">
+      <div className="w-full max-w-md animate-fade-in">
+        {/* Logo Section */}
         <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4 shadow-lg shadow-primary/25">
+            <span className="text-2xl font-bold text-primary-foreground">F</span>
+          </div>
           <h1 className="text-3xl font-bold text-primary tracking-tight">FANZON</h1>
           <p className="text-muted-foreground mt-1 text-sm">Pakistan's Premier Marketplace</p>
         </div>
 
         {/* Auth Card */}
-        <div className="bg-card rounded-2xl shadow-xl border border-border p-8">
+        <div className="bg-card rounded-2xl shadow-xl border border-border p-6 sm:p-8">
           {/* Header */}
           <div className="text-center mb-6">
             <h2 className="text-xl font-semibold text-foreground">
@@ -182,7 +188,7 @@ const Auth = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     className={cn(
-                      "pl-10 h-11 bg-muted/50 border-border focus:bg-background transition-colors",
+                      "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background transition-colors touch-target",
                       errors.name && "border-destructive focus:ring-destructive"
                     )}
                   />
@@ -199,11 +205,13 @@ const Auth = () => {
                   id="email"
                   name="email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleInputChange}
                   className={cn(
-                    "pl-10 h-11 bg-muted/50 border-border focus:bg-background transition-colors",
+                    "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background transition-colors touch-target",
                     errors.email && "border-destructive focus:ring-destructive"
                   )}
                 />
@@ -219,20 +227,22 @@ const Auth = () => {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleInputChange}
                   className={cn(
-                    "pl-10 pr-10 h-11 bg-muted/50 border-border focus:bg-background transition-colors",
+                    "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background transition-colors touch-target",
                     errors.password && "border-destructive focus:ring-destructive"
                   )}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               {errors.password && <p className="text-destructive text-xs">{errors.password}</p>}
@@ -248,20 +258,22 @@ const Auth = () => {
                       id="confirmPassword"
                       name="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
+                      autoComplete="new-password"
                       placeholder="••••••••"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
                       className={cn(
-                        "pl-10 pr-10 h-11 bg-muted/50 border-border focus:bg-background transition-colors",
+                        "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background transition-colors touch-target",
                         errors.confirmPassword && "border-destructive focus:ring-destructive"
                       )}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
                   </div>
                   {errors.confirmPassword && <p className="text-destructive text-xs">{errors.confirmPassword}</p>}
@@ -300,7 +312,7 @@ const Auth = () => {
 
             <Button
               type="submit"
-              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/25 transition-all"
+              className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/25 transition-all touch-target"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -311,7 +323,7 @@ const Auth = () => {
               ) : (
                 <span className="flex items-center gap-2">
                   {mode === "login" ? "Sign In" : "Create Account"}
-                  <ArrowRight size={16} />
+                  <ArrowRight size={18} />
                 </span>
               )}
             </Button>

@@ -156,11 +156,11 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 px-1">
       {/* Profile Picture Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <User size={20} />
             Profile Picture
           </CardTitle>
@@ -169,23 +169,26 @@ const ProfilePage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={profile?.avatar_url || undefined} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <div className="relative flex-shrink-0">
+              <Avatar className="h-24 w-24 sm:h-28 sm:w-28">
+                <AvatarImage 
+                  src={profile?.avatar_url || undefined} 
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-primary text-primary-foreground text-2xl sm:text-3xl">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-50"
+                className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2.5 rounded-full hover:bg-primary/90 transition-colors disabled:opacity-50 shadow-lg touch-target"
               >
                 {isUploading ? (
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                 ) : (
-                  <Camera size={16} />
+                  <Camera size={18} />
                 )}
               </button>
               <input
@@ -196,8 +199,8 @@ const ProfilePage = () => {
                 className="hidden"
               />
             </div>
-            <div>
-              <p className="font-medium">{profile?.full_name || "User"}</p>
+            <div className="text-center sm:text-left">
+              <p className="font-semibold text-lg">{profile?.full_name || "User"}</p>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
               <p className="text-xs text-muted-foreground mt-2">
                 JPG, PNG or GIF. Max 2MB.
@@ -209,8 +212,8 @@ const ProfilePage = () => {
 
       {/* Profile Info Card */}
       <Card>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Personal Information</CardTitle>
           <CardDescription>
             Update your personal details
           </CardDescription>
@@ -225,7 +228,11 @@ const ProfilePage = () => {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your full name" {...field} />
+                      <Input 
+                        placeholder="Enter your full name" 
+                        className="h-12 text-base touch-target"
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -239,7 +246,12 @@ const ProfilePage = () => {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="0300-1234567" {...field} />
+                      <Input 
+                        placeholder="0300-1234567" 
+                        inputMode="tel"
+                        className="h-12 text-base touch-target"
+                        {...field} 
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -247,15 +259,19 @@ const ProfilePage = () => {
               />
 
               <div className="pt-4">
-                <Button type="submit" disabled={isSaving}>
+                <Button 
+                  type="submit" 
+                  disabled={isSaving}
+                  className="w-full sm:w-auto h-12 px-6 touch-target"
+                >
                   {isSaving ? (
                     <>
-                      <Loader2 size={16} className="mr-2 animate-spin" />
+                      <Loader2 size={18} className="mr-2 animate-spin" />
                       Saving...
                     </>
                   ) : (
                     <>
-                      <Save size={16} className="mr-2" />
+                      <Save size={18} className="mr-2" />
                       Save Changes
                     </>
                   )}
@@ -268,14 +284,18 @@ const ProfilePage = () => {
 
       {/* Email Card (Read-only) */}
       <Card>
-        <CardHeader>
-          <CardTitle>Email Address</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Email Address</CardTitle>
           <CardDescription>
             Your email address is used for login and cannot be changed
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Input value={user?.email || ""} disabled className="bg-muted" />
+          <Input 
+            value={user?.email || ""} 
+            disabled 
+            className="bg-muted h-12 text-base"
+          />
         </CardContent>
       </Card>
     </div>
