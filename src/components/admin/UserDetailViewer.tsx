@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { 
   User, Mail, Phone, Calendar, Package, Wallet, 
-  FileText, Activity, ShieldCheck, LogIn, X, Eye
+  FileText, Activity, ShieldCheck, LogIn, X, Eye,
+  CheckCircle, XCircle, AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -23,9 +34,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import { useUserDetails } from "@/hooks/useAdminUsers";
 import { useUserStaffRole } from "@/hooks/useRoleManagement";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -50,14 +62,31 @@ const getRoleBadge = (role: string) => {
   }
 };
 
+const getVerificationBadge = (status: string) => {
+  switch (status) {
+    case "verified":
+      return <Badge className="bg-green-500 text-white gap-1"><CheckCircle size={12} /> Verified</Badge>;
+    case "rejected":
+      return <Badge variant="destructive" className="gap-1"><XCircle size={12} /> Rejected</Badge>;
+    case "pending":
+      return <Badge className="bg-yellow-500 text-white gap-1"><AlertCircle size={12} /> Pending</Badge>;
+    default:
+      return <Badge variant="secondary">{status}</Badge>;
+  }
+};
+
 interface UserDetailViewerProps {
   userId: string | null;
   onClose: () => void;
 }
 
 const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
+  const queryClient = useQueryClient();
   const { user, isLoading: isLoadingDetails } = useUserDetails(userId || "");
   const { data: staffRole } = useUserStaffRole(userId);
+  const [showVerifyDialog, setShowVerifyDialog] = useState(false);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
   
   // Fetch activity logs for this user
   const { data: activityLogs = [] } = useQuery({
@@ -103,9 +132,62 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
     enabled: !!userId,
   });
   
+  // Verify seller mutation
+  const verifySellerMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId) throw new Error("No user selected");
+      
+      const { error } = await supabase
+        .from("seller_profiles")
+        .update({ 
+          verification_status: "verified",
+          verified_at: new Date().toISOString(),
+          rejection_reason: null
+        })
+        .eq("user_id", userId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Seller verified successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin-user-details", userId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setShowVerifyDialog(false);
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to verify seller: ${error.message}`);
+    },
+  });
+  
+  // Reject/Unverify seller mutation
+  const rejectSellerMutation = useMutation({
+    mutationFn: async (reason: string) => {
+      if (!userId) throw new Error("No user selected");
+      
+      const { error } = await supabase
+        .from("seller_profiles")
+        .update({ 
+          verification_status: "rejected",
+          rejection_reason: reason,
+          verified_at: null
+        })
+        .eq("user_id", userId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Seller verification revoked");
+      queryClient.invalidateQueries({ queryKey: ["admin-user-details", userId] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setShowRejectDialog(false);
+      setRejectionReason("");
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to update seller: ${error.message}`);
+    },
+  });
+  
   const handleImpersonate = () => {
-    // In a real implementation, this would create a secure impersonation session
-    // For now, we show a placeholder message
     toast.info("Impersonation feature requires backend implementation for security");
   };
   
@@ -346,6 +428,62 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
                 
                 {user.seller_profile && (
                   <TabsContent value="seller" className="mt-4 space-y-4">
+                    {/* Verification Actions Card */}
+                    <Card className="border-2 border-dashed">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base flex items-center justify-between">
+                          <span className="flex items-center gap-2">
+                            <ShieldCheck size={16} />
+                            Verification Status
+                          </span>
+                          {getVerificationBadge(user.seller_profile.verification_status)}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {user.seller_profile.rejection_reason && (
+                          <div className="p-3 bg-destructive/10 rounded-lg text-sm">
+                            <p className="font-medium text-destructive">Rejection Reason:</p>
+                            <p className="text-muted-foreground">{user.seller_profile.rejection_reason}</p>
+                          </div>
+                        )}
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {user.seller_profile.verification_status !== "verified" && (
+                            <Button 
+                              onClick={() => setShowVerifyDialog(true)}
+                              className="bg-green-600 hover:bg-green-700"
+                              disabled={verifySellerMutation.isPending}
+                            >
+                              <CheckCircle size={16} className="mr-2" />
+                              Verify Seller
+                            </Button>
+                          )}
+                          
+                          {user.seller_profile.verification_status === "verified" && (
+                            <Button 
+                              variant="destructive"
+                              onClick={() => setShowRejectDialog(true)}
+                              disabled={rejectSellerMutation.isPending}
+                            >
+                              <XCircle size={16} className="mr-2" />
+                              Revoke Verification
+                            </Button>
+                          )}
+                          
+                          {user.seller_profile.verification_status === "pending" && (
+                            <Button 
+                              variant="outline"
+                              onClick={() => setShowRejectDialog(true)}
+                              disabled={rejectSellerMutation.isPending}
+                            >
+                              <XCircle size={16} className="mr-2" />
+                              Reject Application
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
@@ -367,14 +505,8 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
                           <p className="font-medium">{user.seller_profile.city}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-muted-foreground">Verification Status</p>
-                          <Badge className={
-                            user.seller_profile.verification_status === "verified"
-                              ? "bg-green-500"
-                              : "bg-yellow-500"
-                          }>
-                            {user.seller_profile.verification_status}
-                          </Badge>
+                          <p className="text-sm text-muted-foreground">Business Address</p>
+                          <p className="font-medium">{user.seller_profile.business_address || 'N/A'}</p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">CNIC Number</p>
@@ -383,6 +515,14 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
                         <div>
                           <p className="text-sm text-muted-foreground">Bank</p>
                           <p className="font-medium">{user.seller_profile.bank_name || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">IBAN</p>
+                          <p className="font-medium">{user.seller_profile.iban || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Account Title</p>
+                          <p className="font-medium">{user.seller_profile.account_title || 'N/A'}</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -452,6 +592,59 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
             </div>
           ) : null}
         </ScrollArea>
+        
+        {/* Verify Seller Confirmation Dialog */}
+        <AlertDialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Verify Seller</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to verify this seller? They will be able to list products and receive orders.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => verifySellerMutation.mutate()}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {verifySellerMutation.isPending ? "Verifying..." : "Verify Seller"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        
+        {/* Reject/Revoke Verification Dialog */}
+        <AlertDialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {user?.seller_profile?.verification_status === "verified" 
+                  ? "Revoke Verification" 
+                  : "Reject Application"}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Please provide a reason for this action. This will be visible to the seller.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <Textarea
+              placeholder="Enter reason..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              className="min-h-[100px]"
+            />
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setRejectionReason("")}>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => rejectSellerMutation.mutate(rejectionReason)}
+                className="bg-destructive hover:bg-destructive/90"
+                disabled={!rejectionReason.trim()}
+              >
+                {rejectSellerMutation.isPending ? "Processing..." : "Confirm"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );
