@@ -9,10 +9,16 @@ interface VisualEditContextType {
 
 const VisualEditContext = createContext<VisualEditContextType | undefined>(undefined);
 
+// Safe hook that returns defaults when used outside provider
 export const useVisualEdit = () => {
   const context = useContext(VisualEditContext);
+  // Return safe defaults if context is not available
   if (!context) {
-    throw new Error("useVisualEdit must be used within a VisualEditProvider");
+    return {
+      isEditMode: false,
+      toggleEditMode: () => {},
+      canEdit: false,
+    };
   }
   return context;
 };

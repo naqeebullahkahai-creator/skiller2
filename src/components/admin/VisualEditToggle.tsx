@@ -1,11 +1,15 @@
 import { Edit3, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useVisualEdit } from "@/contexts/VisualEditContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 const VisualEditToggle = () => {
+  const { isAuthenticated, role, isSuperAdmin } = useAuth();
   const { isEditMode, toggleEditMode, canEdit } = useVisualEdit();
 
+  // Only show for admin users who are authenticated
+  if (!isAuthenticated || (!isSuperAdmin && role !== "admin")) return null;
   if (!canEdit) return null;
 
   return (

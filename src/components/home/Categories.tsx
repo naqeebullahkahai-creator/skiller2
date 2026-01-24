@@ -86,7 +86,7 @@ const Categories = () => {
               >
                 <div className={cn(
                   "w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center",
-                  "bg-fanzon-orange-light group-hover:bg-primary group-active:bg-primary",
+                  "bg-primary/10 group-hover:bg-primary group-active:bg-primary",
                   "transition-all duration-300 group-hover:scale-105"
                 )}>
                   <IconComponent 
