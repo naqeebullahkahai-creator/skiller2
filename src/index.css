@@ -371,4 +371,20 @@
   .action-card {
     @apply bg-card rounded-xl border border-border p-4 min-h-[100px] flex flex-col justify-center cursor-pointer hover:shadow-lg hover:border-primary/30 active:scale-[0.98] transition-all duration-200;
   }
+
+  /* Confetti animation */
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  .animate-confetti-fall {
+    animation: confetti-fall 3s ease-out forwards;
+  }
 }

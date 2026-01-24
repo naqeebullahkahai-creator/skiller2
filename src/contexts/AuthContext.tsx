@@ -148,7 +148,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isSeller: boolean = false
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      // For sellers, redirect to verification success page; for customers, redirect to home
+      const redirectUrl = isSeller 
+        ? `${window.location.origin}/business/verify-email-success`
+        : `${window.location.origin}/`;
       
       const { data, error } = await supabase.auth.signUp({
         email,

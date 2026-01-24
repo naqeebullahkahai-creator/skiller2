@@ -22,6 +22,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import SellerAuth from "./pages/seller/SellerAuth";
 import BusinessAuth from "./pages/business/BusinessAuth";
+import EmailVerificationPending from "./pages/business/EmailVerificationPending";
+import EmailVerificationSuccess from "./pages/business/EmailVerificationSuccess";
 import CustomerAuth from "./pages/auth/CustomerAuth";
 import ResetPassword from "./pages/ResetPassword";
 import ProductListing from "./pages/ProductListing";
@@ -158,6 +160,8 @@ const App = () => (
                           {/* Business Partner Auth Routes - /business/* */}
                           <Route path="/business/login" element={<BusinessAuth />} />
                           <Route path="/business/signup" element={<BusinessAuth />} />
+                          <Route path="/business/verify-email-pending" element={<EmailVerificationPending />} />
+                          <Route path="/business/verify-email-success" element={<EmailVerificationSuccess />} />
                           
                           {/* Legacy Seller Auth Routes - Redirect to /business/* */}
                           <Route path="/seller/login" element={<SellerAuth />} />

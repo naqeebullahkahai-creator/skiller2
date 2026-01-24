@@ -155,8 +155,10 @@ const BusinessAuth = () => {
         if (result.success) {
           toast({
             title: "Partner Account Created! 🎉",
-            description: "Welcome to FANZON Business! Start listing your products.",
+            description: "Please check your email to verify your account.",
           });
+          // Redirect to email verification pending page
+          navigate(`/business/verify-email-pending?email=${encodeURIComponent(formData.email)}`);
           setFormData({ name: "", email: "", password: "", confirmPassword: "" });
         } else {
           toast({
