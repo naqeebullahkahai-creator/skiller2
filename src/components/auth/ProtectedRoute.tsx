@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth, UserRole, SUPER_ADMIN_EMAIL } from "@/contexts/AuthContext";
+import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -14,11 +15,10 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <div className="text-2xl font-bold text-primary tracking-tight mb-4">FANZON</div>
+        <FanzonSpinner size="lg" />
+        <p className="text-sm text-muted-foreground mt-4 animate-pulse">Authenticating...</p>
       </div>
     );
   }

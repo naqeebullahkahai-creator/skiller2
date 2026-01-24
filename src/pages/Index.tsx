@@ -7,8 +7,11 @@ import Categories from "@/components/home/Categories";
 import JustForYou from "@/components/home/JustForYou";
 import SEOHead from "@/components/seo/SEOHead";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
+import { useViewMode } from "@/contexts/ViewModeContext";
 
 const Index = () => {
+  const { isCustomerView } = useViewMode();
+
   return (
     <div className="min-h-screen bg-secondary">
       <SEOHead
@@ -17,6 +20,10 @@ const Index = () => {
         url="/"
       />
       <OrganizationJsonLd />
+      
+      {/* Add padding when admin/seller view bar is visible */}
+      {isCustomerView && <div className="h-12" />}
+      
       <Header />
       
       <main>

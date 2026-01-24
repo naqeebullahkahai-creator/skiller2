@@ -3,13 +3,14 @@ import {
   Users, ShoppingBag, Package, BarChart3, 
   Settings, Shield, Image, Link2, CreditCard,
   CheckCircle, Star, MessageSquare, Zap, Tag,
-  FileText, RotateCcw, LogOut, Store, TrendingUp
+  FileText, RotateCcw, LogOut, Store, TrendingUp, Eye
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useViewMode } from "@/contexts/ViewModeContext";
 import { useAdminDashboardAnalytics } from "@/hooks/useAdminDashboardAnalytics";
 
 const formatPKR = (amount: number) => {
@@ -64,11 +65,17 @@ const ActionCard = ({ icon, title, description, badge, badgeVariant = "default",
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
+  const { enableCustomerView } = useViewMode();
   const { stats, isLoading } = useAdminDashboardAnalytics();
 
   const handleLogout = async () => {
     await logout();
     navigate("/auth");
+  };
+
+  const handleViewAsCustomer = () => {
+    enableCustomerView();
+    navigate("/");
   };
 
   const quickStats = [
@@ -115,11 +122,11 @@ const AdminDashboard = () => {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => navigate("/")}
+              onClick={handleViewAsCustomer}
               className="h-9 gap-1.5"
             >
-              <Store size={16} />
-              <span className="hidden sm:inline">Store</span>
+              <Eye size={16} />
+              <span className="hidden sm:inline">View as Customer</span>
             </Button>
             <Button 
               variant="destructive" 
