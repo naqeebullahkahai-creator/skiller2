@@ -1,30 +1,79 @@
 import { useState, useEffect, memo } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { banners } from "@/data/mockData";
+import { ChevronLeft, ChevronRight, Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LazyImage from "@/components/ui/lazy-image";
+import InlineEditableText from "@/components/admin/InlineEditableText";
+import { useVisualEdit } from "@/contexts/VisualEditContext";
+import { useActiveBanners, useAdminBanners } from "@/hooks/useMarketing";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 const HeroCarousel = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { banners, isLoading } = useActiveBanners();
+  const { updateBanner } = useAdminBanners();
+  const { isEditMode, canEdit } = useVisualEdit();
+  const { toast } = useToast();
 
   useEffect(() => {
+    if (banners.length === 0) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [banners.length]);
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
   };
 
   const goToPrev = () => {
+    if (banners.length === 0) return;
     setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
   };
 
   const goToNext = () => {
+    if (banners.length === 0) return;
     setCurrentSlide((prev) => (prev + 1) % banners.length);
   };
+
+  const handleTitleUpdate = async (bannerId: string, newTitle: string) => {
+    const success = await updateBanner(bannerId, { title: newTitle });
+    if (success) {
+      toast({ title: "Updated!", description: "Banner title saved." });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <section className="relative w-full overflow-hidden bg-secondary">
+        <div className="container mx-auto py-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div className="lg:col-span-3">
+              <Skeleton className="w-full aspect-[2.5/1] md:aspect-[3/1] rounded-lg" />
+            </div>
+            <div className="hidden lg:flex flex-col gap-4">
+              <Skeleton className="flex-1 rounded-lg" />
+              <Skeleton className="flex-1 rounded-lg" />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (banners.length === 0) {
+    return (
+      <section className="relative w-full overflow-hidden bg-secondary">
+        <div className="container mx-auto py-4">
+          <div className="aspect-[2.5/1] md:aspect-[3/1] rounded-lg bg-muted flex items-center justify-center">
+            <p className="text-muted-foreground">No banners available</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative w-full overflow-hidden bg-secondary">
@@ -39,10 +88,13 @@ const HeroCarousel = memo(() => {
               {banners.map((banner, index) => (
                 <div 
                   key={banner.id} 
-                  className="w-full h-full flex-shrink-0 relative"
+                  className={cn(
+                    "w-full h-full flex-shrink-0 relative",
+                    isEditMode && canEdit && "ring-2 ring-primary ring-dashed"
+                  )}
                 >
                   <LazyImage
-                    src={banner.image}
+                    src={banner.image_url}
                     alt={banner.title}
                     priority={index === 0}
                     className="w-full h-full object-cover"
@@ -51,9 +103,13 @@ const HeroCarousel = memo(() => {
                   <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center">
                     <div className="p-6 md:p-10">
                       <h2 className="text-white text-lg md:text-3xl font-bold mb-2">
-                        {banner.title}
+                        <InlineEditableText
+                          value={banner.title}
+                          onSave={(newTitle) => handleTitleUpdate(banner.id, newTitle)}
+                          className="text-white text-lg md:text-3xl font-bold"
+                        />
                       </h2>
-                      <button className="bg-primary hover:bg-fanzon-orange-hover text-primary-foreground px-4 py-2 rounded text-sm font-medium transition-colors">
+                      <button className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded text-sm font-medium transition-colors">
                         Shop Now
                       </button>
                     </div>
@@ -96,18 +152,18 @@ const HeroCarousel = memo(() => {
 
           {/* Side Banners */}
           <div className="hidden lg:flex flex-col gap-4">
-            <div className="flex-1 relative rounded-lg overflow-hidden bg-gradient-to-br from-primary to-fanzon-orange-hover">
+            <div className="flex-1 relative rounded-lg overflow-hidden bg-gradient-to-br from-primary to-primary/70">
               <div className="absolute inset-0 p-4 flex flex-col justify-center">
                 <p className="text-primary-foreground/80 text-xs uppercase tracking-wider">Limited Time</p>
                 <h3 className="text-primary-foreground font-bold text-lg mt-1">Flash Sale</h3>
                 <p className="text-primary-foreground/90 text-sm mt-2">Up to 70% Off</p>
               </div>
             </div>
-            <div className="flex-1 relative rounded-lg overflow-hidden bg-gradient-to-br from-fanzon-dark to-fanzon-gray">
+            <div className="flex-1 relative rounded-lg overflow-hidden bg-gradient-to-br from-slate-800 to-slate-600">
               <div className="absolute inset-0 p-4 flex flex-col justify-center">
-                <p className="text-secondary/80 text-xs uppercase tracking-wider">New Arrivals</p>
-                <h3 className="text-secondary font-bold text-lg mt-1">Electronics</h3>
-                <p className="text-secondary/90 text-sm mt-2">Shop Latest Tech</p>
+                <p className="text-white/80 text-xs uppercase tracking-wider">New Arrivals</p>
+                <h3 className="text-white font-bold text-lg mt-1">Electronics</h3>
+                <p className="text-white/90 text-sm mt-2">Shop Latest Tech</p>
               </div>
             </div>
           </div>

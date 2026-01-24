@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, Store } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Store, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { cn } from "@/lib/utils";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -138,136 +139,98 @@ const Auth = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary p-12 flex-col justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">
-            FANZON
-          </h1>
-          <p className="text-primary-foreground/80 mt-2">
-            Pakistan's Premier E-Commerce Platform
-          </p>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-primary tracking-tight">FANZON</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Pakistan's Premier Marketplace</p>
         </div>
-        
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-primary-foreground">
-              {mode === "login" ? "Welcome Back!" : "Join Our Marketplace"}
-            </h2>
-            <p className="text-primary-foreground/70 text-lg">
-              {mode === "login" 
-                ? "Login to access your orders, wishlist, and personalized recommendations."
-                : "Create an account to start shopping or become a seller on FANZON."}
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-primary-foreground/10 rounded-lg p-4">
-              <div className="text-3xl font-bold text-primary-foreground">50K+</div>
-              <div className="text-primary-foreground/70 text-sm">Products</div>
-            </div>
-            <div className="bg-primary-foreground/10 rounded-lg p-4">
-              <div className="text-3xl font-bold text-primary-foreground">10K+</div>
-              <div className="text-primary-foreground/70 text-sm">Sellers</div>
-            </div>
-            <div className="bg-primary-foreground/10 rounded-lg p-4">
-              <div className="text-3xl font-bold text-primary-foreground">1M+</div>
-              <div className="text-primary-foreground/70 text-sm">Customers</div>
-            </div>
-            <div className="bg-primary-foreground/10 rounded-lg p-4">
-              <div className="text-3xl font-bold text-primary-foreground">100%</div>
-              <div className="text-primary-foreground/70 text-sm">Secure</div>
-            </div>
-          </div>
-        </div>
-        
-        <p className="text-primary-foreground/50 text-sm">
-          © 2024 FANZON. All rights reserved.
-        </p>
-      </div>
 
-      {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center">
-            <h1 className="text-3xl font-bold text-primary tracking-tight">FANZON</h1>
-            <p className="text-muted-foreground mt-1">Pakistan's Premier E-Commerce Platform</p>
-          </div>
-
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-foreground">
-              {mode === "login" ? "Sign In" : "Create Account"}
+        {/* Auth Card */}
+        <div className="bg-card rounded-2xl shadow-xl border border-border p-8">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-semibold text-foreground">
+              {mode === "login" ? "Welcome Back" : "Create Account"}
             </h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground text-sm mt-1">
               {mode === "login" 
-                ? "Enter your credentials to access your account" 
-                : "Fill in your details to get started"}
+                ? "Sign in to continue shopping" 
+                : "Join FANZON today"}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Enter your full name"
+                    placeholder="John Doe"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`pl-10 ${errors.name ? "border-destructive" : ""}`}
+                    className={cn(
+                      "pl-10 h-11 bg-muted/50 border-border focus:bg-background transition-colors",
+                      errors.name && "border-destructive focus:ring-destructive"
+                    )}
                   />
                 </div>
                 {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
+                  className={cn(
+                    "pl-10 h-11 bg-muted/50 border-border focus:bg-background transition-colors",
+                    errors.email && "border-destructive focus:ring-destructive"
+                  )}
                 />
               </div>
               {errors.email && <p className="text-destructive text-xs">{errors.email}</p>}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`pl-10 pr-10 ${errors.password ? "border-destructive" : ""}`}
+                  className={cn(
+                    "pl-10 pr-10 h-11 bg-muted/50 border-border focus:bg-background transition-colors",
+                    errors.password && "border-destructive focus:ring-destructive"
+                  )}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -277,23 +240,26 @@ const Auth = () => {
 
             {mode === "signup" && (
               <>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
+                      placeholder="••••••••"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className={`pl-10 pr-10 ${errors.confirmPassword ? "border-destructive" : ""}`}
+                      className={cn(
+                        "pl-10 pr-10 h-11 bg-muted/50 border-border focus:bg-background transition-colors",
+                        errors.confirmPassword && "border-destructive focus:ring-destructive"
+                      )}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -301,12 +267,13 @@ const Auth = () => {
                   {errors.confirmPassword && <p className="text-destructive text-xs">{errors.confirmPassword}</p>}
                 </div>
 
-                {/* Seller Registration Checkbox */}
-                <div className="flex items-center space-x-3 p-4 bg-muted rounded-lg">
+                {/* Seller Registration */}
+                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border">
                   <Checkbox
                     id="isSeller"
                     checked={isSeller}
                     onCheckedChange={(checked) => setIsSeller(checked === true)}
+                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
                   <div className="flex items-center gap-2">
                     <Store className="h-4 w-4 text-primary" />
@@ -316,8 +283,8 @@ const Auth = () => {
                   </div>
                 </div>
                 {isSeller && (
-                  <p className="text-xs text-muted-foreground bg-primary/5 p-3 rounded">
-                    ✓ As a seller, you'll be able to list products and manage orders on FANZON.
+                  <p className="text-xs text-muted-foreground bg-primary/5 p-3 rounded-lg border border-primary/20">
+                    ✓ You'll be able to list products and manage orders on FANZON.
                   </p>
                 )}
               </>
@@ -325,7 +292,7 @@ const Auth = () => {
 
             {mode === "login" && (
               <div className="flex justify-end">
-                <button type="button" className="text-sm text-primary hover:underline">
+                <button type="button" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
                   Forgot Password?
                 </button>
               </div>
@@ -333,33 +300,50 @@ const Auth = () => {
 
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold h-11"
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/25 transition-all"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent"></span>
+                  Please wait...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  {mode === "login" ? "Sign In" : "Create Account"}
+                  <ArrowRight size={16} />
+                </span>
+              )}
             </Button>
           </form>
 
-          <div className="relative">
+          {/* Divider */}
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or</span>
+            <div className="relative flex justify-center">
+              <span className="bg-card px-3 text-xs text-muted-foreground uppercase tracking-wider">Or</span>
             </div>
           </div>
 
+          {/* Switch Mode */}
           <p className="text-center text-sm text-muted-foreground">
             {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
             <button
               type="button"
               onClick={switchMode}
-              className="text-primary font-semibold hover:underline"
+              className="text-primary font-semibold hover:text-primary/80 transition-colors"
             >
               {mode === "login" ? "Sign Up" : "Sign In"}
             </button>
           </p>
         </div>
+
+        {/* Footer */}
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          By continuing, you agree to FANZON's Terms of Service and Privacy Policy
+        </p>
       </div>
     </div>
   );
