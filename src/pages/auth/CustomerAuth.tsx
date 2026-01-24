@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,12 +27,15 @@ const signupSchema = z.object({
   path: ["confirmPassword"],
 });
 
-const Auth = () => {
+const CustomerAuth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, signup, isAuthenticated, role, isLoading, isSuperAdmin } = useAuth();
   const { toast } = useToast();
   
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const isLoginMode = location.pathname === "/auth/login";
+  const [mode, setMode] = useState<"login" | "signup">(isLoginMode ? "login" : "signup");
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -45,21 +48,23 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  // Role-based redirection - Admin/Seller go to their dashboards IMMEDIATELY
+  useEffect(() => {
+    setMode(location.pathname === "/auth/login" ? "login" : "signup");
+    setErrors({});
+    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+  }, [location.pathname]);
+
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      // Super Admin always goes to admin dashboard
       if (isSuperAdmin || role === "admin") {
         navigate("/admin/dashboard", { replace: true });
       } else if (role === "seller") {
-        // Seller trying to login via customer portal - redirect to seller dashboard with message
         toast({
           title: "Redirecting to Seller Portal",
-          description: "You have a seller account. Redirecting to your Seller Dashboard.",
+          description: "You have a seller account. Redirecting to your dashboard.",
         });
         navigate("/seller/dashboard", { replace: true });
       } else {
-        // Customer goes to homepage
         navigate("/", { replace: true });
       }
     }
@@ -102,12 +107,10 @@ const Auth = () => {
 
     setIsSubmitting(true);
     try {
-      let result;
       if (mode === "login") {
-        result = await login(formData.email, formData.password);
+        const result = await login(formData.email, formData.password);
         
         if (result.success) {
-          // After login, verify they're not a seller (sellers should use seller portal)
           const { data: roleData } = await supabase
             .from("user_roles")
             .select("role")
@@ -115,7 +118,6 @@ const Auth = () => {
             .maybeSingle();
           
           if (roleData?.role === "seller") {
-            // Let the useEffect handle the redirect with proper message
             return;
           }
           
@@ -131,13 +133,12 @@ const Auth = () => {
           });
         }
       } else {
-        // Signup as customer only (isSeller = false)
-        result = await signup(formData.name, formData.email, formData.password, false);
+        const result = await signup(formData.name, formData.email, formData.password, false);
         
         if (result.success) {
           toast({
             title: "Account created!",
-            description: "Your account has been created successfully. Welcome to FANZON!",
+            description: "Welcome to FANZON! Start shopping now.",
           });
           setFormData({ name: "", email: "", password: "", confirmPassword: "" });
         } else {
@@ -160,14 +161,12 @@ const Auth = () => {
   };
 
   const switchMode = () => {
-    setMode(mode === "login" ? "signup" : "login");
-    setErrors({});
-    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+    navigate(mode === "login" ? "/auth/signup" : "/auth/login");
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-secondary/30 to-background">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
         <div className="text-3xl font-bold text-primary tracking-tight mb-4">FANZON</div>
         <FanzonSpinner size="lg" />
         <p className="text-sm text-muted-foreground mt-4 animate-pulse">Loading...</p>
@@ -176,22 +175,21 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary/30 via-background to-background flex items-center justify-center p-4 safe-area-top safe-area-bottom">
+    <div className="min-h-screen bg-gradient-to-b from-secondary/50 via-background to-background flex items-center justify-center p-4 safe-area-top safe-area-bottom">
       <div className="w-full max-w-md animate-fade-in">
         {/* Logo Section */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4 shadow-lg shadow-primary/25">
             <span className="text-2xl font-bold text-primary-foreground">F</span>
           </div>
-          <h1 className="text-3xl font-bold text-primary tracking-tight">FANZON</h1>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">FANZON</h1>
           <p className="text-muted-foreground mt-1 text-sm">Pakistan's Premier Marketplace</p>
         </div>
 
         {/* Auth Card */}
         <div className="bg-card rounded-2xl shadow-xl border border-border p-6 sm:p-8">
-          {/* Header */}
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-secondary/50 text-foreground px-3 py-1 rounded-full text-xs font-semibold mb-3">
+            <div className="inline-flex items-center gap-2 bg-secondary text-foreground px-3 py-1 rounded-full text-xs font-semibold mb-3">
               <ShoppingBag className="h-3 w-3" />
               Customer Portal
             </div>
@@ -219,8 +217,8 @@ const Auth = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     className={cn(
-                      "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background transition-colors touch-target",
-                      errors.name && "border-destructive focus:ring-destructive"
+                      "pl-10 h-12 text-base bg-secondary border-border focus:border-primary transition-colors touch-target",
+                      errors.name && "border-destructive"
                     )}
                   />
                 </div>
@@ -242,8 +240,8 @@ const Auth = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   className={cn(
-                    "pl-10 h-12 text-base bg-muted/50 border-border focus:bg-background transition-colors touch-target",
-                    errors.email && "border-destructive focus:ring-destructive"
+                    "pl-10 h-12 text-base bg-secondary border-border focus:border-primary transition-colors touch-target",
+                    errors.email && "border-destructive"
                   )}
                 />
               </div>
@@ -263,15 +261,14 @@ const Auth = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   className={cn(
-                    "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background transition-colors touch-target",
-                    errors.password && "border-destructive focus:ring-destructive"
+                    "pl-10 pr-10 h-12 text-base bg-secondary border-border focus:border-primary transition-colors touch-target",
+                    errors.password && "border-destructive"
                   )}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -293,15 +290,14 @@ const Auth = () => {
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     className={cn(
-                      "pl-10 pr-10 h-12 text-base bg-muted/50 border-border focus:bg-background transition-colors touch-target",
-                      errors.confirmPassword && "border-destructive focus:ring-destructive"
+                      "pl-10 pr-10 h-12 text-base bg-secondary border-border focus:border-primary transition-colors touch-target",
+                      errors.confirmPassword && "border-destructive"
                     )}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                   >
                     {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -324,7 +320,7 @@ const Auth = () => {
 
             <Button
               type="submit"
-              className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/25 transition-all touch-target"
+              className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/25 transition-all touch-target"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -341,7 +337,6 @@ const Auth = () => {
             </Button>
           </form>
 
-          {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
@@ -351,7 +346,6 @@ const Auth = () => {
             </div>
           </div>
 
-          {/* Switch Mode */}
           <p className="text-center text-sm text-muted-foreground">
             {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
             <button
@@ -378,13 +372,11 @@ const Auth = () => {
           </Link>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-4">
           By continuing, you agree to FANZON's Terms of Service and Privacy Policy
         </p>
       </div>
 
-      {/* Forgot Password Modal */}
       <ForgotPasswordModal 
         open={showForgotPassword} 
         onOpenChange={setShowForgotPassword}
@@ -394,4 +386,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default CustomerAuth;

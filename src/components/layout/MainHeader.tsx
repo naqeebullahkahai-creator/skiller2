@@ -91,7 +91,7 @@ const MainHeader = () => {
               />
               <Button 
                 type="submit"
-                className="rounded-none px-6 bg-fanzon-orange-hover hover:bg-fanzon-dark transition-colors duration-200"
+                className="rounded-none px-6 bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors duration-200"
               >
                 <Search size={18} />
               </Button>
@@ -136,7 +136,7 @@ const MainHeader = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <Button type="submit" className="rounded-none px-4 bg-fanzon-orange-hover hover:bg-fanzon-dark transition-colors duration-200">
+            <Button type="submit" className="rounded-none px-4 hover:bg-primary/90 transition-colors duration-200">
               <Search size={18} />
             </Button>
           </form>

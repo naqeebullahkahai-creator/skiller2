@@ -26,7 +26,7 @@ const MobileHeader = () => {
   };
 
   const sidebarLinks = [
-    { icon: Store, label: "Sell on FANZON", path: "/seller/signup" },
+    { icon: Store, label: "Become a Partner", path: "/business/signup" },
     { icon: HelpCircle, label: t("nav.help"), path: "/help" },
     { icon: Settings, label: t("nav.settings"), path: "/account/profile" },
   ];
