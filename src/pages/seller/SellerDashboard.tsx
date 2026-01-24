@@ -3,13 +3,14 @@ import {
   Package, ShoppingBag, Wallet, BarChart3, 
   Settings, MessageSquare, Star, Zap, Tag,
   Plus, FileUp, RotateCcw, LogOut, Store,
-  Shield, HelpCircle
+  Shield, HelpCircle, Eye
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useViewMode } from "@/contexts/ViewModeContext";
 import { useSellerAnalytics } from "@/hooks/useSellerAnalytics";
 import { useSellerWallet } from "@/hooks/useSellerWallet";
 import { useOrders } from "@/hooks/useOrders";
@@ -70,6 +71,7 @@ const ActionCard = ({ icon, title, description, badge, badgeVariant = "default",
 const SellerDashboard = () => {
   const navigate = useNavigate();
   const { user, profile, logout } = useAuth();
+  const { enableCustomerView } = useViewMode();
   const { totalStats, isLoading: analyticsLoading } = useSellerAnalytics();
   const { wallet, isLoading: walletLoading } = useSellerWallet();
   const { orders, isLoading: ordersLoading } = useOrders({ role: "seller", sellerId: user?.id });
@@ -78,6 +80,11 @@ const SellerDashboard = () => {
   const handleLogout = async () => {
     await logout();
     navigate("/auth");
+  };
+
+  const handleViewStorefront = () => {
+    enableCustomerView();
+    navigate("/");
   };
 
   const pendingOrders = orders?.filter(o => o.order_status === "pending")?.length || 0;
@@ -128,11 +135,11 @@ const SellerDashboard = () => {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => navigate("/")}
+              onClick={handleViewStorefront}
               className="h-9 gap-1.5"
             >
-              <Store size={16} />
-              <span className="hidden sm:inline">Store</span>
+              <Eye size={16} />
+              <span className="hidden sm:inline">View Store</span>
             </Button>
             <Button 
               variant="destructive" 

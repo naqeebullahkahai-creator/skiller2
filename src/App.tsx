@@ -9,6 +9,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { ComparisonProvider } from "@/contexts/ComparisonContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { VisualEditProvider } from "@/contexts/VisualEditContext";
+import { ViewModeProvider } from "@/contexts/ViewModeContext";
 import AuthModal from "@/components/auth/AuthModal";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -16,6 +17,7 @@ import OfflineIndicator from "@/components/OfflineIndicator";
 import OrderStatusNotification from "./components/orders/OrderStatusNotification";
 import ComparisonBar from "./components/comparison/ComparisonBar";
 import VisualEditToggle from "./components/admin/VisualEditToggle";
+import BackToDashboardBar from "./components/navigation/BackToDashboardBar";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ProductListing from "./pages/ProductListing";
@@ -114,23 +116,25 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
           <AuthProvider>
-            <VisualEditProvider>
-              <CartProvider>
-                <ComparisonProvider>
-                  <OrderStatusNotification>
-                    <TooltipProvider>
-                      <Toaster />
-                      <Sonner />
-                      <OfflineIndicator />
-                      <BrowserRouter>
-                        <InstallPrompt />
-                        <NotificationPermissionBanner />
-                        <AuthModal />
-                        <ChatWidget />
-                        <ComparisonBar />
-                        <VisualEditToggle />
-                        <Routes>
-                          <Route path="/" element={<Index />} />
+            <ViewModeProvider>
+              <VisualEditProvider>
+                <CartProvider>
+                  <ComparisonProvider>
+                    <OrderStatusNotification>
+                      <TooltipProvider>
+                        <Toaster />
+                        <Sonner />
+                        <OfflineIndicator />
+                        <BrowserRouter>
+                          <BackToDashboardBar />
+                          <InstallPrompt />
+                          <NotificationPermissionBanner />
+                          <AuthModal />
+                          <ChatWidget />
+                          <ComparisonBar />
+                          <VisualEditToggle />
+                          <Routes>
+                            <Route path="/" element={<Index />} />
                           <Route path="/auth" element={<Auth />} />
                           <Route path="/products" element={<ProductListing />} />
                           <Route path="/category/:category" element={<ProductListing />} />
@@ -245,11 +249,12 @@ const App = () => (
                 </ComparisonProvider>
               </CartProvider>
             </VisualEditProvider>
-          </AuthProvider>
-        </LanguageProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
-  </ErrorBoundary>
+          </ViewModeProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
+</ErrorBoundary>
 );
 
 export default App;
