@@ -8,12 +8,14 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ComparisonProvider } from "@/contexts/ComparisonContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { VisualEditProvider } from "@/contexts/VisualEditContext";
 import AuthModal from "@/components/auth/AuthModal";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import OfflineIndicator from "@/components/OfflineIndicator";
 import OrderStatusNotification from "./components/orders/OrderStatusNotification";
 import ComparisonBar from "./components/comparison/ComparisonBar";
+import VisualEditToggle from "./components/admin/VisualEditToggle";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ProductListing from "./pages/ProductListing";
@@ -52,6 +54,7 @@ import BannerManager from "./pages/dashboard/BannerManager";
 import AdminBulkUploadLogs from "./pages/dashboard/AdminBulkUploadLogs";
 import AdminCancellationsPage from "./pages/dashboard/AdminCancellationsPage";
 import AdminReturnsPage from "./pages/dashboard/AdminReturnsPage";
+import AdminUserDirectory from "./pages/dashboard/AdminUserDirectory";
 
 // Seller Dashboard
 import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
@@ -89,6 +92,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
   <AuthProvider>
+    <VisualEditProvider>
     <CartProvider>
       <ComparisonProvider>
       <OrderStatusNotification>
@@ -102,6 +106,7 @@ const App = () => (
               <AuthModal />
               <ChatWidget />
               <ComparisonBar />
+              <VisualEditToggle />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -154,6 +159,7 @@ const App = () => (
                 }
               >
                 <Route index element={<AdminDashboardHome />} />
+                <Route path="users" element={<AdminUserDirectory />} />
                 <Route path="orders" element={<AdminOrderManagement />} />
                 <Route path="cancellations" element={<AdminCancellationsPage />} />
                 <Route path="returns" element={<AdminReturnsPage />} />
@@ -209,6 +215,7 @@ const App = () => (
         </OrderStatusNotification>
       </ComparisonProvider>
       </CartProvider>
+      </VisualEditProvider>
     </AuthProvider>
     </LanguageProvider>
   </QueryClientProvider>
