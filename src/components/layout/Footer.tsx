@@ -110,11 +110,12 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Earn With FANZON */}
+          {/* Make Money with Us */}
           <div>
-            <h4 className="font-semibold text-sm mb-4">{t("footer.earn")}</h4>
+            <h4 className="font-semibold text-sm mb-4">Make Money with Us</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/sell" className="hover:text-primary transition-colors">Sell on FANZON</Link></li>
+              <li><Link to="/seller/signup" className="hover:text-primary transition-colors">Seller Register</Link></li>
+              <li><Link to="/seller/login" className="hover:text-primary transition-colors">Seller Login</Link></li>
               <li><Link to="/affiliate" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
               <li><Link to="/vendor-support" className="hover:text-primary transition-colors">Vendor Support</Link></li>
             </ul>

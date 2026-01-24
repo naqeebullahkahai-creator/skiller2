@@ -70,7 +70,7 @@ const AdminDashboard = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/auth");
+    navigate("/");
   };
 
   const handleViewAsCustomer = () => {

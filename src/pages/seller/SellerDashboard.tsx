@@ -79,7 +79,7 @@ const SellerDashboard = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/auth");
+    navigate("/");
   };
 
   const handleViewStorefront = () => {
