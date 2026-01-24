@@ -43,14 +43,14 @@ const Auth = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Role-based redirection - Admin/Seller go to their dashboards
+  // Role-based redirection - Admin/Seller go to their dashboards IMMEDIATELY
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
       // Super Admin always goes to admin dashboard
       if (isSuperAdmin || role === "admin") {
-        navigate("/admin-dashboard", { replace: true });
+        navigate("/admin/dashboard", { replace: true });
       } else if (role === "seller") {
-        navigate("/seller-center", { replace: true });
+        navigate("/seller/dashboard", { replace: true });
       } else {
         // Customer goes to homepage
         navigate("/", { replace: true });

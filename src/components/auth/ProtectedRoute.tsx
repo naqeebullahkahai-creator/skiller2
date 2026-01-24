@@ -47,7 +47,9 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
     if (!role || !allowedRoles.includes(role)) {
       // User doesn't have required role - redirect based on their actual role
       if (role === "seller") {
-        return <Navigate to="/seller-center" replace />;
+        return <Navigate to="/seller/dashboard" replace />;
+      } else if (role === "admin") {
+        return <Navigate to="/admin/dashboard" replace />;
       } else {
         return <Navigate to="/" replace />;
       }
