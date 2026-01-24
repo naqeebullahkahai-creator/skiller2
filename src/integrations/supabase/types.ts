@@ -1254,6 +1254,47 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          can_create: boolean
+          can_delete: boolean
+          can_edit: boolean
+          can_view: boolean
+          created_at: string
+          feature: Database["public"]["Enums"]["permission_feature"]
+          id: string
+          role_id: string
+        }
+        Insert: {
+          can_create?: boolean
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          feature: Database["public"]["Enums"]["permission_feature"]
+          id?: string
+          role_id: string
+        }
+        Update: {
+          can_create?: boolean
+          can_delete?: boolean
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          feature?: Database["public"]["Enums"]["permission_feature"]
+          id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "staff_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seller_profiles: {
         Row: {
           account_title: string
@@ -1373,6 +1414,65 @@ export type Database = {
           seller_id?: string
           total_earnings?: number
           total_withdrawn?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      staff_role_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          role_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          role_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_role_assignments_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "staff_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_system_role: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_system_role?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_system_role?: boolean
+          name?: string
           updated_at?: string
         }
         Relationships: []
@@ -1664,9 +1764,27 @@ export type Database = {
       }
       generate_order_number: { Args: never; Returns: string }
       generate_product_slug: { Args: { title: string }; Returns: string }
+      get_user_permissions: {
+        Args: { _user_id: string }
+        Returns: {
+          can_create: boolean
+          can_delete: boolean
+          can_edit: boolean
+          can_view: boolean
+          feature: Database["public"]["Enums"]["permission_feature"]
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_permission: {
+        Args: {
+          _action: Database["public"]["Enums"]["permission_action"]
+          _feature: Database["public"]["Enums"]["permission_feature"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       has_role: {
         Args: {
@@ -1746,6 +1864,20 @@ export type Database = {
         | "cancelled"
       payment_status: "unpaid" | "paid"
       payout_status: "pending" | "approved" | "rejected" | "completed"
+      permission_action: "view" | "create" | "edit" | "delete"
+      permission_feature:
+        | "banners"
+        | "products"
+        | "orders"
+        | "payouts"
+        | "flash_sales"
+        | "users"
+        | "categories"
+        | "reviews"
+        | "returns"
+        | "analytics"
+        | "settings"
+        | "vouchers"
       product_status: "pending" | "active" | "rejected"
       return_reason:
         | "wrong_item"
@@ -1908,6 +2040,21 @@ export const Constants = {
       ],
       payment_status: ["unpaid", "paid"],
       payout_status: ["pending", "approved", "rejected", "completed"],
+      permission_action: ["view", "create", "edit", "delete"],
+      permission_feature: [
+        "banners",
+        "products",
+        "orders",
+        "payouts",
+        "flash_sales",
+        "users",
+        "categories",
+        "reviews",
+        "returns",
+        "analytics",
+        "settings",
+        "vouchers",
+      ],
       product_status: ["pending", "active", "rejected"],
       return_reason: [
         "wrong_item",
