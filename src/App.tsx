@@ -28,6 +28,7 @@ import CustomerAuth from "./pages/auth/CustomerAuth";
 import ResetPassword from "./pages/ResetPassword";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
+import CategoryPage from "./pages/CategoryPage";
 import ComparePage from "./pages/ComparePage";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
@@ -59,7 +60,8 @@ import { PermissionsProvider } from "@/contexts/PermissionsContext";
 // Admin Sub-Pages (reused from old structure)
 import AdminOrderManagement from "./pages/dashboard/OrderManagement";
 import AdminProductCatalog from "./pages/dashboard/ProductCatalog";
-import AdminCategoryManager from "./pages/dashboard/CategoryManager";
+import AdminCategoryManager from "./pages/dashboard/AdminCategoryManager";
+import AdminProductApprovals from "./pages/dashboard/AdminProductApprovals";
 import SellerApprovals from "./pages/dashboard/SellerApprovals";
 import AdminSettings from "./pages/dashboard/DashboardSettings";
 import AdminSellerKyc from "./pages/dashboard/AdminSellerKyc";
@@ -174,8 +176,7 @@ const App = () => (
                           <Route path="/reset-password" element={<ResetPassword />} />
                           
                           <Route path="/products" element={<ProductListing />} />
-                          <Route path="/products" element={<ProductListing />} />
-                          <Route path="/category/:category" element={<ProductListing />} />
+                          <Route path="/category/:slug" element={<CategoryPage />} />
                           <Route path="/search" element={<ProductListing />} />
                           <Route path="/product/:id" element={<ProductDetail />} />
                           <Route path="/compare" element={<ComparePage />} />
@@ -231,7 +232,7 @@ const App = () => (
                           <Route path="/admin/returns" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Returns"><AdminReturnsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/products" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Products"><AdminProductCatalog /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/categories" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Categories"><AdminCategoryManager /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/approvals" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Product Approvals"><SellerApprovals /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/approvals" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Product Approvals"><AdminProductApprovals /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/seller-kyc" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller KYC"><AdminSellerKyc /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/seller-kyc/:sellerId" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Details"><AdminSellerDetail /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/payouts" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Payouts"><AdminPayoutManagement /></AdminPageWrapper></ProtectedRoute>} />
