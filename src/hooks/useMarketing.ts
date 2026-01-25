@@ -136,19 +136,14 @@ export const useAdminFlashSales = () => {
     application_deadline?: string;
     fee_per_product_pkr?: number;
   }) => {
-    const insertData: Record<string, any> = {
+    const insertData = {
       campaign_name: data.campaign_name,
       start_date: data.start_date,
       end_date: data.end_date,
-      status: 'draft',
+      status: 'draft' as const,
+      ...(data.application_deadline && { application_deadline: data.application_deadline }),
+      ...(data.fee_per_product_pkr !== undefined && { fee_per_product_pkr: data.fee_per_product_pkr }),
     };
-    
-    if (data.application_deadline) {
-      insertData.application_deadline = data.application_deadline;
-    }
-    if (data.fee_per_product_pkr !== undefined) {
-      insertData.fee_per_product_pkr = data.fee_per_product_pkr;
-    }
 
     const { data: newSale, error } = await supabase
       .from("flash_sales")
