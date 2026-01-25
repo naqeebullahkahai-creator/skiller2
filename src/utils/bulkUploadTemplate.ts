@@ -125,50 +125,59 @@ export const isValidPrice = (value: string): { valid: boolean; error?: string } 
   return { valid: true };
 };
 
-// Generate the branded CSV template
+// Generate the branded CSV template (Clean version - no dummy data)
 export const generateFanzonTemplate = (): string => {
   const lines: string[] = [];
   
-  // Branding header (comment line)
+  // FANZON Branding header
   lines.push("# ═══════════════════════════════════════════════════════════════════════════");
-  lines.push("# FANZON Official Seller Template v2.0");
-  lines.push("# Generated: " + new Date().toISOString().split('T')[0]);
+  lines.push("# ");
+  lines.push("#     ███████╗ █████╗ ███╗   ██╗███████╗ ██████╗ ███╗   ██╗");
+  lines.push("#     ██╔════╝██╔══██╗████╗  ██║╚══███╔╝██╔═══██╗████╗  ██║");
+  lines.push("#     █████╗  ███████║██╔██╗ ██║  ███╔╝ ██║   ██║██╔██╗ ██║");
+  lines.push("#     ██╔══╝  ██╔══██║██║╚██╗██║ ███╔╝  ██║   ██║██║╚██╗██║");
+  lines.push("#     ██║     ██║  ██║██║ ╚████║███████╗╚██████╔╝██║ ╚████║");
+  lines.push("#     ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝");
+  lines.push("# ");
+  lines.push("#                    OFFICIAL BULK UPLOAD TEMPLATE v3.0");
+  lines.push("#                    Generated: " + new Date().toISOString().split('T')[0]);
+  lines.push("# ");
   lines.push("# ═══════════════════════════════════════════════════════════════════════════");
   lines.push("#");
-  lines.push("# INSTRUCTIONS:");
-  lines.push("# 1. Fill in the data starting from row 8 (after these comments)");
-  lines.push("# 2. Fields marked with * are MANDATORY");
-  lines.push("# 3. Do NOT modify the header row (row 7)");
-  lines.push("# 4. Maximum 1000 products per upload");
-  lines.push("# 5. Delete these comment lines OR keep them (they will be ignored)");
+  lines.push("# 📋 INSTRUCTIONS:");
+  lines.push("# ─────────────────────────────────────────────────────────────────────────");
+  lines.push("# 1. Fill in your product data starting from row 21 (after this header)");
+  lines.push("# 2. Fields marked with * are MANDATORY - do not leave them empty");
+  lines.push("# 3. Do NOT modify or delete the header row (row 20)");
+  lines.push("# 4. Maximum 1000 products per upload batch");
+  lines.push("# 5. Save as CSV with UTF-8 encoding before uploading");
   lines.push("#");
-  lines.push("# CATEGORY REFERENCE:");
+  lines.push("# 📂 CATEGORY REFERENCE (use name or ID):");
+  lines.push("# ─────────────────────────────────────────────────────────────────────────");
   CATEGORY_MAPPINGS.forEach(cat => {
-    lines.push(`#   ${cat.id} = ${cat.name} (${cat.examples})`);
+    lines.push(`#   ${cat.id.toString().padStart(2, ' ')} = ${cat.name.padEnd(15)} │ Examples: ${cat.examples}`);
   });
   lines.push("#");
-  lines.push("# PRICE FORMAT: Numbers only! ✓ 2500  ✓ 1999.99  ✗ Rs. 2500  ✗ PKR 1999");
+  lines.push("# 💰 PRICE FORMAT:");
+  lines.push("# ─────────────────────────────────────────────────────────────────────────");
+  lines.push("#   ✓ CORRECT: 2500, 1999.99, 50000");
+  lines.push("#   ✗ WRONG:   Rs. 2500, PKR 1999, 2,500 (no letters, commas, or symbols)");
+  lines.push("#");
+  lines.push("# ❓ NEED HELP? Contact: seller-support@fanzon.pk");
   lines.push("# ═══════════════════════════════════════════════════════════════════════════");
   lines.push("");
   
-  // Header row with mandatory/optional indicators
+  // Clean header row with only essential fields
   const headers = [
-    "Product_Title*",
+    "Product_Name*",
+    "SKU*",
     "Category*",
     "Price_PKR*",
-    "Stock_Quantity*",
-    "Discount_Price",
-    "Brand_Name",
-    "Product_Description",
-    "Image_URL",
-    "SKU"
+    "Description*"
   ];
   lines.push(headers.join(","));
   
-  // Example rows
-  lines.push('"Wireless Bluetooth Earbuds Pro","Electronics",4500,50,3999,"TechPro","Premium quality earbuds with noise cancellation and 24-hour battery life","https://example.com/earbuds.jpg","SKU-EAR-001"');
-  lines.push('"Cotton T-Shirt - Large Blue","Fashion",1200,100,,"StyleWear","100% cotton casual t-shirt comfortable fit",,"SKU-TSH-002"');
-  lines.push('"LED Desk Lamp","Home & Garden",2800,30,2499,"HomeBright","Adjustable LED desk lamp with 3 brightness levels","https://example.com/lamp.jpg","SKU-LMP-003"');
+  // No dummy data - just empty template
   
   return lines.join("\n");
 };
@@ -498,67 +507,61 @@ export const validateProductRow = (
 // EXCEL SUPPORT FUNCTIONS
 // ============================================================================
 
-// Generate Excel template with branded styling and instructions sheet
+// Generate Excel template with branded styling and instructions sheet (Clean version)
 export const generateExcelTemplate = (): Blob => {
   const workbook = XLSX.utils.book_new();
   
-  // === PRODUCTS SHEET ===
+  // === PRODUCTS SHEET (Clean - Essential Fields Only) ===
   const headers = [
-    "Product_Title*",
+    "Product_Name*",
+    "SKU*",
     "Category*",
     "Price_PKR*",
-    "Stock_Quantity*",
-    "Discount_Price",
-    "Brand_Name",
-    "Product_Description",
-    "Image_URL",
-    "SKU"
+    "Description*"
   ];
   
-  const exampleData = [
-    ["Wireless Bluetooth Earbuds Pro", "Electronics", 4500, 50, 3999, "TechPro", "Premium quality earbuds with noise cancellation and 24-hour battery life", "https://example.com/earbuds.jpg", "SKU-EAR-001"],
-    ["Cotton T-Shirt - Large Blue", "Fashion", 1200, 100, "", "StyleWear", "100% cotton casual t-shirt comfortable fit", "", "SKU-TSH-002"],
-    ["LED Desk Lamp", "Home & Garden", 2800, 30, 2499, "HomeBright", "Adjustable LED desk lamp with 3 brightness levels", "https://example.com/lamp.jpg", "SKU-LMP-003"],
-  ];
-  
-  const productsData = [headers, ...exampleData];
+  // No dummy data - just headers
+  const productsData = [headers];
   const productsSheet = XLSX.utils.aoa_to_sheet(productsData);
   
-  // Set column widths
+  // Set column widths for clean layout
   productsSheet['!cols'] = [
-    { wch: 35 }, // Product_Title
-    { wch: 15 }, // Category
-    { wch: 12 }, // Price_PKR
-    { wch: 15 }, // Stock_Quantity
-    { wch: 14 }, // Discount_Price
-    { wch: 15 }, // Brand_Name
-    { wch: 50 }, // Product_Description
-    { wch: 40 }, // Image_URL
-    { wch: 15 }, // SKU
+    { wch: 40 }, // Product_Name
+    { wch: 18 }, // SKU
+    { wch: 18 }, // Category
+    { wch: 15 }, // Price_PKR
+    { wch: 60 }, // Description
   ];
   
   XLSX.utils.book_append_sheet(workbook, productsSheet, "Products");
   
-  // === INSTRUCTIONS SHEET ===
+  // === INSTRUCTIONS SHEET (Branded) ===
   const instructionsData = [
-    ["FANZON BULK UPLOAD TEMPLATE - INSTRUCTIONS"],
     [""],
-    ["📋 MANDATORY FIELDS (marked with * in header)"],
-    ["Field", "Description", "Example"],
-    ["Product_Title*", "Your product name (max 200 characters)", "Wireless Bluetooth Earbuds Pro"],
-    ["Category*", "Category name OR ID number (see table below)", "Electronics or 1"],
-    ["Price_PKR*", "Regular price - NUMBERS ONLY", "2500"],
-    ["Stock_Quantity*", "Available quantity (whole number)", "50"],
+    ["═══════════════════════════════════════════════════════════════"],
     [""],
-    ["📝 OPTIONAL FIELDS"],
+    ["    ███████╗ █████╗ ███╗   ██╗███████╗ ██████╗ ███╗   ██╗"],
+    ["    ██╔════╝██╔══██╗████╗  ██║╚══███╔╝██╔═══██╗████╗  ██║"],
+    ["    █████╗  ███████║██╔██╗ ██║  ███╔╝ ██║   ██║██╔██╗ ██║"],
+    ["    ██╔══╝  ██╔══██║██║╚██╗██║ ███╔╝  ██║   ██║██║╚██╗██║"],
+    ["    ██║     ██║  ██║██║ ╚████║███████╗╚██████╔╝██║ ╚████║"],
+    ["    ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═══╝"],
+    [""],
+    ["             OFFICIAL BULK UPLOAD TEMPLATE v3.0"],
+    [""],
+    ["═══════════════════════════════════════════════════════════════"],
+    [""],
+    ["📋 MANDATORY FIELDS (marked with *)"],
+    ["─────────────────────────────────────────────────────────────────"],
     ["Field", "Description", "Example"],
-    ["Discount_Price", "Sale price (must be less than regular price)", "1999"],
-    ["Brand_Name", "Brand or manufacturer name", "TechPro"],
-    ["Product_Description", "Product details (max 2000 characters)", "Premium quality..."],
-    ["Image_URL", "Direct link to product image", "https://cdn.example.com/image.jpg"],
-    ["SKU", "Your unique product code", "SKU-001"],
+    ["Product_Name*", "Your product name (max 200 characters)", "Wireless Bluetooth Earbuds Pro"],
+    ["SKU*", "Your unique product code/ID", "SKU-EAR-001"],
+    ["Category*", "Category name OR ID number", "Electronics or 1"],
+    ["Price_PKR*", "Price in PKR - NUMBERS ONLY", "2500"],
+    ["Description*", "Product details (max 2000 characters)", "Premium quality with noise cancellation..."],
     [""],
     ["📂 CATEGORY REFERENCE"],
+    ["─────────────────────────────────────────────────────────────────"],
     ["ID", "Category Name", "Examples"],
   ];
   
@@ -568,12 +571,17 @@ export const generateExcelTemplate = (): Blob => {
   });
   
   instructionsData.push([""]);
+  instructionsData.push(["💰 PRICE FORMAT"]);
+  instructionsData.push(["─────────────────────────────────────────────────────────────────"]);
+  instructionsData.push(["✓ CORRECT:", "2500, 1999.99, 50000"]);
+  instructionsData.push(["✗ WRONG:", "Rs. 2500, PKR 1999, 2,500"]);
+  instructionsData.push([""]);
   instructionsData.push(["⚠️ IMPORTANT TIPS"]);
+  instructionsData.push(["─────────────────────────────────────────────────────────────────"]);
   instructionsData.push(["• Do NOT change the header row in the Products sheet"]);
-  instructionsData.push(["• Delete the 3 example rows before uploading your data"]);
   instructionsData.push(["• Maximum 1,000 products per upload"]);
   instructionsData.push(["• Price must be numbers only (e.g., 2500, not Rs. 2500)"]);
-  instructionsData.push(["• Image URLs must start with http:// or https://"]);
+  instructionsData.push(["• Each SKU must be unique to your store"]);
   instructionsData.push([""]);
   instructionsData.push(["❓ Need help? Contact seller-support@fanzon.pk"]);
   
@@ -581,9 +589,9 @@ export const generateExcelTemplate = (): Blob => {
   
   // Set column widths for instructions
   instructionsSheet['!cols'] = [
-    { wch: 20 },
+    { wch: 25 },
+    { wch: 50 },
     { wch: 45 },
-    { wch: 40 },
   ];
   
   XLSX.utils.book_append_sheet(workbook, instructionsSheet, "Instructions");

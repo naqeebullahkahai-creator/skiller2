@@ -3,7 +3,7 @@ import {
   Users, ShoppingBag, Package, BarChart3, 
   Settings, Shield, Image, Link2, CreditCard,
   CheckCircle, Star, MessageSquare, Zap, Tag,
-  FileText, RotateCcw, LogOut, Store, TrendingUp, Eye, Trophy
+  FileText, RotateCcw, LogOut, Store, TrendingUp, Eye, Trophy, XCircle
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -98,6 +98,7 @@ const AdminDashboard = () => {
 
   const managementActions = [
     { icon: <ShoppingBag size={20} className="text-primary" />, title: "Orders", description: "View all orders", href: "/admin/orders", color: "bg-primary/10" },
+    { icon: <XCircle size={20} className="text-destructive" />, title: "Cancelled", description: "View cancellations", href: "/admin/cancelled", color: "bg-destructive/10" },
     { icon: <Package size={20} className="text-teal-600" />, title: "Products", description: "Product catalog", href: "/admin/products", color: "bg-teal-100" },
     { icon: <Tag size={20} className="text-pink-600" />, title: "Categories", description: "Manage categories", href: "/admin/categories", color: "bg-pink-100" },
     { icon: <CreditCard size={20} className="text-emerald-600" />, title: "Payouts", description: "Seller payouts", href: "/admin/payouts", color: "bg-emerald-100" },
