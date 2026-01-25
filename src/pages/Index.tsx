@@ -7,82 +7,92 @@ import Categories from "@/components/home/Categories";
 import SEOHead from "@/components/seo/SEOHead";
 import OrganizationJsonLd from "@/components/seo/OrganizationJsonLd";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
-import { Sparkles, Truck, ShieldCheck, HeadphonesIcon } from "lucide-react";
+import { Truck, Shield, RotateCcw, Headphones } from "lucide-react";
 
-// Lazy load below-fold components for faster initial paint
+// Lazy load below-fold sections
 const FlashSaleSection = lazy(() => import("@/components/home/FlashSaleSection"));
 const InfiniteProductGrid = lazy(() => import("@/components/home/InfiniteProductGrid"));
 
-// Premium loading state
 const SectionSkeleton = () => (
-  <div className="py-12">
-    <div className="container mx-auto flex items-center justify-center">
-      <FanzonSpinner size="lg" />
-    </div>
+  <div className="flex items-center justify-center py-12">
+    <FanzonSpinner size="lg" />
   </div>
 );
 
-// Features bar data
 const features = [
-  { icon: Truck, label: "Free Shipping", desc: "On orders over Rs. 2000" },
-  { icon: ShieldCheck, label: "Secure Payment", desc: "100% protected" },
-  { icon: Sparkles, label: "Best Quality", desc: "Authentic products" },
-  { icon: HeadphonesIcon, label: "24/7 Support", desc: "Dedicated support" },
+  { icon: Truck, label: "Free Shipping", desc: "Orders over Rs. 2000" },
+  { icon: Shield, label: "Secure Payment", desc: "100% Protected" },
+  { icon: RotateCcw, label: "Easy Returns", desc: "7-Day Policy" },
+  { icon: Headphones, label: "24/7 Support", desc: "Dedicated Help" },
 ];
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <SEOHead
-        title="FANZON - Pakistan's Premium Multi-Vendor Store"
-        description="Shop authentic products at FANZON Pakistan. Best prices in PKR, Cash on Delivery, Easy Returns. Electronics, Fashion, Home & more!"
+        title="FANZON - Pakistan's Best Online Marketplace"
+        description="Shop millions of products with fast delivery, secure payments, and great prices. Electronics, Fashion, Home & more."
         url="/"
       />
       <OrganizationJsonLd />
       
-      <Header />
-      
-      <main className="pb-20 md:pb-0">
-        {/* Hero Section */}
-        <HeroCarousel />
+      <div className="min-h-screen bg-secondary flex flex-col">
+        <Header />
         
-        {/* Features Bar */}
-        <section className="bg-card border-b border-border">
-          <div className="container mx-auto py-4 md:py-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {features.map((feature) => (
-                <div key={feature.label} className="flex items-center gap-3 justify-center md:justify-start">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <feature.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                  </div>
-                  <div className="hidden md:block">
-                    <p className="text-sm font-semibold text-foreground">{feature.label}</p>
-                    <p className="text-xs text-muted-foreground">{feature.desc}</p>
-                  </div>
-                  <p className="text-xs font-medium text-foreground md:hidden">{feature.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        
-        {/* Categories */}
-        <Categories />
-        
-        {/* Flash Sales */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <FlashSaleSection />
-        </Suspense>
-        
-        {/* Products Grid */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <InfiniteProductGrid />
-        </Suspense>
-      </main>
+        <main className="flex-1 pb-16 md:pb-0">
+          {/* Hero Section */}
+          <HeroCarousel />
 
-      <Footer />
-      <MobileBottomNav />
-    </div>
+          {/* Features Bar */}
+          <section className="bg-card border-b border-border">
+            <div className="container mx-auto py-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                {features.map((feature, index) => (
+                  <div 
+                    key={index}
+                    className="flex items-center gap-2 md:gap-3 justify-center md:justify-start"
+                  >
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-fanzon-orange-light flex items-center justify-center flex-shrink-0">
+                      <feature.icon size={16} className="text-primary md:w-5 md:h-5" />
+                    </div>
+                    <div className="hidden sm:block">
+                      <p className="text-xs md:text-sm font-semibold text-foreground">{feature.label}</p>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">{feature.desc}</p>
+                    </div>
+                    <span className="sm:hidden text-[10px] font-medium text-foreground">{feature.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Categories */}
+          <Categories />
+
+          {/* Flash Sale */}
+          <Suspense fallback={<SectionSkeleton />}>
+            <FlashSaleSection />
+          </Suspense>
+
+          {/* Just For You - Infinite Scroll */}
+          <section className="bg-secondary py-4">
+            <div className="container mx-auto">
+              <div className="bg-primary text-white py-2.5 px-4 rounded-t">
+                <h2 className="text-base md:text-lg font-bold text-center">Just For You</h2>
+              </div>
+              <div className="bg-card rounded-b p-3">
+                <Suspense fallback={<SectionSkeleton />}>
+                  <InfiniteProductGrid />
+                </Suspense>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <Footer />
+        <MobileBottomNav />
+      </div>
+    </>
   );
 };
 
