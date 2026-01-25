@@ -52,6 +52,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariant | null>>({});
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Related products (same category)
   const relatedProducts = useMemo(() => {
@@ -119,16 +120,21 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    if (product) {
+    if (product && !isAddingToCart) {
       if (needsVariantSelection) return;
+      setIsAddingToCart(true);
       addToCart(product, quantity, selectedVariant);
+      // Small delay for UX feedback
+      setTimeout(() => setIsAddingToCart(false), 500);
     }
   };
 
   const handleBuyNow = () => {
-    if (product) {
+    if (product && !isAddingToCart) {
       if (needsVariantSelection) return;
+      setIsAddingToCart(true);
       addToCart(product, quantity, selectedVariant);
+      // Navigate immediately after adding to cart
       navigate("/checkout");
     }
   };
@@ -307,19 +313,31 @@ const ProductDetail = () => {
             <div className="flex gap-3 mb-6">
               <Button
                 onClick={handleBuyNow}
-                disabled={availableStock === 0 || needsVariantSelection}
+                disabled={availableStock === 0 || needsVariantSelection || isAddingToCart}
                 className="flex-1 bg-primary hover:bg-fanzon-orange-hover text-primary-foreground font-semibold"
               >
-                {needsVariantSelection ? "Select Variant" : "Buy Now"}
+                {isAddingToCart ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : needsVariantSelection ? (
+                  "Select Variant"
+                ) : (
+                  "Buy Now"
+                )}
               </Button>
               <Button
                 onClick={handleAddToCart}
-                disabled={availableStock === 0 || needsVariantSelection}
+                disabled={availableStock === 0 || needsVariantSelection || isAddingToCart}
                 variant="outline"
                 className="flex-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               >
-                <ShoppingCart size={18} className="mr-2" />
-                Add to Cart
+                {isAddingToCart ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <ShoppingCart size={18} className="mr-2" />
+                    Add to Cart
+                  </>
+                )}
               </Button>
             </div>
 
@@ -521,7 +539,7 @@ const ProductDetail = () => {
         originalPrice={product.price_pkr}
         onBuyNow={handleBuyNow}
         onAddToCart={handleAddToCart}
-        disabled={availableStock === 0 || needsVariantSelection}
+        disabled={availableStock === 0 || needsVariantSelection || isAddingToCart}
       />
       
       <MobileBottomNav />
