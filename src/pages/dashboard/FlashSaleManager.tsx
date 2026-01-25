@@ -71,17 +71,25 @@ const FlashSaleManager = () => {
   const pendingNominations = nominations.filter(n => n.status === "pending");
 
   const handleCreateSale = async () => {
-    if (!newSale.campaign_name || !newSale.start_date || !newSale.end_date) return;
+    if (!newSale.campaign_name || !newSale.start_date || !newSale.end_date) {
+      toast.error("Please fill in campaign name, start date, and end date");
+      return;
+    }
+    
+    const feeValue = parseFloat(newSale.fee_per_product_pkr) || feePerProduct;
     
     const result = await createFlashSale({
       campaign_name: newSale.campaign_name,
       start_date: new Date(newSale.start_date).toISOString(),
       end_date: new Date(newSale.end_date).toISOString(),
+      application_deadline: newSale.application_deadline ? new Date(newSale.application_deadline).toISOString() : undefined,
+      fee_per_product_pkr: feeValue,
     });
 
     if (result) {
       setShowCreateDialog(false);
       setNewSale({ campaign_name: "", start_date: "", end_date: "", application_deadline: "", fee_per_product_pkr: feePerProduct.toString() });
+      toast.success("Campaign created successfully! Click 'Launch & Notify Sellers' to start accepting applications.");
     }
   };
 

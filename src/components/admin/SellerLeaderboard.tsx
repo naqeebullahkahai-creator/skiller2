@@ -20,11 +20,11 @@ const formatPKR = (amount: number) => {
 const getRankIcon = (rank: number) => {
   switch (rank) {
     case 1:
-      return <Crown className="h-5 w-5 text-yellow-500" />;
+      return <Crown className="h-5 w-5 text-amber-500" />;
     case 2:
-      return <Medal className="h-5 w-5 text-gray-400" />;
+      return <Medal className="h-5 w-5 text-muted-foreground" />;
     case 3:
-      return <Medal className="h-5 w-5 text-amber-600" />;
+      return <Medal className="h-5 w-5 text-orange-600" />;
     default:
       return <span className="text-sm font-bold text-muted-foreground">#{rank}</span>;
   }
@@ -33,13 +33,13 @@ const getRankIcon = (rank: number) => {
 const getRankBadgeColor = (rank: number) => {
   switch (rank) {
     case 1:
-      return "bg-gradient-to-r from-yellow-400 to-amber-500 text-white";
+      return "bg-gradient-to-r from-amber-400 to-orange-500 text-primary-foreground";
     case 2:
-      return "bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800";
-    case 3:
-      return "bg-gradient-to-r from-amber-500 to-orange-600 text-white";
-    default:
       return "bg-muted text-muted-foreground";
+    case 3:
+      return "bg-gradient-to-r from-orange-500 to-destructive text-primary-foreground";
+    default:
+      return "bg-secondary text-secondary-foreground";
   }
 };
 

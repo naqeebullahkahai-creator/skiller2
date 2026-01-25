@@ -133,10 +133,26 @@ export const useAdminFlashSales = () => {
     campaign_name: string;
     start_date: string;
     end_date: string;
+    application_deadline?: string;
+    fee_per_product_pkr?: number;
   }) => {
+    const insertData: Record<string, any> = {
+      campaign_name: data.campaign_name,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      status: 'draft',
+    };
+    
+    if (data.application_deadline) {
+      insertData.application_deadline = data.application_deadline;
+    }
+    if (data.fee_per_product_pkr !== undefined) {
+      insertData.fee_per_product_pkr = data.fee_per_product_pkr;
+    }
+
     const { data: newSale, error } = await supabase
       .from("flash_sales")
-      .insert([data])
+      .insert([insertData])
       .select()
       .single();
 
@@ -145,7 +161,7 @@ export const useAdminFlashSales = () => {
       return null;
     }
 
-    toast({ title: "Success", description: "Flash sale created!" });
+    toast({ title: "Success", description: "Flash sale campaign created!" });
     queryClient.invalidateQueries({ queryKey: ["admin-flash-sales"] });
     return newSale;
   };
