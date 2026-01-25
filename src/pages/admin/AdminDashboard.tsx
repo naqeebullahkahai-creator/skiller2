@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { useAdminDashboardAnalytics } from "@/hooks/useAdminDashboardAnalytics";
+import { useRealtimeKycNotifications } from "@/hooks/useRealtimeKycNotifications";
 
 const formatPKR = (amount: number) => {
   return new Intl.NumberFormat("en-PK", {
@@ -67,6 +68,9 @@ const AdminDashboard = () => {
   const { profile, logout } = useAuth();
   const { enableCustomerView } = useViewMode();
   const { stats, isLoading } = useAdminDashboardAnalytics();
+  
+  // Enable real-time KYC notifications for admin
+  useRealtimeKycNotifications();
 
   const handleLogout = async () => {
     await logout();

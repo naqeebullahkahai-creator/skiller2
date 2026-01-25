@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Bell, Lock, Store, User, Globe, CreditCard, Save } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Bell, Lock, Store, User, Globe, Save, Wrench, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -14,12 +15,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { useToast } from "@/hooks/use-toast";
+import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
 
 const DashboardSettings = () => {
   const { role } = useDashboard();
   const { toast } = useToast();
+  const { isMaintenanceMode, toggleMaintenanceMode, isLoading: isMaintenanceLoading } = useMaintenanceMode();
+  const [showMaintenanceConfirm, setShowMaintenanceConfirm] = useState(false);
+  const [pendingMaintenanceState, setPendingMaintenanceState] = useState(false);
+  
   const [notifications, setNotifications] = useState({
     orderUpdates: true,
     promotions: false,
@@ -32,6 +48,16 @@ const DashboardSettings = () => {
       title: "Settings Saved",
       description: "Your settings have been updated successfully.",
     });
+  };
+
+  const handleMaintenanceToggle = (checked: boolean) => {
+    setPendingMaintenanceState(checked);
+    setShowMaintenanceConfirm(true);
+  };
+
+  const confirmMaintenanceToggle = () => {
+    toggleMaintenanceMode.mutate(pendingMaintenanceState);
+    setShowMaintenanceConfirm(false);
   };
 
   return (
@@ -269,56 +295,121 @@ const DashboardSettings = () => {
         {/* General Tab (Admin Only) */}
         {role === "admin" && (
           <TabsContent value="general">
-            <Card>
-              <CardHeader>
-                <CardTitle>General Store Settings</CardTitle>
-                <CardDescription>Configure global store settings</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="currency">Currency</Label>
-                    <Select defaultValue="pkr">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pkr">PKR (Rs.)</SelectItem>
-                        <SelectItem value="usd">USD ($)</SelectItem>
-                      </SelectContent>
-                    </Select>
+            <div className="space-y-6">
+              {/* Maintenance Mode Card */}
+              <Card className={isMaintenanceMode ? "border-destructive" : ""}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Wrench size={20} />
+                    Maintenance Mode
+                    {isMaintenanceMode && (
+                      <Badge variant="destructive">ACTIVE</Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription>
+                    When enabled, all non-admin users will see a maintenance page
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                    <div>
+                      <p className="font-medium">Enable Maintenance Mode</p>
+                      <p className="text-sm text-muted-foreground">
+                        Temporarily disable the storefront for all users
+                      </p>
+                    </div>
+                    <Switch
+                      checked={isMaintenanceMode}
+                      onCheckedChange={handleMaintenanceToggle}
+                      disabled={isMaintenanceLoading || toggleMaintenanceMode.isPending}
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="timezone">Timezone</Label>
-                    <Select defaultValue="pkt">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pkt">Pakistan Time (PKT)</SelectItem>
-                        <SelectItem value="utc">UTC</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  
+                  {isMaintenanceMode && (
+                    <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3">
+                      <AlertTriangle className="text-destructive shrink-0 mt-0.5" size={18} />
+                      <div>
+                        <p className="font-medium text-destructive">Maintenance Mode is Active</p>
+                        <p className="text-sm text-muted-foreground">
+                          All customers and sellers are currently seeing the maintenance page. 
+                          Only super admins can access the dashboard.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* General Store Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>General Store Settings</CardTitle>
+                  <CardDescription>Configure global store settings</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="currency">Currency</Label>
+                      <Select defaultValue="pkr">
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pkr">PKR (Rs.)</SelectItem>
+                          <SelectItem value="usd">USD ($)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="timezone">Timezone</Label>
+                      <Select defaultValue="pkt">
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pkt">Pakistan Time (PKT)</SelectItem>
+                          <SelectItem value="utc">UTC</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                  <div>
-                    <p className="font-medium">Maintenance Mode</p>
-                    <p className="text-sm text-muted-foreground">
-                      Temporarily disable the storefront
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-                <Button onClick={handleSave} className="gap-2">
-                  <Save size={16} />
-                  Save Settings
-                </Button>
-              </CardContent>
-            </Card>
+                  <Button onClick={handleSave} className="gap-2">
+                    <Save size={16} />
+                    Save Settings
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         )}
       </Tabs>
+
+      {/* Maintenance Mode Confirmation Dialog */}
+      <AlertDialog open={showMaintenanceConfirm} onOpenChange={setShowMaintenanceConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Wrench size={20} />
+              {pendingMaintenanceState ? "Enable Maintenance Mode?" : "Disable Maintenance Mode?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingMaintenanceState 
+                ? "This will immediately redirect all customers and sellers to the maintenance page. Only super admins will be able to access the site."
+                : "This will restore normal access to all users. The storefront will be fully operational."
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmMaintenanceToggle}
+              className={pendingMaintenanceState ? "bg-destructive hover:bg-destructive/90" : ""}
+            >
+              {pendingMaintenanceState ? "Enable Maintenance" : "Disable Maintenance"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

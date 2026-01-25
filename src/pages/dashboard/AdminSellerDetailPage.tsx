@@ -28,6 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSellerDetails } from "@/hooks/useAdminSellers";
+import SellerPerformanceCharts from "@/components/admin/SellerPerformanceCharts";
 import { format } from "date-fns";
 
 const formatPKR = (amount: number) => {
@@ -194,13 +195,18 @@ const AdminSellerDetailPage = () => {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="products" className="w-full">
+      <Tabs defaultValue="analytics" className="w-full">
         <TabsList>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="wallet">Wallet</TabsTrigger>
           <TabsTrigger value="kyc">KYC Documents</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="analytics" className="mt-4">
+          <SellerPerformanceCharts sellerId={seller.user_id} />
+        </TabsContent>
 
         <TabsContent value="products" className="mt-4">
           {seller.products?.length === 0 ? (
