@@ -74,6 +74,8 @@ import AdminBulkUploadLogs from "./pages/dashboard/AdminBulkUploadLogs";
 import AdminCancellationsPage from "./pages/dashboard/AdminCancellationsPage";
 import AdminReturnsPage from "./pages/dashboard/AdminReturnsPage";
 import AdminUserDirectory from "./pages/dashboard/AdminUserDirectory";
+import AdminSellersDirectory from "./pages/dashboard/AdminSellersDirectory";
+import AdminSellerDetailPage from "./pages/dashboard/AdminSellerDetailPage";
 import AdminRolesPage from "./pages/dashboard/AdminRolesPage";
 import SocialSettingsPage from "./pages/dashboard/SocialSettingsPage";
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
@@ -225,7 +227,9 @@ const App = () => (
                               </ProtectedRoute>
                             }
                           />
-                          <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Users"><AdminUserDirectory /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Customers"><AdminUserDirectory /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/sellers" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Sellers"><AdminSellersDirectory /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/sellers/:sellerId" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Details"><AdminSellerDetailPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/roles" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Roles & Permissions"><AdminRolesPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/orders" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Orders"><AdminOrderManagement /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/cancellations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancellations"><AdminCancellationsPage /></AdminPageWrapper></ProtectedRoute>} />

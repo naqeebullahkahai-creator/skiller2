@@ -85,7 +85,8 @@ const AdminDashboard = () => {
   ];
 
   const commandCenterActions = [
-    { icon: <Users size={20} className="text-blue-600" />, title: "Users", description: "Manage all users", href: "/admin/users", color: "bg-blue-100" },
+    { icon: <Users size={20} className="text-blue-600" />, title: "Customers", description: "Manage customers", href: "/admin/users", color: "bg-blue-100" },
+    { icon: <Store size={20} className="text-green-600" />, title: "Sellers", description: "Manage sellers", href: "/admin/sellers", color: "bg-green-100" },
     { icon: <Shield size={20} className="text-purple-600" />, title: "Roles", description: "Manage permissions", href: "/admin/roles", color: "bg-purple-100" },
     { icon: <CheckCircle size={20} className="text-emerald-600" />, title: "Seller KYC", description: "Review verifications", badge: stats?.pendingApprovals?.toString(), badgeVariant: "destructive" as const, href: "/admin/seller-kyc", color: "bg-emerald-100" },
     { icon: <Package size={20} className="text-orange-600" />, title: "Approvals", description: "Product approvals", href: "/admin/approvals", color: "bg-orange-100" },
