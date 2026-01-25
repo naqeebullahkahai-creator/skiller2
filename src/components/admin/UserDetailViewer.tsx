@@ -187,9 +187,8 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
     },
   });
   
-  const handleImpersonate = () => {
-    toast.info("Impersonation feature requires backend implementation for security");
-  };
+  // Impersonation removed for security - session tokens cannot be securely shared
+  // Admin must use the "View as Customer" feature instead
   
   if (!userId) return null;
   
@@ -254,10 +253,7 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
                   </div>
                 </div>
                 
-                <Button onClick={handleImpersonate} variant="outline" size="sm">
-                  <LogIn size={16} className="mr-2" />
-                  Login as User
-                </Button>
+                {/* Impersonation removed for security - use "View as Customer" instead */}
               </div>
               
               <Tabs defaultValue="overview" className="w-full">
