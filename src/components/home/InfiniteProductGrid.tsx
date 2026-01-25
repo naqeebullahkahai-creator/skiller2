@@ -2,7 +2,8 @@ import { useEffect, useRef, useCallback, memo } from "react";
 import ProductCard from "@/components/product/ProductCard";
 import ProductCardSkeleton from "@/components/ui/product-card-skeleton";
 import { useInfiniteProducts } from "@/hooks/useInfiniteProducts";
-import FanzonSpinner from "@/components/ui/fanzon-spinner";
+import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
+import { PackageOpen, ArrowDown } from "lucide-react";
 
 const InfiniteProductGrid = memo(() => {
   const {
@@ -17,7 +18,6 @@ const InfiniteProductGrid = memo(() => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Intersection Observer for infinite scroll
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const [entry] = entries;
@@ -30,7 +30,7 @@ const InfiniteProductGrid = memo(() => {
 
   useEffect(() => {
     observerRef.current = new IntersectionObserver(handleObserver, {
-      rootMargin: "200px", // Start loading 200px before reaching the end
+      rootMargin: "200px",
       threshold: 0.1,
     });
 
@@ -41,23 +41,23 @@ const InfiniteProductGrid = memo(() => {
     return () => observerRef.current?.disconnect();
   }, [handleObserver]);
 
-  // Flatten all pages into a single array
   const allProducts = data?.pages.flatMap((page) => page.products) || [];
   const totalCount = data?.pages[0]?.totalCount || 0;
 
   if (isLoading) {
     return (
-      <section className="bg-secondary py-6">
-        <div className="container mx-auto">
-          <div className="bg-primary text-primary-foreground py-3 px-4 md:px-6 rounded-t-lg">
-            <h2 className="text-lg md:text-xl font-bold text-center">Just For You</h2>
-          </div>
-          <div className="bg-card p-4 rounded-b-lg">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
+      <section className="py-8 md:py-12 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <div>
+              <div className="h-8 w-48 bg-muted rounded-lg animate-pulse" />
+              <div className="h-4 w-32 bg-muted rounded mt-2 animate-pulse" />
             </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
           </div>
         </div>
       </section>
@@ -66,13 +66,14 @@ const InfiniteProductGrid = memo(() => {
 
   if (isError) {
     return (
-      <section className="bg-secondary py-6">
-        <div className="container mx-auto">
-          <div className="bg-primary text-primary-foreground py-3 px-4 md:px-6 rounded-t-lg">
-            <h2 className="text-lg md:text-xl font-bold text-center">Just For You</h2>
-          </div>
-          <div className="bg-card p-4 rounded-b-lg text-center py-12 text-muted-foreground">
-            Failed to load products. Please try again.
+      <section className="py-12 bg-muted/30">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <PackageOpen className="w-8 h-8 text-destructive" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Failed to load products</h3>
+            <p className="text-muted-foreground">Please try again later</p>
           </div>
         </div>
       </section>
@@ -81,13 +82,14 @@ const InfiniteProductGrid = memo(() => {
 
   if (allProducts.length === 0) {
     return (
-      <section className="bg-secondary py-6">
-        <div className="container mx-auto">
-          <div className="bg-primary text-primary-foreground py-3 px-4 md:px-6 rounded-t-lg">
-            <h2 className="text-lg md:text-xl font-bold text-center">Just For You</h2>
-          </div>
-          <div className="bg-card p-4 rounded-b-lg text-center py-12 text-muted-foreground">
-            No products available yet
+      <section className="py-12 bg-muted/30">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <PackageOpen className="w-10 h-10 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No products yet</h3>
+            <p className="text-muted-foreground">Check back soon for amazing deals!</p>
           </div>
         </div>
       </section>
@@ -95,42 +97,53 @@ const InfiniteProductGrid = memo(() => {
   }
 
   return (
-    <section className="bg-secondary py-6">
-      <div className="container mx-auto">
+    <section className="py-8 md:py-12 bg-muted/30">
+      <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="bg-primary text-primary-foreground py-3 px-4 md:px-6 rounded-t-lg flex items-center justify-between">
-          <h2 className="text-lg md:text-xl font-bold">Just For You</h2>
-          <span className="text-xs opacity-80">
-            {allProducts.length} of {totalCount} products
-          </span>
+        <div className="flex items-center justify-between mb-6 md:mb-8">
+          <div>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">
+              Just For You
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {totalCount} products available
+            </p>
+          </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="bg-card p-4 rounded-b-lg">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            {allProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                priority={index < 6} // First 6 products load immediately
-              />
-            ))}
-          </div>
+        {/* Products Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+          {allProducts.map((product, index) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              priority={index < 4}
+            />
+          ))}
+        </div>
 
-          {/* Infinite Scroll Trigger */}
-          <div ref={loadMoreRef} className="flex justify-center py-6">
-            {isFetchingNextPage && (
-              <div className="flex flex-col items-center gap-2">
-                <FanzonSpinner size="md" />
-                <span className="text-sm text-muted-foreground">Loading more...</span>
+        {/* Load More Trigger */}
+        <div ref={loadMoreRef} className="flex flex-col items-center justify-center py-10">
+          {isFetchingNextPage && (
+            <div className="flex flex-col items-center gap-3">
+              <FanzonSpinner size="md" />
+              <p className="text-sm text-muted-foreground">Loading more...</p>
+            </div>
+          )}
+          {!hasNextPage && allProducts.length > 0 && (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                <PackageOpen className="w-6 h-6" />
               </div>
-            )}
-            {!hasNextPage && allProducts.length > 0 && (
-              <p className="text-sm text-muted-foreground">
-                You've seen all {totalCount} products
-              </p>
-            )}
-          </div>
+              <p className="text-sm font-medium">You've seen all products</p>
+            </div>
+          )}
+          {hasNextPage && !isFetchingNextPage && (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground animate-bounce">
+              <ArrowDown className="w-5 h-5" />
+              <p className="text-sm">Scroll for more</p>
+            </div>
+          )}
         </div>
       </div>
     </section>
