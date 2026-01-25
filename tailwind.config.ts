@@ -76,6 +76,8 @@ export default {
           warning: "hsl(var(--fanzon-warning))",
           star: "hsl(var(--fanzon-star))",
           emerald: "hsl(var(--fanzon-emerald))",
+          orange: "hsl(var(--fanzon-orange))",
+          "orange-light": "hsl(var(--fanzon-orange-light))",
         },
       },
       borderRadius: {

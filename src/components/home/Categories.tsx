@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { useMainCategories } from "@/hooks/useCategories";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Smartphone, 
   Shirt, 
@@ -10,16 +8,13 @@ import {
   ShoppingBasket,
   Baby,
   Car,
-  Watch,
-  BookOpen,
-  Gamepad2,
-  Grid3X3,
   Folder,
-  ChevronRight,
+  Refrigerator,
   type LucideIcon
 } from "lucide-react";
+import { useMainCategories } from "@/hooks/useCategories";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const iconMap: Record<string, LucideIcon> = {
   Smartphone,
@@ -30,36 +25,27 @@ const iconMap: Record<string, LucideIcon> = {
   ShoppingBasket,
   Baby,
   Car,
-  Watch,
-  BookOpen,
-  Gamepad2,
-  Refrigerator: Home,
   Folder,
+  Refrigerator,
 };
 
 const Categories = () => {
   const { data: categories, isLoading } = useMainCategories();
   const isMobile = useIsMobile();
 
-  const displayCategories = isMobile ? categories?.slice(0, 8) : categories;
-  const hasMore = isMobile && (categories?.length || 0) > 8;
-
   if (isLoading) {
     return (
-      <section className="py-8 md:py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-6">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-24" />
+      <section className="bg-card py-4">
+        <div className="container mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-4 w-16" />
           </div>
-          <div className={cn(
-            "grid gap-4",
-            isMobile ? "grid-cols-4" : "grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"
-          )}>
-            {[...Array(isMobile ? 8 : 10)].map((_, i) => (
-              <div key={i} className="flex flex-col items-center gap-3">
-                <Skeleton className="w-16 h-16 md:w-20 md:h-20 rounded-2xl" />
-                <Skeleton className="h-3 w-14" />
+          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-10 gap-3">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <Skeleton className="w-14 h-14 rounded-full" />
+                <Skeleton className="h-3 w-12" />
               </div>
             ))}
           </div>
@@ -68,56 +54,39 @@ const Categories = () => {
     );
   }
 
+  const displayCategories = isMobile ? categories?.slice(0, 8) : categories;
+
   return (
-    <section className="py-8 md:py-12 bg-background">
-      <div className="container mx-auto px-4">
+    <section className="bg-card py-4">
+      <div className="container mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 md:mb-8">
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">
-              Shop by Category
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1 hidden md:block">
-              Find exactly what you need
-            </p>
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base md:text-lg font-bold text-foreground">Categories</h2>
           <Link 
             to="/categories" 
-            className="flex items-center gap-1 text-primary text-sm font-medium hover:underline"
+            className="text-xs md:text-sm text-primary hover:underline font-medium"
           >
-            View All <ChevronRight className="w-4 h-4" />
+            View All
           </Link>
         </div>
-        
-        {/* Categories Grid */}
-        <div className={cn(
-          "grid gap-4 md:gap-6",
-          isMobile ? "grid-cols-4" : "grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10"
-        )}>
+
+        {/* Category Grid */}
+        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-10 gap-3 md:gap-4">
           {displayCategories?.map((category) => {
-            const IconComponent = iconMap[category.icon] || Folder;
+            const IconComponent = iconMap[category.icon] || iconMap["Refrigerator"] || Folder;
             return (
               <Link
                 key={category.id}
                 to={`/category/${category.slug}`}
-                className="flex flex-col items-center gap-3 group"
+                className="flex flex-col items-center gap-2 group"
               >
-                <div className={cn(
-                  "w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center",
-                  "bg-gradient-to-br from-primary/5 to-primary/15",
-                  "group-hover:from-primary group-hover:to-primary/90",
-                  "transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-primary/20",
-                  "active:scale-95"
-                )}>
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-fanzon-orange-light flex items-center justify-center group-hover:bg-primary group-hover:shadow-md transition-all duration-200">
                   <IconComponent 
-                    className={cn(
-                      "w-7 h-7 md:w-8 md:h-8",
-                      "text-primary group-hover:text-primary-foreground",
-                      "transition-colors duration-300"
-                    )} 
+                    size={24} 
+                    className="text-primary group-hover:text-white transition-colors" 
                   />
                 </div>
-                <span className="text-xs md:text-sm text-center text-foreground font-medium line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                <span className="text-[10px] md:text-xs text-center text-foreground font-medium line-clamp-2">
                   {category.name}
                 </span>
               </Link>
@@ -126,17 +95,12 @@ const Categories = () => {
         </div>
 
         {/* Mobile See All */}
-        {hasMore && (
+        {isMobile && (categories?.length || 0) > 8 && (
           <Link
             to="/categories"
-            className={cn(
-              "mt-6 flex items-center justify-center gap-2 w-full py-3.5 rounded-xl",
-              "bg-primary/5 hover:bg-primary/10 text-primary font-medium text-sm",
-              "transition-all duration-300 active:scale-[0.98] border border-primary/20"
-            )}
+            className="mt-4 flex items-center justify-center w-full py-2.5 rounded bg-secondary hover:bg-muted text-foreground font-medium text-sm transition-colors"
           >
-            <Grid3X3 size={18} />
-            <span>See All Categories</span>
+            See All Categories
           </Link>
         )}
       </div>

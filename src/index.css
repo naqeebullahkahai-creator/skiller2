@@ -24,117 +24,121 @@
   }
 }
 
-/* FANZON Design System - Premium Minimalist Theme
-   Deep Charcoal + Electric Blue Accent
+/* FANZON Design System - Daraz-Style Marketplace Theme
+   Orange Primary + Clean White Background
    All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 13%;
 
-    /* Primary: Electric Blue #3B82F6 */
-    --primary: 217 91% 60%;
+    /* Primary: Daraz Orange #F85606 */
+    --primary: 21 95% 50%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Cool gray */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
+    /* Secondary: Light gray background */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 13%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 217 91% 60%;
+    --accent: 21 95% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 217 91% 60%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 21 95% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.25rem;
 
-    /* Custom FANZON tokens - Premium palette */
-    --fanzon-primary: 217 91% 60%;
-    --fanzon-primary-hover: 217 91% 55%;
-    --fanzon-primary-light: 217 91% 95%;
-    --fanzon-dark: 222 47% 11%;
-    --fanzon-charcoal: 222 47% 15%;
-    --fanzon-gray: 220 9% 46%;
-    --fanzon-light-gray: 220 14% 96%;
+    /* Custom FANZON tokens - Daraz palette */
+    --fanzon-primary: 21 95% 50%;
+    --fanzon-primary-hover: 21 95% 45%;
+    --fanzon-primary-light: 21 95% 95%;
+    --fanzon-dark: 0 0% 13%;
+    --fanzon-charcoal: 0 0% 20%;
+    --fanzon-gray: 0 0% 45%;
+    --fanzon-light-gray: 0 0% 96%;
     --fanzon-success: 142 71% 45%;
     --fanzon-warning: 38 92% 50%;
     --fanzon-star: 45 93% 47%;
     --fanzon-emerald: 160 84% 39%;
+    --fanzon-orange: 21 95% 50%;
+    --fanzon-orange-light: 21 95% 95%;
 
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 13%;
+    --sidebar-primary: 21 95% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 47% 18%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 222 47% 20%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 13%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 21 95% 50%;
   }
 
   .dark {
-    --background: 222 47% 8%;
+    --background: 0 0% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 222 47% 10%;
+    --card: 0 0% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 222 47% 10%;
+    --popover: 0 0% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 21 95% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 47% 15%;
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 222 47% 15%;
-    --muted-foreground: 220 9% 65%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 217 91% 60%;
+    --accent: 21 95% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 222 47% 20%;
-    --input: 222 47% 20%;
-    --ring: 217 91% 60%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 21 95% 50%;
 
-    --fanzon-primary: 217 91% 60%;
-    --fanzon-primary-hover: 217 91% 65%;
-    --fanzon-primary-light: 217 50% 20%;
+    --fanzon-primary: 21 95% 50%;
+    --fanzon-primary-hover: 21 95% 55%;
+    --fanzon-primary-light: 21 50% 20%;
     --fanzon-dark: 0 0% 98%;
-    --fanzon-charcoal: 222 47% 15%;
-    --fanzon-gray: 220 9% 65%;
-    --fanzon-light-gray: 222 47% 15%;
+    --fanzon-charcoal: 0 0% 15%;
+    --fanzon-gray: 0 0% 65%;
+    --fanzon-light-gray: 0 0% 15%;
     --fanzon-success: 142 71% 45%;
     --fanzon-warning: 38 92% 50%;
     --fanzon-star: 45 93% 47%;
     --fanzon-emerald: 160 84% 39%;
+    --fanzon-orange: 21 95% 50%;
+    --fanzon-orange-light: 21 50% 20%;
 
-    --sidebar-background: 222 47% 8%;
+    --sidebar-background: 0 0% 8%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary: 21 95% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 47% 15%;
+    --sidebar-accent: 0 0% 15%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 222 47% 20%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 21 95% 50%;
   }
 }
 
