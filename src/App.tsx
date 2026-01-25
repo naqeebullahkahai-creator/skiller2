@@ -12,6 +12,7 @@ import { VisualEditProvider } from "@/contexts/VisualEditContext";
 import { ViewModeProvider } from "@/contexts/ViewModeContext";
 import AuthModal from "@/components/auth/AuthModal";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import MaintenanceGuard from "@/components/MaintenanceGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import OfflineIndicator from "@/components/OfflineIndicator";
 import OrderStatusNotification from "./components/orders/OrderStatusNotification";
@@ -141,11 +142,12 @@ const App = () => (
                 <CartProvider>
                   <ComparisonProvider>
                     <OrderStatusNotification>
-                      <TooltipProvider>
-                        <Toaster />
-                        <Sonner />
-                        <OfflineIndicator />
-                        <BrowserRouter>
+                      <MaintenanceGuard>
+                        <TooltipProvider>
+                          <Toaster />
+                          <Sonner />
+                          <OfflineIndicator />
+                          <BrowserRouter>
                           <BackToDashboardBar />
                           <InstallPrompt />
                           <NotificationPermissionBanner />
@@ -288,7 +290,8 @@ const App = () => (
                         </Routes>
                       </BrowserRouter>
                     </TooltipProvider>
-                  </OrderStatusNotification>
+                  </MaintenanceGuard>
+                </OrderStatusNotification>
                 </ComparisonProvider>
               </CartProvider>
             </VisualEditProvider>
