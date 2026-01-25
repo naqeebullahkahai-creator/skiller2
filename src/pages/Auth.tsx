@@ -107,22 +107,53 @@ const Auth = () => {
         result = await login(formData.email, formData.password);
         
         if (result.success) {
-          // After login, verify they're not a seller (sellers should use seller portal)
-          const { data: roleData } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
-            .maybeSingle();
+          // Get current user and check role for immediate redirect
+          const { data: { user } } = await supabase.auth.getUser();
           
-          if (roleData?.role === "seller") {
-            // Let the useEffect handle the redirect with proper message
-            return;
+          if (user) {
+            // Check if super admin by email
+            const isSuperAdminUser = user.email === "alxteam001@gmail.com";
+            
+            if (isSuperAdminUser) {
+              toast({
+                title: "Welcome Admin!",
+                description: "Redirecting to Admin Dashboard...",
+              });
+              navigate("/admin/dashboard", { replace: true });
+              return;
+            }
+            
+            // Check role from database
+            const { data: roleData } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", user.id)
+              .maybeSingle();
+            
+            if (roleData?.role === "admin") {
+              toast({
+                title: "Welcome Admin!",
+                description: "Redirecting to Admin Dashboard...",
+              });
+              navigate("/admin/dashboard", { replace: true });
+              return;
+            }
+            
+            if (roleData?.role === "seller") {
+              toast({
+                title: "Redirecting to Seller Portal",
+                description: "You have a seller account. Redirecting to your Seller Dashboard.",
+              });
+              navigate("/seller/dashboard", { replace: true });
+              return;
+            }
           }
           
           toast({
             title: "Welcome back!",
             description: "You have successfully logged in.",
           });
+          navigate("/", { replace: true });
         } else {
           toast({
             title: "Error",
