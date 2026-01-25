@@ -83,6 +83,7 @@ import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
 import AdminReviewsPage from "./pages/dashboard/AdminReviewsPage";
 import AdminFlashNominations from "./pages/dashboard/AdminFlashNominations";
 import AdminQAModerationPage from "./pages/dashboard/AdminQAModerationPage";
+import AdminCancelledOrdersPage from "./pages/admin/AdminCancelledOrdersPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -98,6 +99,7 @@ import SellerProductsPage from "./pages/seller/SellerProductsPage";
 import SellerAddProductPage from "./pages/seller/SellerAddProductPage";
 import SellerReturnsPage from "./pages/seller/SellerReturnsPage";
 import SellerQAPage from "./pages/seller/SellerQAPage";
+import SellerCancelledOrdersPage from "./pages/seller/SellerCancelledOrdersPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -235,6 +237,7 @@ const App = () => (
                           <Route path="/admin/roles" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Roles & Permissions"><AdminRolesPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/orders" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Orders"><AdminOrderManagement /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/cancellations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancellations"><AdminCancellationsPage /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/cancelled" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancelled Orders"><AdminCancelledOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/returns" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Returns"><AdminReturnsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/products" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Products"><AdminProductCatalog /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/categories" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Categories"><AdminCategoryManager /></AdminPageWrapper></ProtectedRoute>} />
@@ -275,6 +278,7 @@ const App = () => (
                           <Route path="/seller/wallet" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Wallet"><VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
                           <Route path="/seller/analytics" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Analytics"><VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
                           <Route path="/seller/returns" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Returns"><VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
+                          <Route path="/seller/cancelled" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Cancelled Orders"><VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
                           <Route path="/seller/settings" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Settings"><AdminSettings /></SellerPageWrapper></ProtectedRoute>} />
 
                           {/* Legacy route redirects */}

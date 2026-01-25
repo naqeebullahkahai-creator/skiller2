@@ -3,7 +3,7 @@ import {
   Package, ShoppingBag, Wallet, BarChart3, 
   Settings, MessageSquare, Star, Zap, Tag,
   Plus, FileUp, RotateCcw, LogOut, Store,
-  Shield, HelpCircle, Eye
+  Shield, HelpCircle, Eye, XCircle
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -118,6 +118,7 @@ const SellerDashboard = () => {
     { icon: <Zap size={20} className="text-yellow-600" />, title: "Flash Sale", description: "Nominate products", href: "/seller/flash-sale", color: "bg-yellow-100", disabled: !isVerified },
     { icon: <FileUp size={20} className="text-slate-600" />, title: "Bulk Upload", description: "Import products", href: "/seller/bulk-upload", color: "bg-slate-100", disabled: !isVerified },
     { icon: <RotateCcw size={20} className="text-red-600" />, title: "Returns", description: "Handle returns", href: "/seller/returns", color: "bg-red-100", disabled: !isVerified },
+    { icon: <XCircle size={20} className="text-destructive" />, title: "Cancelled", description: "View cancelled orders", href: "/seller/cancelled", color: "bg-destructive/10", disabled: !isVerified },
     { icon: <HelpCircle size={20} className="text-violet-600" />, title: "Q&A", description: "Answer questions", href: "/seller/qa", color: "bg-violet-100", disabled: !isVerified },
     { icon: <Settings size={20} className="text-gray-600" />, title: "Settings", description: "Account settings", href: "/seller/settings", color: "bg-gray-100" },
   ];
