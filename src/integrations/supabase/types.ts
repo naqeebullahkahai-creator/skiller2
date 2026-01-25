@@ -1065,6 +1065,7 @@ export type Database = {
           created_at: string
           description: string | null
           discount_price_pkr: number | null
+          display_id: string | null
           id: string
           images: string[] | null
           price_pkr: number
@@ -1083,6 +1084,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           discount_price_pkr?: number | null
+          display_id?: string | null
           id?: string
           images?: string[] | null
           price_pkr: number
@@ -1101,6 +1103,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           discount_price_pkr?: number | null
+          display_id?: string | null
           id?: string
           images?: string[] | null
           price_pkr?: number
@@ -1120,6 +1123,7 @@ export type Database = {
           address: string | null
           avatar_url: string | null
           created_at: string
+          display_id: string | null
           email: string
           full_name: string
           id: string
@@ -1130,6 +1134,7 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           created_at?: string
+          display_id?: string | null
           email: string
           full_name: string
           id: string
@@ -1140,6 +1145,7 @@ export type Database = {
           address?: string | null
           avatar_url?: string | null
           created_at?: string
+          display_id?: string | null
           email?: string
           full_name?: string
           id?: string
@@ -1363,6 +1369,7 @@ export type Database = {
           cnic_number: string
           created_at: string
           date_of_birth: string | null
+          display_id: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
           father_husband_name: string | null
@@ -1393,6 +1400,7 @@ export type Database = {
           cnic_number: string
           created_at?: string
           date_of_birth?: string | null
+          display_id?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           father_husband_name?: string | null
@@ -1423,6 +1431,7 @@ export type Database = {
           cnic_number?: string
           created_at?: string
           date_of_birth?: string | null
+          display_id?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
           father_husband_name?: string | null

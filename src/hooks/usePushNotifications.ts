@@ -88,7 +88,7 @@ export const usePushNotifications = () => {
         
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: convertedVapidKey,
+          applicationServerKey: convertedVapidKey.buffer as ArrayBuffer,
         });
       }
 
@@ -164,7 +164,6 @@ export const usePushNotifications = () => {
         badge: "/fanzon-icon-512.png",
         tag: `fanzon-${Date.now()}`,
         data: { url },
-        vibrate: [200, 100, 200],
       });
     });
   }, [isSupported, permission]);

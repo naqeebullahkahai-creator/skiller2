@@ -19,6 +19,13 @@ export interface LeaderboardSeller {
 
 export type LeaderboardMetric = "sales" | "ratings" | "fulfillment";
 
+interface SellerProfileData {
+  id: string;
+  user_id: string;
+  shop_name: string;
+  display_id?: string | null;
+}
+
 export const useSellerLeaderboard = (metric: LeaderboardMetric = "sales", limit: number = 10) => {
   const { data: leaderboard = [], isLoading } = useQuery({
     queryKey: ["seller-leaderboard", metric, limit],
@@ -26,13 +33,14 @@ export const useSellerLeaderboard = (metric: LeaderboardMetric = "sales", limit:
       // Get verified sellers only
       const { data: sellerProfiles, error: sellersError } = await supabase
         .from("seller_profiles")
-        .select("id, user_id, shop_name, display_id")
+        .select("id, user_id, shop_name")
         .eq("verification_status", "verified");
 
       if (sellersError) throw sellersError;
       if (!sellerProfiles || sellerProfiles.length === 0) return [];
 
-      const userIds = sellerProfiles.map(s => s.user_id);
+      const typedProfiles = sellerProfiles as SellerProfileData[];
+      const userIds = typedProfiles.map(s => s.user_id);
 
       // Parallel fetch all required data
       const [profilesRes, productsRes, ordersRes, reviewsRes] = await Promise.all([
@@ -55,7 +63,7 @@ export const useSellerLeaderboard = (metric: LeaderboardMetric = "sales", limit:
       }> = {};
 
       // Initialize all sellers
-      sellerProfiles.forEach(sp => {
+      typedProfiles.forEach(sp => {
         sellerMetrics[sp.user_id] = {
           totalSales: 0,
           totalOrders: 0,
@@ -104,7 +112,7 @@ export const useSellerLeaderboard = (metric: LeaderboardMetric = "sales", limit:
       });
 
       // Build leaderboard entries
-      const leaderboardData: LeaderboardSeller[] = sellerProfiles.map(sp => {
+      const leaderboardData: LeaderboardSeller[] = typedProfiles.map(sp => {
         const profile = profileMap.get(sp.user_id);
         const metrics = sellerMetrics[sp.user_id];
         
@@ -122,7 +130,7 @@ export const useSellerLeaderboard = (metric: LeaderboardMetric = "sales", limit:
           shop_name: sp.shop_name,
           full_name: profile?.full_name || "Unknown",
           avatar_url: profile?.avatar_url || null,
-          display_id: sp.display_id,
+          display_id: sp.display_id || null,
           total_sales: metrics.totalSales,
           total_orders: metrics.totalOrders,
           average_rating: Math.round(avgRating * 10) / 10,

@@ -3,7 +3,7 @@ import {
   Users, ShoppingBag, Package, BarChart3, 
   Settings, Shield, Image, Link2, CreditCard,
   CheckCircle, Star, MessageSquare, Zap, Tag,
-  FileText, RotateCcw, LogOut, Store, TrendingUp, Eye
+  FileText, RotateCcw, LogOut, Store, TrendingUp, Eye, Trophy
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useViewMode } from "@/contexts/ViewModeContext";
 import { useAdminDashboardAnalytics } from "@/hooks/useAdminDashboardAnalytics";
 import { useRealtimeKycNotifications } from "@/hooks/useRealtimeKycNotifications";
-
+import SellerLeaderboard from "@/components/admin/SellerLeaderboard";
 const formatPKR = (amount: number) => {
   return new Intl.NumberFormat("en-PK", {
     style: "currency",
@@ -203,6 +203,9 @@ const AdminDashboard = () => {
             ))}
           </div>
         </div>
+
+        {/* Seller Leaderboard */}
+        <SellerLeaderboard limit={5} />
       </div>
     </div>
   );
