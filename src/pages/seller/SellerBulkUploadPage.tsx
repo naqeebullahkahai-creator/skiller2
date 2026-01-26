@@ -10,13 +10,12 @@ import {
   History,
   FileText,
   Sparkles,
-  FileDown,
   HelpCircle,
   ChevronDown,
   ChevronUp,
   Info,
-  ListChecks,
-  FileX2
+  FileX2,
+  Package
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,19 +37,19 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useBulkUpload, BulkUploadError } from "@/hooks/useBulkUpload";
+import { useBulkUpload } from "@/hooks/useBulkUpload";
 import { 
   generateFanzonTemplate,
   generateInstructionsGuide,
   generateExcelTemplate,
   parseUploadFile,
   isSupportedFileType,
-  getFileTypeLabel,
-  validateProductRow,
+  validateAllRows,
   ParsedProductRow,
   ValidationError,
   CATEGORY_MAPPINGS,
-  resolveCategory
+  resolveCategory,
+  TEMPLATE_FIELDS,
 } from "@/utils/bulkUploadTemplate";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -73,9 +72,11 @@ const SellerBulkUploadPage = () => {
     validationErrors, 
     uploadLogs,
     isLoadingLogs,
+    progressDetails,
     processUpload,
     fetchUploadLogs,
-    setValidationErrors
+    setValidationErrors,
+    resetProgress,
   } = useBulkUpload();
 
   useEffect(() => {
@@ -115,7 +116,6 @@ const SellerBulkUploadPage = () => {
   };
 
   const processFile = useCallback(async (file: File) => {
-    // Check if file type is supported
     if (!isSupportedFileType(file.name)) {
       setLocalErrors([{
         row: 0,
@@ -128,6 +128,7 @@ const SellerBulkUploadPage = () => {
     setSelectedFile(file);
     setLocalErrors([]);
     setValidationErrors([]);
+    resetProgress();
     
     try {
       const rows = await parseUploadFile(file);
@@ -150,12 +151,8 @@ const SellerBulkUploadPage = () => {
         return;
       }
       
-      // Validate all rows and collect errors
-      const allErrors: ValidationError[] = [];
-      rows.forEach((row, index) => {
-        const rowErrors = validateProductRow(row, index);
-        allErrors.push(...rowErrors);
-      });
+      // Validate all rows with row-specific errors
+      const allErrors = validateAllRows(rows);
       
       setLocalErrors(allErrors);
       setParsedRows(rows);
@@ -167,7 +164,7 @@ const SellerBulkUploadPage = () => {
         message: error.message || "Failed to parse the file. Please check the format.",
       }]);
     }
-  }, [setValidationErrors]);
+  }, [setValidationErrors, resetProgress]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -195,20 +192,7 @@ const SellerBulkUploadPage = () => {
   const handleUpload = async () => {
     if (!selectedFile || parsedRows.length === 0 || localErrors.length > 0) return;
     
-    // Convert parsed rows to the format expected by useBulkUpload
-    const uploadRows = parsedRows.map(row => ({
-      title: row.title,
-      description: row.description || "",
-      price: row.price,
-      discount_price: row.discount_price || "",
-      category: resolveCategory(row.category) || row.category,
-      stock_quantity: row.stock_quantity,
-      image_url: row.image_url || "",
-      brand: row.brand || "",
-      sku: row.sku || "",
-    }));
-    
-    const result = await processUpload(uploadRows, selectedFile.name);
+    const result = await processUpload(parsedRows, selectedFile.name);
     
     if (result.success) {
       setSelectedFile(null);
@@ -225,6 +209,7 @@ const SellerBulkUploadPage = () => {
     setPreviewMode(false);
     setLocalErrors([]);
     setValidationErrors([]);
+    resetProgress();
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -248,13 +233,14 @@ const SellerBulkUploadPage = () => {
   };
 
   const validRowsCount = parsedRows.length - new Set(localErrors.map(e => e.row)).size;
+  const errorRows = new Set(localErrors.map(e => e.row));
 
   return (
     <div className="space-y-6">
-      {/* Page Header with FANZON branding */}
+      {/* Page Header */}
       <div className="flex items-center gap-3">
         <div className="p-3 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d5a87] shadow-lg">
-          <Sparkles className="h-6 w-6 text-white" />
+          <Package className="h-6 w-6 text-white" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
@@ -282,7 +268,7 @@ const SellerBulkUploadPage = () => {
         </TabsList>
 
         <TabsContent value="upload" className="space-y-6">
-          {/* How to Use Guide */}
+          {/* Instructions Guide */}
           <Collapsible open={showGuide} onOpenChange={setShowGuide}>
             <Card className="border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/20">
               <CollapsibleTrigger className="w-full">
@@ -310,58 +296,24 @@ const SellerBulkUploadPage = () => {
                 </CardHeader>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <CardContent className="pt-0">
+                <CardContent className="pt-0 space-y-4">
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
-                        1
+                    {["Download Template", "Fill Your Data", "Upload & Preview", "Fix Errors"].map((step, i) => (
+                      <div key={i} className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
+                          {i + 1}
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{step}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {i === 0 && "Get the official FANZON template"}
+                            {i === 1 && "Add products with required fields"}
+                            {i === 2 && "Review your data before confirming"}
+                            {i === 3 && "We show exactly what to fix"}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-sm">Download Template</p>
-                        <p className="text-xs text-muted-foreground">Get the official FANZON CSV template</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
-                        2
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Fill Your Data</p>
-                        <p className="text-xs text-muted-foreground">Add products (delete example rows first)</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
-                        3
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Upload & Preview</p>
-                        <p className="text-xs text-muted-foreground">Review your data before confirming</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-3 p-3 bg-white dark:bg-background rounded-lg border border-blue-100 dark:border-blue-900/30">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold text-sm">
-                        4
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Fix Errors (if any)</p>
-                        <p className="text-xs text-muted-foreground">We'll show exactly what to fix</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg">
-                    <div className="flex gap-2">
-                      <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-amber-800 dark:text-amber-200">
-                        <strong>Pro Tips:</strong>
-                        <ul className="list-disc list-inside mt-1 space-y-0.5 text-amber-700 dark:text-amber-300">
-                          <li>Price must be numbers only (e.g., <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">2500</code> not <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">Rs. 2500</code>)</li>
-                          <li>Use category ID (1-10) or name (e.g., "Electronics")</li>
-                          <li>Image URLs must be direct links starting with https://</li>
-                        </ul>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </CardContent>
               </CollapsibleContent>
@@ -371,7 +323,6 @@ const SellerBulkUploadPage = () => {
           {/* Template Download Section */}
           <Card className="border-[#1e3a5f]/30 bg-gradient-to-br from-[#1e3a5f]/10 via-[#1e3a5f]/5 to-transparent overflow-hidden relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#1e3a5f]/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#1e3a5f]/10 rounded-full blur-2xl" />
             
             <CardHeader className="relative z-10">
               <div className="flex items-center gap-3">
@@ -381,7 +332,7 @@ const SellerBulkUploadPage = () => {
                 <div>
                   <CardTitle className="text-lg">Step 1: Download FANZON Template</CardTitle>
                   <CardDescription>
-                    Official branded template with instructions and category reference
+                    Clean template with field definitions and category reference
                   </CardDescription>
                 </div>
               </div>
@@ -410,25 +361,15 @@ const SellerBulkUploadPage = () => {
                 <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl">
                   <p className="font-semibold text-red-700 dark:text-red-400 flex items-center gap-2 mb-3">
                     <span className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
-                    Mandatory Fields (Required) *
+                    Required Fields
                   </p>
                   <ul className="text-sm text-red-800 dark:text-red-300 space-y-1.5">
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                      <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">Product_Title*</code>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                      <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">Category*</code>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                      <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">Price_PKR*</code>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                      <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">Stock_Quantity*</code>
-                    </li>
+                    {TEMPLATE_FIELDS.filter(f => f.required).map(field => (
+                      <li key={field.name} className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                        <code className="bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-xs">{field.name}</code>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 rounded-xl">
@@ -437,274 +378,251 @@ const SellerBulkUploadPage = () => {
                     Optional Fields
                   </p>
                   <ul className="text-sm text-green-800 dark:text-green-300 space-y-1.5">
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">Discount_Price</code>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">Brand_Name</code>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">Product_Description</code>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">Image_URL, SKU</code>
-                    </li>
+                    {TEMPLATE_FIELDS.filter(f => !f.required).map(field => (
+                      <li key={field.name} className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                        <code className="bg-green-100 dark:bg-green-900/50 px-1.5 py-0.5 rounded text-xs">{field.name}</code>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
 
-              {/* Category Reference - Collapsible */}
+              {/* Category Reference */}
               <Collapsible open={showCategoryRef} onOpenChange={setShowCategoryRef}>
-                <div className="p-4 bg-muted/50 rounded-xl border border-border">
-                  <CollapsibleTrigger className="w-full">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium flex items-center gap-2">
-                        <ListChecks className="h-4 w-4 text-muted-foreground" />
-                        Category Reference (ID or Name)
-                      </p>
-                      {showCategoryRef ? (
-                        <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2">
-                      {CATEGORY_MAPPINGS.map((cat) => (
-                        <div 
-                          key={cat.id} 
-                          className="p-2 bg-background rounded-lg border border-border text-center"
-                        >
-                          <span className="text-xs font-bold text-[#1e3a5f] dark:text-blue-400">
-                            {cat.id}
-                          </span>
-                          <p className="text-xs font-medium truncate">{cat.name}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </CollapsibleContent>
-                  {!showCategoryRef && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {CATEGORY_MAPPINGS.slice(0, 5).map((cat) => (
-                        <Badge key={cat.id} variant="secondary" className="text-xs px-2 py-0.5">
-                          {cat.id}={cat.name}
-                        </Badge>
-                      ))}
-                      <Badge variant="outline" className="text-xs px-2 py-0.5">
-                        +{CATEGORY_MAPPINGS.length - 5} more
-                      </Badge>
-                    </div>
-                  )}
-                </div>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between mt-2">
+                    <span className="flex items-center gap-2">
+                      <Info size={16} />
+                      Category ID Reference
+                    </span>
+                    {showCategoryRef ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="mt-2 p-4 bg-muted rounded-lg">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[80px]">ID</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead className="hidden sm:table-cell">Examples</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {CATEGORY_MAPPINGS.map(cat => (
+                          <TableRow key={cat.id}>
+                            <TableCell className="font-mono font-bold">{cat.id}</TableCell>
+                            <TableCell>{cat.name}</TableCell>
+                            <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">{cat.examples}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CollapsibleContent>
               </Collapsible>
             </CardContent>
           </Card>
 
-          {/* File Upload Section */}
+          {/* Upload Section */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-muted">
-                  <Upload className="h-5 w-5 text-muted-foreground" />
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Upload className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <CardTitle className="text-lg">Step 2: Upload Your File</CardTitle>
                   <CardDescription>
-                    Drag & drop your filled CSV file or click to browse
+                    Drag and drop or click to select your filled template
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              
               {!previewMode ? (
-                <div 
-                  className={cn(
-                    "border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer relative overflow-hidden",
-                    isDragging 
-                      ? "border-[#1e3a5f] bg-[#1e3a5f]/5 scale-[1.01] shadow-lg" 
-                      : "border-border hover:border-[#1e3a5f]/50 hover:bg-muted/30"
-                  )}
+                <div
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                >
-                  {isDragging && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#1e3a5f]/10 to-transparent pointer-events-none" />
+                  className={cn(
+                    "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200",
+                    isDragging 
+                      ? "border-primary bg-primary/5 scale-[1.02]" 
+                      : "border-muted-foreground/25 hover:border-primary hover:bg-primary/5"
                   )}
-                  
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <div className={cn(
-                    "mx-auto w-20 h-20 rounded-2xl flex items-center justify-center mb-4 transition-all",
-                    isDragging ? "bg-[#1e3a5f]/20 scale-110" : "bg-muted"
-                  )}>
-                    <FileDown className={cn(
-                      "h-10 w-10 transition-colors",
-                      isDragging ? "text-[#1e3a5f]" : "text-muted-foreground"
-                    )} />
-                  </div>
-                  
-                  {/* FANZON branding in upload zone */}
-                  <div className="mb-3">
-                    <Badge className="bg-[#1e3a5f] text-white border-0 text-xs font-bold px-3 py-1">
-                      FANZON BULK UPLOAD
-                    </Badge>
-                  </div>
-                  
-                  <p className="text-xl font-semibold mb-1">
-                    {isDragging ? "Drop your file here!" : "Drag & Drop your CSV file"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    or <span className="text-[#1e3a5f] dark:text-blue-400 font-medium underline">click to browse</span>
-                  </p>
-                  <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <FileSpreadsheet className="h-3.5 w-3.5" />
-                      CSV files only
-                    </span>
-                    <span>•</span>
-                    <span>Max 1,000 products</span>
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className={cn(
+                      "p-4 rounded-full transition-colors",
+                      isDragging ? "bg-primary/20" : "bg-muted"
+                    )}>
+                      <Upload className={cn(
+                        "h-8 w-8 transition-colors",
+                        isDragging ? "text-primary" : "text-muted-foreground"
+                      )} />
+                    </div>
+                    <div>
+                      <p className="font-medium text-lg">
+                        {isDragging ? "Drop your file here" : "Drag & drop your file here"}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        or click to browse • Supports .csv and .xlsx
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* File Info Card */}
-                  <div className="flex items-center justify-between p-4 bg-muted rounded-xl">
+                  {/* File Info */}
+                  <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-[#1e3a5f]/10">
-                        <FileSpreadsheet className="h-6 w-6 text-[#1e3a5f] dark:text-blue-400" />
-                      </div>
+                      <FileSpreadsheet className="h-8 w-8 text-primary" />
                       <div>
                         <p className="font-medium">{selectedFile?.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {parsedRows.length} products found • {validRowsCount} valid
+                          {parsedRows.length} products found
                         </p>
                       </div>
                     </div>
                     <Button variant="ghost" size="icon" onClick={handleCancelUpload}>
-                      <X size={18} />
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
 
-                  {/* Validation Errors - Enhanced */}
-                  {localErrors.length > 0 && (
+                  {/* Real-time Progress Bar */}
+                  {isUploading && progressDetails && (
+                    <div className="space-y-3 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-900/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                          <span className="font-medium text-blue-900 dark:text-blue-100">
+                            {progressDetails.message}
+                          </span>
+                        </div>
+                        <span className="text-sm font-mono text-blue-700 dark:text-blue-300">
+                          {progressDetails.percentage}%
+                        </span>
+                      </div>
+                      <Progress value={progressDetails.percentage} className="h-3" />
+                      {progressDetails.stage === "uploading" && (
+                        <p className="text-xs text-blue-600 dark:text-blue-400">
+                          Processing {progressDetails.currentRow} of {progressDetails.totalRows} products
+                          {progressDetails.totalBatches > 1 && ` (Batch ${progressDetails.currentBatch}/${progressDetails.totalBatches})`}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Validation Summary */}
+                  {localErrors.length > 0 ? (
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
-                      <AlertTitle className="flex items-center gap-2">
-                        Fix These Errors Before Uploading
-                        <Badge variant="destructive" className="text-xs">
-                          {localErrors.length} error{localErrors.length > 1 ? 's' : ''}
-                        </Badge>
-                      </AlertTitle>
+                      <AlertTitle>Validation Errors Found</AlertTitle>
                       <AlertDescription>
-                        <ScrollArea className="h-48 mt-2">
-                          <div className="space-y-2">
-                            {localErrors.map((error, idx) => (
-                              <div 
-                                key={idx} 
-                                className="p-2 bg-destructive/10 rounded-lg border border-destructive/20"
-                              >
-                                <p className="text-sm">
-                                  <span className="font-bold text-destructive">
-                                    Row {error.row}:
-                                  </span>{" "}
-                                  <span className="font-medium">{error.field}</span>
-                                  <span className="text-muted-foreground"> — </span>
-                                  {error.message}
-                                </p>
-                                {error.value && (
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    Current value: <code className="bg-muted px-1 rounded">{error.value}</code>
-                                  </p>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </ScrollArea>
+                        {localErrors.length} errors in {errorRows.size} rows. Fix these issues and re-upload.
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <Alert className="border-green-200 bg-green-50 dark:bg-green-950/30">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <AlertTitle className="text-green-800 dark:text-green-200">Ready to Upload</AlertTitle>
+                      <AlertDescription className="text-green-700 dark:text-green-300">
+                        All {parsedRows.length} products passed validation.
                       </AlertDescription>
                     </Alert>
                   )}
 
-                  {/* Preview Table with status */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium">
-                        Data Preview 
-                        <span className="text-muted-foreground font-normal"> (first 10 rows)</span>
-                      </h4>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="gap-1">
-                          <CheckCircle2 size={12} className="text-green-500" />
-                          {validRowsCount} valid
-                        </Badge>
-                        {localErrors.length > 0 && (
-                          <Badge variant="destructive" className="gap-1">
-                            <AlertCircle size={12} />
-                            {new Set(localErrors.map(e => e.row)).size} with errors
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    <div className="border rounded-lg overflow-hidden">
-                      <ScrollArea className="h-72">
+                  {/* Error List with Row-Specific Messages */}
+                  {localErrors.length > 0 && (
+                    <Card className="border-destructive/50">
+                      <CardHeader className="py-3">
+                        <CardTitle className="text-base flex items-center gap-2 text-destructive">
+                          <FileX2 className="h-4 w-4" />
+                          Error Details ({localErrors.length} errors)
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <ScrollArea className="h-[200px]">
+                          <div className="space-y-2">
+                            {localErrors.slice(0, 50).map((error, idx) => (
+                              <div 
+                                key={idx} 
+                                className="flex items-start gap-3 p-2 bg-destructive/5 rounded text-sm"
+                              >
+                                <Badge variant="outline" className="shrink-0 font-mono">
+                                  Row {error.row}
+                                </Badge>
+                                <div>
+                                  <span className="font-medium">{error.field}:</span>{" "}
+                                  <span className="text-muted-foreground">{error.message}</span>
+                                </div>
+                              </div>
+                            ))}
+                            {localErrors.length > 50 && (
+                              <p className="text-sm text-muted-foreground text-center py-2">
+                                And {localErrors.length - 50} more errors...
+                              </p>
+                            )}
+                          </div>
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Preview Table */}
+                  <Card>
+                    <CardHeader className="py-3">
+                      <CardTitle className="text-base">
+                        Data Preview (First 10 Rows)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <ScrollArea className="w-full">
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-[#1e3a5f] hover:bg-[#1e3a5f]">
-                              <TableHead className="w-16 text-white font-bold">Row</TableHead>
-                              <TableHead className="text-white font-bold">Product Title</TableHead>
-                              <TableHead className="text-white font-bold">Category</TableHead>
-                              <TableHead className="text-white font-bold">Price (PKR)</TableHead>
-                              <TableHead className="text-white font-bold">Stock</TableHead>
-                              <TableHead className="text-right text-white font-bold">Status</TableHead>
+                            <TableRow>
+                              <TableHead className="w-[50px]">#</TableHead>
+                              <TableHead>Product_Name</TableHead>
+                              <TableHead>SKU</TableHead>
+                              <TableHead>Category_ID</TableHead>
+                              <TableHead className="text-right">Base_Price</TableHead>
+                              <TableHead className="text-right">Stock</TableHead>
+                              <TableHead className="w-[60px]">Status</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {parsedRows.slice(0, 10).map((row, idx) => {
-                              const errors = getRowErrors(idx);
+                              const rowErrors = getRowErrors(idx);
+                              const hasError = rowErrors.length > 0;
                               return (
                                 <TableRow 
-                                  key={idx} 
-                                  className={errors.length > 0 ? "bg-red-50 dark:bg-red-950/20" : ""}
+                                  key={idx}
+                                  className={hasError ? "bg-destructive/5" : ""}
                                 >
-                                  <TableCell className="font-mono text-muted-foreground">
-                                    {idx + 2}
+                                  <TableCell className="font-mono text-xs">{idx + 2}</TableCell>
+                                  <TableCell className="max-w-[200px] truncate">{row.title}</TableCell>
+                                  <TableCell className="font-mono text-xs">{row.sku}</TableCell>
+                                  <TableCell>{row.category}</TableCell>
+                                  <TableCell className="text-right font-mono">
+                                    {row.price ? `Rs. ${parseFloat(row.price).toLocaleString()}` : "-"}
                                   </TableCell>
-                                  <TableCell className="max-w-48 truncate font-medium">
-                                    {row.title || <span className="text-muted-foreground italic">Empty</span>}
-                                  </TableCell>
+                                  <TableCell className="text-right">{row.stock_quantity}</TableCell>
                                   <TableCell>
-                                    {resolveCategory(row.category) || row.category || (
-                                      <span className="text-muted-foreground italic">Empty</span>
-                                    )}
-                                  </TableCell>
-                                  <TableCell className="font-mono">
-                                    {row.price || <span className="text-muted-foreground italic">Empty</span>}
-                                  </TableCell>
-                                  <TableCell className="font-mono">
-                                    {row.stock_quantity || <span className="text-muted-foreground italic">Empty</span>}
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    {errors.length > 0 ? (
-                                      <Badge variant="destructive" className="gap-1">
-                                        <AlertCircle size={12} />
-                                        {errors.length} error{errors.length > 1 ? 's' : ''}
-                                      </Badge>
+                                    {hasError ? (
+                                      <AlertCircle className="h-4 w-4 text-destructive" />
                                     ) : (
-                                      <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 gap-1">
-                                        <CheckCircle2 size={12} />
-                                        Valid
-                                      </Badge>
+                                      <CheckCircle2 className="h-4 w-4 text-green-600" />
                                     )}
                                   </TableCell>
                                 </TableRow>
@@ -713,42 +631,23 @@ const SellerBulkUploadPage = () => {
                           </TableBody>
                         </Table>
                       </ScrollArea>
-                    </div>
-                    {parsedRows.length > 10 && (
-                      <p className="text-sm text-muted-foreground mt-2 text-center">
-                        ...and {parsedRows.length - 10} more rows
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Upload Progress */}
-                  {isUploading && (
-                    <div className="space-y-3 p-4 bg-[#1e3a5f]/5 rounded-lg border border-[#1e3a5f]/20">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium flex items-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Uploading products...
-                        </span>
-                        <span className="font-mono">{uploadProgress}%</span>
-                      </div>
-                      <Progress value={uploadProgress} className="h-2" />
-                      {totalBatches > 0 && (
-                        <p className="text-xs text-muted-foreground text-center">
-                          Processing batch {currentBatch} of {totalBatches}
+                      {parsedRows.length > 10 && (
+                        <p className="text-sm text-muted-foreground text-center py-2">
+                          And {parsedRows.length - 10} more products...
                         </p>
                       )}
-                    </div>
-                  )}
+                    </CardContent>
+                  </Card>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-3 pt-2">
-                    <Button onClick={handleCancelUpload} variant="outline" disabled={isUploading}>
+                  <div className="flex gap-3 justify-end">
+                    <Button variant="outline" onClick={handleCancelUpload} disabled={isUploading}>
                       Cancel
                     </Button>
                     <Button 
                       onClick={handleUpload} 
-                      disabled={isUploading || localErrors.length > 0}
-                      className="gap-2 flex-1 sm:flex-none bg-[#1e3a5f] hover:bg-[#2d5a87]"
+                      disabled={localErrors.length > 0 || isUploading}
+                      className="gap-2"
                     >
                       {isUploading ? (
                         <>
@@ -757,18 +656,12 @@ const SellerBulkUploadPage = () => {
                         </>
                       ) : (
                         <>
-                          <Upload size={18} />
-                          Upload {validRowsCount} Products
+                          <Upload className="h-4 w-4" />
+                          Upload {parsedRows.length} Products
                         </>
                       )}
                     </Button>
                   </div>
-                  
-                  {localErrors.length > 0 && (
-                    <p className="text-sm text-amber-600 dark:text-amber-400 text-center">
-                      ⚠️ Fix the {localErrors.length} error{localErrors.length > 1 ? 's' : ''} above to enable upload
-                    </p>
-                  )}
                 </div>
               )}
             </CardContent>
@@ -778,52 +671,51 @@ const SellerBulkUploadPage = () => {
         <TabsContent value="history" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2">
                 <History className="h-5 w-5" />
                 Upload History
               </CardTitle>
               <CardDescription>
-                View your past bulk upload activities
+                View your previous bulk upload attempts
               </CardDescription>
             </CardHeader>
             <CardContent>
               {isLoadingLogs ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 </div>
               ) : uploadLogs.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <div className="text-center py-8 text-muted-foreground">
+                  <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
                   <p>No upload history yet</p>
-                  <p className="text-sm">Upload your first batch of products to get started</p>
                 </div>
               ) : (
-                <div className="rounded-md border overflow-x-auto">
+                <ScrollArea className="h-[400px]">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-muted/50">
+                      <TableRow>
                         <TableHead>File Name</TableHead>
                         <TableHead>Date</TableHead>
-                        <TableHead className="text-center">Total</TableHead>
-                        <TableHead className="text-center">Success</TableHead>
-                        <TableHead className="text-center">Failed</TableHead>
+                        <TableHead className="text-right">Total</TableHead>
+                        <TableHead className="text-right">Success</TableHead>
+                        <TableHead className="text-right">Failed</TableHead>
                         <TableHead>Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {uploadLogs.map((log) => (
                         <TableRow key={log.id}>
-                          <TableCell className="font-medium max-w-48 truncate">
+                          <TableCell className="font-medium max-w-[200px] truncate">
                             {log.file_name}
                           </TableCell>
-                          <TableCell className="text-muted-foreground">
+                          <TableCell className="text-sm text-muted-foreground">
                             {format(new Date(log.created_at), "MMM d, yyyy HH:mm")}
                           </TableCell>
-                          <TableCell className="text-center font-mono">{log.total_rows}</TableCell>
-                          <TableCell className="text-center text-green-600 dark:text-green-400 font-mono">
+                          <TableCell className="text-right">{log.total_rows}</TableCell>
+                          <TableCell className="text-right text-green-600 font-medium">
                             {log.successful_rows}
                           </TableCell>
-                          <TableCell className="text-center text-destructive font-mono">
+                          <TableCell className="text-right text-destructive font-medium">
                             {log.failed_rows}
                           </TableCell>
                           <TableCell>{getStatusBadge(log.status)}</TableCell>
@@ -831,7 +723,7 @@ const SellerBulkUploadPage = () => {
                       ))}
                     </TableBody>
                   </Table>
-                </div>
+                </ScrollArea>
               )}
             </CardContent>
           </Card>
