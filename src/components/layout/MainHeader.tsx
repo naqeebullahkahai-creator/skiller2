@@ -18,6 +18,7 @@ import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 import SearchSuggestions from "@/components/search/SearchSuggestions";
 import AnimatedProfileMenu from "@/components/navigation/AnimatedProfileMenu";
 import CategoryAccordion from "@/components/navigation/CategoryAccordion";
+import FanzonLogo from "@/components/brand/FanzonLogo";
 
 const MainHeader = () => {
   const navigate = useNavigate();
@@ -49,11 +50,9 @@ const MainHeader = () => {
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Logo */}
+          {/* Logo with Amazon-style arrow */}
           <Link to="/" className="flex-shrink-0">
-            <h1 className="text-xl md:text-2xl font-bold text-primary-foreground tracking-tight">
-              FANZON
-            </h1>
+            <FanzonLogo size="md" textClassName="text-primary-foreground" />
           </Link>
 
           {/* Search Bar - Desktop */}
