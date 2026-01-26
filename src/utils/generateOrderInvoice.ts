@@ -46,52 +46,54 @@ export const generateOrderInvoice = (order: InvoiceOrder): void => {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   
-  // ========== HEADER WITH FANZON BRANDING ==========
+  // ========== HEADER WITH CENTERED FANZON BRANDING ==========
   // Orange gradient header
   doc.setFillColor(243, 136, 58);
-  doc.rect(0, 0, pageWidth, 45, "F");
+  doc.rect(0, 0, pageWidth, 50, "F");
   
   // Add subtle darker stripe at bottom of header
   doc.setFillColor(220, 120, 50);
-  doc.rect(0, 42, pageWidth, 3, "F");
+  doc.rect(0, 47, pageWidth, 3, "F");
   
-  // FANZON Logo (high-res text rendering)
+  // FANZON Logo - CENTERED at top
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(32);
+  doc.setFontSize(36);
   doc.setFont("helvetica", "bold");
-  doc.text("FANZON", 15, 25);
+  doc.text("FANZON", pageWidth / 2, 22, { align: "center" });
   
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
-  doc.text("Your Trusted Marketplace", 15, 33);
-  doc.setFontSize(8);
-  doc.text("www.fanzon.pk | support@fanzon.pk", 15, 40);
-  
-  // Invoice Badge (right side)
-  doc.setFillColor(255, 255, 255);
-  doc.roundedRect(pageWidth - 65, 10, 50, 25, 3, 3, "F");
-  
-  doc.setTextColor(243, 136, 58);
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("INVOICE", pageWidth - 40, 20, { align: "center" });
+  doc.text("Pakistan's Premium Marketplace", pageWidth / 2, 32, { align: "center" });
   
   doc.setFontSize(9);
-  doc.setTextColor(80, 80, 80);
-  doc.text(order.order_number || `#${order.id.slice(0, 8).toUpperCase()}`, pageWidth - 40, 28, { align: "center" });
+  doc.text("www.fanzon.pk | support@fanzon.pk", pageWidth / 2, 42, { align: "center" });
   
-  // ========== ORDER INFO SECTION ==========
-  let currentY = 55;
+  // ========== INVOICE TITLE & ORDER INFO ==========
+  let currentY = 62;
   
-  // Invoice Date and Status Row
+  // Invoice title centered
+  doc.setTextColor(243, 136, 58);
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.text("INVOICE", pageWidth / 2, currentY, { align: "center" });
+  
+  currentY += 12;
+  
+  // Order ID and Date row
+  doc.setFillColor(248, 249, 250);
+  doc.roundedRect(12, currentY - 5, pageWidth - 24, 20, 2, 2, "F");
+  
   doc.setTextColor(51, 51, 51);
   doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Order ID: ${order.order_number || order.id.slice(0, 8).toUpperCase()}`, 18, currentY + 5);
+  
   doc.setFont("helvetica", "normal");
-  doc.text(`Invoice Date: ${new Date(order.created_at).toLocaleDateString("en-PK", {
+  doc.text(`Date: ${new Date(order.created_at).toLocaleDateString("en-PK", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  })}`, 15, currentY);
+  })}`, pageWidth / 2, currentY + 5);
   
   // Status badge
   const statusColors: Record<string, [number, number, number]> = {
@@ -105,80 +107,68 @@ export const generateOrderInvoice = (order: InvoiceOrder): void => {
   
   const statusColor = statusColors[order.order_status] || statusColors.pending;
   doc.setFillColor(...statusColor);
-  doc.roundedRect(pageWidth - 55, currentY - 7, 40, 10, 2, 2, "F");
+  doc.roundedRect(pageWidth - 55, currentY - 2, 40, 14, 2, 2, "F");
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(8);
+  doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
-  doc.text(order.order_status.toUpperCase(), pageWidth - 35, currentY, { align: "center" });
+  doc.text(order.order_status.toUpperCase(), pageWidth - 35, currentY + 6, { align: "center" });
   
-  currentY += 15;
+  currentY += 28;
   
-  // ========== BILLING & SHIPPING INFO ==========
-  // Two column layout
+  // ========== SELLER & BUYER INFO (Two Column Layout) ==========
   const leftColX = 15;
   const rightColX = pageWidth / 2 + 5;
   
-  // Bill To Section
-  doc.setFillColor(248, 249, 250);
-  doc.roundedRect(leftColX - 3, currentY - 5, (pageWidth / 2) - 15, 40, 2, 2, "F");
+  // Seller Info Section (Left)
+  doc.setFillColor(255, 248, 240);
+  doc.roundedRect(leftColX - 3, currentY - 5, (pageWidth / 2) - 15, 45, 2, 2, "F");
   
   doc.setTextColor(243, 136, 58);
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
-  doc.text("BILL TO", leftColX, currentY + 3);
+  doc.text("SELLER", leftColX, currentY + 3);
   
   doc.setTextColor(51, 51, 51);
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
-  doc.text(order.customer_name, leftColX, currentY + 13);
+  const sellerName = order.seller_store_name || order.items[0]?.seller_name || "FANZON Seller";
+  doc.text(sellerName, leftColX, currentY + 13);
   
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
-  if (order.customer_phone) {
-    doc.text(`📞 ${order.customer_phone}`, leftColX, currentY + 21);
+  const sellerContact = order.seller_contact || order.items[0]?.seller_phone || "";
+  if (sellerContact) {
+    doc.text(`Contact: ${sellerContact}`, leftColX, currentY + 21);
+  }
+  const sellerLocation = order.seller_address || order.pickup_location || "";
+  if (sellerLocation) {
+    const locationLines = doc.splitTextToSize(`Location: ${sellerLocation}`, 80);
+    doc.text(locationLines, leftColX, currentY + 29);
   }
   
-  // Ship To Section
+  // Buyer Info Section (Right)
   doc.setFillColor(248, 249, 250);
-  doc.roundedRect(rightColX - 3, currentY - 5, (pageWidth / 2) - 15, 40, 2, 2, "F");
+  doc.roundedRect(rightColX - 3, currentY - 5, (pageWidth / 2) - 15, 45, 2, 2, "F");
   
   doc.setTextColor(243, 136, 58);
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
-  doc.text("SHIP TO", rightColX, currentY + 3);
+  doc.text("BUYER", rightColX, currentY + 3);
   
   doc.setTextColor(51, 51, 51);
-  doc.setFontSize(9);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text(order.customer_name, rightColX, currentY + 13);
+  
   doc.setFont("helvetica", "normal");
-  const addressLines = doc.splitTextToSize(order.shipping_address, 80);
-  doc.text(addressLines, rightColX, currentY + 13);
-  
-  currentY += 50;
-  
-  // ========== SELLER INFO SECTION ==========
-  if (order.seller_store_name || order.items[0]?.seller_name) {
-    doc.setFillColor(255, 248, 240);
-    doc.roundedRect(leftColX - 3, currentY - 5, pageWidth - 24, 25, 2, 2, "F");
-    
-    doc.setTextColor(243, 136, 58);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("SELLER INFORMATION", leftColX, currentY + 3);
-    
-    doc.setTextColor(51, 51, 51);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    
-    const sellerName = order.seller_store_name || order.items[0]?.seller_name || "—";
-    const sellerContact = order.seller_contact || order.items[0]?.seller_phone || "";
-    
-    doc.text(`Store: ${sellerName}`, leftColX, currentY + 12);
-    if (sellerContact) {
-      doc.text(`Contact: ${sellerContact}`, rightColX, currentY + 12);
-    }
-    
-    currentY += 30;
+  doc.setFontSize(9);
+  if (order.customer_phone) {
+    doc.text(`Phone: ${order.customer_phone}`, rightColX, currentY + 21);
   }
+  const addressLines = doc.splitTextToSize(order.shipping_address, 80);
+  doc.text(addressLines, rightColX, currentY + 29);
+  
+  currentY += 55;
   
   // ========== TRACKING INFO ==========
   if (order.tracking_id && order.courier_name) {
@@ -188,25 +178,27 @@ export const generateOrderInvoice = (order: InvoiceOrder): void => {
     doc.setTextColor(56, 142, 60);
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
-    doc.text(`📦 Courier: ${order.courier_name}`, leftColX, currentY + 5);
+    doc.text(`Courier: ${order.courier_name}`, leftColX, currentY + 5);
     doc.text(`Tracking ID: ${order.tracking_id}`, rightColX, currentY + 5);
     
     currentY += 23;
   }
   
-  // ========== ITEMS TABLE ==========
-  const tableData = order.items.map((item, index) => [
-    (index + 1).toString(),
-    item.sku || `SKU-${(item.product_id || "").slice(0, 6).toUpperCase()}`,
-    item.title + (item.variant ? `\n(${item.variant})` : ""),
-    item.quantity.toString(),
-    formatPKR(item.price_pkr),
-    formatPKR(item.price_pkr * item.quantity),
-  ]);
+  // ========== PRODUCTS TABLE ==========
+  // Clean table with: Product Name, SKU, Unit Price, Quantity, Subtotal
+  const tableData = order.items.map((item) => {
+    const productName = item.title + (item.variant ? ` (${item.variant})` : "");
+    const sku = item.sku || `SKU-${(item.product_id || "").slice(0, 6).toUpperCase()}`;
+    const unitPrice = formatPKR(item.price_pkr);
+    const quantity = item.quantity.toString();
+    const subtotal = formatPKR(item.price_pkr * item.quantity);
+    
+    return [productName, sku, unitPrice, quantity, subtotal];
+  });
   
   autoTable(doc, {
     startY: currentY,
-    head: [["#", "SKU", "Product Name", "Qty", "Unit Price", "Total"]],
+    head: [["Product Name", "SKU", "Unit Price", "Quantity", "Subtotal"]],
     body: tableData,
     theme: "striped",
     headStyles: {
@@ -214,19 +206,18 @@ export const generateOrderInvoice = (order: InvoiceOrder): void => {
       textColor: [255, 255, 255],
       fontStyle: "bold",
       halign: "center",
-      fontSize: 9,
+      fontSize: 10,
     },
     columnStyles: {
-      0: { halign: "center", cellWidth: 12 },
-      1: { cellWidth: 28, fontSize: 8 },
-      2: { cellWidth: 60 },
-      3: { halign: "center", cellWidth: 15 },
-      4: { halign: "right", cellWidth: 30 },
-      5: { halign: "right", cellWidth: 30, fontStyle: "bold" },
+      0: { cellWidth: 65 },
+      1: { cellWidth: 30, halign: "center", fontSize: 8 },
+      2: { halign: "right", cellWidth: 30 },
+      3: { halign: "center", cellWidth: 20 },
+      4: { halign: "right", cellWidth: 30, fontStyle: "bold" },
     },
     styles: {
       fontSize: 9,
-      cellPadding: 4,
+      cellPadding: 5,
     },
     alternateRowStyles: {
       fillColor: [252, 252, 252],
@@ -286,51 +277,33 @@ export const generateOrderInvoice = (order: InvoiceOrder): void => {
   doc.setFont("helvetica", "normal");
   doc.text(`Payment Method: ${order.payment_method}`, 15, finalY + 5);
   
-  // ========== LOCATIONS SECTION ==========
-  if (order.pickup_location || order.seller_address) {
-    finalY += 25;
-    
-    doc.setFillColor(248, 249, 250);
-    doc.roundedRect(12, finalY - 5, pageWidth - 24, 30, 2, 2, "F");
-    
-    doc.setTextColor(243, 136, 58);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("LOCATION DETAILS", 15, finalY + 5);
-    
-    doc.setTextColor(51, 51, 51);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    
-    if (order.pickup_location) {
-      doc.text(`📍 Pickup: ${order.pickup_location}`, 15, finalY + 15);
-    }
-    doc.text(`📍 Delivery: ${order.shipping_address.split(",")[0]}...`, 15, finalY + 23);
-  }
+  // ========== BRANDED FOOTER ==========
+  const footerY = pageHeight - 40;
   
-  // ========== FOOTER ==========
-  const footerY = pageHeight - 35;
-  
-  // Footer divider
+  // Footer divider - orange line
   doc.setDrawColor(243, 136, 58);
-  doc.setLineWidth(1);
-  doc.line(15, footerY - 10, pageWidth - 15, footerY - 10);
+  doc.setLineWidth(2);
+  doc.line(15, footerY - 15, pageWidth - 15, footerY - 15);
   
-  // Thank you message
-  doc.setFontSize(14);
+  // Main thank you message - FANZON branded
+  doc.setFontSize(13);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(243, 136, 58);
-  doc.text("Thank you for shopping at FANZON!", pageWidth / 2, footerY, { align: "center" });
+  doc.text("Thank you for shopping on FANZON", pageWidth / 2, footerY - 3, { align: "center" });
+  
+  doc.setFontSize(11);
+  doc.setTextColor(51, 51, 51);
+  doc.text("Pakistan's Premium Marketplace", pageWidth / 2, footerY + 6, { align: "center" });
   
   // Contact info
   doc.setFontSize(8);
   doc.setTextColor(128, 128, 128);
-  doc.text("For any queries, contact us at support@fanzon.pk | WhatsApp: +92 300 1234567", pageWidth / 2, footerY + 8, { align: "center" });
+  doc.text("For any queries, contact us at support@fanzon.pk | WhatsApp: +92 300 1234567", pageWidth / 2, footerY + 16, { align: "center" });
   
   // Legal note
   doc.setFontSize(7);
-  doc.text("This is a computer-generated invoice. No signature required.", pageWidth / 2, footerY + 15, { align: "center" });
-  doc.text(`Generated on ${new Date().toLocaleString("en-PK")}`, pageWidth / 2, footerY + 20, { align: "center" });
+  doc.text("This is a computer-generated invoice. No signature required.", pageWidth / 2, footerY + 24, { align: "center" });
+  doc.text(`Generated on ${new Date().toLocaleString("en-PK")}`, pageWidth / 2, footerY + 30, { align: "center" });
   
   // Save PDF
   const fileName = `FANZON_Invoice_${order.order_number || order.id.slice(0, 8)}.pdf`;
