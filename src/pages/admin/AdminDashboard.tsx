@@ -14,6 +14,7 @@ import { useViewMode } from "@/contexts/ViewModeContext";
 import { useAdminDashboardAnalytics } from "@/hooks/useAdminDashboardAnalytics";
 import { useRealtimeKycNotifications } from "@/hooks/useRealtimeKycNotifications";
 import SellerLeaderboard from "@/components/admin/SellerLeaderboard";
+import MaintenanceStatusBanner from "@/components/admin/MaintenanceStatusBanner";
 const formatPKR = (amount: number) => {
   return new Intl.NumberFormat("en-PK", {
     style: "currency",
@@ -117,6 +118,9 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {/* Maintenance Mode Status Banner */}
+      <MaintenanceStatusBanner />
+      
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background border-b border-border px-4 py-3">
         <div className="flex items-center justify-between">
