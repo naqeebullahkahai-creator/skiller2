@@ -179,9 +179,11 @@ const CustomerAuth = () => {
       <div className="w-full max-w-md animate-fade-in">
         {/* Logo Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4 shadow-lg shadow-primary/25">
-            <span className="text-2xl font-bold text-primary-foreground">F</span>
-          </div>
+          <img 
+            src="/fanzon-icon-512.png" 
+            alt="FANZON" 
+            className="w-20 h-20 mx-auto mb-4 rounded-2xl shadow-lg shadow-primary/25"
+          />
           <h1 className="text-3xl font-bold text-foreground tracking-tight">FANZON</h1>
           <p className="text-muted-foreground mt-1 text-sm">Pakistan's Premier Marketplace</p>
         </div>
