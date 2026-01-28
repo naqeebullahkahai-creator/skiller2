@@ -12,6 +12,7 @@ export interface CustomerWithDetails {
   orders_count: number;
   total_spent: number;
   wallet_balance: number;
+  display_id: string | null;
 }
 
 export const useAdminCustomers = (searchQuery?: string) => {
@@ -26,7 +27,8 @@ export const useAdminCustomers = (searchQuery?: string) => {
         .order("created_at", { ascending: false });
 
       if (searchQuery) {
-        query = query.or(`full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
+        // Search by name, email, or display_id (FZN-USR-XXXXXX)
+        query = query.or(`full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,display_id.ilike.%${searchQuery}%`);
       }
 
       const { data: profiles, error: profilesError } = await query;
@@ -70,6 +72,7 @@ export const useAdminCustomers = (searchQuery?: string) => {
             orders_count: userOrders.length,
             total_spent: userOrders.reduce((sum, o) => sum + Number(o.total_amount_pkr || 0), 0),
             wallet_balance: Number(userWallet?.balance || 0),
+            display_id: profile.display_id || null,
           };
         }) || [];
 
