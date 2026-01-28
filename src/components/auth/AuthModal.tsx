@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { checkEmailRoleConflict } from "@/utils/roleValidation";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -86,6 +87,20 @@ const AuthModal = () => {
       if (authModalMode === "login") {
         result = await login(formData.email, formData.password);
       } else {
+        // Check for role conflict before signup
+        const targetRole = isSeller ? "seller" : "customer";
+        const roleConflict = await checkEmailRoleConflict(formData.email, targetRole);
+        
+        if (roleConflict.hasConflict) {
+          toast({
+            title: "Email Already Registered",
+            description: `This email is already registered as a ${roleConflict.displayName}. Please use a different email.`,
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        
         result = await signup(formData.name, formData.email, formData.password, isSeller);
       }
 

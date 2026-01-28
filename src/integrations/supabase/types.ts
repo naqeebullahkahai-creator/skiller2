@@ -1853,6 +1853,16 @@ export type Database = {
         }
         Returns: Json
       }
+      check_email_role_conflict: {
+        Args: {
+          p_email: string
+          p_target_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: {
+          existing_role: Database["public"]["Enums"]["app_role"]
+          has_conflict: boolean
+        }[]
+      }
       decrease_product_stock: {
         Args: { p_product_id: string; p_quantity: number }
         Returns: boolean
@@ -1867,6 +1877,10 @@ export type Database = {
       }
       generate_order_number: { Args: never; Returns: string }
       generate_product_slug: { Args: { title: string }; Returns: string }
+      get_role_display_name: {
+        Args: { p_role: Database["public"]["Enums"]["app_role"] }
+        Returns: string
+      }
       get_seller_commission_rate: {
         Args: { p_seller_id: string }
         Returns: number
