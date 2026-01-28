@@ -771,6 +771,7 @@ export type Database = {
           order_status: Database["public"]["Enums"]["order_status"]
           payment_method: string
           payment_status: Database["public"]["Enums"]["payment_status"]
+          shipped_at: string | null
           shipping_address: string
           total_amount_pkr: number
           tracking_id: string | null
@@ -793,6 +794,7 @@ export type Database = {
           order_status?: Database["public"]["Enums"]["order_status"]
           payment_method?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          shipped_at?: string | null
           shipping_address: string
           total_amount_pkr: number
           tracking_id?: string | null
@@ -815,6 +817,7 @@ export type Database = {
           order_status?: Database["public"]["Enums"]["order_status"]
           payment_method?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
+          shipped_at?: string | null
           shipping_address?: string
           total_amount_pkr?: number
           tracking_id?: string | null

@@ -30,6 +30,7 @@ export interface Order {
   updated_at: string;
   tracking_id: string | null;
   courier_name: string | null;
+  shipped_at: string | null;
 }
 
 interface UseOrdersOptions {
