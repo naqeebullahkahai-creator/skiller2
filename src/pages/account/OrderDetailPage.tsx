@@ -30,18 +30,18 @@ import {
   CreditCard,
   ChevronLeft,
   CheckCircle,
-  Circle,
   Clock,
   Star,
   Loader2,
   PackageCheck,
-  Home,
   FileText,
   XCircle,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
 import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
+import OrderStatusDropdown from "@/components/orders/OrderStatusDropdown";
 
 interface OrderItem {
   product_id: string;
@@ -96,7 +96,7 @@ const statusColors: Record<string, string> = {
 const OrderDetailPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, role, isSuperAdmin } = useAuth();
   const { toast } = useToast();
   const { canCancelOrder } = useOrderCancellation();
 
@@ -111,6 +111,9 @@ const OrderDetailPage = () => {
   const [rating, setRating] = useState(5);
   const [reviewText, setReviewText] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  
+  // Check if user can manage orders (admin or seller)
+  const canManageOrder = isSuperAdmin || role === "admin" || role === "seller";
 
   useEffect(() => {
     if (user && orderId) {
@@ -153,12 +156,19 @@ const OrderDetailPage = () => {
 
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
+      
+      // Admins and sellers can view any order, customers only their own
+      let query = supabase
         .from("orders")
         .select("*")
-        .eq("id", orderId)
-        .eq("customer_id", user.id)
-        .maybeSingle();
+        .eq("id", orderId);
+      
+      // Only filter by customer_id for customers
+      if (!canManageOrder) {
+        query = query.eq("customer_id", user.id);
+      }
+      
+      const { data, error } = await query.maybeSingle();
 
       if (error) throw error;
 
@@ -350,10 +360,30 @@ const OrderDetailPage = () => {
       {/* Order Status Tracker */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Truck size={20} />
-            Order Status
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Truck size={20} />
+              Order Status
+            </CardTitle>
+            
+            {/* Admin/Seller Status Dropdown */}
+            {canManageOrder && order && !isCancelled && (
+              <div className="flex items-center gap-2">
+                <Settings size={16} className="text-muted-foreground" />
+                <OrderStatusDropdown
+                  orderId={order.id}
+                  orderNumber={order.order_number || `#${order.id.slice(0, 8)}`}
+                  currentStatus={order.order_status}
+                  paymentStatus={order.payment_status}
+                  totalAmount={order.total_amount_pkr}
+                  role={isSuperAdmin || role === "admin" ? "admin" : "seller"}
+                  onStatusChange={(newStatus) => {
+                    setOrder(prev => prev ? { ...prev, order_status: newStatus } : null);
+                  }}
+                />
+              </div>
+            )}
+          </div>
           {isCancelled ? (
             <Badge variant="destructive">Order Cancelled</Badge>
           ) : (

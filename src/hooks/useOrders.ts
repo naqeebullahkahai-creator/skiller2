@@ -48,13 +48,12 @@ export const useOrders = ({ role, sellerId }: UseOrdersOptions) => {
 
     try {
       setIsLoading(true);
+      // Fetch all orders - search by order_number (FZN-ORD-XXXXX) is done client-side in the UI
       let query = supabase
         .from("orders")
         .select("*")
         .order("created_at", { ascending: false });
 
-      // For sellers, filter by their products in the order items
-      // This is a simplified approach - in production you'd use a join or view
       const { data, error } = await query;
 
       if (error) throw error;

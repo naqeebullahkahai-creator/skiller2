@@ -52,12 +52,16 @@ const OrderManagement = () => {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [selectedOrderForCancel, setSelectedOrderForCancel] = useState<Order | null>(null);
 
-  // Filter orders
+  // Filter orders - supports FZN-ORD-XXXXX format search
   const filteredOrders = orders
-    .filter((order) =>
-      (order.order_number || order.id).toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer_name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    .filter((order) => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        (order.order_number || "").toLowerCase().includes(searchLower) ||
+        order.id.toLowerCase().includes(searchLower) ||
+        order.customer_name.toLowerCase().includes(searchLower)
+      );
+    })
     .filter((order) => statusFilter === "all" || order.order_status === statusFilter);
 
   const handleStatusChange = async (order: Order, newStatus: string) => {

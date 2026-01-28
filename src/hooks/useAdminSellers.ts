@@ -17,6 +17,7 @@ export interface SellerWithDetails {
   wallet_balance: number;
   total_earnings: number;
   total_orders: number;
+  display_id: string | null;
 }
 
 export const useAdminSellers = (searchQuery?: string) => {
@@ -99,18 +100,20 @@ export const useAdminSellers = (searchQuery?: string) => {
             wallet_balance: Number(wallet?.current_balance || 0),
             total_earnings: Number(wallet?.total_earnings || 0),
             total_orders: orderCountBySeller[seller.user_id] || 0,
+            display_id: seller.display_id || null,
           };
         })
         .filter((seller): seller is NonNullable<typeof seller> => seller !== null) as SellerWithDetails[];
 
-      // Apply search filter
+      // Apply search filter - include display_id (FZN-SEL-XXXXXX)
       if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+        const searchLower = searchQuery.toLowerCase();
         return sellersWithDetails.filter(
           (seller) =>
-            seller.shop_name?.toLowerCase().includes(query) ||
-            seller.full_name?.toLowerCase().includes(query) ||
-            seller.city?.toLowerCase().includes(query)
+            seller.shop_name?.toLowerCase().includes(searchLower) ||
+            seller.full_name?.toLowerCase().includes(searchLower) ||
+            seller.city?.toLowerCase().includes(searchLower) ||
+            seller.display_id?.toLowerCase().includes(searchLower)
         );
       }
 
