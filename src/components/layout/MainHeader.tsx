@@ -1,4 +1,4 @@
-import { Search, ChevronDown, Menu, X } from "lucide-react";
+import { Search, ChevronDown, Menu, X, MessageCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,12 +19,14 @@ import SearchSuggestions from "@/components/search/SearchSuggestions";
 import AnimatedProfileMenu from "@/components/navigation/AnimatedProfileMenu";
 import CategoryAccordion from "@/components/navigation/CategoryAccordion";
 import FanzonLogo from "@/components/brand/FanzonLogo";
+import { useUnreadCount } from "@/hooks/useMessaging";
 
 const MainHeader = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { t, isRTL } = useLanguage();
   const { data: categories } = useMainCategories();
+  const { unreadCount } = useUnreadCount();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(t("nav.all_categories"));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -113,6 +115,22 @@ const MainHeader = () => {
             <div className="hidden md:block">
               <LanguageSwitcher variant="header" />
             </div>
+            
+            {/* Messages Icon - Desktop */}
+            {isAuthenticated && (
+              <Link 
+                to="/account/messages" 
+                className="hidden md:flex relative p-2 text-primary-foreground hover:bg-primary-foreground/10 rounded-lg transition-colors"
+                title="Messages"
+              >
+                <MessageCircle size={22} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-fanzon-star text-foreground text-[10px] font-bold rounded-full px-1">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+            )}
             
             {/* Notification Bell */}
             {isAuthenticated && <NotificationBell />}
