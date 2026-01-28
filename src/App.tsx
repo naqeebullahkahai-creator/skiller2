@@ -100,6 +100,7 @@ import SellerAddProductPage from "./pages/seller/SellerAddProductPage";
 import SellerReturnsPage from "./pages/seller/SellerReturnsPage";
 import SellerQAPage from "./pages/seller/SellerQAPage";
 import SellerCancelledOrdersPage from "./pages/seller/SellerCancelledOrdersPage";
+import SellerSettingsPage from "./pages/seller/SellerSettingsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -279,7 +280,7 @@ const App = () => (
                           <Route path="/seller/analytics" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Analytics"><VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
                           <Route path="/seller/returns" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Returns"><VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
                           <Route path="/seller/cancelled" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Cancelled Orders"><VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/settings" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Settings"><AdminSettings /></SellerPageWrapper></ProtectedRoute>} />
+                          <Route path="/seller/settings" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Settings"><SellerSettingsPage /></SellerPageWrapper></ProtectedRoute>} />
 
                           {/* Legacy route redirects */}
                           <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
