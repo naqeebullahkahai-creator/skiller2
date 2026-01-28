@@ -42,10 +42,10 @@ const AdminUserDirectory = () => {
           </h1>
           <p className="text-muted-foreground">View and manage all customers (excludes sellers)</p>
         </div>
-        <div className="relative w-full sm:w-72">
+        <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name or email..."
+            placeholder="Search by ID, name or email (FZN-USR-...)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -115,6 +115,7 @@ const AdminUserDirectory = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>ID</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead className="hidden md:table-cell">Orders</TableHead>
                 <TableHead className="hidden md:table-cell">Spent</TableHead>
@@ -137,13 +138,16 @@ const AdminUserDirectory = () => {
                 ))
               ) : customers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     No customers found
                   </TableCell>
                 </TableRow>
               ) : (
                 customers.map((user) => (
                   <TableRow key={user.id}>
+                    <TableCell className="font-mono text-xs text-primary">
+                      {user.display_id || `FZN-USR-${user.id.slice(0, 6).toUpperCase()}`}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 shrink-0">
