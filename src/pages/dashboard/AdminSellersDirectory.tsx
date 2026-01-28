@@ -56,10 +56,10 @@ const AdminSellersDirectory = () => {
           </h1>
           <p className="text-muted-foreground">Manage all registered sellers and their stores</p>
         </div>
-        <div className="relative w-full sm:w-72">
+        <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by shop name or email..."
+            placeholder="Search by ID, shop or email (FZN-SEL-...)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -129,6 +129,7 @@ const AdminSellersDirectory = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>ID</TableHead>
                 <TableHead>Seller / Shop</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="hidden md:table-cell">Products</TableHead>
@@ -153,13 +154,16 @@ const AdminSellersDirectory = () => {
                 ))
               ) : sellers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     No sellers found
                   </TableCell>
                 </TableRow>
               ) : (
                 sellers.map((seller) => (
                   <TableRow key={seller.id}>
+                    <TableCell className="font-mono text-xs text-primary">
+                      {seller.display_id || `FZN-SEL-${seller.id.slice(0, 5).toUpperCase()}`}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 shrink-0">
