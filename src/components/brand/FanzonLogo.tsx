@@ -22,26 +22,30 @@ const FanzonLogo = ({ className, textClassName, size = "md" }: FanzonLogoProps) 
         FANZON
       </span>
       
-      {/* Amazon-style curved arrow from F to N */}
+      {/* Amazon-style smile arrow from F to N */}
       <svg
-        viewBox="0 0 70 14"
+        viewBox="0 0 70 16"
         width={config.arrow.width}
         height={config.arrow.height}
-        className="mt-[-2px]"
+        className="mt-[-3px]"
         aria-hidden="true"
       >
-        {/* Curved arrow path - using orange accent color */}
+        {/* Smooth smile curve - Amazon style */}
         <path
-          d="M5 8 Q35 16 62 6"
+          d="M3 4 Q35 14 58 4"
           fill="none"
-          stroke="hsl(var(--chart-4))"
-          strokeWidth="2.5"
+          stroke="hsl(var(--fanzon-orange))"
+          strokeWidth="3"
           strokeLinecap="round"
         />
-        {/* Arrow head */}
-        <polygon
-          points="58,2 65,6 58,9"
-          fill="hsl(var(--chart-4))"
+        {/* Arrow head pointing right-up */}
+        <path
+          d="M54 6 L62 3 L56 10"
+          fill="none"
+          stroke="hsl(var(--fanzon-orange))"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
     </div>
