@@ -67,6 +67,7 @@ interface Order {
   updated_at: string;
   tracking_id: string | null;
   courier_name: string | null;
+  shipped_at: string | null;
   cancellation_reason?: string | null;
 }
 
@@ -351,6 +352,20 @@ const OrderDetailPage = () => {
                 <p className="text-sm text-muted-foreground">
                   Tracking ID: <span className="font-medium text-foreground">{order.tracking_id}</span>
                 </p>
+                {order.shipped_at && (
+                  <p className="text-sm text-muted-foreground">
+                    Shipped on: <span className="font-medium text-foreground">
+                      {new Date(order.shipped_at).toLocaleDateString("en-PK", {
+                        weekday: "short",
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </p>
+                )}
               </div>
             </div>
           </CardContent>

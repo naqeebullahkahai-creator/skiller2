@@ -239,6 +239,7 @@ const App = () => (
                           <Route path="/admin/orders" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Orders"><AdminOrderManagement /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/cancellations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancellations"><AdminCancellationsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/cancelled" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancelled Orders"><AdminCancelledOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/orders/cancelled" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancelled Orders"><AdminCancelledOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/returns" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Returns"><AdminReturnsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/products" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Products"><AdminProductCatalog /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/categories" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Categories"><AdminCategoryManager /></AdminPageWrapper></ProtectedRoute>} />
