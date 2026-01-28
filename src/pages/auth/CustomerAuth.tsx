@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
+import { checkEmailRoleConflict } from "@/utils/roleValidation";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -133,6 +134,19 @@ const CustomerAuth = () => {
           });
         }
       } else {
+        // Check for role conflict before signup
+        const roleConflict = await checkEmailRoleConflict(formData.email, "customer");
+        
+        if (roleConflict.hasConflict) {
+          toast({
+            title: "Email Already Registered",
+            description: `This email is already registered as a ${roleConflict.displayName}. Please use a different email.`,
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+        
         const result = await signup(formData.name, formData.email, formData.password, false);
         
         if (result.success) {

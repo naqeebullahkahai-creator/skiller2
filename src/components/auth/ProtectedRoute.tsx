@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { useToast } from "@/hooks/use-toast";
+import { canAccessAccountPage, getRoleRedirectPath } from "@/utils/roleValidation";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -34,6 +35,15 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
         toast({
           title: "Access Denied",
           description: "This section is for sellers only. Please use the customer area.",
+          variant: "destructive",
+        });
+      }
+      // Check for customer account pages access by seller
+      else if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
+        hasShownToast.current = true;
+        toast({
+          title: "Permission Denied",
+          description: "This section is for customers only. Please use your Seller Dashboard.",
           variant: "destructive",
         });
       }
@@ -69,6 +79,12 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
     }
   }
 
+  // Check role-based session locking for customer account pages
+  // If a seller tries to access customer-only pages, redirect them to their dashboard
+  if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
+    return <Navigate to="/seller/dashboard" replace />;
+  }
+
   // If specific roles are required, check if user has one of them
   if (allowedRoles && allowedRoles.length > 0) {
     // For admin role, must also be super admin
@@ -78,13 +94,8 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
     
     if (!role || !allowedRoles.includes(role)) {
       // User doesn't have required role - redirect based on their actual role
-      if (role === "seller") {
-        return <Navigate to="/seller/dashboard" replace />;
-      } else if (role === "admin") {
-        return <Navigate to="/admin/dashboard" replace />;
-      } else {
-        return <Navigate to="/" replace />;
-      }
+      const redirectPath = getRoleRedirectPath(role);
+      return <Navigate to={redirectPath} replace />;
     }
   }
 
