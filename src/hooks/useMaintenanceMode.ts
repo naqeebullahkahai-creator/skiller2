@@ -1,9 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 export const useMaintenanceMode = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: isMaintenanceMode, isLoading } = useQuery({
     queryKey: ['maintenance-mode'],
@@ -31,14 +32,27 @@ export const useMaintenanceMode = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return { data, enabled };
     },
-    onSuccess: (_, enabled) => {
+    onSuccess: ({ enabled }) => {
       queryClient.invalidateQueries({ queryKey: ['maintenance-mode'] });
-      toast.success(enabled ? 'Maintenance mode enabled' : 'Maintenance mode disabled');
+      
+      // Show prominent toast notification
+      toast({
+        title: enabled ? "🔧 Maintenance Mode ENABLED" : "✅ Maintenance Mode DISABLED",
+        description: enabled 
+          ? "All non-admin users are now being redirected to the maintenance page. The storefront is offline."
+          : "The storefront is now live. All users can access the platform.",
+        variant: enabled ? "destructive" : "default",
+        duration: 5000,
+      });
     },
     onError: (error: Error) => {
-      toast.error(`Failed to toggle maintenance mode: ${error.message}`);
+      toast({
+        title: "Failed to Toggle Maintenance Mode",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
