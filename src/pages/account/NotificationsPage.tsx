@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Bell, Package, TrendingDown, Megaphone, Info, Check, ChevronLeft, Trash2 } from "lucide-react";
+import { Bell, Package, TrendingDown, Megaphone, Info, Check, ChevronLeft } from "lucide-react";
+import EmptyState from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from "date-fns";
@@ -149,17 +150,16 @@ const NotificationsPage = () => {
             ))}
           </div>
         ) : filteredNotifications.length === 0 ? (
-          <div className="text-center py-12">
-            <Bell size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="font-semibold mb-1">
-              {filter === "unread" ? "No unread notifications" : "No notifications yet"}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {filter === "unread" 
-                ? "You've read all your notifications!"
-                : "We'll notify you about orders, messages, and promotions."}
-            </p>
-          </div>
+          <EmptyState
+            type="default"
+            title={filter === "unread" ? "No unread notifications" : "No notifications yet"}
+            description={filter === "unread" 
+              ? "You've read all your notifications! Check back later."
+              : "We'll notify you about orders, messages, and promotions."}
+            actionLabel="Browse Products"
+            actionHref="/products"
+            icon={<Bell size={56} strokeWidth={1.5} />}
+          />
         ) : (
           <div className="space-y-2">
             {filteredNotifications.map((notification) => (
