@@ -1944,6 +1944,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      adjust_customer_wallet_balance: {
+        Args: {
+          p_adjustment_type: string
+          p_admin_id: string
+          p_amount: number
+          p_customer_id: string
+          p_reason: string
+        }
+        Returns: Json
+      }
+      adjust_seller_wallet_balance: {
+        Args: {
+          p_adjustment_type: string
+          p_admin_id: string
+          p_amount: number
+          p_reason: string
+          p_seller_id: string
+        }
+        Returns: Json
+      }
       approve_deposit_request: {
         Args: {
           p_admin_id: string

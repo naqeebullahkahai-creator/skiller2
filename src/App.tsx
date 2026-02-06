@@ -88,6 +88,8 @@ import AdminSubscriptionPage from "./pages/dashboard/AdminSubscriptionPage";
 import AdminDepositSettings from "./pages/dashboard/AdminDepositSettings";
 import AdminSellerDepositsPage from "./pages/dashboard/AdminSellerDepositsPage";
 import AdminUserDepositsPage from "./pages/dashboard/AdminUserDepositsPage";
+import AdminBalanceAdjustmentsPage from "./pages/dashboard/AdminBalanceAdjustmentsPage";
+import AdminPaymentMethodsPage from "./pages/dashboard/AdminPaymentMethodsPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -265,6 +267,8 @@ const App = () => (
                           <Route path="/admin/deposits/sellers" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Deposits"><AdminSellerDepositsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/deposits/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="User Deposits"><AdminUserDepositsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/deposits/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Deposit Settings"><AdminDepositSettings /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/balance-adjustments" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Balance Adjustments"><AdminBalanceAdjustmentsPage /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/payment-methods" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Payment Methods"><AdminPaymentMethodsPage /></AdminPageWrapper></ProtectedRoute>} />
 
                           {/* NEW Seller Routes - /seller/* */}
                           <Route 
