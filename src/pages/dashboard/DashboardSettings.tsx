@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Lock, Store, User, Globe, Save, Wrench, AlertTriangle } from "lucide-react";
+import { Bell, Lock, Store, User, Globe, Save, Wrench, AlertTriangle, Megaphone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ import {
 import { useDashboard } from "@/contexts/DashboardContext";
 import { useToast } from "@/hooks/use-toast";
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
+import SystemAnnouncementManager from "@/components/admin/SystemAnnouncementManager";
 
 const DashboardSettings = () => {
   const { role } = useDashboard();
@@ -296,6 +297,9 @@ const DashboardSettings = () => {
         {role === "admin" && (
           <TabsContent value="general">
             <div className="space-y-6">
+              {/* System Announcement */}
+              <SystemAnnouncementManager />
+
               {/* Maintenance Mode Card */}
               <Card className={isMaintenanceMode ? "border-destructive" : ""}>
                 <CardHeader>

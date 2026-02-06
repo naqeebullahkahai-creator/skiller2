@@ -113,6 +113,8 @@ import SellerReturnsPage from "./pages/seller/SellerReturnsPage";
 import SellerQAPage from "./pages/seller/SellerQAPage";
 import SellerCancelledOrdersPage from "./pages/seller/SellerCancelledOrdersPage";
 import SellerSettingsPage from "./pages/seller/SellerSettingsPage";
+import TrackOrder from "./pages/TrackOrder";
+import SystemAnnouncementBanner from "./components/admin/SystemAnnouncementBanner";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -169,6 +171,7 @@ const App = () => (
                           <Sonner />
                           <OfflineIndicator />
                           <BrowserRouter>
+                          <SystemAnnouncementBanner />
                           <BackToDashboardBar />
                           <InstallPrompt />
                           <NotificationPermissionBanner />
@@ -209,6 +212,7 @@ const App = () => (
                           <Route path="/compare" element={<ComparePage />} />
                           <Route path="/help" element={<HelpCenter />} />
                           <Route path="/contact" element={<ContactUs />} />
+                          <Route path="/track-order" element={<TrackOrder />} />
                           
                           {/* Checkout Routes */}
                           <Route 
