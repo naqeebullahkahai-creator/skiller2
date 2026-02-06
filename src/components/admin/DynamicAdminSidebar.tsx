@@ -105,6 +105,8 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
       feature: 'orders',
       children: [
         { name: "All Orders", href: "/admin/orders", icon: ClipboardList, feature: 'orders' },
+        { name: "Direct Store Orders", href: "/admin/orders/direct", icon: Store, feature: 'orders' },
+        { name: "Vendor Orders", href: "/admin/orders/vendor", icon: Users, feature: 'orders' },
         { name: "Cancellations", href: "/admin/cancellations", icon: XCircle, feature: 'orders' },
       ],
     },
