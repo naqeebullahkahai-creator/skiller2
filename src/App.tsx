@@ -38,8 +38,10 @@ import Forbidden from "./pages/Forbidden";
 import HelpCenter from "./pages/HelpCenter";
 import ContactUs from "./pages/ContactUs";
 import ChatWidget from "./components/chat/ChatWidget";
+import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton";
 import InstallPrompt from "./components/pwa/InstallPrompt";
 import NotificationPermissionBanner from "./components/notifications/NotificationPermissionBanner";
+import { useAdminInactivityLogout } from "./hooks/useAdminInactivityLogout";
 
 // Account Pages
 import AccountLayout from "./components/account/AccountLayout";
@@ -144,6 +146,12 @@ const SellerPageWrapper = ({ children, title }: { children: React.ReactNode; tit
   </DashboardProvider>
 );
 
+// Wrapper to call hooks inside AuthProvider
+const AdminInactivityGuard = () => {
+  useAdminInactivityLogout();
+  return null;
+};
+
 const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
@@ -164,8 +172,10 @@ const App = () => (
                           <BackToDashboardBar />
                           <InstallPrompt />
                           <NotificationPermissionBanner />
+                          <AdminInactivityGuard />
                           <AuthModal />
                           <ChatWidget />
+                          <WhatsAppFloatingButton />
                           <ComparisonBar />
                           <VisualEditToggle />
                           <Routes>
