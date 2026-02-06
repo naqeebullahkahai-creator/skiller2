@@ -24,6 +24,7 @@ import { useSellerWallet } from "@/hooks/useSellerWallet";
 import { useOrders } from "@/hooks/useOrders";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import PaymentPendingAlert from "@/components/seller/PaymentPendingAlert";
 
 interface QuickActionCardProps {
   icon: React.ReactNode;
@@ -201,6 +202,9 @@ const SellerDashboardHome = () => {
 
   return (
     <div className="space-y-6 pb-6">
+      {/* Payment Pending Alert */}
+      <PaymentPendingAlert />
+
       {/* Welcome Header */}
       <div className="bg-gradient-to-r from-primary to-primary/80 rounded-xl p-5 text-white">
         <h1 className="text-xl font-bold mb-1">Welcome to Seller Center</h1>

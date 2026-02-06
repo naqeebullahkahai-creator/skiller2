@@ -1970,6 +1970,10 @@ export type Database = {
         Args: { p_amount: number; p_order_id: string; p_seller_id: string }
         Returns: undefined
       }
+      process_subscription_deduction: {
+        Args: { p_seller_id: string }
+        Returns: Json
+      }
       restock_order_items: { Args: { p_order_id: string }; Returns: boolean }
       validate_voucher: {
         Args: { p_code: string; p_order_total: number; p_user_id: string }
@@ -2029,6 +2033,7 @@ export type Database = {
         | "withdrawal"
         | "refund_deduction"
         | "adjustment"
+        | "platform_fee"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2208,6 +2213,7 @@ export const Constants = {
         "withdrawal",
         "refund_deduction",
         "adjustment",
+        "platform_fee",
       ],
     },
   },
