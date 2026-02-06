@@ -202,9 +202,6 @@ const App = () => (
                           {/* Password Reset Route */}
                           <Route path="/reset-password" element={<ResetPassword />} />
                           
-                          {/* Password Reset Route */}
-                          <Route path="/reset-password" element={<ResetPassword />} />
-                          
                           <Route path="/products" element={<ProductListing />} />
                           <Route path="/category/:slug" element={<CategoryPage />} />
                           <Route path="/search" element={<ProductListing />} />

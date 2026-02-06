@@ -30,6 +30,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Plus, Trash2, Star, Loader2, Phone, Home, Pencil, Building2, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
+import EmptyState from "@/components/ui/empty-state";
 
 const addressSchema = z.object({
   full_name: z.string().min(3, "Full name must be at least 3 characters").max(100),
@@ -202,17 +203,14 @@ const AddressesPage = () => {
       </CardHeader>
       <CardContent>
         {addresses.length === 0 ? (
-          <div className="text-center py-12">
-            <Home size={64} className="mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No addresses saved</h2>
-            <p className="text-muted-foreground mb-6">
-              Add an address to make checkout faster.
-            </p>
-            <Button onClick={openAddModal}>
-              <Plus size={16} className="mr-2" />
-              Add Your First Address
-            </Button>
-          </div>
+          <EmptyState
+            type="default"
+            title="No addresses saved"
+            description="Add a delivery address to make checkout faster and easier."
+            actionLabel="Add Your First Address"
+            onAction={openAddModal}
+            icon={<MapPin size={56} strokeWidth={1.5} />}
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {addresses.map((address) => {

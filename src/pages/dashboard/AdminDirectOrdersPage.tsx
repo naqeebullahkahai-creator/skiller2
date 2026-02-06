@@ -208,7 +208,17 @@ const AdminDirectOrdersPage = () => {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {filteredOrders.length === 0 && <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No direct store orders found</TableCell></TableRow>}
+                  {filteredOrders.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="h-32">
+                        <div className="flex flex-col items-center justify-center text-center py-6">
+                          <Store className="h-10 w-10 text-muted-foreground mb-2" />
+                          <p className="font-medium text-foreground">No direct store orders found</p>
+                          <p className="text-sm text-muted-foreground mt-1">Orders for your own products will appear here.</p>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>

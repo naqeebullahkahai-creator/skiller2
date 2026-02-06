@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ChevronRight, ShoppingBag, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import EmptyState from "@/components/ui/empty-state";
 
 interface OrderItem {
   product_id: string;
@@ -147,16 +148,7 @@ const OrdersPage = () => {
       </CardHeader>
       <CardContent>
         {orders.length === 0 ? (
-          <div className="text-center py-12">
-            <ShoppingBag size={64} className="mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
-            <p className="text-muted-foreground mb-6">
-              You haven't placed any orders yet. Start shopping!
-            </p>
-            <Button asChild>
-              <Link to="/products">Browse Products</Link>
-            </Button>
-          </div>
+          <EmptyState type="orders" />
         ) : (
           <div className="space-y-4">
             {orders.map((order) => {
