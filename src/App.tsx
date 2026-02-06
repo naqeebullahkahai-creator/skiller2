@@ -52,11 +52,13 @@ import CustomerMessagesPage from "./pages/account/MessagesPage";
 import NotificationsPage from "./pages/account/NotificationsPage";
 
 // New Mobile-First Dashboard Pages
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import SellerDashboard from "./pages/seller/SellerDashboard";
+import AdminDashboardLayout from "./components/dashboard/AdminDashboardLayout";
+import SellerDashboardLayout from "./components/dashboard/SellerDashboardLayout";
 import DashboardPageWrapper from "./components/layout/DashboardPageWrapper";
 import { DashboardProvider } from "@/contexts/DashboardContext";
 import { PermissionsProvider } from "@/contexts/PermissionsContext";
+import AdminDashboardHome from "./pages/dashboard/AdminDashboardHome";
+import SellerDashboardHome from "./pages/seller/SellerDashboardHome";
 
 // Admin Sub-Pages (reused from old structure)
 import AdminOrderManagement from "./pages/dashboard/OrderManagement";
@@ -229,81 +231,66 @@ const App = () => (
                           </Route>
                           <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
                           
-                          {/* NEW Admin Routes - /admin/* */}
-                          <Route 
-                            path="/admin/dashboard" 
-                            element={
-                              <ProtectedRoute allowedRoles={["admin"]}>
-                                <PermissionsProvider>
-                                  <AdminDashboard />
-                                </PermissionsProvider>
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route path="/admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Customers"><AdminUserDirectory /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/sellers" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Sellers"><AdminSellersDirectory /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/sellers/:sellerId" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Details"><AdminSellerDetailPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/roles" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Roles & Permissions"><AdminRolesPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/orders" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Orders"><AdminOrderManagement /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/orders/direct" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Direct Store Orders"><AdminDirectOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/orders/vendor" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Vendor Orders"><AdminVendorOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/cancellations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancellations"><AdminCancellationsPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/cancelled" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancelled Orders"><AdminCancelledOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/orders/cancelled" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancelled Orders"><AdminCancelledOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/returns" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Returns"><AdminReturnsPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/products" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Products"><AdminProductCatalog /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/categories" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Categories"><AdminCategoryManager /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/approvals" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Product Approvals"><AdminProductApprovals /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/seller-kyc" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller KYC"><AdminSellerKyc /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/seller-kyc/:sellerId" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Details"><AdminSellerDetail /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/payouts" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Payouts"><AdminPayoutManagement /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/subscriptions" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Subscriptions"><AdminSubscriptionPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/flash-sales" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Flash Sales"><FlashSaleManager /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/flash-nominations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Flash Nominations"><AdminFlashNominations /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/reviews" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Reviews"><AdminReviewsPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/qa" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Q&A Moderation"><AdminQAModerationPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/vouchers" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Vouchers"><VoucherManager /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/banners" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Banners"><BannerManager /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/bulk-uploads" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Bulk Uploads"><AdminBulkUploadLogs /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Analytics"><AdminAnalyticsPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/site-settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Site Settings"><SocialSettingsPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Settings"><AdminSettings /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/deposits/sellers" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Deposits"><AdminSellerDepositsPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/deposits/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="User Deposits"><AdminUserDepositsPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/deposits/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Deposit Settings"><AdminDepositSettings /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/balance-adjustments" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Balance Adjustments"><AdminBalanceAdjustmentsPage /></AdminPageWrapper></ProtectedRoute>} />
-                          <Route path="/admin/payment-methods" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Payment Methods"><AdminPaymentMethodsPage /></AdminPageWrapper></ProtectedRoute>} />
+                          {/* Admin Routes - Nested under sidebar layout */}
+                          <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboardLayout /></ProtectedRoute>}>
+                            <Route path="dashboard" element={<AdminDashboardHome />} />
+                            <Route path="users" element={<AdminUserDirectory />} />
+                            <Route path="sellers" element={<AdminSellersDirectory />} />
+                            <Route path="sellers/:sellerId" element={<AdminSellerDetailPage />} />
+                            <Route path="roles" element={<AdminRolesPage />} />
+                            <Route path="orders" element={<AdminOrderManagement />} />
+                            <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
+                            <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />
+                            <Route path="cancellations" element={<AdminCancellationsPage />} />
+                            <Route path="cancelled" element={<AdminCancelledOrdersPage />} />
+                            <Route path="orders/cancelled" element={<AdminCancelledOrdersPage />} />
+                            <Route path="returns" element={<AdminReturnsPage />} />
+                            <Route path="products" element={<AdminProductCatalog />} />
+                            <Route path="categories" element={<AdminCategoryManager />} />
+                            <Route path="approvals" element={<AdminProductApprovals />} />
+                            <Route path="seller-kyc" element={<AdminSellerKyc />} />
+                            <Route path="seller-kyc/:sellerId" element={<AdminSellerDetail />} />
+                            <Route path="payouts" element={<AdminPayoutManagement />} />
+                            <Route path="subscriptions" element={<AdminSubscriptionPage />} />
+                            <Route path="flash-sales" element={<FlashSaleManager />} />
+                            <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                            <Route path="reviews" element={<AdminReviewsPage />} />
+                            <Route path="qa" element={<AdminQAModerationPage />} />
+                            <Route path="vouchers" element={<VoucherManager />} />
+                            <Route path="banners" element={<BannerManager />} />
+                            <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
+                            <Route path="analytics" element={<AdminAnalyticsPage />} />
+                            <Route path="site-settings" element={<SocialSettingsPage />} />
+                            <Route path="settings" element={<AdminSettings />} />
+                            <Route path="deposits/sellers" element={<AdminSellerDepositsPage />} />
+                            <Route path="deposits/users" element={<AdminUserDepositsPage />} />
+                            <Route path="deposits/settings" element={<AdminDepositSettings />} />
+                            <Route path="balance-adjustments" element={<AdminBalanceAdjustmentsPage />} />
+                            <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
+                          </Route>
 
-                          {/* NEW Seller Routes - /seller/* */}
-                          <Route 
-                            path="/seller/dashboard" 
-                            element={
-                              <ProtectedRoute allowedRoles={["seller"]}>
-                                <SellerDashboard />
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route path="/seller/kyc" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="KYC Verification"><SellerKyc /></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/products" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="My Products"><VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/products/new" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Add Product"><VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/orders" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Orders"><VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/vouchers" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Vouchers"><VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/reviews" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Reviews"><SellerReviewsPage /></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/qa" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Q&A"><VerifiedSellerGuard><SellerQAPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/bulk-upload" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Bulk Upload"><VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/flash-sale" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Flash Sale"><SellerFlashSalePage /></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/messages" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Messages"><VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/wallet" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Wallet"><VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/analytics" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Analytics"><VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/returns" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Returns"><VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/cancelled" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Cancelled Orders"><VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard></SellerPageWrapper></ProtectedRoute>} />
-                          <Route path="/seller/settings" element={<ProtectedRoute allowedRoles={["seller"]}><SellerPageWrapper title="Settings"><SellerSettingsPage /></SellerPageWrapper></ProtectedRoute>} />
+                          {/* Seller Routes - Nested under sidebar layout */}
+                          <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
+                            <Route path="dashboard" element={<SellerDashboardHome />} />
+                            <Route path="kyc" element={<SellerKyc />} />
+                            <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
+                            <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
+                            <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
+                            <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
+                            <Route path="reviews" element={<SellerReviewsPage />} />
+                            <Route path="qa" element={<VerifiedSellerGuard><SellerQAPage /></VerifiedSellerGuard>} />
+                            <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
+                            <Route path="flash-sale" element={<SellerFlashSalePage />} />
+                            <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
+                            <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
+                            <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
+                            <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
+                            <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
+                            <Route path="settings" element={<SellerSettingsPage />} />
+                          </Route>
 
                           {/* Legacy route redirects */}
                           <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
-                          <Route path="/admin-dashboard/deposits/sellers" element={<Navigate to="/admin/deposits/sellers" replace />} />
-                          <Route path="/admin-dashboard/deposits/users" element={<Navigate to="/admin/deposits/users" replace />} />
-                          <Route path="/admin-dashboard/deposits/settings" element={<Navigate to="/admin/deposits/settings" replace />} />
                           <Route path="/admin-dashboard/*" element={<Navigate to="/admin/dashboard" replace />} />
                           <Route path="/seller-center" element={<Navigate to="/seller/dashboard" replace />} />
                           <Route path="/seller-center/*" element={<Navigate to="/seller/dashboard" replace />} />

@@ -121,28 +121,28 @@ const AdminDashboardHome = () => {
       badge: (stats?.pendingApprovals || 0) > 0 ? `${stats?.pendingApprovals} pending` : undefined,
       badgeVariant: "destructive",
       description: "KYC & Seller Applications",
-      href: "/admin-dashboard/seller-kyc",
+      href: "/admin/seller-kyc",
       color: "bg-primary"
     },
     {
       icon: <BarChart3 className="w-6 h-6 text-white" />,
       title: "Platform Stats",
       description: "Analytics & Insights",
-      href: "/admin-dashboard/analytics",
+      href: "/admin/analytics",
       color: "bg-violet-500"
     },
     {
       icon: <Image className="w-6 h-6 text-white" />,
       title: "Edit Banners",
       description: "Homepage Carousel",
-      href: "/admin-dashboard/banners",
+      href: "/admin/banners",
       color: "bg-pink-500"
     },
     {
       icon: <Shield className="w-6 h-6 text-white" />,
       title: "Role Management",
       description: "Staff & Permissions",
-      href: "/admin-dashboard/roles",
+      href: "/admin/roles",
       color: "bg-slate-700"
     }
   ];
@@ -152,84 +152,84 @@ const AdminDashboardHome = () => {
       icon: <ShoppingCart className="w-6 h-6 text-white" />,
       title: "Order Management",
       description: "View & update orders",
-      href: "/admin-dashboard/orders",
+      href: "/admin/orders",
       color: "bg-blue-500"
     },
     {
       icon: <Package className="w-6 h-6 text-white" />,
       title: "Product Catalog",
       description: "Approve & manage products",
-      href: "/admin-dashboard/products",
+      href: "/admin/products",
       color: "bg-emerald-500"
     },
     {
       icon: <Users className="w-6 h-6 text-white" />,
       title: "User Directory",
       description: "Customers & Sellers",
-      href: "/admin-dashboard/users",
+      href: "/admin/users",
       color: "bg-cyan-500"
     },
     {
       icon: <Wallet className="w-6 h-6 text-white" />,
       title: "Payout Management",
       description: "Seller withdrawals",
-      href: "/admin-dashboard/payouts",
+      href: "/admin/payouts",
       color: "bg-amber-500"
     },
     {
       icon: <Zap className="w-6 h-6 text-white" />,
       title: "Flash Sales",
       description: "Campaigns & Nominations",
-      href: "/admin-dashboard/flash-sales",
+      href: "/admin/flash-sales",
       color: "bg-rose-500"
     },
     {
       icon: <Tags className="w-6 h-6 text-white" />,
       title: "Categories",
       description: "Manage categories",
-      href: "/admin-dashboard/categories",
+      href: "/admin/categories",
       color: "bg-indigo-500"
     },
     {
       icon: <RotateCcw className="w-6 h-6 text-white" />,
       title: "Returns",
       description: "Handle returns",
-      href: "/admin-dashboard/returns",
+      href: "/admin/returns",
       color: "bg-orange-500"
     },
     {
       icon: <Star className="w-6 h-6 text-white" />,
       title: "Reviews",
       description: "Moderate reviews",
-      href: "/admin-dashboard/reviews",
+      href: "/admin/reviews",
       color: "bg-yellow-500"
     },
     {
       icon: <MessageSquare className="w-6 h-6 text-white" />,
       title: "Q&A Moderation",
       description: "Product questions",
-      href: "/admin-dashboard/qa",
+      href: "/admin/qa",
       color: "bg-teal-500"
     },
     {
       icon: <FileCheck className="w-6 h-6 text-white" />,
       title: "Cancellations",
       description: "Order cancellations",
-      href: "/admin-dashboard/cancellations",
+      href: "/admin/cancellations",
       color: "bg-red-500"
     },
     {
       icon: <Tags className="w-6 h-6 text-white" />,
       title: "Vouchers",
       description: "Discount codes",
-      href: "/admin-dashboard/vouchers",
+      href: "/admin/vouchers",
       color: "bg-purple-500"
     },
     {
       icon: <Settings className="w-6 h-6 text-white" />,
       title: "Settings",
       description: "Platform configuration",
-      href: "/admin-dashboard/settings",
+      href: "/admin/settings",
       color: "bg-slate-500"
     }
   ];
