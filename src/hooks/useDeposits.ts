@@ -258,9 +258,39 @@ export const useAdminDepositRequests = (requesterType?: 'customer' | 'seller') =
       if (!result?.success) throw new Error(result?.message || 'Failed to approve');
       return result;
     },
-    onSuccess: () => {
+    onSuccess: async (_data, variables) => {
       toast.success('Deposit approved and wallet updated');
       queryClient.invalidateQueries({ queryKey: ['admin-deposit-requests'] });
+
+      // Send deposit approved email
+      try {
+        const { data: deposit } = await supabase
+          .from("deposit_requests")
+          .select("user_id, amount")
+          .eq("id", variables.depositId)
+          .single();
+
+        if (deposit) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", deposit.user_id)
+            .single();
+
+          if (profile) {
+            await supabase.functions.invoke("send-order-emails", {
+              body: {
+                type: "deposit_approved",
+                userEmail: profile.email,
+                userName: profile.full_name,
+                depositAmount: deposit.amount,
+              },
+            });
+          }
+        }
+      } catch (emailErr) {
+        console.error("Failed to send deposit approval email:", emailErr);
+      }
     },
     onError: (error: Error) => {
       toast.error(`Failed to approve: ${error.message}`);

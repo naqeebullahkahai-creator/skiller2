@@ -287,6 +287,51 @@ const Checkout = () => {
         }
       }
 
+      // Send order confirmation email to customer
+      try {
+        await supabase.functions.invoke("send-order-emails", {
+          body: {
+            type: "new_order",
+            customerEmail: user.email,
+            customerName: selectedAddress.full_name,
+            orderNumber: order.order_number,
+            totalAmount: getCartTotal(),
+            itemCount: items.length,
+          },
+        });
+      } catch (emailErr) {
+        console.error("Failed to send order email:", emailErr);
+      }
+
+      // Send seller alert emails for each unique seller
+      const sellerIds = [...new Set(items.map((i) => i.product.seller_id))];
+      for (const sellerId of sellerIds) {
+        try {
+          const { data: sellerProfile } = await supabase
+            .from("profiles")
+            .select("email, full_name")
+            .eq("id", sellerId)
+            .single();
+
+          if (sellerProfile) {
+            const sellerItems = items.filter((i) => i.product.seller_id === sellerId);
+            await supabase.functions.invoke("send-order-emails", {
+              body: {
+                type: "order_seller_alert",
+                sellerEmail: sellerProfile.email,
+                sellerName: sellerProfile.full_name,
+                orderNumber: order.order_number,
+                productTitle: sellerItems.map((i) => i.product.title).join(", "),
+                quantity: sellerItems.reduce((sum, i) => sum + i.quantity, 0),
+                orderAmount: sellerItems.reduce((sum, i) => sum + (i.product.discount_price_pkr || i.product.price_pkr) * i.quantity, 0),
+              },
+            });
+          }
+        } catch (sellerEmailErr) {
+          console.error("Failed to send seller alert:", sellerEmailErr);
+        }
+      }
+
       // Clear cart and navigate to success
       clearCart();
       navigate(`/order-success/${order.order_number}`);
