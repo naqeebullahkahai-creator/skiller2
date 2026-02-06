@@ -84,6 +84,7 @@ import AdminReviewsPage from "./pages/dashboard/AdminReviewsPage";
 import AdminFlashNominations from "./pages/dashboard/AdminFlashNominations";
 import AdminQAModerationPage from "./pages/dashboard/AdminQAModerationPage";
 import AdminCancelledOrdersPage from "./pages/admin/AdminCancelledOrdersPage";
+import AdminSubscriptionPage from "./pages/dashboard/AdminSubscriptionPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -247,6 +248,7 @@ const App = () => (
                           <Route path="/admin/seller-kyc" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller KYC"><AdminSellerKyc /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/seller-kyc/:sellerId" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Details"><AdminSellerDetail /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/payouts" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Payouts"><AdminPayoutManagement /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/subscriptions" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Subscriptions"><AdminSubscriptionPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/flash-sales" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Flash Sales"><FlashSaleManager /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/flash-nominations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Flash Nominations"><AdminFlashNominations /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/reviews" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Reviews"><AdminReviewsPage /></AdminPageWrapper></ProtectedRoute>} />
