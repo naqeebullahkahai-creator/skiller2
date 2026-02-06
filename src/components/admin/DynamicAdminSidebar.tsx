@@ -24,6 +24,10 @@ import {
   CreditCard,
   Store,
   ClipboardList,
+  DollarSign,
+  FileCheck,
+  UserCheck,
+  Scale,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -61,9 +65,10 @@ function isGroup(entry: NavEntry): entry is NavGroup {
 
 interface DynamicAdminSidebarProps {
   sidebarOpen: boolean;
+  onNavigate?: () => void;
 }
 
-const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
+const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarProps) => {
   const location = useLocation();
   const { canView, isLoading } = usePermissions();
   const { isSuperAdmin } = useAuth();
@@ -72,13 +77,14 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
   const { pendingCount: pendingCustomerDeposits } = useAdminDepositRequests('customer');
   const totalPendingDeposits = pendingSellerDeposits + pendingCustomerDeposits;
 
-  // Track open groups
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
     const path = location.pathname;
     return {
       'Deposit Management': path.includes('/deposits') || path.includes('/payment-methods'),
-      'User Management': path.includes('/users') || path.includes('/sellers') || path.includes('/approvals') || path.includes('/seller-kyc'),
+      'User Management': path.includes('/users') || path.includes('/sellers'),
+      'Verification Hub': path.includes('/seller-kyc') || path.includes('/approvals'),
       'Order Management': path.includes('/orders') || path.includes('/cancellations'),
+      'Financial Controls': path.includes('/payouts') || path.includes('/balance-adjustments') || path.includes('/analytics'),
     };
   });
 
@@ -95,7 +101,15 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
       children: [
         { name: "Customer List", href: "/admin/users", icon: UserCircle, feature: 'users' },
         { name: "Seller List", href: "/admin/sellers", icon: Store, feature: 'users' },
-        { name: "Verification Requests", href: "/admin/seller-kyc", icon: ShieldCheck, feature: 'users' },
+      ],
+    },
+    {
+      name: "Verification Hub",
+      icon: ShieldCheck,
+      feature: 'users',
+      children: [
+        { name: "Pending KYC", href: "/admin/seller-kyc", icon: FileCheck },
+        { name: "Seller Approvals", href: "/admin/approvals", icon: UserCheck },
       ],
     },
     { name: "Roles & Permissions", href: "/admin/roles", icon: Shield, requireSuperAdmin: true },
@@ -113,14 +127,6 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
     { name: "Returns", href: "/admin/returns", icon: RotateCcw, feature: 'returns' },
     { name: "Product Catalog", href: "/admin/products", icon: Package, feature: 'products' },
     { name: "Category Manager", href: "/admin/categories", icon: FolderOpen, feature: 'categories' },
-    { name: "Reviews", href: "/admin/reviews", icon: Star, feature: 'reviews' },
-    { name: "Q&A Moderation", href: "/admin/qa", icon: MessageSquare, feature: 'reviews' },
-    { name: "Flash Sales", href: "/admin/flash-sales", icon: Zap, feature: 'flash_sales' },
-    { name: "Vouchers", href: "/admin/vouchers", icon: Ticket, feature: 'vouchers' },
-    { name: "Banners", href: "/admin/banners", icon: Image, feature: 'banners' },
-    { name: "Bulk Uploads", href: "/admin/bulk-uploads", icon: Package, feature: 'products' },
-    { name: "Analytics", href: "/admin/analytics", icon: BarChart3, feature: 'analytics' },
-    { name: "Payouts", href: "/admin/payouts", icon: Wallet, feature: 'payouts' },
     {
       name: "Deposit Management",
       icon: PiggyBank,
@@ -131,12 +137,26 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
         { name: "Payment Methods", href: "/admin/payment-methods", icon: CreditCard },
       ],
     },
-    { name: "Balance Adjustments", href: "/admin/balance-adjustments", icon: Wallet, feature: 'payouts' },
+    {
+      name: "Financial Controls",
+      icon: DollarSign,
+      feature: 'payouts',
+      children: [
+        { name: "Payouts", href: "/admin/payouts", icon: Wallet },
+        { name: "Balance Adjustments", href: "/admin/balance-adjustments", icon: Scale },
+        { name: "Platform Revenue", href: "/admin/analytics", icon: BarChart3 },
+      ],
+    },
+    { name: "Reviews", href: "/admin/reviews", icon: Star, feature: 'reviews' },
+    { name: "Q&A Moderation", href: "/admin/qa", icon: MessageSquare, feature: 'reviews' },
+    { name: "Flash Sales", href: "/admin/flash-sales", icon: Zap, feature: 'flash_sales' },
+    { name: "Vouchers", href: "/admin/vouchers", icon: Ticket, feature: 'vouchers' },
+    { name: "Banners", href: "/admin/banners", icon: Image, feature: 'banners' },
+    { name: "Bulk Uploads", href: "/admin/bulk-uploads", icon: Package, feature: 'products' },
     { name: "Site Settings", href: "/admin/site-settings", icon: Globe, feature: 'settings' },
     { name: "Settings", href: "/admin/settings", icon: Settings, feature: 'settings' },
   ];
 
-  // Filter based on permissions
   const isVisible = (entry: NavEntry): boolean => {
     if (isSuperAdmin) return true;
     if ('requireSuperAdmin' in entry && entry.requireSuperAdmin) return false;
@@ -215,6 +235,7 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
                     <Link
                       key={child.href}
                       to={child.href}
+                      onClick={onNavigate}
                       className={cn(
                         "flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
                         isLinkActive(child.href)
@@ -222,7 +243,10 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
                           : "text-slate-400 hover:bg-slate-800 hover:text-white"
                       )}
                     >
-                      <span>{child.name}</span>
+                      <div className="flex items-center gap-2">
+                        <child.icon size={16} />
+                        <span>{child.name}</span>
+                      </div>
                       {(child.badge ?? 0) > 0 && (
                         <span className="text-xs bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-full">
                           {child.badge}
@@ -241,6 +265,7 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
           <Link
             key={item.href}
             to={item.href}
+            onClick={onNavigate}
             className={cn(
               "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
               isLinkActive(item.href)
