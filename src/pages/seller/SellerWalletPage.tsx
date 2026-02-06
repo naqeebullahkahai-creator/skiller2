@@ -35,6 +35,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useSellerWallet, formatPKR } from "@/hooks/useSellerWallet";
 import { useSellerKyc } from "@/hooks/useSellerKyc";
+import DepositFundsSection from "@/components/wallet/DepositFundsSection";
 
 const SellerWalletPage = () => {
   const { wallet, transactions, payoutRequests, isLoading, requestPayout, canRequestPayout, hasPendingPayout } = useSellerWallet();
@@ -184,6 +185,9 @@ const SellerWalletPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Deposit Funds Section */}
+      <DepositFundsSection requesterType="seller" formatCurrency={formatPKR} />
 
       {/* Request Payout Button */}
       <Card>
