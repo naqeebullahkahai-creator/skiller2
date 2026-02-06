@@ -18,12 +18,21 @@ import {
   MessageSquare,
   UserCircle,
   Shield,
-  Globe
+  Globe,
+  PiggyBank,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PermissionFeature } from "@/hooks/useRoleManagement";
+import { useAdminDepositRequests } from "@/hooks/useDeposits";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { useState } from "react";
 
 interface NavLink {
   name: string;
@@ -31,6 +40,13 @@ interface NavLink {
   icon: any;
   feature?: PermissionFeature;
   requireSuperAdmin?: boolean;
+}
+
+interface NavDropdown {
+  name: string;
+  icon: any;
+  feature?: PermissionFeature;
+  children: { name: string; href: string; badge?: number }[];
 }
 
 const allAdminLinks: NavLink[] = [
@@ -64,6 +80,14 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
   const location = useLocation();
   const { canView, isLoading } = usePermissions();
   const { isSuperAdmin } = useAuth();
+  const [depositsOpen, setDepositsOpen] = useState(
+    location.pathname.includes('/deposits')
+  );
+  
+  // Get pending deposit counts
+  const { pendingCount: pendingSellerDeposits } = useAdminDepositRequests('seller');
+  const { pendingCount: pendingCustomerDeposits } = useAdminDepositRequests('customer');
+  const totalPendingDeposits = pendingSellerDeposits + pendingCustomerDeposits;
   
   // Filter links based on permissions
   const visibleLinks = allAdminLinks.filter(link => {
@@ -79,6 +103,9 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
     // Check if user has view permission for the feature
     return canView(link.feature);
   });
+
+  // Check if deposits should be shown (payouts permission)
+  const showDeposits = isSuperAdmin || canView('payouts');
   
   if (isLoading) {
     return (
@@ -95,6 +122,101 @@ const DynamicAdminSidebar = ({ sidebarOpen }: DynamicAdminSidebarProps) => {
       {visibleLinks.map((link) => {
         const isActive = location.pathname === link.href || 
           (link.href !== "/admin-dashboard" && location.pathname.startsWith(link.href));
+        
+        // Insert Deposits dropdown after Payouts
+        if (link.name === "Payouts" && showDeposits) {
+          return (
+            <div key={link.name}>
+              <Link
+                to={link.href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                )}
+              >
+                <link.icon size={20} />
+                {sidebarOpen && <span>{link.name}</span>}
+              </Link>
+              
+              {/* Deposit Requests Dropdown */}
+              <Collapsible open={depositsOpen} onOpenChange={setDepositsOpen}>
+                <CollapsibleTrigger className={cn(
+                  "flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-colors w-full mt-1",
+                  location.pathname.includes('/deposits')
+                    ? "bg-primary/20 text-primary"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                )}>
+                  <div className="flex items-center gap-3">
+                    <PiggyBank size={20} />
+                    {sidebarOpen && <span>Deposit Requests</span>}
+                  </div>
+                  {sidebarOpen && (
+                    <div className="flex items-center gap-2">
+                      {totalPendingDeposits > 0 && (
+                        <span className="text-xs bg-destructive text-white px-1.5 py-0.5 rounded-full">
+                          {totalPendingDeposits}
+                        </span>
+                      )}
+                      <ChevronDown className={cn(
+                        "w-4 h-4 transition-transform",
+                        depositsOpen && "rotate-180"
+                      )} />
+                    </div>
+                  )}
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="ml-8 mt-1 space-y-1">
+                    <Link
+                      to="/admin/deposits/sellers"
+                      className={cn(
+                        "flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
+                        location.pathname === "/admin/deposits/sellers"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                      )}
+                    >
+                      <span>Seller Deposits</span>
+                      {pendingSellerDeposits > 0 && (
+                        <span className="text-xs bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-full">
+                          {pendingSellerDeposits}
+                        </span>
+                      )}
+                    </Link>
+                    <Link
+                      to="/admin/deposits/users"
+                      className={cn(
+                        "flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
+                        location.pathname === "/admin/deposits/users"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                      )}
+                    >
+                      <span>User Deposits</span>
+                      {pendingCustomerDeposits > 0 && (
+                        <span className="text-xs bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-full">
+                          {pendingCustomerDeposits}
+                        </span>
+                      )}
+                    </Link>
+                    <Link
+                      to="/admin/deposits/settings"
+                      className={cn(
+                        "flex items-center px-3 py-2 rounded-lg text-sm transition-colors",
+                        location.pathname === "/admin/deposits/settings"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                      )}
+                    >
+                      Deposit Settings
+                    </Link>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
+          );
+        }
         
         return (
           <Link

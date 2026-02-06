@@ -85,6 +85,9 @@ import AdminFlashNominations from "./pages/dashboard/AdminFlashNominations";
 import AdminQAModerationPage from "./pages/dashboard/AdminQAModerationPage";
 import AdminCancelledOrdersPage from "./pages/admin/AdminCancelledOrdersPage";
 import AdminSubscriptionPage from "./pages/dashboard/AdminSubscriptionPage";
+import AdminDepositSettings from "./pages/dashboard/AdminDepositSettings";
+import AdminSellerDepositsPage from "./pages/dashboard/AdminSellerDepositsPage";
+import AdminUserDepositsPage from "./pages/dashboard/AdminUserDepositsPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -259,6 +262,9 @@ const App = () => (
                           <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Analytics"><AdminAnalyticsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/site-settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Site Settings"><SocialSettingsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Settings"><AdminSettings /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/deposits/sellers" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Deposits"><AdminSellerDepositsPage /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/deposits/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="User Deposits"><AdminUserDepositsPage /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/deposits/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Deposit Settings"><AdminDepositSettings /></AdminPageWrapper></ProtectedRoute>} />
 
                           {/* NEW Seller Routes - /seller/* */}
                           <Route 
@@ -287,6 +293,9 @@ const App = () => (
 
                           {/* Legacy route redirects */}
                           <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+                          <Route path="/admin-dashboard/deposits/sellers" element={<Navigate to="/admin/deposits/sellers" replace />} />
+                          <Route path="/admin-dashboard/deposits/users" element={<Navigate to="/admin/deposits/users" replace />} />
+                          <Route path="/admin-dashboard/deposits/settings" element={<Navigate to="/admin/deposits/settings" replace />} />
                           <Route path="/admin-dashboard/*" element={<Navigate to="/admin/dashboard" replace />} />
                           <Route path="/seller-center" element={<Navigate to="/seller/dashboard" replace />} />
                           <Route path="/seller-center/*" element={<Navigate to="/seller/dashboard" replace />} />

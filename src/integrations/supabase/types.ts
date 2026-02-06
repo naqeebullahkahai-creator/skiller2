@@ -386,6 +386,62 @@ export type Database = {
         }
         Relationships: []
       }
+      deposit_requests: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          id: string
+          payment_method_id: string
+          processed_at: string | null
+          processed_by: string | null
+          requester_type: Database["public"]["Enums"]["deposit_requester_type"]
+          screenshot_url: string
+          status: Database["public"]["Enums"]["deposit_request_status"]
+          transaction_reference: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          payment_method_id: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requester_type: Database["public"]["Enums"]["deposit_requester_type"]
+          screenshot_url: string
+          status?: Database["public"]["Enums"]["deposit_request_status"]
+          transaction_reference?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_method_id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requester_type?: Database["public"]["Enums"]["deposit_requester_type"]
+          screenshot_url?: string
+          status?: Database["public"]["Enums"]["deposit_request_status"]
+          transaction_reference?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_requests_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financial_logs: {
         Row: {
           amount_pkr: number
@@ -832,6 +888,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_methods: {
+        Row: {
+          account_name: string
+          account_number: string | null
+          created_at: string
+          display_order: number
+          iban: string | null
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          method_name: string
+          till_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_name: string
+          account_number?: string | null
+          created_at?: string
+          display_order?: number
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          method_name: string
+          till_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string | null
+          created_at?: string
+          display_order?: number
+          iban?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          method_name?: string
+          till_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       payout_requests: {
         Row: {
@@ -1846,6 +1944,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_deposit_request: {
+        Args: {
+          p_admin_id: string
+          p_admin_notes?: string
+          p_deposit_id: string
+        }
+        Returns: Json
+      }
       can_request_return: { Args: { p_order_id: string }; Returns: boolean }
       cancel_order_with_refund: {
         Args: {
@@ -1974,6 +2080,10 @@ export type Database = {
         Args: { p_seller_id: string }
         Returns: Json
       }
+      reject_deposit_request: {
+        Args: { p_admin_id: string; p_deposit_id: string; p_reason: string }
+        Returns: Json
+      }
       restock_order_items: { Args: { p_order_id: string }; Returns: boolean }
       validate_voucher: {
         Args: { p_code: string; p_order_total: number; p_user_id: string }
@@ -1986,6 +2096,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "seller" | "customer"
+      deposit_request_status: "pending" | "approved" | "rejected"
+      deposit_requester_type: "customer" | "seller"
       discount_type: "fixed" | "percentage"
       notification_type: "order" | "price_drop" | "promotion" | "system"
       order_status:
@@ -2162,6 +2274,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "seller", "customer"],
+      deposit_request_status: ["pending", "approved", "rejected"],
+      deposit_requester_type: ["customer", "seller"],
       discount_type: ["fixed", "percentage"],
       notification_type: ["order", "price_drop", "promotion", "system"],
       order_status: [
