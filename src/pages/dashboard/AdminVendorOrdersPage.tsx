@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck, XCircle, Users } from "lucide-react";
+import DateRangeFilter, { DateRange } from "@/components/admin/DateRangeFilter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,7 @@ const AdminVendorOrdersPage = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
   const [selectedOrderForShipping, setSelectedOrderForShipping] = useState<Order | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -45,7 +47,12 @@ const AdminVendorOrdersPage = () => {
         order.id.toLowerCase().includes(q) ||
         order.customer_name.toLowerCase().includes(q);
     })
-    .filter((order) => statusFilter === "all" || order.order_status === statusFilter);
+    .filter((order) => statusFilter === "all" || order.order_status === statusFilter)
+    .filter((order) => {
+      if (!dateRange.from) return true;
+      const d = new Date(order.created_at);
+      return d >= dateRange.from && (!dateRange.to || d <= new Date(dateRange.to.getTime() + 86400000));
+    });
 
   const updateOrderStatus = async (orderId: string, newStatus: string, trackingInfo?: { tracking_id: string; courier_name: string }) => {
     const updateData: any = { order_status: newStatus };
@@ -125,13 +132,12 @@ const AdminVendorOrdersPage = () => {
         </Card>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search by Order ID or Customer" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
+              <Input placeholder="Search by FZN-ORD-, Order ID or Customer" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48"><SelectValue placeholder="Filter by status" /></SelectTrigger>
@@ -145,6 +151,7 @@ const AdminVendorOrdersPage = () => {
                 <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
+            <DateRangeFilter value={dateRange} onChange={setDateRange} />
           </div>
         </CardContent>
       </Card>

@@ -185,6 +185,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setProfile(null);
     setRole(null);
+    // Import dynamically to avoid circular deps – toast is a standalone function
+    const { toast } = await import("sonner");
+    toast.success("Logged out. See you soon!");
   };
 
   // Check if current user is super admin
