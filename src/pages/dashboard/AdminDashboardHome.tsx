@@ -18,12 +18,15 @@ import {
   DollarSign,
   UserCheck,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Store,
+  Percent
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAdminDashboardAnalytics } from "@/hooks/useAdminDashboardAnalytics";
+import { useAdminOrderClassification } from "@/hooks/useAdminOrderClassification";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const formatPKR = (amount: number) => {
@@ -87,7 +90,7 @@ const CommandCard = ({
 const AdminDashboardHome = () => {
   const navigate = useNavigate();
   const { stats, isLoading } = useAdminDashboardAnalytics();
-
+  const { directRevenue, vendorRevenue, isLoading: classLoading } = useAdminOrderClassification();
   const quickStats = [
     {
       label: "Revenue",
@@ -237,6 +240,34 @@ const AdminDashboardHome = () => {
       <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-5 text-white">
         <h1 className="text-xl font-bold mb-1">Admin Control Center</h1>
         <p className="text-white/80 text-sm">Platform management & oversight</p>
+      </div>
+
+      {/* Revenue Split */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Card className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/admin/orders/direct')}>
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-emerald-500">
+              <Store className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Direct Store Revenue</p>
+              {classLoading ? <Skeleton className="h-6 w-24" /> : <p className="text-lg font-bold text-emerald-600">{formatPKR(directRevenue)}</p>}
+              <p className="text-xs text-muted-foreground">Your own product sales</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/admin/orders/vendor')}>
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-amber-500">
+              <Percent className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Vendor Marketplace Revenue</p>
+              {classLoading ? <Skeleton className="h-6 w-24" /> : <p className="text-lg font-bold text-amber-600">{formatPKR(vendorRevenue)}</p>}
+              <p className="text-xs text-muted-foreground">Commission from sellers</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Quick Stats Bar */}

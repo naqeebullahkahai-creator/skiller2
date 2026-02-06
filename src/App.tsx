@@ -90,6 +90,8 @@ import AdminSellerDepositsPage from "./pages/dashboard/AdminSellerDepositsPage";
 import AdminUserDepositsPage from "./pages/dashboard/AdminUserDepositsPage";
 import AdminBalanceAdjustmentsPage from "./pages/dashboard/AdminBalanceAdjustmentsPage";
 import AdminPaymentMethodsPage from "./pages/dashboard/AdminPaymentMethodsPage";
+import AdminDirectOrdersPage from "./pages/dashboard/AdminDirectOrdersPage";
+import AdminVendorOrdersPage from "./pages/dashboard/AdminVendorOrdersPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -243,6 +245,8 @@ const App = () => (
                           <Route path="/admin/sellers/:sellerId" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Seller Details"><AdminSellerDetailPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/roles" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Roles & Permissions"><AdminRolesPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/orders" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Orders"><AdminOrderManagement /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/orders/direct" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Direct Store Orders"><AdminDirectOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
+                          <Route path="/admin/orders/vendor" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Vendor Orders"><AdminVendorOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/cancellations" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancellations"><AdminCancellationsPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/cancelled" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancelled Orders"><AdminCancelledOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
                           <Route path="/admin/orders/cancelled" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPageWrapper title="Cancelled Orders"><AdminCancelledOrdersPage /></AdminPageWrapper></ProtectedRoute>} />
