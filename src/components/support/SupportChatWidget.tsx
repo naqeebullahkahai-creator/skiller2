@@ -14,6 +14,7 @@ const SupportChatWidget = () => {
   const [showRating, setShowRating] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
   const { user } = useAuth();
   const { session, messages, loading, createSession, sendMessage, endSession, rateSession } = useSupportSession();
   const { shortcuts } = useChatShortcuts();
@@ -43,11 +44,12 @@ const SupportChatWidget = () => {
 
   const handleSubmitRating = async () => {
     if (rating > 0) {
-      await rateSession(rating);
+      await rateSession(rating, feedbackText.trim() || undefined);
     }
     await endSession();
     setShowRating(false);
     setRating(0);
+    setFeedbackText("");
     setIsOpen(false);
   };
 
@@ -132,6 +134,13 @@ const SupportChatWidget = () => {
                     </button>
                   ))}
                 </div>
+                <textarea
+                  placeholder="Tell us about your experience (optional)"
+                  value={feedbackText}
+                  onChange={e => setFeedbackText(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-background p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                  rows={3}
+                />
                 <Button onClick={handleSubmitRating} className="w-full">
                   {rating > 0 ? 'Submit & Close' : 'Skip & Close'}
                 </Button>
