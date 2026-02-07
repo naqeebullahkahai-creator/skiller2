@@ -37,7 +37,7 @@ import NotFound from "./pages/NotFound";
 import Forbidden from "./pages/Forbidden";
 import HelpCenter from "./pages/HelpCenter";
 import ContactUs from "./pages/ContactUs";
-import ChatWidget from "./components/chat/ChatWidget";
+import SupportChatWidget from "./components/support/SupportChatWidget";
 import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton";
 import InstallPrompt from "./components/pwa/InstallPrompt";
 import NotificationPermissionBanner from "./components/notifications/NotificationPermissionBanner";
@@ -96,6 +96,8 @@ import AdminBalanceAdjustmentsPage from "./pages/dashboard/AdminBalanceAdjustmen
 import AdminPaymentMethodsPage from "./pages/dashboard/AdminPaymentMethodsPage";
 import AdminDirectOrdersPage from "./pages/dashboard/AdminDirectOrdersPage";
 import AdminVendorOrdersPage from "./pages/dashboard/AdminVendorOrdersPage";
+import AdminChatShortcutsPage from "./pages/dashboard/AdminChatShortcutsPage";
+import AdminSiteContentPage from "./pages/dashboard/AdminSiteContentPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -177,7 +179,7 @@ const App = () => (
                           <NotificationPermissionBanner />
                           <AdminInactivityGuard />
                           <AuthModal />
-                          <ChatWidget />
+                          <SupportChatWidget />
                           <WhatsAppFloatingButton />
                           <ComparisonBar />
                           <VisualEditToggle />
@@ -278,6 +280,8 @@ const App = () => (
                             <Route path="deposits/settings" element={<AdminDepositSettings />} />
                             <Route path="balance-adjustments" element={<AdminBalanceAdjustmentsPage />} />
                             <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
+                            <Route path="chat-shortcuts" element={<AdminChatShortcutsPage />} />
+                            <Route path="content-manager" element={<AdminSiteContentPage />} />
                           </Route>
 
                           {/* Seller Routes - Nested under sidebar layout */}

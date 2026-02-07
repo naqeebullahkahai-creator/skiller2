@@ -225,6 +225,39 @@ export type Database = {
           },
         ]
       }
+      chat_shortcuts: {
+        Row: {
+          category: string | null
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          label: string
+          message: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          label: string
+          message: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          label?: string
+          message?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       collected_vouchers: {
         Row: {
           collected_at: string
@@ -1585,6 +1618,42 @@ export type Database = {
         }
         Relationships: []
       }
+      site_content: {
+        Row: {
+          content: string
+          content_type: string
+          created_at: string
+          id: string
+          is_active: boolean
+          page: string
+          section_key: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          page: string
+          section_key: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          page?: string
+          section_key?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string
@@ -1676,6 +1745,116 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      support_agent_status: {
+        Row: {
+          active_chats: number
+          created_at: string
+          id: string
+          is_online: boolean
+          last_seen_at: string
+          max_concurrent_chats: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_chats?: number
+          created_at?: string
+          id?: string
+          is_online?: boolean
+          last_seen_at?: string
+          max_concurrent_chats?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_chats?: number
+          created_at?: string
+          id?: string
+          is_online?: boolean
+          last_seen_at?: string
+          max_concurrent_chats?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_chat_sessions: {
+        Row: {
+          agent_id: string | null
+          created_at: string
+          ended_at: string | null
+          id: string
+          rating: number | null
+          rating_comment: string | null
+          started_at: string | null
+          status: string
+          subject: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agent_id?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          rating?: number | null
+          rating_comment?: string | null
+          started_at?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agent_id?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          rating?: number | null
+          rating_comment?: string | null
+          started_at?: string | null
+          status?: string
+          subject?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean
+          sender_id: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          sender_id: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          sender_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "support_chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_addresses: {
         Row: {
@@ -2115,7 +2294,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "seller" | "customer"
+      app_role: "admin" | "seller" | "customer" | "support_agent"
       deposit_request_status: "pending" | "approved" | "rejected"
       deposit_requester_type: "customer" | "seller"
       discount_type: "fixed" | "percentage"
@@ -2142,6 +2321,7 @@ export type Database = {
         | "analytics"
         | "settings"
         | "vouchers"
+        | "support"
       product_status: "pending" | "active" | "rejected"
       return_reason:
         | "wrong_item"
@@ -2293,7 +2473,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "seller", "customer"],
+      app_role: ["admin", "seller", "customer", "support_agent"],
       deposit_request_status: ["pending", "approved", "rejected"],
       deposit_requester_type: ["customer", "seller"],
       discount_type: ["fixed", "percentage"],
@@ -2321,6 +2501,7 @@ export const Constants = {
         "analytics",
         "settings",
         "vouchers",
+        "support",
       ],
       product_status: ["pending", "active", "rejected"],
       return_reason: [

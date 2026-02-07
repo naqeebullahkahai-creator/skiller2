@@ -28,6 +28,8 @@ import {
   FileCheck,
   UserCheck,
   Scale,
+  FileText,
+  Headphones,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -153,6 +155,8 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     { name: "Vouchers", href: "/admin/vouchers", icon: Ticket, feature: 'vouchers' },
     { name: "Banners", href: "/admin/banners", icon: Image, feature: 'banners' },
     { name: "Bulk Uploads", href: "/admin/bulk-uploads", icon: Package, feature: 'products' },
+    { name: "Chat Shortcuts", href: "/admin/chat-shortcuts", icon: Headphones, feature: 'settings' },
+    { name: "Content Manager", href: "/admin/content-manager", icon: FileText, feature: 'settings' },
     { name: "Site Settings", href: "/admin/site-settings", icon: Globe, feature: 'settings' },
     { name: "Settings", href: "/admin/settings", icon: Settings, feature: 'settings' },
   ];
