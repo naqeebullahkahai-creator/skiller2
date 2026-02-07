@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -289,4 +289,44 @@ export const useAgentQueue = () => {
   });
 
   return { waitingSessions, isLoading, acceptSession };
+};
+
+// Hook for agents to manage their online status
+export const useAgentOnlineStatus = () => {
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const goOnline = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase
+      .from('agent_online_status')
+      .upsert({ user_id: user.id, is_online: true, last_seen_at: new Date().toISOString() }, { onConflict: 'user_id' });
+
+    // Heartbeat every 30s
+    heartbeatRef.current = setInterval(async () => {
+      await supabase
+        .from('agent_online_status')
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq('user_id', user.id);
+    }, 30000);
+  }, []);
+
+  const goOffline = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+    await supabase
+      .from('agent_online_status')
+      .update({ is_online: false })
+      .eq('user_id', user.id);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+    };
+  }, []);
+
+  return { goOnline, goOffline };
 };

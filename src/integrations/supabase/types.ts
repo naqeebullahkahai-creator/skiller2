@@ -98,6 +98,33 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_online_status: {
+        Row: {
+          created_at: string
+          id: string
+          is_online: boolean
+          last_seen_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_online?: boolean
+          last_seen_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_online?: boolean
+          last_seen_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       agent_performance: {
         Row: {
           agent_id: string
