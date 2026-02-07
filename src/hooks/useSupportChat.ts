@@ -194,11 +194,11 @@ export const useSupportSession = () => {
   }, [session]);
 
   // Rate the session
-  const rateSession = useCallback(async (rating: number, comment?: string) => {
+  const rateSession = useCallback(async (rating: number, feedbackText?: string) => {
     if (!session) return;
     await supabase
       .from('support_chat_sessions')
-      .update({ rating, rating_comment: comment || null })
+      .update({ rating, rating_comment: feedbackText || null, feedback_text: feedbackText || null })
       .eq('id', session.id);
     toast.success('Thank you for your feedback!');
   }, [session]);

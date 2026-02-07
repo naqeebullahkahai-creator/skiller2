@@ -98,6 +98,44 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_performance: {
+        Row: {
+          agent_id: string
+          created_at: string
+          feedback_text: string | null
+          id: string
+          rating: number | null
+          session_duration_minutes: number | null
+          session_id: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          feedback_text?: string | null
+          id?: string
+          rating?: number | null
+          session_duration_minutes?: number | null
+          session_id: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          feedback_text?: string | null
+          id?: string
+          rating?: number | null
+          session_duration_minutes?: number | null
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_performance_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "support_chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bulk_upload_logs: {
         Row: {
           completed_at: string | null
@@ -1784,6 +1822,7 @@ export type Database = {
           agent_id: string | null
           created_at: string
           ended_at: string | null
+          feedback_text: string | null
           id: string
           rating: number | null
           rating_comment: string | null
@@ -1797,6 +1836,7 @@ export type Database = {
           agent_id?: string | null
           created_at?: string
           ended_at?: string | null
+          feedback_text?: string | null
           id?: string
           rating?: number | null
           rating_comment?: string | null
@@ -1810,6 +1850,7 @@ export type Database = {
           agent_id?: string | null
           created_at?: string
           ended_at?: string | null
+          feedback_text?: string | null
           id?: string
           rating?: number | null
           rating_comment?: string | null
