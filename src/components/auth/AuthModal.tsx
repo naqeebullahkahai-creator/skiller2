@@ -14,6 +14,8 @@ import {
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { checkEmailRoleConflict } from "@/utils/roleValidation";
+import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
+import RealTimeFieldValidator from "@/components/auth/RealTimeFieldValidator";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -175,6 +177,7 @@ const AuthModal = () => {
               {errors.name && (
                 <p className="text-destructive text-xs">{errors.name}</p>
               )}
+              <RealTimeFieldValidator value={formData.name} fieldType="name" show={authModalMode === "signup"} />
             </div>
           )}
 
@@ -197,6 +200,7 @@ const AuthModal = () => {
             {errors.email && (
               <p className="text-destructive text-xs">{errors.email}</p>
             )}
+            <RealTimeFieldValidator value={formData.email} fieldType="email" />
           </div>
 
           <div className="space-y-2">
@@ -225,6 +229,7 @@ const AuthModal = () => {
             {errors.password && (
               <p className="text-destructive text-xs">{errors.password}</p>
             )}
+            <PasswordStrengthMeter password={formData.password} show={authModalMode === "signup"} />
           </div>
 
           {authModalMode === "signup" && (
@@ -255,6 +260,7 @@ const AuthModal = () => {
                 {errors.confirmPassword && (
                   <p className="text-destructive text-xs">{errors.confirmPassword}</p>
                 )}
+                <RealTimeFieldValidator value={formData.confirmPassword} fieldType="confirmPassword" compareValue={formData.password} />
               </div>
 
               {/* Seller Registration Checkbox */}

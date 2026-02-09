@@ -153,12 +153,45 @@ export const useOrders = ({ role, sellerId }: UseOrdersOptions) => {
         updateData.courier_name = trackingInfo.courier_name;
       }
 
+      if (newStatus === "shipped") {
+        updateData.shipped_at = new Date().toISOString();
+      }
+
       const { error } = await supabase
         .from("orders")
         .update(updateData)
         .eq("id", orderId);
 
       if (error) throw error;
+
+      // Send email notification for status change (fire & forget)
+      const order = orders.find((o) => o.id === orderId);
+      if (order) {
+        const emailType = newStatus === "shipped" ? "order_shipped" 
+          : newStatus === "delivered" ? "order_delivered" 
+          : "order_status_update";
+        
+        // Fetch customer email from profile
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("email, full_name")
+          .eq("id", order.customer_id)
+          .maybeSingle();
+        
+        if (profile?.email) {
+          supabase.functions.invoke("send-order-emails", {
+            body: {
+              type: emailType,
+              customerEmail: profile.email,
+              customerName: profile.full_name || order.customer_name,
+              orderNumber: order.order_number || order.id.slice(0, 8),
+              newStatus,
+              trackingId: trackingInfo?.tracking_id || order.tracking_id,
+              courierName: trackingInfo?.courier_name || order.courier_name,
+            },
+          }).catch((e) => console.error("Status email failed:", e));
+        }
+      }
 
       toast({
         title: "Status Updated",

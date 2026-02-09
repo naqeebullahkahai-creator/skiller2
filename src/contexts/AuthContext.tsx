@@ -172,6 +172,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { success: false, error: error.message };
       }
 
+      // Send welcome email via edge function (fire & forget)
+      try {
+        supabase.functions.invoke("send-order-emails", {
+          body: {
+            type: "welcome",
+            customerEmail: email,
+            customerName: name,
+            isSeller: isSeller,
+          },
+        });
+      } catch (e) {
+        console.error("Welcome email failed:", e);
+      }
+
       setShowAuthModal(false);
       return { success: true };
     } catch (error: any) {
