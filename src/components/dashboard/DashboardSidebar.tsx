@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Store,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDashboard } from "@/contexts/DashboardContext";
@@ -100,16 +101,17 @@ const DashboardSidebar = () => {
           })}
         </ul>
       </nav>
-
-      {/* Back to Store */}
+      {/* Logout */}
       <div className="px-3 py-4 border-t border-white/10">
-        <Link
-          to="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+        <button
+          onClick={() => {
+            // Will be wired via props if needed
+          }}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors w-full"
         >
-          <Store size={20} />
-          {sidebarOpen && <span>Back to Store</span>}
-        </Link>
+          <LogOut size={20} />
+          {sidebarOpen && <span>Logout</span>}
+        </button>
       </div>
     </aside>
   );

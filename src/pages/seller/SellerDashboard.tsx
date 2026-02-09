@@ -71,7 +71,7 @@ const ActionCard = ({ icon, title, description, badge, badgeVariant = "default",
 const SellerDashboard = () => {
   const navigate = useNavigate();
   const { user, profile, logout } = useAuth();
-  const { enableCustomerView } = useViewMode();
+  // Strict role isolation - no customer view
   const { totalStats, isLoading: analyticsLoading } = useSellerAnalytics();
   const { wallet, isLoading: walletLoading } = useSellerWallet();
   const { orders, isLoading: ordersLoading } = useOrders({ role: "seller", sellerId: user?.id });
@@ -82,10 +82,7 @@ const SellerDashboard = () => {
     navigate("/");
   };
 
-  const handleViewStorefront = () => {
-    enableCustomerView();
-    navigate("/");
-  };
+  // Removed: handleViewStorefront - strict role isolation
 
   const pendingOrders = orders?.filter(o => o.order_status === "pending")?.length || 0;
   const todaySales = totalStats?.totalEarnings || 0;
@@ -133,15 +130,6 @@ const SellerDashboard = () => {
             <p className="text-xs text-muted-foreground">Welcome, {profile?.full_name || "Seller"}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleViewStorefront}
-              className="h-9 gap-1.5"
-            >
-              <Eye size={16} />
-              <span className="hidden sm:inline">View Store</span>
-            </Button>
             <Button 
               variant="destructive" 
               size="sm"

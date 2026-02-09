@@ -190,7 +190,7 @@ const VerificationPending = ({ sellerProfile }: VerificationPendingProps) => {
           {/* Actions */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <Button variant="outline" className="flex-1" asChild>
-              <Link to="/">Back to Store</Link>
+              <Link to="/seller/dashboard">Back to Dashboard</Link>
             </Button>
             {isRejected && (
               <Button className="flex-1" asChild>
