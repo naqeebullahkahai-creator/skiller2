@@ -72,8 +72,9 @@ const DashboardSettings = () => {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="bg-muted/50">
-          <TabsTrigger value="profile" className="gap-2">
+        <div className="overflow-x-auto -mx-3 px-3 md:mx-0 md:px-0">
+          <TabsList className="bg-muted/50 w-max md:w-auto">
+            <TabsTrigger value="profile" className="gap-2">
             <User size={16} />
             Profile
           </TabsTrigger>
@@ -97,7 +98,8 @@ const DashboardSettings = () => {
               General
             </TabsTrigger>
           )}
-        </TabsList>
+          </TabsList>
+        </div>
 
         {/* Profile Tab */}
         <TabsContent value="profile">
