@@ -140,7 +140,7 @@ const AdminDashboardLayout = () => {
         >
           <div className="flex h-16 items-center justify-between px-4 border-b border-slate-700">
             {sidebarOpen && (
-              <Link to="/" className="flex items-center gap-2">
+              <Link to="/admin/dashboard" className="flex items-center gap-2">
                 <span className="text-xl font-bold text-primary">FANZON</span>
               </Link>
             )}

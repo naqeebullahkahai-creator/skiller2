@@ -314,10 +314,6 @@ const MobileSellerLayout = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate("/account/profile")}>
-                  <User className="h-4 w-4 mr-2" />
-                  My Profile
-                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/seller/settings")}>
                   <Settings className="h-4 w-4 mr-2" />
                   Settings
