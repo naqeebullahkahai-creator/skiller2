@@ -40,7 +40,7 @@ const Footer = () => {
   };
   
   return (
-    <footer className="bg-fanzon-dark text-secondary mt-8 pb-20 md:pb-0">
+    <footer className="hidden md:block bg-fanzon-dark text-secondary mt-8">
       {/* Features Bar */}
       <div className="border-b border-muted-foreground/20">
         <div className="container mx-auto py-6">
