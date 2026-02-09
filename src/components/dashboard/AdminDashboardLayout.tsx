@@ -9,6 +9,11 @@ import {
   Store,
   Eye,
   Menu,
+  Home,
+  ShoppingCart,
+  Users,
+  Settings,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +44,6 @@ const AdminDashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
@@ -54,66 +58,93 @@ const AdminDashboardLayout = () => {
     navigate("/");
   };
 
+  // Mobile bottom nav items
+  const bottomNavItems = [
+    { icon: Home, label: "Home", href: "/admin/dashboard" },
+    { icon: ShoppingCart, label: "Orders", href: "/admin/orders" },
+    { icon: Users, label: "Users", href: "/admin/users" },
+    { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
+    { icon: Settings, label: "Settings", href: "/admin/settings" },
+  ];
+
+  const isBottomActive = (href: string) => {
+    if (href === "/admin/dashboard") return location.pathname === href;
+    return location.pathname.startsWith(href);
+  };
+
   return (
     <PermissionsProvider>
       <div className="min-h-screen bg-muted">
-        {/* Mobile Header */}
-        <header className="md:hidden sticky top-0 z-50 h-14 bg-slate-900 border-b border-slate-700 flex items-center justify-between px-4">
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-white hover:bg-slate-800">
-                <Menu size={24} />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0 bg-slate-900 border-slate-700">
-              <div className="flex h-14 items-center px-4 border-b border-slate-700">
-                <span className="text-xl font-bold text-primary">FANZON</span>
-              </div>
-              <div className="p-4 border-b border-slate-700">
-                <Badge className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                  Admin Panel
-                </Badge>
-              </div>
-              <DynamicAdminSidebar sidebarOpen={true} onNavigate={() => setMobileMenuOpen(false)} />
-              <div className="p-4 border-t border-slate-700">
-                <Link
-                  to="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-                >
-                  <Store size={20} />
-                  <span>Back to Store</span>
-                </Link>
-              </div>
-            </SheetContent>
-          </Sheet>
-          
-          <span className="text-lg font-bold text-primary">Admin Panel</span>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-white hover:bg-slate-800">
-                <Avatar className="h-8 w-8">
-                  {profile?.avatar_url ? (
-                    <AvatarImage src={profile.avatar_url} alt={profile.full_name} className="object-cover aspect-square" />
-                  ) : null}
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                    {profile?.full_name?.charAt(0) || "A"}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover">
-              <DropdownMenuItem onClick={handleBuyerView}>
-                <Eye size={16} className="mr-2" />View as Customer
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/admin/settings")}>Settings</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                <LogOut size={16} className="mr-2" />Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Mobile Header - Native App Style */}
+        <header className="md:hidden sticky top-0 z-50 bg-primary safe-area-top">
+          <div className="flex items-center justify-between h-14 px-3">
+            <div className="flex items-center gap-2">
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <button className="text-primary-foreground p-1.5 active:scale-95 transition-transform">
+                    <Menu size={22} />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[280px] p-0 bg-slate-900 border-slate-700">
+                  {/* Drawer Header */}
+                  <div className="p-4 bg-primary">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12 border-2 border-primary-foreground/30">
+                        {profile?.avatar_url ? (
+                          <AvatarImage src={profile.avatar_url} alt={profile.full_name} className="object-cover" />
+                        ) : null}
+                        <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground font-semibold">
+                          {profile?.full_name?.charAt(0) || "A"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold text-primary-foreground">{profile?.full_name || "Admin"}</p>
+                        <Badge className="bg-primary-foreground/20 text-primary-foreground text-xs border-0">
+                          Super Admin
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sidebar Navigation */}
+                  <DynamicAdminSidebar sidebarOpen={true} onNavigate={() => setMobileMenuOpen(false)} />
+                  
+                  {/* Footer */}
+                  <div className="p-3 border-t border-slate-700">
+                    <button
+                      onClick={handleBuyerView}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 w-full active:scale-[0.97] transition-all"
+                    >
+                      <Eye className="w-5 h-5" />
+                      <span className="text-sm font-medium">Customer View</span>
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 w-full active:scale-[0.97] transition-all"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span className="text-sm font-medium">Logout</span>
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+              <span className="text-primary-foreground font-bold text-lg">Admin Panel</span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <button className="text-primary-foreground p-2 active:scale-95 transition-transform rounded-full hover:bg-primary-foreground/10">
+                <Bell size={20} />
+              </button>
+              <Avatar className="h-8 w-8 border-2 border-primary-foreground/30">
+                {profile?.avatar_url ? (
+                  <AvatarImage src={profile.avatar_url} className="object-cover" />
+                ) : null}
+                <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground text-xs font-semibold">
+                  {profile?.full_name?.charAt(0) || "A"}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+          </div>
         </header>
 
         {/* Desktop Sidebar */}
@@ -209,12 +240,51 @@ const AdminDashboardLayout = () => {
             </div>
           </header>
 
-          <main className="p-4 md:p-6 pb-20 md:pb-6">
+          <main className="p-3 md:p-6 pb-24 md:pb-6">
             <DashboardProvider>
               <Outlet />
             </DashboardProvider>
           </main>
         </div>
+
+        {/* Mobile Bottom Navigation - Native App Style */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
+          <div className="bg-slate-900/95 backdrop-blur-xl border-t border-slate-700/50">
+            <div className="flex items-center justify-around h-16">
+              {bottomNavItems.map((item) => {
+                const active = isBottomActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={cn(
+                      "flex flex-col items-center justify-center flex-1 h-full relative",
+                      "active:scale-[0.92] transition-all duration-200"
+                    )}
+                  >
+                    <item.icon
+                      size={20}
+                      strokeWidth={active ? 2.5 : 1.8}
+                      className={cn(
+                        "transition-all duration-200",
+                        active ? "text-primary" : "text-slate-400"
+                      )}
+                    />
+                    <span className={cn(
+                      "text-[10px] font-medium mt-0.5 transition-all",
+                      active ? "text-primary font-semibold" : "text-slate-400"
+                    )}>
+                      {item.label}
+                    </span>
+                    {active && (
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-b" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </nav>
       </div>
     </PermissionsProvider>
   );

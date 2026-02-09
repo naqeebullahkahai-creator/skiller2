@@ -42,6 +42,7 @@ import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton";
 import InstallPrompt from "./components/pwa/InstallPrompt";
 import NotificationPermissionBanner from "./components/notifications/NotificationPermissionBanner";
 import { useAdminInactivityLogout } from "./hooks/useAdminInactivityLogout";
+import { useIsMobile } from "./hooks/use-mobile";
 
 // Account Pages
 import AccountLayout from "./components/account/AccountLayout";
@@ -130,6 +131,13 @@ const queryClient = new QueryClient({
   },
 });
 
+// On mobile, /account shows the menu grid; on desktop, redirect to /account/profile
+const AccountIndexRedirect = () => {
+  const isMobile = useIsMobile();
+  if (isMobile) return null; // AccountLayout handles mobile menu
+  return <Navigate to="/account/profile" replace />;
+};
+
 // Admin page wrapper component
 const AdminPageWrapper = ({ children, title }: { children: React.ReactNode; title: string }) => (
   <PermissionsProvider>
@@ -140,7 +148,6 @@ const AdminPageWrapper = ({ children, title }: { children: React.ReactNode; titl
     </DashboardProvider>
   </PermissionsProvider>
 );
-
 // Seller page wrapper component
 const SellerPageWrapper = ({ children, title }: { children: React.ReactNode; title: string }) => (
   <DashboardProvider>
@@ -233,7 +240,7 @@ const App = () => (
                               </ProtectedRoute>
                             }
                           >
-                            <Route index element={<Navigate to="/account/profile" replace />} />
+                            <Route index element={<AccountIndexRedirect />} />
                             <Route path="profile" element={<ProfilePage />} />
                             <Route path="orders" element={<OrdersPage />} />
                             <Route path="orders/:orderId" element={<OrderDetailPage />} />
