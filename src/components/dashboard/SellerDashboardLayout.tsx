@@ -24,7 +24,8 @@ import {
   Menu,
   RotateCcw,
   XCircle,
-  HelpCircle
+  HelpCircle,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -117,6 +118,20 @@ const SellerDashboardLayout = () => {
     );
   };
 
+  // Bottom nav items for mobile
+  const bottomNavItems = [
+    { icon: Home, label: "Home", href: "/seller/dashboard" },
+    { icon: Package, label: "Products", href: "/seller/products" },
+    { icon: ShoppingCart, label: "Orders", href: "/seller/orders" },
+    { icon: Wallet, label: "Wallet", href: "/seller/wallet" },
+    { icon: Settings, label: "More", href: "/seller/settings" },
+  ];
+
+  const isBottomActive = (href: string) => {
+    if (href === "/seller/dashboard") return location.pathname === href;
+    return location.pathname.startsWith(href);
+  };
+
   const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => (
     <>
       <div className="p-4 border-b border-slate-700">
@@ -191,48 +206,52 @@ const SellerDashboardLayout = () => {
   return (
     <DashboardProvider>
       <div className="min-h-screen bg-muted">
-        {/* Mobile Header */}
-        <header className="md:hidden sticky top-0 z-50 h-14 bg-slate-900 border-b border-slate-700 flex items-center justify-between px-4">
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-white hover:bg-slate-800">
-                <Menu size={24} />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0 bg-slate-900 border-slate-700">
-              <div className="flex h-14 items-center px-4 border-b border-slate-700">
-                <span className="text-xl font-bold text-primary">FANZON</span>
-              </div>
-              <SidebarNav onNavigate={() => setMobileMenuOpen(false)} />
-            </SheetContent>
-          </Sheet>
-          
-          <span className="text-lg font-bold text-primary">Seller Center</span>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-white hover:bg-slate-800">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={profile?.avatar_url || undefined} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                    {profile?.full_name?.charAt(0) || "S"}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover">
-              <DropdownMenuItem onClick={handleViewStorefront}>
-                <Store size={16} className="mr-2" />View Store
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/seller/settings")}>
-                <Settings size={16} className="mr-2" />Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                <LogOut size={16} className="mr-2" />Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Mobile Header - Native App Style */}
+        <header className="md:hidden sticky top-0 z-50 bg-primary safe-area-top">
+          <div className="flex items-center justify-between h-14 px-3">
+            <div className="flex items-center gap-2">
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <button className="text-primary-foreground p-1.5 active:scale-95 transition-transform">
+                    <Menu size={22} />
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[280px] p-0 bg-slate-900 border-slate-700">
+                  {/* Drawer Header */}
+                  <div className="p-4 bg-primary">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12 border-2 border-primary-foreground/30">
+                        <AvatarImage src={profile?.avatar_url || undefined} className="object-cover" />
+                        <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground font-semibold">
+                          {profile?.full_name?.charAt(0) || "S"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold text-primary-foreground">{profile?.full_name || "Seller"}</p>
+                        <div className="mt-1">{getVerificationBadge()}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <SidebarNav onNavigate={() => setMobileMenuOpen(false)} />
+                </SheetContent>
+              </Sheet>
+              <span className="text-primary-foreground font-bold text-lg">Seller Center</span>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <button className="text-primary-foreground p-2 active:scale-95 transition-transform rounded-full hover:bg-primary-foreground/10 relative">
+                <MessageSquare size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center text-white text-[10px] font-bold rounded-full px-1 bg-destructive">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+              <button className="text-primary-foreground p-2 active:scale-95 transition-transform rounded-full hover:bg-primary-foreground/10">
+                <Bell size={20} />
+              </button>
+            </div>
+          </div>
         </header>
 
         {/* Desktop Sidebar */}
@@ -300,10 +319,49 @@ const SellerDashboardLayout = () => {
             </div>
           </header>
 
-          <main className="p-4 md:p-6 pb-20 md:pb-6">
+          <main className="p-3 md:p-6 pb-24 md:pb-6">
             <Outlet />
           </main>
         </div>
+
+        {/* Mobile Bottom Navigation - Native App Style */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
+          <div className="bg-card/90 backdrop-blur-xl border-t border-border/50">
+            <div className="flex items-center justify-around h-16">
+              {bottomNavItems.map((item) => {
+                const active = isBottomActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={cn(
+                      "flex flex-col items-center justify-center flex-1 h-full relative",
+                      "active:scale-[0.92] transition-all duration-200"
+                    )}
+                  >
+                    <item.icon
+                      size={20}
+                      strokeWidth={active ? 2.5 : 1.8}
+                      className={cn(
+                        "transition-all duration-200",
+                        active ? "text-primary" : "text-muted-foreground"
+                      )}
+                    />
+                    <span className={cn(
+                      "text-[10px] font-medium mt-0.5 transition-all",
+                      active ? "text-primary font-semibold" : "text-muted-foreground"
+                    )}>
+                      {item.label}
+                    </span>
+                    {active && (
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-b" />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </nav>
       </div>
     </DashboardProvider>
   );
