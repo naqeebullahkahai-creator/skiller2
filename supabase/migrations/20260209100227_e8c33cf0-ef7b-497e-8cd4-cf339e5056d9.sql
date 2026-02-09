@@ -1,0 +1,20 @@
+
+-- Add visual customization columns to hero_banners
+ALTER TABLE public.hero_banners
+  ADD COLUMN IF NOT EXISTS subtitle TEXT,
+  ADD COLUMN IF NOT EXISTS title_font TEXT DEFAULT 'Inter',
+  ADD COLUMN IF NOT EXISTS title_size TEXT DEFAULT '2xl',
+  ADD COLUMN IF NOT EXISTS title_color TEXT DEFAULT '#FFFFFF',
+  ADD COLUMN IF NOT EXISTS subtitle_font TEXT DEFAULT 'Inter',
+  ADD COLUMN IF NOT EXISTS subtitle_size TEXT DEFAULT 'base',
+  ADD COLUMN IF NOT EXISTS subtitle_color TEXT DEFAULT '#FFFFFF',
+  ADD COLUMN IF NOT EXISTS overlay_color TEXT DEFAULT '#000000',
+  ADD COLUMN IF NOT EXISTS overlay_opacity NUMERIC DEFAULT 0.4,
+  ADD COLUMN IF NOT EXISTS text_alignment TEXT DEFAULT 'left',
+  ADD COLUMN IF NOT EXISTS animation_type TEXT DEFAULT 'fade',
+  ADD COLUMN IF NOT EXISTS button_text TEXT,
+  ADD COLUMN IF NOT EXISTS button_color TEXT DEFAULT '#F85606',
+  ADD COLUMN IF NOT EXISTS button_text_color TEXT DEFAULT '#FFFFFF',
+  ADD COLUMN IF NOT EXISTS gradient_direction TEXT DEFAULT 'to-t',
+  ADD COLUMN IF NOT EXISTS title_bold BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS subtitle_bold BOOLEAN DEFAULT false;
