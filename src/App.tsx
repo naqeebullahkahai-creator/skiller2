@@ -101,6 +101,7 @@ import AdminDirectOrdersPage from "./pages/dashboard/AdminDirectOrdersPage";
 import AdminVendorOrdersPage from "./pages/dashboard/AdminVendorOrdersPage";
 import AdminChatShortcutsPage from "./pages/dashboard/AdminChatShortcutsPage";
 import AdminSiteContentPage from "./pages/dashboard/AdminSiteContentPage";
+import AdminBrandAssetsPage from "./pages/dashboard/AdminBrandAssetsPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -293,6 +294,7 @@ const App = () => (
                             <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
                             <Route path="chat-shortcuts" element={<AdminChatShortcutsPage />} />
                             <Route path="content-manager" element={<AdminSiteContentPage />} />
+                            <Route path="brand-assets" element={<AdminBrandAssetsPage />} />
                           </Route>
 
                           {/* Seller Routes - Nested under sidebar layout */}

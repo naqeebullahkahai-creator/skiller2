@@ -66,19 +66,14 @@ const ActionCard = ({ icon, title, description, badge, badgeVariant = "default",
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
-  const { enableCustomerView } = useViewMode();
   const { stats, isLoading } = useAdminDashboardAnalytics();
+  // Strict role isolation - no customer view
   
   // Enable real-time KYC notifications for admin
   useRealtimeKycNotifications();
 
   const handleLogout = async () => {
     await logout();
-    navigate("/");
-  };
-
-  const handleViewAsCustomer = () => {
-    enableCustomerView();
     navigate("/");
   };
 
@@ -125,15 +120,6 @@ const AdminDashboard = () => {
             <p className="text-xs text-muted-foreground">Welcome, {profile?.full_name || "Admin"}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleViewAsCustomer}
-              className="h-9 gap-1.5"
-            >
-              <Eye size={16} />
-              <span className="hidden sm:inline">View as Customer</span>
-            </Button>
             <Button 
               variant="destructive" 
               size="sm"

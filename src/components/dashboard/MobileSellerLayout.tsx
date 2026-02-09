@@ -149,14 +149,6 @@ const MobileSellerLayout = () => {
 
                     {/* Sheet Footer */}
                     <div className="p-3 border-t">
-                      <Link
-                        to="/"
-                        onClick={() => setSheetOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted"
-                      >
-                        <Store className="w-5 h-5" />
-                        Back to Store
-                      </Link>
                       <button
                         onClick={handleLogout}
                         className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 w-full"
@@ -282,15 +274,14 @@ const MobileSellerLayout = () => {
           </ul>
         </nav>
 
-        {/* Back to Store */}
+        {/* Logout */}
         <div className="px-3 py-4 border-t border-white/10">
-          <Link
-            to="/"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+          <button
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 w-full"
           >
-            <Store size={20} />
-            {sidebarOpen && <span>Back to Store</span>}
-          </Link>
+            <LogOut size={20} />
+            {sidebarOpen && <span>Logout</span>}
+          </button>
         </div>
       </aside>
 
@@ -307,10 +298,6 @@ const MobileSellerLayout = () => {
             <Input placeholder="Search..." className="pl-9" />
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => navigate("/")}>
-              <Store className="h-4 w-4 mr-2" />
-              Buyer View
-            </Button>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
             </Button>

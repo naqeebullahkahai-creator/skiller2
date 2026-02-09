@@ -145,14 +145,6 @@ const MobileAdminLayout = () => {
 
                         {/* Sheet Footer */}
                         <div className="p-3 border-t border-slate-800">
-                          <Link
-                            to="/"
-                            onClick={() => setSheetOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800"
-                          >
-                            <Store className="w-5 h-5" />
-                            Buyer View
-                          </Link>
                           <button
                             onClick={handleLogout}
                             className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 w-full"

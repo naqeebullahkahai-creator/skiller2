@@ -82,10 +82,7 @@ const DashboardHeader = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem asChild>
-              <Link to="/account/profile">My Profile</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/">Back to Store</Link>
+              <Link to="/admin/settings">Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
