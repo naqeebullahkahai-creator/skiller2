@@ -6,7 +6,7 @@ const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const FANZON_LOGO = "https://tyydinsbnmnvykoiyidb.supabase.co/storage/v1/object/public/email-assets/fanzon-logo.png?v=1";
@@ -44,23 +44,37 @@ const brandedWrapper = (content: string) => `
 `;
 
 interface EmailRequest {
-  type: "new_order" | "order_seller_alert" | "deposit_approved";
-  // new_order fields
+  type: "new_order" | "order_seller_alert" | "deposit_approved" | "welcome" | "order_status_update" | "admin_broadcast" | "order_shipped" | "order_delivered" | "refund_processed";
+  // Common
   customerEmail?: string;
   customerName?: string;
+  // new_order
   orderNumber?: string;
   totalAmount?: number;
   itemCount?: number;
-  // order_seller_alert fields
+  // order_seller_alert
   sellerEmail?: string;
   sellerName?: string;
   productTitle?: string;
   quantity?: number;
   orderAmount?: number;
-  // deposit_approved fields
+  // deposit_approved
   userEmail?: string;
   userName?: string;
   depositAmount?: number;
+  // welcome
+  // uses customerEmail & customerName
+  isSeller?: boolean;
+  // order_status_update / order_shipped / order_delivered
+  newStatus?: string;
+  trackingId?: string;
+  courierName?: string;
+  // admin_broadcast
+  broadcastSubject?: string;
+  broadcastMessage?: string;
+  recipientEmails?: string[];
+  // refund_processed
+  refundAmount?: number;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -74,7 +88,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     let subject = "";
     let html = "";
-    let to = "";
+    let to: string | string[] = "";
 
     switch (body.type) {
       case "new_order": {
@@ -181,13 +195,233 @@ const handler = async (req: Request): Promise<Response> => {
         break;
       }
 
+      case "welcome": {
+        if (!body.customerEmail) throw new Error("Missing welcome email fields");
+        to = body.customerEmail;
+        const isSeller = body.isSeller || false;
+        subject = isSeller ? "🎉 Welcome to FANZON Business Partner Program!" : "🎉 Welcome to FANZON!";
+        html = brandedWrapper(`
+          <div style="padding: 32px 24px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <div style="font-size: 48px;">${isSeller ? "🏪" : "🎉"}</div>
+              <h2 style="color: #111827; margin: 12px 0 0; font-size: 22px;">Welcome to FANZON${isSeller ? " Business" : ""}!</h2>
+            </div>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Dear <strong>${body.customerName || "Valued Member"}</strong>,
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              ${isSeller 
+                ? "Thank you for joining FANZON as a Business Partner! You're now part of Pakistan's fastest-growing marketplace." 
+                : "Welcome aboard! Your FANZON account has been created successfully. Start exploring millions of products from trusted sellers."}
+            </p>
+            ${isSeller ? `
+              <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 20px; margin: 24px 0; border-radius: 8px;">
+                <h3 style="color: #1e40af; margin: 0 0 12px; font-size: 16px;">Next Steps:</h3>
+                <ul style="color: #374151; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                  <li>Complete your KYC verification</li>
+                  <li>Set up your shop profile</li>
+                  <li>Add your first product</li>
+                  <li>Start receiving orders!</li>
+                </ul>
+              </div>
+            ` : `
+              <div style="background-color: #fff7ed; border: 1px solid #fed7aa; padding: 20px; margin: 24px 0; border-radius: 8px;">
+                <h3 style="color: #9a3412; margin: 0 0 12px; font-size: 16px;">What You Can Do:</h3>
+                <ul style="color: #374151; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                  <li>Browse millions of products</li>
+                  <li>Save favorites to your wishlist</li>
+                  <li>Track orders in real-time</li>
+                  <li>Enjoy secure checkout</li>
+                </ul>
+              </div>
+            `}
+            <div style="text-align: center;">
+              <a href="${SITE_URL}${isSeller ? "/seller/dashboard" : "/"}" style="display: inline-block; background: linear-gradient(135deg, #ff6600 0%, #e65c00 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                ${isSeller ? "Go to Dashboard" : "Start Shopping"}
+              </a>
+            </div>
+          </div>
+        `);
+        break;
+      }
+
+      case "order_shipped": {
+        if (!body.customerEmail || !body.orderNumber) throw new Error("Missing order_shipped fields");
+        to = body.customerEmail;
+        subject = `🚚 Order Shipped - ${body.orderNumber}`;
+        html = brandedWrapper(`
+          <div style="padding: 32px 24px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <div style="font-size: 48px;">🚚</div>
+              <h2 style="color: #111827; margin: 12px 0 0; font-size: 22px;">Your Order Has Been Shipped!</h2>
+            </div>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Dear <strong>${body.customerName || "Customer"}</strong>,
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Your order <strong>${body.orderNumber}</strong> is on its way!
+            </p>
+            <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; padding: 20px; margin: 24px 0; border-radius: 8px;">
+              <table style="width: 100%; font-size: 14px; color: #374151;">
+                ${body.courierName ? `<tr><td style="padding: 6px 0;">Courier</td><td style="text-align: right; font-weight: 600;">${body.courierName}</td></tr>` : ""}
+                ${body.trackingId ? `<tr><td style="padding: 6px 0;">Tracking ID</td><td style="text-align: right; font-weight: 600;">${body.trackingId}</td></tr>` : ""}
+                <tr><td style="padding: 6px 0;">Status</td><td style="text-align: right; font-weight: 600; color: #2563eb;">Shipped</td></tr>
+              </table>
+            </div>
+            <div style="text-align: center;">
+              <a href="${SITE_URL}/track-order" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                Track Your Order
+              </a>
+            </div>
+          </div>
+        `);
+        break;
+      }
+
+      case "order_delivered": {
+        if (!body.customerEmail || !body.orderNumber) throw new Error("Missing order_delivered fields");
+        to = body.customerEmail;
+        subject = `✅ Order Delivered - ${body.orderNumber}`;
+        html = brandedWrapper(`
+          <div style="padding: 32px 24px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <div style="font-size: 48px;">🎁</div>
+              <h2 style="color: #111827; margin: 12px 0 0; font-size: 22px;">Order Delivered!</h2>
+            </div>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Dear <strong>${body.customerName || "Customer"}</strong>,
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Your order <strong>${body.orderNumber}</strong> has been delivered successfully. We hope you love it!
+            </p>
+            <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; margin: 24px 0; border-radius: 8px; text-align: center;">
+              <p style="color: #166534; margin: 0; font-size: 16px; font-weight: 600;">✅ Successfully Delivered</p>
+            </div>
+            <p style="color: #374151; font-size: 14px; line-height: 1.6; text-align: center;">
+              If you have any issues, you can request a return within 7 days.
+            </p>
+            <div style="text-align: center;">
+              <a href="${SITE_URL}/my-orders" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                Rate Your Experience
+              </a>
+            </div>
+          </div>
+        `);
+        break;
+      }
+
+      case "order_status_update": {
+        if (!body.customerEmail || !body.orderNumber || !body.newStatus) throw new Error("Missing order_status_update fields");
+        to = body.customerEmail;
+        subject = `📋 Order Update - ${body.orderNumber}`;
+        html = brandedWrapper(`
+          <div style="padding: 32px 24px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <div style="font-size: 48px;">📋</div>
+              <h2 style="color: #111827; margin: 12px 0 0; font-size: 22px;">Order Status Updated</h2>
+            </div>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Dear <strong>${body.customerName || "Customer"}</strong>,
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Your order <strong>${body.orderNumber}</strong> status has been updated.
+            </p>
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; margin: 24px 0; border-radius: 8px; text-align: center;">
+              <p style="color: #64748b; margin: 0 0 4px; font-size: 13px; font-weight: 600;">NEW STATUS</p>
+              <p style="color: #1e40af; margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase;">${body.newStatus}</p>
+            </div>
+            <div style="text-align: center;">
+              <a href="${SITE_URL}/track-order" style="display: inline-block; background: linear-gradient(135deg, #ff6600 0%, #e65c00 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                View Order Details
+              </a>
+            </div>
+          </div>
+        `);
+        break;
+      }
+
+      case "refund_processed": {
+        if (!body.customerEmail || !body.orderNumber) throw new Error("Missing refund fields");
+        to = body.customerEmail;
+        subject = `💰 Refund Processed - ${body.orderNumber}`;
+        html = brandedWrapper(`
+          <div style="padding: 32px 24px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <div style="font-size: 48px;">💰</div>
+              <h2 style="color: #111827; margin: 12px 0 0; font-size: 22px;">Refund Processed!</h2>
+            </div>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Dear <strong>${body.customerName || "Customer"}</strong>,
+            </p>
+            <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+              Your refund for order <strong>${body.orderNumber}</strong> has been processed and credited to your wallet.
+            </p>
+            <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; margin: 24px 0; border-radius: 8px; text-align: center;">
+              <p style="color: #166534; margin: 0 0 4px; font-size: 13px; font-weight: 600;">REFUND AMOUNT</p>
+              <p style="color: #15803d; margin: 0; font-size: 28px; font-weight: 800;">PKR ${(body.refundAmount || 0).toLocaleString()}</p>
+            </div>
+            <div style="text-align: center;">
+              <a href="${SITE_URL}/account/wallet" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                Check Wallet Balance
+              </a>
+            </div>
+          </div>
+        `);
+        break;
+      }
+
+      case "admin_broadcast": {
+        if (!body.recipientEmails || body.recipientEmails.length === 0) throw new Error("Missing broadcast recipients");
+        if (!body.broadcastSubject || !body.broadcastMessage) throw new Error("Missing broadcast content");
+        
+        // Send to all recipients
+        const results = [];
+        for (const email of body.recipientEmails) {
+          try {
+            const emailHtml = brandedWrapper(`
+              <div style="padding: 32px 24px;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                  <div style="font-size: 48px;">📢</div>
+                  <h2 style="color: #111827; margin: 12px 0 0; font-size: 22px;">${body.broadcastSubject}</h2>
+                </div>
+                <div style="color: #374151; font-size: 16px; line-height: 1.8; white-space: pre-line;">
+                  ${body.broadcastMessage}
+                </div>
+                <div style="text-align: center; margin-top: 24px;">
+                  <a href="${SITE_URL}" style="display: inline-block; background: linear-gradient(135deg, #ff6600 0%, #e65c00 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                    Visit FANZON
+                  </a>
+                </div>
+              </div>
+            `);
+
+            const res = await resend.emails.send({
+              from: "FANZON <noreply@fanzon.pk>",
+              to: [email],
+              subject: `📢 ${body.broadcastSubject}`,
+              html: emailHtml,
+            });
+            results.push({ email, success: true, data: res });
+          } catch (err: any) {
+            console.error(`Failed to send to ${email}:`, err.message);
+            results.push({ email, success: false, error: err.message });
+          }
+        }
+
+        console.log(`Broadcast sent: ${results.filter(r => r.success).length}/${results.length} successful`);
+        return new Response(JSON.stringify({ success: true, results }), {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+
       default:
         throw new Error(`Unknown email type: ${body.type}`);
     }
 
     const emailResponse = await resend.emails.send({
       from: "FANZON <noreply@fanzon.pk>",
-      to: [to],
+      to: Array.isArray(to) ? to : [to],
       subject,
       html,
     });
