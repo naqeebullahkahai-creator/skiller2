@@ -1,131 +1,83 @@
 
 
-# FANZON Mobile UI -- Native App Style Overhaul
+## Commission Management Tool - Mukammal System
 
-## Overview
+Aap ko ek complete commission management page chahiye jahan se admin sab sellers ki commission manage kar sake - naye sellers ko free period de sake, daily rate set kar sake, aur har seller ki individually manage kar sake.
 
-Mobile UI ko completely redesign karein ge taake yeh web jaisa na lagay balkay ek real native app (Daraz/Shopee style) jaisa feel karay. Desktop UI bilkul same rahega, sirf mobile pe changes hongi.
+### Kya banega:
 
----
+**1. Naya Admin Commission Management Page**
+- Ek dedicated page `/admin/commission-management` banegi
+- Sidebar mein link add hoga
+- Is page par 3 sections honge:
+  - Global Settings (default commission rate + new seller free period toggle)
+  - All Sellers Commission Overview (table with all sellers)
+  - Per-seller edit capability
 
-## Part 1: Mobile Home Page (Complete Redesign)
+**2. Global New Seller Policy**
+- Admin toggle kar sakta hai: "New sellers ko pehle 3 months free do (0% commission)"
+- Admin months change kar sakta hai (1 se 12 months)
+- Admin grace period commission bhi set kar sakta hai (default 0%)
+- Jab ye ON hai, har naye seller ko automatically grace period mil jayega
+- Jab OFF kare, naye sellers ko direct global rate lagega
 
-### 1.1 New Mobile Home Layout
+**3. All Sellers Commission Table**
+- Ek table jismein sab sellers dikhenge with:
+  - Seller name, shop name
+  - Status: New Seller / Old Seller (based on join date)
+  - Current effective rate
+  - Grace period status (Active/Expired/None)
+  - Grace end date
+  - Custom rate ya Global rate
+  - Quick edit button
+- Filter: New Sellers / Old Sellers / Grace Active / All
+- Search by seller name
 
-Ek naya `MobileHomeLayout.tsx` component banay ga jo sirf mobile pe render hoga. `Index.tsx` mein `useIsMobile()` se detect karay ga ke mobile hai ya desktop.
-
-**Design:**
-- Full-width edge-to-edge layout (no container margins)
-- Har section ke beech subtle spacing
-- Smooth scroll behavior
-
-### 1.2 Swipeable Hero Banner
-
-Naya `MobileHeroBanner.tsx` -- touch swipe support ke saath:
-- Full-width images (no padding/margins)
-- Rounded pill dot indicators at bottom
-- Auto-slide every 4 seconds
-- Touch swipe gestures (embla-carousel already installed)
-
-### 1.3 Horizontal Scrolling Categories
-
-Naya `MobileCategoryScroll.tsx`:
-- Horizontal scroll (left-right swipe)
-- Round icon circles with labels below
-- No grid -- single row scrollable
-- Smooth momentum scrolling
-
-### 1.4 Mobile Flash Sale Section
-
-Naya `MobileFlashSale.tsx`:
-- Compact countdown timer bar at top (red gradient)
-- Horizontal scrollable product cards
-- Tighter card design with bigger discount badges
-
-### 1.5 Full-Screen Search Overlay
-
-Naya `MobileSearchOverlay.tsx`:
-- Tappable search pill in header (replaces current input)
-- Full-screen overlay when tapped
-- Recent searches list
-- Auto-focus on open
+**4. Per-Seller Inline Edit**
+- Table se kisi bhi seller par click karke:
+  - Custom commission set/remove karna
+  - Grace period on/off karna
+  - Grace period months change karna
+  - Grace commission % change karna
+  - Notes add karna
+- Ye existing `SellerCommissionManager` component reuse karega
 
 ---
 
-## Part 2: Premium Mobile Product Cards
+### Technical Details
 
-### 2.1 MobileProductCard Redesign
+**Database Changes:**
+- `admin_settings` table mein 3 naye settings add honge:
+  - `new_seller_grace_enabled` (true/false) - Toggle for auto grace period
+  - `new_seller_grace_months` (default: 3) - Kitne months free
+  - `new_seller_grace_commission` (default: 0) - Grace period mein commission %
 
-Current card update karay ga:
-- `rounded-2xl` corners with soft shadow
-- Floating "Add to Cart" icon button on image corner
-- Bigger discount badge with gradient background
-- Sold count badge for popular items
-- Smooth image loading with fade-in animation
-- Rating stars inline with actual product rating
+**New Files:**
+- `src/pages/dashboard/AdminCommissionManagementPage.tsx` - Main page with:
+  - Global commission rate settings (reusing `AdminCommissionSettings`)
+  - New seller policy card with toggle + months + rate inputs
+  - Sellers commission overview table with filters and search
+  - Dialog-based per-seller commission editor (using `SellerCommissionManager`)
 
----
+**Modified Files:**
+- `src/App.tsx` - Route add: `/admin/commission-management`
+- `src/components/admin/DynamicAdminSidebar.tsx` - Sidebar link add
+- `src/hooks/useAdminFinance.ts` - New seller policy settings ka fetch/update logic add
 
-## Part 3: Mobile Bottom Navigation Enhancement
+**Auto Grace Period Logic:**
+- Jab new seller verify hota hai aur `new_seller_grace_enabled = true`:
+  - Automatically `seller_commissions` mein entry create hogi
+  - `grace_period_months` = admin setting se
+  - `grace_commission_percentage` = admin setting se (default 0%)
+  - `grace_start_date` = verification date
+- Database trigger banayenge jo `seller_profiles.verification_status` change hone par fire ho
 
-### 3.1 Glass Effect Bottom Nav
+**Seller Classification:**
+- "New Seller" = joined within last 3 months (or grace period active)
+- "Old Seller" = grace period expired or no grace period
 
-`MobileBottomNav.tsx` update:
-- Glass/blur effect background (`backdrop-blur-xl` + semi-transparent bg)
-- Active tab: filled icon + colored label + subtle glow
-- Cart badge with bounce animation on count change
-- Smoother press animation
-
----
-
-## Part 4: Mobile Header Redesign
-
-### 4.1 Compact Header
-
-`MobileHeader.tsx` update:
-- FANZON logo left, notification + avatar right
-- Search bar becomes a tappable pill shape
-- Tapping pill opens full-screen search overlay
-- Cleaner, more compact look
-
----
-
-## Part 5: Mobile CSS Utilities
-
-### 5.1 New CSS Classes in `index.css`
-
-- `.glass-nav` -- backdrop-blur + transparent background
-- `.mobile-card` -- rounded-2xl + shadow
-- `.search-pill` -- rounded-full tappable area
-- `.swipe-indicator` -- small pill dots for carousels
-- Shimmer loading animation improvements
-
----
-
-## Technical Details
-
-### New Files to Create:
-1. `src/components/mobile/MobileHomeLayout.tsx` -- Mobile-specific home wrapper
-2. `src/components/mobile/MobileHeroBanner.tsx` -- Swipeable full-width banner
-3. `src/components/mobile/MobileCategoryScroll.tsx` -- Horizontal category scroll
-4. `src/components/mobile/MobileFlashSale.tsx` -- Mobile flash sale section
-5. `src/components/mobile/MobileSearchOverlay.tsx` -- Full-screen search overlay
-
-### Files to Modify:
-1. `src/pages/Index.tsx` -- Mobile layout switch using `useIsMobile()`
-2. `src/components/layout/MobileHeader.tsx` -- Search pill + compact design
-3. `src/components/layout/MobileBottomNav.tsx` -- Glass effect + animations
-4. `src/components/mobile/MobileProductCard.tsx` -- Premium card redesign
-5. `src/index.css` -- Mobile utility classes
-
-### No database changes needed -- purely frontend.
-
-### Key Design Rules:
-- Zero container padding on mobile for edge-to-edge content
-- Rounded corners everywhere (16px/2xl radius)
-- Subtle shadows instead of borders
-- All transitions 200-300ms
-- Active press scale (0.97)
-- Glass/blur effects on navigation
-- `embla-carousel-react` (already installed) for swipe gestures
-
+**Data Flow:**
+- Page loads > fetch all seller_profiles + seller_commissions + admin_settings
+- Admin changes global policy > admin_settings update
+- Admin edits individual seller > seller_commissions upsert
+- New seller gets verified > trigger auto-creates commission entry with grace period
