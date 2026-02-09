@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Download, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -12,31 +13,43 @@ const InstallPrompt = () => {
   const isMobile = useIsMobile();
   const [showBanner, setShowBanner] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isEnabled, setIsEnabled] = useState(true);
+
+  // Check admin toggle
+  useEffect(() => {
+    const checkSetting = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("is_enabled")
+        .eq("setting_key", "pwa_install_prompt")
+        .maybeSingle();
+      if (data) setIsEnabled(data.is_enabled);
+    };
+    checkSetting();
+  }, []);
 
   useEffect(() => {
-    // Check if already installed or dismissed
+    if (!isEnabled) {
+      setShowBanner(false);
+      return;
+    }
+
     const dismissed = localStorage.getItem("pwa-install-dismissed");
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
 
-    if (dismissed || isStandalone) {
-      return;
-    }
+    if (dismissed || isStandalone) return;
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      // Only show on mobile
-      if (isMobile) {
-        setShowBanner(true);
-      }
+      if (isMobile) setShowBanner(true);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    // For iOS Safari which doesn't support beforeinstallprompt
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-    
+
     if (isIOS && isSafari && isMobile && !isStandalone && !dismissed) {
       setTimeout(() => setShowBanner(true), 3000);
     }
@@ -44,7 +57,7 @@ const InstallPrompt = () => {
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     };
-  }, [isMobile]);
+  }, [isMobile, isEnabled]);
 
   const handleInstall = async () => {
     if (deferredPrompt) {
@@ -55,7 +68,6 @@ const InstallPrompt = () => {
       }
       setDeferredPrompt(null);
     } else {
-      // For iOS, show instructions
       alert("To install FANZON:\n1. Tap the Share button\n2. Scroll down and tap 'Add to Home Screen'\n3. Tap 'Add'");
     }
   };
@@ -65,7 +77,7 @@ const InstallPrompt = () => {
     localStorage.setItem("pwa-install-dismissed", "true");
   };
 
-  if (!showBanner) return null;
+  if (!showBanner || !isEnabled) return null;
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-primary to-orange-500 text-primary-foreground shadow-lg animate-fade-in">
@@ -91,7 +103,8 @@ const InstallPrompt = () => {
           </Button>
           <button
             onClick={handleDismiss}
-            className="p-1 hover:bg-white/20 rounded-full transition-colors"
+            className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
+            aria-label="Dismiss install prompt"
           >
             <X size={18} />
           </button>

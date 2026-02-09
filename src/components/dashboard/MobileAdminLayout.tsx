@@ -174,7 +174,7 @@ const MobileAdminLayout = () => {
             </header>
 
             {/* Main Content */}
-            <main className="p-4">
+          <main className="p-4 overflow-x-hidden">
               <Outlet />
             </main>
 
@@ -337,7 +337,7 @@ const MobileAdminLayout = () => {
               sidebarOpen ? "ml-64" : "ml-16"
             )}
           >
-            <div className="p-4 md:p-6">
+            <div className="p-4 md:p-6 overflow-x-hidden">
               <Outlet />
             </div>
           </main>

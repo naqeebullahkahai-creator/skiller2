@@ -28,14 +28,18 @@ import {
 import { useDashboard } from "@/contexts/DashboardContext";
 import { useToast } from "@/hooks/use-toast";
 import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import SystemAnnouncementManager from "@/components/admin/SystemAnnouncementManager";
 
 const DashboardSettings = () => {
   const { role } = useDashboard();
   const { toast } = useToast();
   const { isMaintenanceMode, toggleMaintenanceMode, isLoading: isMaintenanceLoading } = useMaintenanceMode();
+  const { getSetting, updateSetting } = useSiteSettings();
   const [showMaintenanceConfirm, setShowMaintenanceConfirm] = useState(false);
   const [pendingMaintenanceState, setPendingMaintenanceState] = useState(false);
+  
+  const pwaInstallEnabled = getSetting('pwa_install_prompt')?.is_enabled ?? true;
   
   const [notifications, setNotifications] = useState({
     orderUpdates: true,
@@ -343,6 +347,36 @@ const DashboardSettings = () => {
                       </div>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+
+              {/* PWA Install Prompt Toggle */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Megaphone size={20} />
+                    PWA Install Prompt
+                  </CardTitle>
+                  <CardDescription>
+                    Control the "Install FANZON App" banner shown to mobile users
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                    <div>
+                      <p className="font-medium">Show Install Banner</p>
+                      <p className="text-sm text-muted-foreground">
+                        Display app install prompt on mobile devices
+                      </p>
+                    </div>
+                    <Switch
+                      checked={pwaInstallEnabled}
+                      onCheckedChange={(checked) => {
+                        updateSetting.mutate({ key: 'pwa_install_prompt', isEnabled: checked });
+                      }}
+                      disabled={updateSetting.isPending}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 

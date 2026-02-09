@@ -159,6 +159,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     { name: "Content Manager", href: "/admin/content-manager", icon: FileText, feature: 'settings' },
     { name: "Site Settings", href: "/admin/site-settings", icon: Globe, feature: 'settings' },
     { name: "Brand Assets", href: "/admin/brand-assets", icon: Image, feature: 'settings' },
+    { name: "Send Notification", href: "/admin/notifications", icon: UserCircle, feature: 'settings' },
     { name: "Settings", href: "/admin/settings", icon: Settings, feature: 'settings' },
   ];
 
