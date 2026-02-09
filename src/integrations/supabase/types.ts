@@ -754,36 +754,87 @@ export type Database = {
       }
       hero_banners: {
         Row: {
+          animation_type: string | null
+          button_color: string | null
+          button_text: string | null
+          button_text_color: string | null
           created_at: string
           display_order: number
+          gradient_direction: string | null
           id: string
           image_url: string
           is_active: boolean
           link_type: string
           link_value: string | null
+          overlay_color: string | null
+          overlay_opacity: number | null
+          subtitle: string | null
+          subtitle_bold: boolean | null
+          subtitle_color: string | null
+          subtitle_font: string | null
+          subtitle_size: string | null
+          text_alignment: string | null
           title: string
+          title_bold: boolean | null
+          title_color: string | null
+          title_font: string | null
+          title_size: string | null
           updated_at: string
         }
         Insert: {
+          animation_type?: string | null
+          button_color?: string | null
+          button_text?: string | null
+          button_text_color?: string | null
           created_at?: string
           display_order?: number
+          gradient_direction?: string | null
           id?: string
           image_url: string
           is_active?: boolean
           link_type?: string
           link_value?: string | null
+          overlay_color?: string | null
+          overlay_opacity?: number | null
+          subtitle?: string | null
+          subtitle_bold?: boolean | null
+          subtitle_color?: string | null
+          subtitle_font?: string | null
+          subtitle_size?: string | null
+          text_alignment?: string | null
           title: string
+          title_bold?: boolean | null
+          title_color?: string | null
+          title_font?: string | null
+          title_size?: string | null
           updated_at?: string
         }
         Update: {
+          animation_type?: string | null
+          button_color?: string | null
+          button_text?: string | null
+          button_text_color?: string | null
           created_at?: string
           display_order?: number
+          gradient_direction?: string | null
           id?: string
           image_url?: string
           is_active?: boolean
           link_type?: string
           link_value?: string | null
+          overlay_color?: string | null
+          overlay_opacity?: number | null
+          subtitle?: string | null
+          subtitle_bold?: boolean | null
+          subtitle_color?: string | null
+          subtitle_font?: string | null
+          subtitle_size?: string | null
+          text_alignment?: string | null
           title?: string
+          title_bold?: boolean | null
+          title_color?: string | null
+          title_font?: string | null
+          title_size?: string | null
           updated_at?: string
         }
         Relationships: []

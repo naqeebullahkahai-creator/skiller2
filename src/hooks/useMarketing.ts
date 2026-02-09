@@ -51,6 +51,23 @@ export interface HeroBanner {
   link_value: string | null;
   display_order: number;
   is_active: boolean;
+  subtitle?: string | null;
+  title_font?: string;
+  title_size?: string;
+  title_color?: string;
+  title_bold?: boolean;
+  subtitle_font?: string;
+  subtitle_size?: string;
+  subtitle_color?: string;
+  subtitle_bold?: boolean;
+  overlay_color?: string;
+  overlay_opacity?: number;
+  text_alignment?: string;
+  animation_type?: string;
+  button_text?: string | null;
+  button_color?: string;
+  button_text_color?: string;
+  gradient_direction?: string;
 }
 
 export interface Notification {
