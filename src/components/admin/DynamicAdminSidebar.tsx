@@ -30,6 +30,7 @@ import {
   Scale,
   FileText,
   Headphones,
+  Percent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -144,6 +145,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
       icon: DollarSign,
       feature: 'payouts',
       children: [
+        { name: "Commission Management", href: "/admin/commission-management", icon: Percent },
         { name: "Payouts", href: "/admin/payouts", icon: Wallet },
         { name: "Balance Adjustments", href: "/admin/balance-adjustments", icon: Scale },
         { name: "Platform Revenue", href: "/admin/analytics", icon: BarChart3 },
