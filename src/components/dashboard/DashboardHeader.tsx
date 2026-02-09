@@ -61,11 +61,9 @@ const DashboardHeader = () => {
         </div>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative" asChild>
-          <Link to="/account/notifications">
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
-          </Link>
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell size={20} />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
         </Button>
 
         {/* Profile Dropdown */}

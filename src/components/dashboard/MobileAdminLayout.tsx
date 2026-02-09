@@ -274,15 +274,15 @@ const MobileAdminLayout = () => {
               </ul>
             </nav>
 
-            {/* Back to Store */}
+            {/* Logout */}
             <div className="px-3 py-4 border-t border-slate-800">
-              <Link
-                to="/"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors w-full"
               >
-                <Store size={20} />
-                {sidebarOpen && <span>Buyer View</span>}
-              </Link>
+                <LogOut size={20} />
+                {sidebarOpen && <span>Logout</span>}
+              </button>
             </div>
           </aside>
 
@@ -299,11 +299,7 @@ const MobileAdminLayout = () => {
                 <Input placeholder="Search..." className="pl-9" />
               </div>
               <div className="flex items-center gap-3">
-                <Button variant="outline" size="sm" onClick={() => navigate("/")}>
-                  <Store className="h-4 w-4 mr-2" />
-                  Buyer View
-                </Button>
-                <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative">
                   <Bell className="h-5 w-5" />
                 </Button>
                 <DropdownMenu>
@@ -319,10 +315,6 @@ const MobileAdminLayout = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => navigate("/account/profile")}>
-                      <User className="h-4 w-4 mr-2" />
-                      My Profile
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/admin-dashboard/settings")}>
                       <Settings className="h-4 w-4 mr-2" />
                       Settings
