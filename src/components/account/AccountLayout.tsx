@@ -27,6 +27,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 const menuItems = [
   { icon: User, label: "Profile Info", path: "/account/profile" },
   { icon: Package, label: "My Orders", path: "/account/orders" },
+  { icon: Wallet, label: "Wallet & Deposit", path: "/account/wallet" },
   { icon: MessageSquare, label: "Messages", path: "/account/messages" },
   { icon: Heart, label: "My Wishlist", path: "/account/wishlist" },
   { icon: MapPin, label: "Saved Addresses", path: "/account/addresses" },

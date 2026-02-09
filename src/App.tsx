@@ -41,6 +41,7 @@ import SupportChatWidget from "./components/support/SupportChatWidget";
 import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton";
 import InstallPrompt from "./components/pwa/InstallPrompt";
 import NotificationPermissionBanner from "./components/notifications/NotificationPermissionBanner";
+import MobileFloatingBackButton from "./components/mobile/MobileFloatingBackButton";
 import { useAdminInactivityLogout } from "./hooks/useAdminInactivityLogout";
 import { useIsMobile } from "./hooks/use-mobile";
 
@@ -53,6 +54,7 @@ import WishlistPage from "./pages/account/WishlistPage";
 import AddressesPage from "./pages/account/AddressesPage";
 import CustomerMessagesPage from "./pages/account/MessagesPage";
 import NotificationsPage from "./pages/account/NotificationsPage";
+import WalletPage from "./pages/account/WalletPage";
 
 // New Mobile-First Dashboard Pages
 import AdminDashboardLayout from "./components/dashboard/AdminDashboardLayout";
@@ -189,6 +191,7 @@ const App = () => (
                           <SupportChatWidget />
                           <WhatsAppFloatingButton />
                           <ComparisonBar />
+                          <MobileFloatingBackButton />
                           <VisualEditToggle />
                           <Routes>
                           <Route path="/" element={<Index />} />
@@ -248,6 +251,7 @@ const App = () => (
                             <Route path="addresses" element={<AddressesPage />} />
                             <Route path="messages" element={<CustomerMessagesPage />} />
                             <Route path="notifications" element={<NotificationsPage />} />
+                            <Route path="wallet" element={<WalletPage />} />
                           </Route>
                           <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
                           
