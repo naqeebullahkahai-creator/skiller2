@@ -6,8 +6,6 @@ import {
   LogOut,
   Bell,
   Search,
-  Store,
-  Eye,
   Menu,
   Home,
   ShoppingCart,
@@ -29,7 +27,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
-import { useViewMode } from "@/contexts/ViewModeContext";
 import { DashboardProvider } from "@/contexts/DashboardContext";
 import { PermissionsProvider } from "@/contexts/PermissionsContext";
 import DynamicAdminSidebar from "@/components/admin/DynamicAdminSidebar";
@@ -39,7 +36,6 @@ const AdminDashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
-  const { enableCustomerView } = useViewMode();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -50,11 +46,6 @@ const AdminDashboardLayout = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/");
-  };
-
-  const handleBuyerView = () => {
-    enableCustomerView();
     navigate("/");
   };
 
@@ -111,13 +102,6 @@ const AdminDashboardLayout = () => {
                   
                   {/* Footer */}
                   <div className="p-3 border-t border-slate-700">
-                    <button
-                      onClick={handleBuyerView}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-slate-800 w-full active:scale-[0.97] transition-all"
-                    >
-                      <Eye className="w-5 h-5" />
-                      <span className="text-sm font-medium">Customer View</span>
-                    </button>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 w-full active:scale-[0.97] transition-all"
@@ -179,13 +163,13 @@ const AdminDashboardLayout = () => {
           <DynamicAdminSidebar sidebarOpen={sidebarOpen} />
 
           <div className="p-4 border-t border-slate-700">
-            <Link
-              to="/"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors w-full"
             >
-              <Store size={20} />
-              {sidebarOpen && <span>Back to Store</span>}
-            </Link>
+              <LogOut size={20} />
+              {sidebarOpen && <span>Logout</span>}
+            </button>
           </div>
         </aside>
 
@@ -205,9 +189,6 @@ const AdminDashboardLayout = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" onClick={handleBuyerView} className="items-center gap-2">
-                <Eye size={16} /><span>Buyer View</span>
-              </Button>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell size={20} />
               </Button>
@@ -226,11 +207,7 @@ const AdminDashboardLayout = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-popover">
-                  <DropdownMenuItem asChild><Link to="/account/profile">Profile</Link></DropdownMenuItem>
                   <DropdownMenuItem asChild><Link to="/admin/settings">Settings</Link></DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleBuyerView}>
-                    <Eye size={16} className="mr-2" />Switch to Buyer
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                     <LogOut size={16} className="mr-2" />Logout
