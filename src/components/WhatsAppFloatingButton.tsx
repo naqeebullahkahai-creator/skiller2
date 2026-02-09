@@ -1,10 +1,14 @@
 import { MessageCircle } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useAuth } from "@/contexts/AuthContext";
 
 const WhatsAppFloatingButton = () => {
   const { getSetting, isLoading } = useSiteSettings();
+  const { role } = useAuth();
   const whatsappSetting = getSetting("social_whatsapp");
 
+  // Only show for customers - NEVER for admin/seller
+  if (role === "admin" || role === "seller") return null;
   if (isLoading || !whatsappSetting?.is_enabled || !whatsappSetting.setting_value) return null;
 
   const phone = whatsappSetting.setting_value.replace(/\D/g, "");

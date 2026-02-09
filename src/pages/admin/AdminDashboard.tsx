@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { useViewMode } from "@/contexts/ViewModeContext";
 import { useAdminDashboardAnalytics } from "@/hooks/useAdminDashboardAnalytics";
 import { useRealtimeKycNotifications } from "@/hooks/useRealtimeKycNotifications";
 import SellerLeaderboard from "@/components/admin/SellerLeaderboard";

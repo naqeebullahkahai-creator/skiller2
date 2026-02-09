@@ -3,14 +3,13 @@ import {
   Package, ShoppingBag, Wallet, BarChart3, 
   Settings, MessageSquare, Star, Zap, Tag,
   Plus, FileUp, RotateCcw, LogOut, Store,
-  Shield, HelpCircle, Eye, XCircle
+  Shield, HelpCircle, XCircle
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { useViewMode } from "@/contexts/ViewModeContext";
 import { useSellerAnalytics } from "@/hooks/useSellerAnalytics";
 import { useSellerWallet } from "@/hooks/useSellerWallet";
 import { useOrders } from "@/hooks/useOrders";

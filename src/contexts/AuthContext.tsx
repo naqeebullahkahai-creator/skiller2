@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 
-export type UserRole = "admin" | "seller" | "customer";
+export type UserRole = "admin" | "seller" | "customer" | "support_agent";
 
 // Super Admin email - the only user allowed to access admin panel
 export const SUPER_ADMIN_EMAIL = "alxteam001@gmail.com";

@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type RoleType = "customer" | "seller" | "admin";
+export type RoleType = "customer" | "seller" | "admin" | "support_agent";
 
 interface RoleConflictResult {
   hasConflict: boolean;
@@ -51,6 +51,8 @@ export const getRoleDisplayName = (role: RoleType): string => {
       return "Business Partner";
     case "admin":
       return "Administrator";
+    case "support_agent":
+      return "Support Agent";
     default:
       return "User";
   }
@@ -114,6 +116,8 @@ export const getRoleRedirectPath = (role: RoleType | null): string => {
       return "/admin/dashboard";
     case "seller":
       return "/seller/dashboard";
+    case "support_agent":
+      return "/admin/dashboard";
     case "customer":
       return "/";
     default:
