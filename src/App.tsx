@@ -9,7 +9,6 @@ import { CartProvider } from "@/contexts/CartContext";
 import { ComparisonProvider } from "@/contexts/ComparisonContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { VisualEditProvider } from "@/contexts/VisualEditContext";
-import { ViewModeProvider } from "@/contexts/ViewModeContext";
 import AuthModal from "@/components/auth/AuthModal";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
@@ -18,7 +17,7 @@ import OfflineIndicator from "@/components/OfflineIndicator";
 import OrderStatusNotification from "./components/orders/OrderStatusNotification";
 import ComparisonBar from "./components/comparison/ComparisonBar";
 import VisualEditToggle from "./components/admin/VisualEditToggle";
-import BackToDashboardBar from "./components/navigation/BackToDashboardBar";
+// BackToDashboardBar removed - strict role isolation
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import SellerAuth from "./pages/seller/SellerAuth";
@@ -173,8 +172,7 @@ const App = () => (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-          <AuthProvider>
-            <ViewModeProvider>
+           <AuthProvider>
               <VisualEditProvider>
                 <CartProvider>
                   <ComparisonProvider>
@@ -186,7 +184,7 @@ const App = () => (
                           <OfflineIndicator />
                           <BrowserRouter>
                           <SystemAnnouncementBanner />
-                          {/* BackToDashboardBar removed - strict role isolation */}
+                          {/* Strict role isolation - no cross-role features */}
                           <InstallPrompt />
                           <NotificationPermissionBanner />
                           <AdminInactivityGuard />
@@ -339,7 +337,6 @@ const App = () => (
                 </ComparisonProvider>
               </CartProvider>
             </VisualEditProvider>
-          </ViewModeProvider>
         </AuthProvider>
       </LanguageProvider>
     </QueryClientProvider>

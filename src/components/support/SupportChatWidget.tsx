@@ -15,7 +15,7 @@ const SupportChatWidget = () => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState("");
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const { session, messages, loading, createSession, sendMessage, endSession, rateSession } = useSupportSession();
   const { shortcuts } = useChatShortcuts();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -23,6 +23,9 @@ const SupportChatWidget = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Only show for customers - NEVER for admin/seller
+  if (!user || role === "admin" || role === "seller") return null;
 
   const handleOpen = async () => {
     setIsOpen(true);
@@ -53,11 +56,8 @@ const SupportChatWidget = () => {
     setIsOpen(false);
   };
 
-  if (!user) return null;
-
   return (
     <>
-      {/* Chat Button */}
       <button
         onClick={handleOpen}
         className={cn(
@@ -68,10 +68,8 @@ const SupportChatWidget = () => {
         <MessageCircle size={24} />
       </button>
 
-      {/* Chat Window */}
       {isOpen && (
         <div className="fixed bottom-20 md:bottom-6 right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-card border border-border rounded-xl shadow-2xl flex flex-col overflow-hidden" style={{ height: "520px" }}>
-          {/* Header */}
           <div className="flex items-center justify-between p-4 bg-primary text-primary-foreground">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary-foreground/20 rounded-full flex items-center justify-center">
@@ -80,7 +78,7 @@ const SupportChatWidget = () => {
               <div>
                 <h3 className="font-semibold">FANZON Support</h3>
                 <p className="text-xs text-primary-foreground/80">
-                  {session?.status === 'active' ? '🟢 Connected to agent' : session?.status === 'waiting' ? '⏳ Finding an agent...' : 'Online'}
+                  {session?.status === 'active' ? '🟢 Connected to agent' : 'Send us a message'}
                 </p>
               </div>
             </div>
@@ -107,7 +105,6 @@ const SupportChatWidget = () => {
             </div>
           </div>
 
-          {/* Rating Dialog */}
           {showRating ? (
             <div className="flex-1 flex items-center justify-center p-6">
               <div className="text-center space-y-4">
@@ -148,7 +145,6 @@ const SupportChatWidget = () => {
             </div>
           ) : (
             <>
-              {/* Messages */}
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-3">
                   {loading && (
@@ -157,11 +153,11 @@ const SupportChatWidget = () => {
                     </div>
                   )}
 
-                  {!loading && messages.length === 0 && session?.status === 'waiting' && (
+                  {!loading && messages.length === 0 && (
                     <div className="text-center py-8 text-muted-foreground">
-                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-primary" />
-                      <p className="text-sm font-medium">Looking for an available agent...</p>
-                      <p className="text-xs mt-1">You can start typing your question below.</p>
+                      <MessageCircle className="h-8 w-8 mx-auto mb-3 text-primary/50" />
+                      <p className="text-sm font-medium">How can we help you?</p>
+                      <p className="text-xs mt-1">Send a message and our team will respond as soon as possible.</p>
                     </div>
                   )}
 
@@ -187,7 +183,6 @@ const SupportChatWidget = () => {
                 </div>
               </ScrollArea>
 
-              {/* Shortcuts */}
               {shortcuts.length > 0 && messages.length < 2 && (
                 <div className="px-4 pb-2">
                   <div className="flex flex-wrap gap-1.5">
@@ -204,7 +199,6 @@ const SupportChatWidget = () => {
                 </div>
               )}
 
-              {/* Input */}
               <div className="p-3 border-t border-border">
                 <div className="flex gap-2">
                   <Input
