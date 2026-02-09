@@ -10,7 +10,7 @@ import {
   LogOut,
   Bell,
   Search,
-  Store,
+  Store, // kept for sidebar icon
   Plus,
   ShieldCheck,
   AlertCircle,
@@ -70,7 +70,7 @@ const SellerDashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
-  const { enableCustomerView } = useViewMode();
+  // Strict role isolation - no customer view
   const { isVerified, isPending, isRejected } = useSellerKyc();
   const { unreadCount } = useUnreadCount();
   const isMobile = useIsMobile();
@@ -86,10 +86,7 @@ const SellerDashboardLayout = () => {
     navigate("/");
   };
 
-  const handleViewStorefront = () => {
-    enableCustomerView();
-    navigate("/");
-  };
+  // Removed: handleViewStorefront - strict role isolation
 
   const getVerificationBadge = () => {
     if (isVerified) {
@@ -192,13 +189,12 @@ const SellerDashboardLayout = () => {
       </nav>
 
       <div className="p-4 border-t border-slate-700">
-        <Link
-          to="/"
-          onClick={onNavigate}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+        <button
+          onClick={() => { handleLogout(); onNavigate?.(); }}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors w-full"
         >
-          <Store size={20} /><span>Back to Store</span>
-        </Link>
+          <LogOut size={20} /><span>Logout</span>
+        </button>
       </div>
     </>
   );
@@ -287,9 +283,6 @@ const SellerDashboardLayout = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" onClick={handleViewStorefront} className="items-center gap-2">
-                <Store size={16} /><span>View Store</span>
-              </Button>
               <Button variant="ghost" size="icon" className="relative"><Bell size={20} /></Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

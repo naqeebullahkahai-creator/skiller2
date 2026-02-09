@@ -64,12 +64,7 @@ export const canAccessAccountPage = (role: RoleType | null, path: string): boole
 
   // Customer account pages - only accessible by customers
   const customerOnlyPages = [
-    "/account/profile",
-    "/account/orders",
-    "/account/wishlist",
-    "/account/addresses",
-    "/account/notifications",
-    "/account/messages",
+    "/account",
     "/my-orders",
   ];
 

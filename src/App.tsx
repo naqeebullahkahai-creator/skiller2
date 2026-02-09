@@ -183,7 +183,7 @@ const App = () => (
                           <OfflineIndicator />
                           <BrowserRouter>
                           <SystemAnnouncementBanner />
-                          <BackToDashboardBar />
+                          {/* BackToDashboardBar removed - strict role isolation */}
                           <InstallPrompt />
                           <NotificationPermissionBanner />
                           <AdminInactivityGuard />

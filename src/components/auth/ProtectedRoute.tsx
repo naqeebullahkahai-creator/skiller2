@@ -38,6 +38,15 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
           variant: "destructive",
         });
       }
+      // Check for account page access by admin
+      else if (role === "admin" && location.pathname.startsWith("/account")) {
+        hasShownToast.current = true;
+        toast({
+          title: "Access Denied",
+          description: "Admins cannot access customer account pages. Use the Admin Panel.",
+          variant: "destructive",
+        });
+      }
       // Check for customer account pages access by seller
       else if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
         hasShownToast.current = true;
@@ -79,10 +88,13 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
     }
   }
 
-  // Check role-based session locking for customer account pages
-  // If a seller tries to access customer-only pages, redirect them to their dashboard
+  // Check role-based session locking - strict isolation
+  // Sellers and admins cannot access customer account pages
   if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
     return <Navigate to="/seller/dashboard" replace />;
+  }
+  if (role === "admin" && !canAccessAccountPage(role, location.pathname)) {
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   // If specific roles are required, check if user has one of them
