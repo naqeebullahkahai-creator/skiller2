@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Bell, Search } from "lucide-react";
+import { Menu, Bell, Search, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import NotificationBell from "@/components/notifications/NotificationBell";
@@ -9,11 +9,14 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { Settings, HelpCircle, Globe, Store } from "lucide-react";
 import MobileSearchOverlay from "@/components/mobile/MobileSearchOverlay";
+import { useCustomerWallet } from "@/hooks/useReturns";
+import { formatPKR } from "@/hooks/useProducts";
 
 const MobileHeader = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
   const { t, isRTL } = useLanguage();
   const [searchOpen, setSearchOpen] = useState(false);
+  const { wallet } = useCustomerWallet();
 
   const sidebarLinks = [
     { icon: Store, label: "Become a Partner", path: "/business/signup" },
@@ -65,6 +68,17 @@ const MobileHeader = () => {
           </Link>
 
           <div className="flex-1" />
+
+          {/* Wallet Balance */}
+          {isAuthenticated && role === "customer" && (
+            <Link
+              to="/account/wallet"
+              className="flex items-center gap-1 px-2 py-1 bg-primary-foreground/15 rounded-full text-primary-foreground active:scale-95 transition-transform"
+            >
+              <Wallet size={14} />
+              <span className="text-xs font-bold">{formatPKR(wallet?.balance || 0)}</span>
+            </Link>
+          )}
 
           {/* Notification */}
           {isAuthenticated && <NotificationBell />}

@@ -1,4 +1,4 @@
-import { Search, ChevronDown, Menu, X, MessageCircle } from "lucide-react";
+import { Search, ChevronDown, Menu, X, MessageCircle, Wallet } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -20,13 +20,16 @@ import AnimatedProfileMenu from "@/components/navigation/AnimatedProfileMenu";
 import CategoryAccordion from "@/components/navigation/CategoryAccordion";
 import FanzonLogo from "@/components/brand/FanzonLogo";
 import { useUnreadCount } from "@/hooks/useMessaging";
+import { useCustomerWallet } from "@/hooks/useReturns";
+import { formatPKR } from "@/hooks/useProducts";
 
 const MainHeader = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
   const { t, isRTL } = useLanguage();
   const { data: categories } = useMainCategories();
   const { unreadCount } = useUnreadCount();
+  const { wallet } = useCustomerWallet();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(t("nav.all_categories"));
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -111,6 +114,18 @@ const MainHeader = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 md:gap-4">
+            {/* Wallet Balance - Desktop */}
+            {isAuthenticated && role === "customer" && (
+              <Link
+                to="/account/wallet"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary-foreground/10 hover:bg-primary-foreground/20 rounded-lg text-primary-foreground transition-colors"
+                title="Wallet"
+              >
+                <Wallet size={18} />
+                <span className="text-sm font-semibold">{formatPKR(wallet?.balance || 0)}</span>
+              </Link>
+            )}
+
             {/* Language Switcher - Desktop */}
             <div className="hidden md:block">
               <LanguageSwitcher variant="header" />
