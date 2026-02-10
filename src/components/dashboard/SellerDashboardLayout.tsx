@@ -211,9 +211,9 @@ const SellerDashboardLayout = () => {
                     <Menu size={22} />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] p-0 bg-slate-900 border-slate-700">
+                <SheetContent side="left" className="w-[280px] p-0 bg-slate-900 border-slate-700 flex flex-col h-full">
                   {/* Drawer Header */}
-                  <div className="p-4 bg-primary">
+                  <div className="p-4 bg-primary shrink-0">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12 border-2 border-primary-foreground/30">
                         <AvatarImage src={profile?.avatar_url || undefined} className="object-cover" />
@@ -227,7 +227,9 @@ const SellerDashboardLayout = () => {
                       </div>
                     </div>
                   </div>
-                  <SidebarNav onNavigate={() => setMobileMenuOpen(false)} />
+                  <div className="flex-1 overflow-y-auto min-h-0 flex flex-col">
+                    <SidebarNav onNavigate={() => setMobileMenuOpen(false)} />
+                  </div>
                 </SheetContent>
               </Sheet>
               <span className="text-primary-foreground font-bold text-lg">Seller Center</span>

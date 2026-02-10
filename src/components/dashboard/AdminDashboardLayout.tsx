@@ -76,9 +76,9 @@ const AdminDashboardLayout = () => {
                     <Menu size={22} />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] p-0 bg-slate-900 border-slate-700">
+                <SheetContent side="left" className="w-[280px] p-0 bg-slate-900 border-slate-700 flex flex-col h-full">
                   {/* Drawer Header */}
-                  <div className="p-4 bg-primary">
+                  <div className="p-4 bg-primary shrink-0">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-12 w-12 border-2 border-primary-foreground/30">
                         {profile?.avatar_url ? (
@@ -97,11 +97,13 @@ const AdminDashboardLayout = () => {
                     </div>
                   </div>
 
-                  {/* Sidebar Navigation */}
-                  <DynamicAdminSidebar sidebarOpen={true} onNavigate={() => setMobileMenuOpen(false)} />
+                  {/* Sidebar Navigation - scrollable */}
+                  <div className="flex-1 overflow-y-auto min-h-0">
+                    <DynamicAdminSidebar sidebarOpen={true} onNavigate={() => setMobileMenuOpen(false)} />
+                  </div>
                   
                   {/* Footer */}
-                  <div className="p-3 border-t border-slate-700">
+                  <div className="p-3 border-t border-slate-700 shrink-0">
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 w-full active:scale-[0.97] transition-all"

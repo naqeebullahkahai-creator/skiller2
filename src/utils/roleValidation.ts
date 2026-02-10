@@ -68,6 +68,7 @@ export const canAccessAccountPage = (role: RoleType | null, path: string): boole
   const customerOnlyPages = [
     "/account",
     "/my-orders",
+    "/checkout",
   ];
 
   // Seller pages - only accessible by sellers
