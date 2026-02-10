@@ -323,6 +323,42 @@ export type Database = {
         }
         Relationships: []
       }
+      chatbot_faqs: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          keywords: string[]
+          question: string
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          keywords?: string[]
+          question: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          keywords?: string[]
+          question?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       collected_vouchers: {
         Row: {
           collected_at: string
@@ -1433,6 +1469,112 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      recently_viewed_products: {
+        Row: {
+          id: string
+          product_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recently_viewed_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          commission_percentage: number
+          created_at: string
+          id: string
+          is_active: boolean
+          total_earnings_pkr: number
+          total_referrals: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          commission_percentage?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          total_earnings_pkr?: number
+          total_referrals?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          commission_percentage?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          total_earnings_pkr?: number
+          total_referrals?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referral_tracking: {
+        Row: {
+          commission_amount_pkr: number
+          created_at: string
+          id: string
+          order_id: string | null
+          referred_user_id: string
+          referrer_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          commission_amount_pkr?: number
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          referred_user_id: string
+          referrer_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          commission_amount_pkr?: number
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          referred_user_id?: string
+          referrer_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_tracking_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       return_requests: {
         Row: {

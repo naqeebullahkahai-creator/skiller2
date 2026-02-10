@@ -122,6 +122,8 @@ import SellerCancelledOrdersPage from "./pages/seller/SellerCancelledOrdersPage"
 import SellerSettingsPage from "./pages/seller/SellerSettingsPage";
 import TrackOrder from "./pages/TrackOrder";
 import SystemAnnouncementBanner from "./components/admin/SystemAnnouncementBanner";
+import SellerStorefront from "./pages/SellerStorefront";
+import ReferralPage from "./pages/account/ReferralPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -223,6 +225,7 @@ const App = () => (
                           <Route path="/help" element={<HelpCenter />} />
                           <Route path="/contact" element={<ContactUs />} />
                           <Route path="/track-order" element={<TrackOrder />} />
+                          <Route path="/store/:sellerId" element={<SellerStorefront />} />
                           
                           {/* Checkout Routes */}
                           <Route 
@@ -252,7 +255,8 @@ const App = () => (
                             <Route path="addresses" element={<AddressesPage />} />
                             <Route path="messages" element={<CustomerMessagesPage />} />
                             <Route path="notifications" element={<NotificationsPage />} />
-                            <Route path="wallet" element={<WalletPage />} />
+                          <Route path="wallet" element={<WalletPage />} />
+                          <Route path="referrals" element={<ReferralPage />} />
                           </Route>
                           <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
                           
