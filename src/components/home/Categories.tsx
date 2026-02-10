@@ -80,11 +80,22 @@ const Categories = () => {
                 to={`/category/${category.slug}`}
                 className="flex flex-col items-center gap-2 group"
               >
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-fanzon-orange-light flex items-center justify-center group-hover:bg-primary group-hover:shadow-md transition-all duration-200">
-                  <IconComponent 
-                    size={24} 
-                    className="text-primary group-hover:text-white transition-colors" 
-                  />
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden bg-muted flex items-center justify-center group-hover:shadow-md transition-all duration-200">
+                  {category.image_url ? (
+                    <img
+                      src={category.image_url}
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-fanzon-orange-light flex items-center justify-center group-hover:bg-primary transition-colors">
+                      <IconComponent 
+                        size={24} 
+                        className="text-primary group-hover:text-white transition-colors" 
+                      />
+                    </div>
+                  )}
                 </div>
                 <span className="text-[10px] md:text-xs text-center text-foreground font-medium line-clamp-2">
                   {category.name}

@@ -91,6 +91,7 @@ interface CategoryFormData {
   name: string;
   slug: string;
   icon: string;
+  image_url: string;
   parent_id: string | null;
   display_order: number;
   is_active: boolean;
@@ -100,6 +101,7 @@ const initialFormData: CategoryFormData = {
   name: "",
   slug: "",
   icon: "Folder",
+  image_url: "",
   parent_id: null,
   display_order: 0,
   is_active: true,
@@ -154,13 +156,14 @@ const AdminCategoryManager = () => {
         await updateCategory.mutateAsync({
           id: editingCategory.id,
           ...formData,
+          image_url: formData.image_url || null,
         });
         toast({
           title: "Category Updated",
           description: `"${formData.name}" has been updated successfully.`,
         });
       } else {
-        await createCategory.mutateAsync(formData);
+        await createCategory.mutateAsync({ ...formData, image_url: formData.image_url || null });
         toast({
           title: "Category Created",
           description: `"${formData.name}" is now live at /category/${formData.slug}`,
@@ -203,6 +206,7 @@ const AdminCategoryManager = () => {
       name: category.name,
       slug: category.slug,
       icon: category.icon,
+      image_url: category.image_url || "",
       parent_id: category.parent_id,
       display_order: category.display_order,
       is_active: category.is_active,
@@ -304,8 +308,8 @@ const AdminCategoryManager = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Category</TableHead>
+                  <TableHead>Image</TableHead>
                   <TableHead>URL Slug</TableHead>
-                  <TableHead>Icon</TableHead>
                   <TableHead>Order</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -332,19 +336,16 @@ const AdminCategoryManager = () => {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <code className="text-xs bg-muted px-2 py-1 rounded">
-                          /category/{category.slug}
+                          /{category.slug}
                         </code>
-                        <Link
-                          to={`/category/${category.slug}`}
-                          target="_blank"
-                          className="text-primary hover:underline"
-                        >
-                          <LinkIcon size={14} />
-                        </Link>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">{category.icon}</Badge>
+                      {category.image_url ? (
+                        <img src={category.image_url} alt={category.name} className="w-10 h-10 rounded-lg object-cover" />
+                      ) : (
+                        <Badge variant="secondary">{category.icon}</Badge>
+                      )}
                     </TableCell>
                     <TableCell>{category.display_order}</TableCell>
                     <TableCell>
@@ -484,6 +485,22 @@ const AdminCategoryManager = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Image URL */}
+            <div className="space-y-2">
+              <Label htmlFor="image_url">Category Image URL</Label>
+              <Input
+                id="image_url"
+                placeholder="https://example.com/image.png"
+                value={formData.image_url}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, image_url: e.target.value }))
+                }
+              />
+              {formData.image_url && (
+                <img src={formData.image_url} alt="Preview" className="w-16 h-16 rounded-lg object-cover border" />
+              )}
             </div>
 
             {/* Display Order */}
