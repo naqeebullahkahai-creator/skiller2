@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Search, X, Clock, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import VoiceSearchButton from "@/components/shared/VoiceSearchButton";
+import QRCodeScanner from "@/components/shared/QRCodeScanner";
 
 interface MobileSearchOverlayProps {
   isOpen: boolean;
@@ -59,20 +61,28 @@ const MobileSearchOverlay = ({ isOpen, onClose }: MobileSearchOverlayProps) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products..."
-            className="w-full h-9 pl-9 pr-8 bg-white rounded-full text-sm text-foreground outline-none"
+            placeholder="Search products... (Urdu bhi bol sakte hain)"
+            className="w-full h-9 pl-9 pr-16 bg-white rounded-full text-sm text-foreground outline-none"
           />
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
-            >
-              <X size={14} className="text-muted-foreground" />
-            </button>
-          )}
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="p-1"
+              >
+                <X size={14} className="text-muted-foreground" />
+              </button>
+            )}
+            <VoiceSearchButton
+              onResult={(text) => { setQuery(text); handleSearch(text); }}
+              size={16}
+              className="p-1"
+            />
+          </div>
         </form>
+        <QRCodeScanner className="text-primary-foreground" />
       </div>
 
       {/* Recent Searches */}

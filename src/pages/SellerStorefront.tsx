@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Star, Store, Package, Calendar, MapPin, Loader2 } from "lucide-react";
+import { Star, Store, Package, Calendar, MapPin, Loader2, Share2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/layout/Header";
@@ -8,6 +8,8 @@ import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/product/ProductCard";
 import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
+import QRCodeDisplay from "@/components/shared/QRCodeDisplay";
+import SocialShareButtons from "@/components/product/SocialShareButtons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -138,6 +140,21 @@ const SellerStorefront = () => {
                   <span className="flex items-center gap-1">
                     <Calendar size={14} /> Joined {format(new Date(seller.created_at), "MMM yyyy")}
                   </span>
+                </div>
+                <div className="flex items-center gap-2 mt-3">
+                  <QRCodeDisplay
+                    url={`/store/${sellerId}`}
+                    title={`${storeName} - QR Code`}
+                    subtitle="Scan to visit this store"
+                    triggerVariant="button"
+                    className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                  />
+                  <SocialShareButtons
+                    productName={storeName}
+                    productUrl={`/store/${sellerId}`}
+                    compact
+                    className="text-primary-foreground"
+                  />
                 </div>
               </div>
             </div>

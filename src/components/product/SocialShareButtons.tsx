@@ -6,9 +6,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MessageCircle, Copy, Share2, Facebook, Check, Link2 } from "lucide-react";
+import { MessageCircle, Copy, Share2, Facebook, Check, Link2, QrCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import QRCodeDisplay from "@/components/shared/QRCodeDisplay";
 
 interface SocialShareButtonsProps {
   productName: string;
@@ -104,6 +105,14 @@ const SocialShareButtons = ({
               <Copy className="mr-2 h-4 w-4" />
             )}
             {copied ? "Copied!" : "Copy Link"}
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+            <QRCodeDisplay
+              url={productUrl}
+              title={`QR: ${productName}`}
+              subtitle="Scan this QR code to view the product"
+              triggerVariant="menuItem"
+            />
           </DropdownMenuItem>
           {navigator.share && (
             <DropdownMenuItem onClick={handleNativeShare}>

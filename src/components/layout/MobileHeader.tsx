@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Bell, Search, Wallet } from "lucide-react";
+import { Menu, Bell, Search, Wallet, ScanLine } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import NotificationBell from "@/components/notifications/NotificationBell";
@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { Settings, HelpCircle, Globe, Store } from "lucide-react";
 import MobileSearchOverlay from "@/components/mobile/MobileSearchOverlay";
+import QRCodeScanner from "@/components/shared/QRCodeScanner";
 import { useCustomerWallet } from "@/hooks/useReturns";
 import { formatPKR } from "@/hooks/useProducts";
 
@@ -68,6 +69,9 @@ const MobileHeader = () => {
           </Link>
 
           <div className="flex-1" />
+
+          {/* QR Scanner */}
+          <QRCodeScanner className="text-primary-foreground" />
 
           {/* Wallet Balance */}
           {isAuthenticated && role === "customer" && (
