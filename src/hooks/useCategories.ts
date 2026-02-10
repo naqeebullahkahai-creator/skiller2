@@ -6,6 +6,7 @@ export interface Category {
   name: string;
   slug: string;
   icon: string;
+  image_url: string | null;
   parent_id: string | null;
   display_order: number;
   is_active: boolean;
