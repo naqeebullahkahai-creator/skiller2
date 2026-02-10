@@ -48,10 +48,10 @@ const AdminCommissionSettings = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Percent className="w-5 h-5" />
-          Commission Settings
+          Sales Commission Settings
         </CardTitle>
         <CardDescription>
-          Set the platform commission percentage that will be deducted from each sale
+          Set the platform commission percentage deducted from each sale (separate from daily/monthly platform fees)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

@@ -62,6 +62,7 @@ const sellerLinks = [
   { name: "Messages", href: "/seller/messages", icon: MessageSquare },
   { name: "Wallet", href: "/seller/wallet", icon: Wallet },
   { name: "Returns", href: "/seller/returns", icon: RotateCcw },
+  { name: "📋 Fee Guide", href: "/seller/fee-guide", icon: HelpCircle },
   { name: "Settings", href: "/seller/settings", icon: Settings },
 ];
 

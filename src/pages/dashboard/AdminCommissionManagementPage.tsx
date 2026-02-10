@@ -187,7 +187,7 @@ const AdminCommissionManagementPage = () => {
             New Seller Grace Period Policy
           </CardTitle>
           <CardDescription>
-            Automatically give new sellers a free/reduced commission period when they get verified
+            Automatically give new sellers a free/reduced fee period when they get verified
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -261,9 +261,9 @@ const AdminCommissionManagementPage = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
-            Sellers Commission Overview
+            Sellers Fee Overview
           </CardTitle>
-          <CardDescription>View and manage commission rates for all verified sellers</CardDescription>
+          <CardDescription>View and manage fee rates for all verified sellers</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Filters */}
@@ -375,7 +375,7 @@ const AdminCommissionManagementPage = () => {
       <Dialog open={!!editingSeller} onOpenChange={(open) => !open && setEditingSeller(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Commission Settings — {editingSeller?.shop_name}</DialogTitle>
+            <DialogTitle>Fee Settings — {editingSeller?.shop_name}</DialogTitle>
           </DialogHeader>
           {editingSeller && (
             <SellerCommissionManager
