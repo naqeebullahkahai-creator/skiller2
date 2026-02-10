@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Star,
@@ -39,7 +39,7 @@ import { useProductVariants, ProductVariant } from "@/hooks/useProductVariants";
 import { useProductReviews } from "@/hooks/useProductReviews";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
-
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -48,7 +48,12 @@ const ProductDetail = () => {
   const { products: allProducts } = useActiveProducts(20);
   const { stats: reviewStats } = useProductReviews(id);
   const { groupedVariants, variants } = useProductVariants(id);
+  const { trackView } = useRecentlyViewed();
 
+  // Track product view
+  useEffect(() => {
+    if (id) trackView.mutate(id);
+  }, [id]);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariant | null>>({});

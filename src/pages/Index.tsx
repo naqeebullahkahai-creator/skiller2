@@ -12,6 +12,7 @@ import MobileHomeLayout from "@/components/mobile/MobileHomeLayout";
 // Lazy load below-fold sections
 const FlashSaleSection = lazy(() => import("@/components/home/FlashSaleSection"));
 const InfiniteProductGrid = lazy(() => import("@/components/home/InfiniteProductGrid"));
+const RecentlyViewedSection = lazy(() => import("@/components/home/RecentlyViewedSection"));
 
 const SectionSkeleton = () => (
   <div className="flex items-center justify-center py-12">
@@ -41,6 +42,9 @@ const Index = () => {
             <Categories />
             <Suspense fallback={<SectionSkeleton />}>
               <FlashSaleSection />
+            </Suspense>
+            <Suspense fallback={null}>
+              <RecentlyViewedSection />
             </Suspense>
             <section className="bg-secondary py-4">
               <div className="container mx-auto">
