@@ -26,8 +26,8 @@ export const useAdminSubscriptions = () => {
       if (error) throw error;
       
       const fees = {
-        daily: 20,
-        monthly: 500,
+        daily: 25,
+        monthly: 600,
       };
       
       data?.forEach(setting => {

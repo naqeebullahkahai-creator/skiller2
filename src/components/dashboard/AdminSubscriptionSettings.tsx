@@ -31,8 +31,8 @@ const AdminSubscriptionSettings = () => {
 
   const { sellerProfiles } = useAdminSellerProfiles();
 
-  const [dailyFee, setDailyFee] = useState<number>(20);
-  const [monthlyFee, setMonthlyFee] = useState<number>(500);
+  const [dailyFee, setDailyFee] = useState<number>(25);
+  const [monthlyFee, setMonthlyFee] = useState<number>(600);
   const [hasChanges, setHasChanges] = useState(false);
 
   // Edit seller modal state

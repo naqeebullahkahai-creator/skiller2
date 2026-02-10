@@ -140,10 +140,10 @@ const SellerCommissionManager = ({ sellerId, sellerName, globalRate = 10 }: Sell
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Percent className="w-5 h-5" />
-          Commission Settings for {sellerName}
+          Fee Settings for {sellerName}
         </CardTitle>
         <CardDescription>
-          Configure custom commission rates and grace periods for this seller
+          Configure custom fee rates and grace periods for this seller
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -295,7 +295,7 @@ const SellerCommissionManager = ({ sellerId, sellerName, globalRate = 10 }: Sell
 
         {/* Preview */}
         <div className="p-4 bg-muted rounded-lg">
-          <h4 className="font-medium mb-3">Commission Preview</h4>
+          <h4 className="font-medium mb-3">Fee Preview</h4>
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div>
               <p className="text-muted-foreground">Sale Amount</p>
@@ -320,7 +320,7 @@ const SellerCommissionManager = ({ sellerId, sellerName, globalRate = 10 }: Sell
             ) : (
               <Save className="w-4 h-4 mr-2" />
             )}
-            Save Commission Settings
+            Save Fee Settings
           </Button>
         </div>
       </CardContent>

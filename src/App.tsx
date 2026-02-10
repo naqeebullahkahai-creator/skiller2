@@ -121,6 +121,7 @@ import SellerReturnsPage from "./pages/seller/SellerReturnsPage";
 import SellerQAPage from "./pages/seller/SellerQAPage";
 import SellerCancelledOrdersPage from "./pages/seller/SellerCancelledOrdersPage";
 import SellerSettingsPage from "./pages/seller/SellerSettingsPage";
+import SellerFeeGuidePage from "./pages/seller/SellerFeeGuidePage";
 import TrackOrder from "./pages/TrackOrder";
 import SystemAnnouncementBanner from "./components/admin/SystemAnnouncementBanner";
 import SellerStorefront from "./pages/SellerStorefront";
@@ -323,6 +324,7 @@ const App = () => (
                             <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
                             <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
                             <Route path="settings" element={<SellerSettingsPage />} />
+                            <Route path="fee-guide" element={<SellerFeeGuidePage />} />
                           </Route>
 
                           {/* Legacy route redirects */}
