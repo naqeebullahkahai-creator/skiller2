@@ -29,6 +29,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import QRCodeDisplay from "@/components/shared/QRCodeDisplay";
 
 const trackSchema = z.object({
   orderNumber: z.string().min(1, "Please enter your order number"),
@@ -287,6 +288,16 @@ const TrackOrder = () => {
                   </p>
                 </div>
               )}
+
+              {/* QR Code for this order */}
+              <div className="flex items-center justify-center pt-2">
+                <QRCodeDisplay
+                  url={`/track-order?order=${result.order_number}`}
+                  title={`Order ${result.order_number}`}
+                  subtitle="Share this QR code to track your order"
+                  triggerVariant="button"
+                />
+              </div>
             </CardContent>
           </Card>
         )}

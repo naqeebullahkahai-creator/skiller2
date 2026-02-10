@@ -19,6 +19,8 @@ import SearchSuggestions from "@/components/search/SearchSuggestions";
 import AnimatedProfileMenu from "@/components/navigation/AnimatedProfileMenu";
 import CategoryAccordion from "@/components/navigation/CategoryAccordion";
 import FanzonLogo from "@/components/brand/FanzonLogo";
+import VoiceSearchButton from "@/components/shared/VoiceSearchButton";
+import QRCodeScanner from "@/components/shared/QRCodeScanner";
 import { useUnreadCount } from "@/hooks/useMessaging";
 import { useCustomerWallet } from "@/hooks/useReturns";
 import { formatPKR } from "@/hooks/useProducts";
@@ -93,6 +95,13 @@ const MainHeader = () => {
                 onFocus={() => setShowSuggestions(true)}
                 className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
               />
+              <VoiceSearchButton
+                onResult={(text) => {
+                  setSearchQuery(text);
+                  navigate(`/search?q=${encodeURIComponent(text)}`);
+                }}
+                size={18}
+              />
               <Button 
                 type="submit"
                 className="rounded-none px-6 bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors duration-200"
@@ -100,6 +109,9 @@ const MainHeader = () => {
                 <Search size={18} />
               </Button>
             </form>
+            <div className="flex items-center ml-2">
+              <QRCodeScanner className="text-primary-foreground hover:bg-primary-foreground/10" />
+            </div>
             <SearchSuggestions
               query={searchQuery}
               isOpen={showSuggestions}
