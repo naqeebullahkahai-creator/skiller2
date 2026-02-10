@@ -1,9 +1,10 @@
-import { Home, Search, ShoppingCart, Heart, User } from "lucide-react";
+import { Home, MessageCircle, ShoppingCart, Heart, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/hooks/useWishlist";
+import { useUnreadCount } from "@/hooks/useMessaging";
 
 const MobileBottomNav = () => {
   const location = useLocation();
@@ -13,10 +14,10 @@ const MobileBottomNav = () => {
   
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlistItems?.length ?? 0;
-
+  const { unreadCount } = useUnreadCount();
   const navItems = [
     { icon: Home, label: "Home", path: "/", isCenter: false },
-    { icon: Search, label: "Search", path: "/products", isCenter: false },
+    { icon: MessageCircle, label: "Chats", path: "/account/messages", badge: unreadCount > 0 ? unreadCount : undefined, requiresAuth: true, isCenter: false },
     { icon: ShoppingCart, label: "Cart", path: "/checkout", badge: cartCount > 0 ? cartCount : undefined, isCenter: true },
     { icon: Heart, label: "Wishlist", path: "/account/wishlist", badge: wishlistCount > 0 ? wishlistCount : undefined, requiresAuth: true, isCenter: false },
     { icon: User, label: "Account", path: "/account", requiresAuth: true, isCenter: false },
