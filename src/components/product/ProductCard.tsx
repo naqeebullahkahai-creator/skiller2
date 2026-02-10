@@ -1,8 +1,9 @@
-import { memo, useState } from "react";
+import { memo } from "react";
 import { Star, Heart, ShoppingCart } from "lucide-react";
 import { DatabaseProduct, formatPKR } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/hooks/useWishlist";
 import LazyImage from "@/components/ui/lazy-image";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,8 @@ interface ProductCardProps {
 
 const ProductCard = memo(({ product, showStockBar = false, priority = false }: ProductCardProps) => {
   const { addToCart } = useCart();
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const isWishlisted = isInWishlist(product.id);
 
   const discount = product.discount_price_pkr && product.discount_price_pkr < product.price_pkr
     ? Math.round(((product.price_pkr - product.discount_price_pkr) / product.price_pkr) * 100)
@@ -33,7 +35,7 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
+    toggleWishlist(product.id);
   };
 
   return (

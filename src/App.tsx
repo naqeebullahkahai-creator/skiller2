@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ComparisonProvider } from "@/contexts/ComparisonContext";
@@ -174,6 +175,7 @@ const App = () => (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
+           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
            <AuthProvider>
               <VisualEditProvider>
                 <CartProvider>
@@ -342,6 +344,7 @@ const App = () => (
               </CartProvider>
             </VisualEditProvider>
         </AuthProvider>
+        </ThemeProvider>
       </LanguageProvider>
     </QueryClientProvider>
   </HelmetProvider>
