@@ -52,18 +52,12 @@ const Auth = () => {
       if (isSuperAdmin || role === "admin") {
         navigate("/admin/dashboard", { replace: true });
       } else if (role === "seller") {
-        // Seller trying to login via customer portal - redirect to seller dashboard with message
-        toast({
-          title: "Redirecting to Seller Portal",
-          description: "You have a seller account. Redirecting to your Seller Dashboard.",
-        });
         navigate("/seller/dashboard", { replace: true });
-      } else {
-        // Customer goes to homepage
-        navigate("/", { replace: true });
       }
+      // Customers: don't redirect here — let handleSubmit handle it
+      // to avoid race conditions where role hasn't loaded yet
     }
-  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate, toast]);
+  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
