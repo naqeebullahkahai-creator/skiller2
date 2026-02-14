@@ -1355,12 +1355,15 @@ export type Database = {
           description: string | null
           discount_price_pkr: number | null
           display_id: string | null
+          free_shipping: boolean
           id: string
           images: string[] | null
+          location: string | null
           price_pkr: number
           seller_id: string
           sku: string | null
           slug: string | null
+          sold_count: number
           status: Database["public"]["Enums"]["product_status"]
           stock_count: number
           title: string
@@ -1374,12 +1377,15 @@ export type Database = {
           description?: string | null
           discount_price_pkr?: number | null
           display_id?: string | null
+          free_shipping?: boolean
           id?: string
           images?: string[] | null
+          location?: string | null
           price_pkr: number
           seller_id: string
           sku?: string | null
           slug?: string | null
+          sold_count?: number
           status?: Database["public"]["Enums"]["product_status"]
           stock_count?: number
           title: string
@@ -1393,12 +1399,15 @@ export type Database = {
           description?: string | null
           discount_price_pkr?: number | null
           display_id?: string | null
+          free_shipping?: boolean
           id?: string
           images?: string[] | null
+          location?: string | null
           price_pkr?: number
           seller_id?: string
           sku?: string | null
           slug?: string | null
+          sold_count?: number
           status?: Database["public"]["Enums"]["product_status"]
           stock_count?: number
           title?: string
