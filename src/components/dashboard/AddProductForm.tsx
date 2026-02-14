@@ -53,6 +53,8 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
     description: "",
     specifications: [{ key: "", value: "" }],
     videoUrl: "",
+    freeShipping: false,
+    location: "",
   });
   const [variants, setVariants] = useState<LocalVariant[]>([]);
 
@@ -205,6 +207,8 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
           images: formData.images,
           status: "pending",
           video_url: formData.videoUrl || null,
+          free_shipping: formData.freeShipping,
+          location: formData.location || null,
         })
         .select("id")
         .single();
@@ -424,6 +428,44 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
                 </p>
               </div>
             )}
+
+            {/* Free Shipping & Location */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-4 bg-muted rounded-lg">
+                <input
+                  type="checkbox"
+                  id="freeShipping"
+                  checked={formData.freeShipping}
+                  onChange={(e) => updateFormData("freeShipping", e.target.checked)}
+                  className="w-4 h-4 accent-primary"
+                />
+                <Label htmlFor="freeShipping" className="cursor-pointer">
+                  Free Shipping
+                  <p className="text-xs text-muted-foreground font-normal">Offer free delivery on this product</p>
+                </Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="location">Product Location</Label>
+                <Select
+                  value={formData.location}
+                  onValueChange={(value) => updateFormData("location", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select province" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Punjab">Punjab</SelectItem>
+                    <SelectItem value="Sindh">Sindh</SelectItem>
+                    <SelectItem value="KPK">KPK</SelectItem>
+                    <SelectItem value="Balochistan">Balochistan</SelectItem>
+                    <SelectItem value="Islamabad">Islamabad</SelectItem>
+                    <SelectItem value="AJK">AJK</SelectItem>
+                    <SelectItem value="GB">Gilgit-Baltistan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
             {/* Variants Section */}
             <div className="border-t border-border pt-6">

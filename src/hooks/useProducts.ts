@@ -18,6 +18,9 @@ export interface DatabaseProduct {
   images: string[] | null;
   video_url: string | null;
   status: "pending" | "active" | "rejected";
+  free_shipping: boolean;
+  location: string | null;
+  sold_count: number;
   created_at: string;
   updated_at: string;
 }

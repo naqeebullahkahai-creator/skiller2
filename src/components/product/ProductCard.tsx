@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Star, Heart, ShoppingCart } from "lucide-react";
+import { Star, Heart, ShoppingCart, MapPin, Truck } from "lucide-react";
 import { DatabaseProduct, formatPKR } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
@@ -52,9 +52,20 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
           priority={priority}
         />
         
+        {/* Free Delivery Badge */}
+        {product.free_shipping && (
+          <div className="absolute top-2 left-2 bg-[#00a862] text-white text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 z-10">
+            <Truck size={10} />
+            FREE DELIVERY
+          </div>
+        )}
+
         {/* Discount Badge */}
         {discount > 0 && (
-          <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-sm">
+          <Badge className={cn(
+            "absolute left-2 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-sm",
+            product.free_shipping ? "top-8" : "top-2"
+          )}>
             -{discount}%
           </Badge>
         )}
@@ -88,39 +99,35 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
           {product.title}
         </h3>
 
-        {/* Price */}
-        <div className="mb-1.5">
+        {/* Price & Sold */}
+        <div className="flex items-center gap-1.5 mb-0.5">
           <p className="text-sm font-bold text-primary">
             {formatPKR(displayPrice)}
           </p>
-          {discount > 0 && (
-            <p className="text-[10px] text-muted-foreground line-through">
-              {formatPKR(product.price_pkr)}
-            </p>
+          {product.sold_count > 0 && (
+            <span className="text-[10px] text-muted-foreground">
+              {product.sold_count} sold
+            </span>
           )}
         </div>
+        {discount > 0 && (
+          <p className="text-[10px] text-muted-foreground line-through mb-1">
+            {formatPKR(product.price_pkr)}
+          </p>
+        )}
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                size={10}
-                className={cn(
-                  i < 4 ? "fill-yellow-400 text-yellow-400" : "fill-gray-200 text-gray-200"
-                )}
-              />
-            ))}
+        {/* Rating & Location */}
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-0.5">
+            <Star size={10} className="fill-yellow-400 text-yellow-400" />
+            <span className="text-[10px] text-muted-foreground">4.5</span>
           </div>
-          <span className="text-[10px] text-muted-foreground">(120)</span>
-        </div>
-
-        {/* Free Shipping Tag */}
-        <div className="flex items-center gap-1">
-          <span className="text-[9px] text-green-600 font-medium bg-green-50 px-1.5 py-0.5 rounded">
-            Free Shipping
-          </span>
+          {product.location && (
+            <div className="flex items-center gap-0.5 text-muted-foreground">
+              <MapPin size={9} />
+              <span className="text-[10px]">{product.location}</span>
+            </div>
+          )}
         </div>
 
         {/* Add to Cart - Desktop */}
@@ -128,7 +135,7 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
           onClick={handleAddToCart}
           disabled={product.stock_count === 0}
           className={cn(
-            "hidden md:flex w-full mt-2 items-center justify-center gap-1.5 py-1.5 rounded text-xs font-medium transition-colors",
+            "hidden md:flex w-full items-center justify-center gap-1.5 py-1.5 rounded text-xs font-medium transition-colors",
             product.stock_count > 0
               ? "bg-primary text-white hover:bg-primary/90"
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
