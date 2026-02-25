@@ -15,6 +15,7 @@ const MobileBottomNav = () => {
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlistItems?.length ?? 0;
   const { unreadCount } = useUnreadCount();
+
   const navItems = [
     { icon: Home, label: "Home", path: "/", isCenter: false },
     { icon: MessageCircle, label: "Chats", path: "/account/messages", badge: unreadCount > 0 ? unreadCount : undefined, requiresAuth: true, isCenter: false },
@@ -38,8 +39,8 @@ const MobileBottomNav = () => {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
-      <div className="bg-card/90 backdrop-blur-xl border-t border-border/50">
-        <div className="flex items-center justify-around h-14">
+      <div className="bg-card/95 backdrop-blur-xl border-t border-border/60 shadow-elevated">
+        <div className="flex items-center justify-around h-16">
           {navItems.map((item) => {
             const active = isActive(item.path);
             const isCartCenter = item.isCenter;
@@ -52,15 +53,15 @@ const MobileBottomNav = () => {
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 h-full relative",
                   "active:scale-[0.92] transition-all duration-200",
-                  isCartCenter && "-mt-4"
+                  isCartCenter && "-mt-5"
                 )}
               >
                 <div className={cn(
                   "relative",
-                  isCartCenter && "w-12 h-12 rounded-full flex items-center justify-center shadow-lg bg-primary"
+                  isCartCenter && "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-primary to-accent"
                 )}>
                   <item.icon
-                    size={isCartCenter ? 20 : 20}
+                    size={isCartCenter ? 22 : 20}
                     strokeWidth={active && !isCartCenter ? 2.5 : 1.8}
                     className={cn(
                       "transition-all duration-200",
@@ -73,10 +74,10 @@ const MobileBottomNav = () => {
                   />
                   {item.badge && (
                     <span className={cn(
-                      "absolute min-w-[14px] h-3.5 flex items-center justify-center text-white text-[9px] font-bold rounded-full px-0.5",
+                      "absolute min-w-[16px] h-4 flex items-center justify-center text-primary-foreground text-[9px] font-bold rounded-full px-1",
                       isCartCenter 
                         ? "-top-0.5 -right-0.5 bg-destructive" 
-                        : "-top-1 -right-2 bg-primary"
+                        : "-top-1 -right-2.5 bg-accent"
                     )}>
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>
@@ -84,7 +85,7 @@ const MobileBottomNav = () => {
                 </div>
                 <span className={cn(
                   "text-[10px] font-medium transition-all duration-200",
-                  isCartCenter ? "mt-0.5 text-primary font-semibold" : "mt-0.5",
+                  isCartCenter ? "mt-1 text-primary font-semibold" : "mt-0.5",
                   !isCartCenter && (active ? "text-primary font-semibold" : "text-muted-foreground")
                 )}>
                   {item.label}

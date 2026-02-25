@@ -8,46 +8,43 @@ interface FanzonLogoProps {
 
 const FanzonLogo = ({ className, textClassName, size = "md" }: FanzonLogoProps) => {
   const sizeConfig = {
-    sm: { text: "text-lg", arrow: { width: 50, height: 10 } },
-    md: { text: "text-xl md:text-2xl", arrow: { width: 70, height: 12 } },
-    lg: { text: "text-2xl md:text-3xl", arrow: { width: 90, height: 14 } },
+    sm: { text: "text-lg", icon: 20, gap: "gap-1.5" },
+    md: { text: "text-xl md:text-2xl", icon: 26, gap: "gap-2" },
+    lg: { text: "text-2xl md:text-3xl", icon: 32, gap: "gap-2.5" },
   };
 
   const config = sizeConfig[size];
 
   return (
-    <div className={cn("relative inline-flex flex-col items-center", className)}>
-      {/* FANZON Text */}
-      <span className={cn("font-bold tracking-tight leading-none", config.text, textClassName)}>
-        FANZON
-      </span>
-      
-      {/* Amazon-style smile arrow from F to N */}
+    <div className={cn("inline-flex items-center", config.gap, className)}>
+      {/* Logo Icon - Abstract "F" mark with layered shapes */}
       <svg
-        viewBox="0 0 70 16"
-        width={config.arrow.width}
-        height={config.arrow.height}
-        className="mt-[-3px]"
+        viewBox="0 0 40 40"
+        width={config.icon}
+        height={config.icon}
+        className="flex-shrink-0"
         aria-hidden="true"
       >
-        {/* Smooth smile curve - Amazon style */}
+        {/* Background circle */}
+        <circle cx="20" cy="20" r="20" fill="hsl(var(--primary))" />
+        {/* Inner geometric "F" shape */}
         <path
-          d="M3 4 Q35 14 58 4"
-          fill="none"
-          stroke="hsl(var(--fanzon-orange))"
-          strokeWidth="3"
-          strokeLinecap="round"
+          d="M12 10 L28 10 L28 15 L17 15 L17 18.5 L26 18.5 L26 23 L17 23 L17 30 L12 30 Z"
+          fill="white"
+          opacity="0.95"
         />
-        {/* Arrow head pointing right-up */}
-        <path
-          d="M54 6 L62 3 L56 10"
-          fill="none"
-          stroke="hsl(var(--fanzon-orange))"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+        {/* Accent dot */}
+        <circle cx="30" cy="30" r="4" fill="hsl(var(--accent))" />
       </svg>
+      
+      {/* FANZOON Text */}
+      <span className={cn(
+        "font-display font-bold tracking-tight leading-none",
+        config.text,
+        textClassName
+      )}>
+        FANZOON
+      </span>
     </div>
   );
 };
