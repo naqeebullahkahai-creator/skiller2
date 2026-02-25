@@ -1,11 +1,12 @@
 /* Critical CSS - Above the fold styles loaded first */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Performance optimizations */
 @layer base {
-  /* Preload critical fonts with swap for faster text paint */
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
@@ -13,132 +14,135 @@
     text-rendering: optimizeLegibility;
   }
   
-  /* Optimize images globally */
   img {
     content-visibility: auto;
   }
   
-  /* Hardware acceleration for animations */
   .will-change-transform {
     will-change: transform;
   }
 }
 
-/* FANZON Design System - Daraz-Style Marketplace Theme
-   Orange Primary + Clean White Background
+/* FANZOON Design System - Premium Marketplace Theme
+   Deep Indigo Primary + Warm Coral Accent + Clean Backgrounds
    All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 13%;
+    --background: 220 20% 97%;
+    --foreground: 224 30% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card-foreground: 224 30% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover-foreground: 224 30% 15%;
 
-    /* Primary: Daraz Orange #F85606 */
-    --primary: 21 95% 50%;
+    /* Primary: Deep Indigo-Violet */
+    --primary: 252 60% 52%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Light gray background */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 13%;
+    /* Secondary: Warm light surface */
+    --secondary: 220 20% 95%;
+    --secondary-foreground: 224 30% 15%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 21 95% 50%;
+    /* Accent: Coral/Salmon for CTAs */
+    --accent: 10 80% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 21 95% 50%;
+    --border: 220 15% 91%;
+    --input: 220 15% 91%;
+    --ring: 252 60% 52%;
 
-    --radius: 0.25rem;
+    --radius: 0.625rem;
 
-    /* Custom FANZON tokens - Daraz palette */
-    --fanzon-primary: 21 95% 50%;
-    --fanzon-primary-hover: 21 95% 45%;
-    --fanzon-primary-light: 21 95% 95%;
-    --fanzon-dark: 0 0% 13%;
-    --fanzon-charcoal: 0 0% 20%;
-    --fanzon-gray: 0 0% 45%;
-    --fanzon-light-gray: 0 0% 96%;
-    --fanzon-success: 142 71% 45%;
+    /* Custom FANZOON tokens */
+    --fanzon-primary: 252 60% 52%;
+    --fanzon-primary-hover: 252 60% 46%;
+    --fanzon-primary-light: 252 60% 96%;
+    --fanzon-dark: 224 30% 15%;
+    --fanzon-charcoal: 224 20% 22%;
+    --fanzon-gray: 220 10% 46%;
+    --fanzon-light-gray: 220 20% 95%;
+    --fanzon-success: 152 60% 42%;
     --fanzon-warning: 38 92% 50%;
-    --fanzon-star: 45 93% 47%;
-    --fanzon-emerald: 160 84% 39%;
-    --fanzon-orange: 21 95% 50%;
-    --fanzon-orange-light: 21 95% 95%;
+    --fanzon-star: 45 93% 55%;
+    --fanzon-emerald: 160 70% 42%;
+    --fanzon-orange: 10 80% 60%;
+    --fanzon-orange-light: 10 80% 96%;
+    --fanzon-coral: 10 80% 60%;
+    --fanzon-coral-light: 10 80% 96%;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 13%;
-    --sidebar-primary: 21 95% 50%;
+    --sidebar-foreground: 224 30% 15%;
+    --sidebar-primary: 252 60% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 13%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 21 95% 50%;
+    --sidebar-accent: 220 20% 95%;
+    --sidebar-accent-foreground: 224 30% 15%;
+    --sidebar-border: 220 15% 91%;
+    --sidebar-ring: 252 60% 52%;
   }
 
   .dark {
-    --background: 0 0% 8%;
-    --foreground: 0 0% 98%;
+    --background: 224 25% 8%;
+    --foreground: 220 20% 95%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 224 25% 12%;
+    --card-foreground: 220 20% 95%;
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 224 25% 12%;
+    --popover-foreground: 220 20% 95%;
 
-    --primary: 21 95% 50%;
+    --primary: 252 60% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 224 20% 16%;
+    --secondary-foreground: 220 20% 95%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 224 20% 16%;
+    --muted-foreground: 220 15% 60%;
 
-    --accent: 21 95% 50%;
+    --accent: 10 80% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 21 95% 50%;
+    --border: 224 20% 20%;
+    --input: 224 20% 20%;
+    --ring: 252 60% 60%;
 
-    --fanzon-primary: 21 95% 50%;
-    --fanzon-primary-hover: 21 95% 55%;
-    --fanzon-primary-light: 21 50% 20%;
-    --fanzon-dark: 0 0% 98%;
-    --fanzon-charcoal: 0 0% 15%;
-    --fanzon-gray: 0 0% 65%;
-    --fanzon-light-gray: 0 0% 15%;
-    --fanzon-success: 142 71% 45%;
+    --fanzon-primary: 252 60% 60%;
+    --fanzon-primary-hover: 252 60% 55%;
+    --fanzon-primary-light: 252 30% 20%;
+    --fanzon-dark: 220 20% 95%;
+    --fanzon-charcoal: 224 20% 16%;
+    --fanzon-gray: 220 15% 60%;
+    --fanzon-light-gray: 224 20% 16%;
+    --fanzon-success: 152 60% 42%;
     --fanzon-warning: 38 92% 50%;
-    --fanzon-star: 45 93% 47%;
-    --fanzon-emerald: 160 84% 39%;
-    --fanzon-orange: 21 95% 50%;
-    --fanzon-orange-light: 21 50% 20%;
+    --fanzon-star: 45 93% 55%;
+    --fanzon-emerald: 160 70% 42%;
+    --fanzon-orange: 10 80% 60%;
+    --fanzon-orange-light: 10 30% 20%;
+    --fanzon-coral: 10 80% 60%;
+    --fanzon-coral-light: 10 30% 20%;
 
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 21 95% 50%;
+    --sidebar-background: 224 25% 8%;
+    --sidebar-foreground: 220 20% 95%;
+    --sidebar-primary: 252 60% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 21 95% 50%;
+    --sidebar-accent: 224 20% 16%;
+    --sidebar-accent-foreground: 220 20% 95%;
+    --sidebar-border: 224 20% 20%;
+    --sidebar-ring: 252 60% 60%;
   }
 }
 
@@ -150,13 +154,16 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     overscroll-behavior-y: contain;
   }
   
-  /* Prevent pull-to-refresh on mobile browsers */
   html {
     overscroll-behavior: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
   /* Urdu Font Class */
@@ -178,7 +185,6 @@
     direction: ltr;
   }
 
-  /* RTL Flex and Layout Adjustments */
   html[dir="rtl"] .flex-row {
     flex-direction: row-reverse;
   }
@@ -195,7 +201,6 @@
     --tw-space-x-reverse: 1;
   }
 
-  /* RTL specific icon flips */
   html[dir="rtl"] .rtl-flip {
     transform: scaleX(-1);
   }
@@ -235,13 +240,11 @@
     display: none;
   }
 
-  /* Touch-friendly tap targets */
   .touch-target {
     min-height: 44px;
     min-width: 44px;
   }
 
-  /* Ripple effect for touch feedback */
   .ripple {
     position: relative;
     overflow: hidden;
@@ -251,7 +254,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 10%, transparent 10.01%);
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.08) 10%, transparent 10.01%);
     background-repeat: no-repeat;
     background-position: 50%;
     transform: scale(10, 10);
@@ -265,20 +268,18 @@
     transition: 0s;
   }
 
-  /* Prevent text selection on touch */
   .no-select {
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
   }
 
-  /* Smooth momentum scrolling */
   .scroll-smooth {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
 
-  /* Optimized skeleton shimmer animation - GPU accelerated */
+  /* Skeleton shimmer */
   .skeleton-shimmer {
     animation: shimmer 1.5s infinite;
     background: linear-gradient(
@@ -292,15 +293,10 @@
   }
 
   @keyframes shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
-  /* Faster shimmer for loading states */
   .animate-shimmer {
     animation: shimmer 1.2s ease-in-out infinite;
     background: linear-gradient(
@@ -318,7 +314,7 @@
   }
   
   .hover-lift:hover {
-    @apply -translate-y-0.5 shadow-md;
+    @apply -translate-y-1 shadow-lg;
   }
 
   .btn-press {
@@ -326,10 +322,10 @@
   }
 
   .link-underline {
-    @apply relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-current after:transition-all after:duration-200 hover:after:w-full;
+    @apply relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full;
   }
 
-  /* Global Image Fix - Prevent stretching */
+  /* Global Image Fix */
   [data-radix-avatar-image],
   .avatar-image,
   img[class*="avatar"],
@@ -340,57 +336,44 @@
     object-fit: cover !important;
   }
 
-  /* Aspect ratio utilities for images */
-  .aspect-product {
-    aspect-ratio: 1 / 1;
-  }
+  .aspect-product { aspect-ratio: 1 / 1; }
+  .aspect-banner { aspect-ratio: 16 / 9; }
+  .aspect-document { aspect-ratio: 3 / 2; }
 
-  .aspect-banner {
-    aspect-ratio: 16 / 9;
-  }
-
-  .aspect-document {
-    aspect-ratio: 3 / 2;
-  }
-
-  /* Glassmorphism effect */
+  /* Glassmorphism */
   .glass {
-    @apply bg-white/80 backdrop-blur-md border border-white/20;
+    @apply bg-white/80 backdrop-blur-xl border border-white/30 shadow-sm;
   }
 
   .glass-dark {
-    @apply bg-black/40 backdrop-blur-md border border-white/10;
+    @apply bg-black/40 backdrop-blur-xl border border-white/10;
   }
 
   /* Premium card styles */
   .card-elevated {
-    @apply bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
+    @apply bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-300;
   }
 
   .card-interactive {
-    @apply bg-card rounded-xl border border-border shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-200 cursor-pointer;
+    @apply bg-card rounded-2xl border border-border shadow-sm hover:shadow-xl hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer;
   }
 
-  /* Dashboard action cards */
   .action-card {
-    @apply bg-card rounded-xl border border-border p-4 min-h-[100px] flex flex-col justify-center cursor-pointer hover:shadow-lg hover:border-primary/30 active:scale-[0.98] transition-all duration-200;
+    @apply bg-card rounded-2xl border border-border p-4 min-h-[100px] flex flex-col justify-center cursor-pointer hover:shadow-xl hover:border-primary/30 active:scale-[0.98] transition-all duration-300;
   }
 
-  /* Confetti animation */
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+
+  /* Confetti */
   @keyframes confetti-fall {
-    0% {
-      transform: translateY(0) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(100vh) rotate(720deg);
-      opacity: 0;
-    }
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
-
-  .animate-confetti-fall {
-    animation: confetti-fall 3s ease-out forwards;
-  }
+  .animate-confetti-fall { animation: confetti-fall 3s ease-out forwards; }
 
   /* Banner Animations */
   @keyframes slideUp {
@@ -426,5 +409,9 @@
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
     20%, 40%, 60%, 80% { transform: translateX(4px); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
   }
 }

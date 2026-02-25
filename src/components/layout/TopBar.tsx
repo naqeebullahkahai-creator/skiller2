@@ -10,11 +10,10 @@ const TopBar = () => {
   const { isAuthenticated, role, isSuperAdmin } = useAuth();
   
   return (
-    <div className="hidden md:block bg-muted/50 border-b border-border">
+    <div className="hidden md:block bg-card border-b border-border">
       <div className="container mx-auto">
         <div className="flex items-center justify-between h-9 text-xs text-muted-foreground">
           <div className="flex items-center gap-4">
-            {/* Show dashboard shortcuts for authenticated staff */}
             {isAuthenticated && isSuperAdmin && (
               <Link 
                 to="/admin/dashboard" 
@@ -34,7 +33,6 @@ const TopBar = () => {
               </Link>
             )}
             
-            {/* Become a Partner - only show for non-sellers */}
             {(!isAuthenticated || role === "customer") && (
               <Link 
                 to="/business/signup" 

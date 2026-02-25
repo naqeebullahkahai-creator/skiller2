@@ -16,14 +16,14 @@ const SectionSkeleton = () => (
 
 const MobileHomeLayout = () => {
   return (
-    <div className="min-h-screen bg-secondary flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <MobileHeader />
       
       <main className="flex-1 pb-20">
-        {/* Hero Banner - edge-to-edge */}
+        {/* Hero Banner */}
         <MobileHeroBanner />
 
-        {/* Categories - horizontal scroll */}
+        {/* Categories */}
         <MobileCategoryScroll />
 
         {/* Flash Sale */}
@@ -32,12 +32,12 @@ const MobileHomeLayout = () => {
         </Suspense>
 
         {/* Just For You */}
-        <section className="bg-secondary pt-2">
-          <div className="mx-2">
-            <div className="bg-primary text-primary-foreground py-2 px-4 rounded-t-2xl">
-              <h2 className="text-sm font-bold text-center">Just For You</h2>
+        <section className="pt-2">
+          <div className="mx-2.5">
+            <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-2.5 px-4 rounded-t-2xl">
+              <h2 className="text-sm font-display font-bold text-center">Just For You</h2>
             </div>
-            <div className="bg-card rounded-b-2xl p-2">
+            <div className="bg-card rounded-b-2xl p-2.5 border border-t-0 border-border">
               <Suspense fallback={<SectionSkeleton />}>
                 <InfiniteProductGrid />
               </Suspense>

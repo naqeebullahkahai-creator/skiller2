@@ -9,7 +9,6 @@ import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import MobileHomeLayout from "@/components/mobile/MobileHomeLayout";
 
-// Lazy load below-fold sections
 const FlashSaleSection = lazy(() => import("@/components/home/FlashSaleSection"));
 const InfiniteProductGrid = lazy(() => import("@/components/home/InfiniteProductGrid"));
 const RecentlyViewedSection = lazy(() => import("@/components/home/RecentlyViewedSection"));
@@ -26,7 +25,7 @@ const Index = () => {
   return (
     <>
       <SEOHead
-        title="FANZON - Pakistan's Best Online Marketplace"
+        title="FANZOON - Pakistan's Best Online Marketplace"
         description="Shop millions of products with fast delivery, secure payments, and great prices. Electronics, Fashion, Home & more."
         url="/"
       />
@@ -35,7 +34,7 @@ const Index = () => {
       {isMobile ? (
         <MobileHomeLayout />
       ) : (
-        <div className="min-h-screen bg-secondary flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col">
           <Header />
           <main className="flex-1 pb-16 md:pb-0">
             <HeroCarousel />
@@ -46,12 +45,12 @@ const Index = () => {
             <Suspense fallback={null}>
               <RecentlyViewedSection />
             </Suspense>
-            <section className="bg-secondary py-4">
+            <section className="py-6">
               <div className="container mx-auto">
-                <div className="bg-primary text-white py-2.5 px-4 rounded-t">
-                  <h2 className="text-base md:text-lg font-bold text-center">Just For You</h2>
+                <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-3 px-5 rounded-t-2xl">
+                  <h2 className="text-base md:text-lg font-display font-bold text-center">Just For You</h2>
                 </div>
-                <div className="bg-card rounded-b p-3">
+                <div className="bg-card rounded-b-2xl p-4 border border-t-0 border-border">
                   <Suspense fallback={<SectionSkeleton />}>
                     <InfiniteProductGrid />
                   </Suspense>

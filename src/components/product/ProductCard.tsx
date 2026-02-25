@@ -41,20 +41,20 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
   return (
     <Link
       to={`/product/${product.id}`}
-      className="group bg-card rounded border border-border hover:shadow-md transition-shadow duration-200 overflow-hidden block"
+      className="group bg-card rounded-2xl border border-border hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden block"
     >
       {/* Image Container */}
-      <div className="relative aspect-square bg-muted overflow-hidden">
+      <div className="relative aspect-square bg-secondary overflow-hidden rounded-t-2xl">
         <LazyImage
           src={image}
           alt={product.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           priority={priority}
         />
         
         {/* Free Delivery Badge */}
         {product.free_shipping && (
-          <div className="absolute top-2 left-2 bg-[#00a862] text-white text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 z-10">
+          <div className="absolute top-2 left-2 bg-fanzon-success text-accent-foreground text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 z-10 shadow-sm">
             <Truck size={10} />
             FREE DELIVERY
           </div>
@@ -63,7 +63,7 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
         {/* Discount Badge */}
         {discount > 0 && (
           <Badge className={cn(
-            "absolute left-2 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded-sm",
+            "absolute left-2 bg-accent text-accent-foreground text-[10px] px-2 py-0.5 rounded-full shadow-sm",
             product.free_shipping ? "top-8" : "top-2"
           )}>
             -{discount}%
@@ -73,29 +73,29 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
         {/* Wishlist Button */}
         <button
           onClick={handleWishlist}
-          className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white shadow flex items-center justify-center hover:bg-gray-50 transition-colors"
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-card/90 backdrop-blur-sm shadow-sm flex items-center justify-center hover:bg-card transition-all"
         >
           <Heart
             size={14}
             className={cn(
               "transition-colors",
-              isWishlisted ? "fill-red-500 text-red-500" : "text-gray-400"
+              isWishlisted ? "fill-destructive text-destructive" : "text-muted-foreground"
             )}
           />
         </button>
 
         {/* Low Stock */}
         {product.stock_count > 0 && product.stock_count <= 5 && (
-          <div className="absolute bottom-2 left-2 bg-red-500 text-white text-[9px] font-medium px-1.5 py-0.5 rounded">
+          <div className="absolute bottom-2 left-2 bg-destructive text-destructive-foreground text-[9px] font-medium px-2 py-0.5 rounded-full shadow-sm">
             Only {product.stock_count} left
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="p-2.5">
+      <div className="p-3">
         {/* Title */}
-        <h3 className="text-xs text-foreground line-clamp-2 mb-1.5 min-h-[32px] leading-tight">
+        <h3 className="text-xs text-foreground line-clamp-2 mb-2 min-h-[32px] leading-relaxed font-medium">
           {product.title}
         </h3>
 
@@ -117,10 +117,10 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
         )}
 
         {/* Rating & Location */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2.5">
           <div className="flex items-center gap-0.5">
-            <Star size={10} className="fill-yellow-400 text-yellow-400" />
-            <span className="text-[10px] text-muted-foreground">4.5</span>
+            <Star size={10} className="fill-fanzon-star text-fanzon-star" />
+            <span className="text-[10px] text-muted-foreground font-medium">4.5</span>
           </div>
           {product.location && (
             <div className="flex items-center gap-0.5 text-muted-foreground">
@@ -135,10 +135,10 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
           onClick={handleAddToCart}
           disabled={product.stock_count === 0}
           className={cn(
-            "hidden md:flex w-full items-center justify-center gap-1.5 py-1.5 rounded text-xs font-medium transition-colors",
+            "hidden md:flex w-full items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200",
             product.stock_count > 0
-              ? "bg-primary text-white hover:bg-primary/90"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md"
+              : "bg-muted text-muted-foreground cursor-not-allowed"
           )}
         >
           <ShoppingCart size={12} />
@@ -148,9 +148,9 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
         {/* Stock Bar */}
         {showStockBar && product.stock_count > 0 && (
           <div className="mt-2">
-            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div 
-                className="h-full bg-primary rounded-full transition-all"
+                className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all"
                 style={{ width: `${Math.min(100, (product.stock_count / 50) * 100)}%` }}
               />
             </div>

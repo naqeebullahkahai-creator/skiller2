@@ -18,7 +18,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Space Grotesk', 'Plus Jakarta Sans', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -78,12 +79,23 @@ export default {
           emerald: "hsl(var(--fanzon-emerald))",
           orange: "hsl(var(--fanzon-orange))",
           "orange-light": "hsl(var(--fanzon-orange-light))",
+          coral: "hsl(var(--fanzon-coral))",
+          "coral-light": "hsl(var(--fanzon-coral-light))",
         },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
+        "2xl": "calc(var(--radius) + 8px)",
+      },
+      boxShadow: {
+        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+        'card': '0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)',
+        'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+        'elevated': '0 20px 40px -12px rgba(0, 0, 0, 0.12)',
+        'glow': '0 0 20px rgba(100, 80, 220, 0.15)',
       },
       keyframes: {
         "accordion-down": {
@@ -116,7 +128,11 @@ export default {
         },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-5px)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        "scale-in": {
+          "0%": { transform: "scale(0.95)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
         },
       },
       animation: {
@@ -128,6 +144,7 @@ export default {
         "pulse-soft": "pulse-soft 2s ease-in-out infinite",
         shimmer: "shimmer 1.5s infinite",
         float: "float 3s ease-in-out infinite",
+        "scale-in": "scale-in 0.2s ease-out",
       },
     },
   },

@@ -35,7 +35,7 @@ export const PageLoader = ({ message = "Loading..." }: PageLoaderProps) => {
       <div className="relative">
         {/* Logo */}
         <div className="text-2xl font-bold text-primary tracking-tight mb-4 text-center">
-          FANZON
+          FANZOON
         </div>
         <FanzonSpinner size="lg" />
       </div>
