@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSellerBundles } from "@/hooks/useBundleDeals";
 import { useSellerSponsored } from "@/hooks/useSponsoredProducts";
 import { useSellerGroupBuy } from "@/hooks/useGroupBuy";
-import { useProducts } from "@/hooks/useProducts";
+import { useSellerProducts } from "@/hooks/useProducts";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,7 +38,7 @@ const SellerMarketingPage = () => {
 const BundlesTab = () => {
   const { bundles, isLoading, createBundle, deleteBundle } = useSellerBundles();
   const { user } = useAuth();
-  const { products = [] } = useProducts(user?.id);
+  const { products } = useSellerProducts();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", bundle_type: "combo", discount_type: "percentage", discount_value: 10 });
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -103,7 +103,7 @@ const BundlesTab = () => {
 const AdsTab = () => {
   const { ads, isLoading, createAd } = useSellerSponsored();
   const { user } = useAuth();
-  const { products = [] } = useProducts(user?.id);
+  const { products } = useSellerProducts();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ product_id: "", budget_pkr: 200, placement: "search" });
 
@@ -160,7 +160,7 @@ const AdsTab = () => {
 const GroupBuyTab = () => {
   const { deals, isLoading, createDeal } = useSellerGroupBuy();
   const { user } = useAuth();
-  const { products = [] } = useProducts(user?.id);
+  const { products } = useSellerProducts();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ product_id: "", original_price_pkr: 0, group_price_pkr: 0, min_participants: 3, ends_at: "" });
 
