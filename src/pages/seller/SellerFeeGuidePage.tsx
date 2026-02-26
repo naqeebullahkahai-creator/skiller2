@@ -20,8 +20,8 @@ import { formatPKR } from "@/hooks/useSellerWallet";
 const SellerFeeGuidePage = () => {
   const { subscription, globalFees, effectiveFee } = useSellerSubscription();
 
-  const dailyFee = globalFees?.daily ?? 25;
-  const monthlyFee = globalFees?.monthly ?? 600;
+  const dailyFee = globalFees?.perDay ?? 25;
+  const monthlyFee = (globalFees?.perDay ?? 25) * 30;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

@@ -6,16 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface SellerSubscription {
-  id: string;
-  seller_id: string;
-  subscription_type: 'daily' | 'monthly';
-  next_deduction_at: string | null;
-  is_active: boolean;
-}
-
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -23,102 +14,105 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log("Starting subscription deduction processing...");
+    console.log("Starting subscription processing...");
 
-    // Get all active subscriptions that are due for deduction
     const now = new Date().toISOString();
-    
+
+    // Get all active, non-free-period subscriptions due for deduction
     const { data: dueSubscriptions, error: fetchError } = await supabase
       .from('seller_subscriptions')
-      .select('id, seller_id, subscription_type, next_deduction_at')
+      .select('id, seller_id, plan_type, next_deduction_at, is_in_free_period, free_period_end')
       .eq('is_active', true)
       .lte('next_deduction_at', now);
 
-    if (fetchError) {
-      console.error("Error fetching subscriptions:", fetchError);
-      throw fetchError;
-    }
+    if (fetchError) throw fetchError;
 
-    console.log(`Found ${dueSubscriptions?.length || 0} subscriptions due for deduction`);
+    console.log(`Found ${dueSubscriptions?.length || 0} subscriptions due`);
 
-    const results = {
-      processed: 0,
-      successful: 0,
-      failed: 0,
-      details: [] as { seller_id: string; success: boolean; message: string }[],
-    };
+    const results = { processed: 0, successful: 0, failed: 0, skipped_free: 0, details: [] as any[] };
 
-    // Process each subscription
-    for (const subscription of (dueSubscriptions as SellerSubscription[] || [])) {
+    for (const sub of (dueSubscriptions || [])) {
       try {
-        console.log(`Processing deduction for seller ${subscription.seller_id}`);
-        
+        // Skip if in free period
+        if (sub.is_in_free_period && sub.free_period_end && new Date(sub.free_period_end) > new Date()) {
+          results.skipped_free++;
+          continue;
+        }
+
         const { data: result, error: rpcError } = await supabase.rpc(
           'process_subscription_deduction',
-          { p_seller_id: subscription.seller_id }
+          { p_seller_id: sub.seller_id }
         );
 
         if (rpcError) {
-          console.error(`Error processing seller ${subscription.seller_id}:`, rpcError);
           results.failed++;
-          results.details.push({
-            seller_id: subscription.seller_id,
-            success: false,
-            message: rpcError.message,
-          });
+          results.details.push({ seller_id: sub.seller_id, success: false, message: rpcError.message });
         } else {
-          const deductionResult = result as { success: boolean; message: string };
-          if (deductionResult?.success) {
-            results.successful++;
-          } else {
-            results.failed++;
-          }
-          results.details.push({
-            seller_id: subscription.seller_id,
-            success: deductionResult?.success ?? false,
-            message: deductionResult?.message ?? 'Unknown result',
-          });
+          const r = result as any;
+          if (r?.success) results.successful++;
+          else results.failed++;
+          results.details.push({ seller_id: sub.seller_id, success: r?.success ?? false, message: r?.message ?? 'Unknown' });
         }
         results.processed++;
       } catch (error) {
-        console.error(`Exception processing seller ${subscription.seller_id}:`, error);
         results.failed++;
-        results.details.push({
-          seller_id: subscription.seller_id,
-          success: false,
-          message: error instanceof Error ? error.message : 'Unknown error',
-        });
+        results.details.push({ seller_id: sub.seller_id, success: false, message: String(error) });
         results.processed++;
       }
     }
 
-    console.log(`Deduction processing complete. Results:`, results);
+    // Send billing reminders (2 days before next deduction)
+    const reminderDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: upcomingSubs } = await supabase
+      .from('seller_subscriptions')
+      .select('seller_id, plan_type, next_deduction_at')
+      .eq('is_active', true)
+      .eq('is_in_free_period', false)
+      .eq('account_suspended', false)
+      .lte('next_deduction_at', reminderDate)
+      .gt('next_deduction_at', now);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: `Processed ${results.processed} subscriptions`,
-        results,
-      }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      }
-    );
+    for (const sub of (upcomingSubs || [])) {
+      await supabase.from('notifications').insert({
+        user_id: sub.seller_id,
+        title: '⏰ Billing Reminder',
+        message: `Your ${sub.plan_type} platform fee is due on ${new Date(sub.next_deduction_at).toLocaleDateString()}. Ensure sufficient wallet balance.`,
+        notification_type: 'system',
+        link: '/seller/wallet',
+      });
+    }
+
+    // Check for free periods ending soon (3 days before)
+    const freeEndDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: endingFree } = await supabase
+      .from('seller_subscriptions')
+      .select('seller_id, free_period_end')
+      .eq('is_in_free_period', true)
+      .lte('free_period_end', freeEndDate)
+      .gt('free_period_end', now);
+
+    for (const sub of (endingFree || [])) {
+      await supabase.from('notifications').insert({
+        user_id: sub.seller_id,
+        title: '⚠️ Free Period Ending Soon',
+        message: `Your free period ends on ${new Date(sub.free_period_end).toLocaleDateString()}. Billing will start automatically.`,
+        notification_type: 'system',
+        link: '/seller/wallet',
+      });
+    }
+
+    console.log("Processing complete:", results);
+
+    return new Response(JSON.stringify({ success: true, results }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("Error in process-subscriptions:", error);
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
-    );
+    console.error("Error:", error);
+    return new Response(JSON.stringify({ success: false, error: String(error) }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
   }
 });

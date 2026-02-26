@@ -104,6 +104,7 @@ import AdminSiteContentPage from "./pages/dashboard/AdminSiteContentPage";
 import AdminBrandAssetsPage from "./pages/dashboard/AdminBrandAssetsPage";
 import AdminNotificationsPage from "./pages/dashboard/AdminNotificationsPage";
 import AdminCommissionManagementPage from "./pages/dashboard/AdminCommissionManagementPage";
+import AdminWalletPage from "./pages/dashboard/AdminWalletPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -304,6 +305,7 @@ const App = () => (
                             <Route path="brand-assets" element={<AdminBrandAssetsPage />} />
                             <Route path="notifications" element={<AdminNotificationsPage />} />
                             <Route path="commission-management" element={<AdminCommissionManagementPage />} />
+                            <Route path="wallet" element={<AdminWalletPage />} />
                           </Route>
 
                           {/* Seller Routes - Nested under sidebar layout */}
