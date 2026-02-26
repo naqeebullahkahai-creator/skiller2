@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { useSellerWallet, formatPKR } from "@/hooks/useSellerWallet";
 import { useSellerKyc } from "@/hooks/useSellerKyc";
 import DepositFundsSection from "@/components/wallet/DepositFundsSection";
+import SellerSubscriptionCard from "@/components/seller/SellerSubscriptionCard";
 
 const SellerWalletPage = () => {
   const { wallet, transactions, payoutRequests, isLoading, requestPayout, canRequestPayout, hasPendingPayout } = useSellerWallet();
@@ -131,8 +132,11 @@ const SellerWalletPage = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Seller Wallet</h1>
-        <p className="text-muted-foreground">Manage your earnings and payouts</p>
+        <p className="text-muted-foreground">Manage your earnings, payouts & subscription</p>
       </div>
+
+      {/* Subscription Card */}
+      <SellerSubscriptionCard />
 
       {/* Earnings Cards */}
       <div className="grid gap-4 md:grid-cols-4">

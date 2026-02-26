@@ -98,6 +98,72 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_wallet: {
+        Row: {
+          created_at: string
+          id: string
+          pin_hash: string | null
+          pin_set: boolean
+          total_balance: number
+          total_commission_earnings: number
+          total_subscription_earnings: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pin_hash?: string | null
+          pin_set?: boolean
+          total_balance?: number
+          total_commission_earnings?: number
+          total_subscription_earnings?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pin_hash?: string | null
+          pin_set?: boolean
+          total_balance?: number
+          total_commission_earnings?: number
+          total_subscription_earnings?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      admin_wallet_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          seller_id: string | null
+          subscription_id: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          seller_id?: string | null
+          subscription_id?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          seller_id?: string | null
+          subscription_id?: string | null
+          transaction_type?: string
+        }
+        Relationships: []
+      }
       agent_online_status: {
         Row: {
           created_at: string
@@ -2430,6 +2496,45 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_plan_change_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          current_plan: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          requested_plan: string
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          current_plan: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_plan: string
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          current_plan?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_plan?: string
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seller_profiles: {
         Row: {
           account_title: string
@@ -2535,6 +2640,78 @@ export type Database = {
           user_id?: string
           verification_status?: Database["public"]["Enums"]["seller_verification_status"]
           verified_at?: string | null
+        }
+        Relationships: []
+      }
+      seller_subscriptions: {
+        Row: {
+          account_suspended: boolean
+          created_at: string
+          custom_daily_fee: number | null
+          custom_monthly_fee: number | null
+          free_months: number
+          free_period_end: string | null
+          free_period_start: string | null
+          id: string
+          is_active: boolean
+          is_in_free_period: boolean
+          last_deduction_at: string | null
+          next_deduction_at: string | null
+          payment_pending: boolean
+          pending_amount: number
+          plan_type: string
+          reactivated_at: string | null
+          seller_id: string
+          subscription_type: string
+          suspended_at: string | null
+          total_fees_paid: number
+          updated_at: string
+        }
+        Insert: {
+          account_suspended?: boolean
+          created_at?: string
+          custom_daily_fee?: number | null
+          custom_monthly_fee?: number | null
+          free_months?: number
+          free_period_end?: string | null
+          free_period_start?: string | null
+          id?: string
+          is_active?: boolean
+          is_in_free_period?: boolean
+          last_deduction_at?: string | null
+          next_deduction_at?: string | null
+          payment_pending?: boolean
+          pending_amount?: number
+          plan_type?: string
+          reactivated_at?: string | null
+          seller_id: string
+          subscription_type?: string
+          suspended_at?: string | null
+          total_fees_paid?: number
+          updated_at?: string
+        }
+        Update: {
+          account_suspended?: boolean
+          created_at?: string
+          custom_daily_fee?: number | null
+          custom_monthly_fee?: number | null
+          free_months?: number
+          free_period_end?: string | null
+          free_period_start?: string | null
+          id?: string
+          is_active?: boolean
+          is_in_free_period?: boolean
+          last_deduction_at?: string | null
+          next_deduction_at?: string | null
+          payment_pending?: boolean
+          pending_amount?: number
+          plan_type?: string
+          reactivated_at?: string | null
+          seller_id?: string
+          subscription_type?: string
+          suspended_at?: string | null
+          total_fees_paid?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2870,6 +3047,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      subscription_deduction_logs: {
+        Row: {
+          amount: number
+          created_at: string
+          deduction_type: string
+          failure_reason: string | null
+          id: string
+          seller_id: string
+          status: string
+          subscription_id: string | null
+          wallet_balance_after: number
+          wallet_balance_before: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          deduction_type: string
+          failure_reason?: string | null
+          id?: string
+          seller_id: string
+          status?: string
+          subscription_id?: string | null
+          wallet_balance_after?: number
+          wallet_balance_before?: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          deduction_type?: string
+          failure_reason?: string | null
+          id?: string
+          seller_id?: string
+          status?: string
+          subscription_id?: string | null
+          wallet_balance_after?: number
+          wallet_balance_before?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_deduction_logs_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "seller_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       support_agent_status: {
         Row: {
@@ -3308,6 +3532,10 @@ export type Database = {
         }
         Returns: Json
       }
+      calculate_plan_fee: {
+        Args: { p_plan_type: string; p_seller_id: string }
+        Returns: number
+      }
       can_request_return: { Args: { p_order_id: string }; Returns: boolean }
       cancel_order_with_refund: {
         Args: {
@@ -3316,6 +3544,10 @@ export type Database = {
           p_order_id: string
           p_reason: string
         }
+        Returns: Json
+      }
+      check_and_reactivate_seller: {
+        Args: { p_seller_id: string }
         Returns: Json
       }
       check_email_role_conflict: {
@@ -3350,6 +3582,7 @@ export type Database = {
         Args: { p_seller_id: string }
         Returns: number
       }
+      get_seller_per_day_fee: { Args: { p_seller_id: string }; Returns: number }
       get_user_permissions: {
         Args: { _user_id: string }
         Returns: {
@@ -3441,6 +3674,10 @@ export type Database = {
         Returns: Json
       }
       restock_order_items: { Args: { p_order_id: string }; Returns: boolean }
+      set_admin_wallet_pin: {
+        Args: { p_admin_id: string; p_pin: string }
+        Returns: Json
+      }
       validate_voucher: {
         Args: { p_code: string; p_order_total: number; p_user_id: string }
         Returns: {
@@ -3448,6 +3685,10 @@ export type Database = {
           message: string
           valid: boolean
         }[]
+      }
+      verify_admin_wallet_pin: {
+        Args: { p_admin_id: string; p_pin: string }
+        Returns: boolean
       }
     }
     Enums: {
