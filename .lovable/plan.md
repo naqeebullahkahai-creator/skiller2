@@ -1,83 +1,108 @@
 
 
-## Commission Management Tool - Mukammal System
+## Plan: Complete Platform Overhaul (Theme + QR Gallery + Domain Links + Notifications)
 
-Aap ko ek complete commission management page chahiye jahan se admin sab sellers ki commission manage kar sake - naye sellers ko free period de sake, daily rate set kar sake, aur har seller ki individually manage kar sake.
-
-### Kya banega:
-
-**1. Naya Admin Commission Management Page**
-- Ek dedicated page `/admin/commission-management` banegi
-- Sidebar mein link add hoga
-- Is page par 3 sections honge:
-  - Global Settings (default commission rate + new seller free period toggle)
-  - All Sellers Commission Overview (table with all sellers)
-  - Per-seller edit capability
-
-**2. Global New Seller Policy**
-- Admin toggle kar sakta hai: "New sellers ko pehle 3 months free do (0% commission)"
-- Admin months change kar sakta hai (1 se 12 months)
-- Admin grace period commission bhi set kar sakta hai (default 0%)
-- Jab ye ON hai, har naye seller ko automatically grace period mil jayega
-- Jab OFF kare, naye sellers ko direct global rate lagega
-
-**3. All Sellers Commission Table**
-- Ek table jismein sab sellers dikhenge with:
-  - Seller name, shop name
-  - Status: New Seller / Old Seller (based on join date)
-  - Current effective rate
-  - Grace period status (Active/Expired/None)
-  - Grace end date
-  - Custom rate ya Global rate
-  - Quick edit button
-- Filter: New Sellers / Old Sellers / Grace Active / All
-- Search by seller name
-
-**4. Per-Seller Inline Edit**
-- Table se kisi bhi seller par click karke:
-  - Custom commission set/remove karna
-  - Grace period on/off karna
-  - Grace period months change karna
-  - Grace commission % change karna
-  - Notes add karna
-- Ye existing `SellerCommissionManager` component reuse karega
+This is a large scope. I'll break it into 4 focused phases, each implementable in one message.
 
 ---
 
-### Technical Details
+### Phase 1: Premium Clean Theme Overhaul
 
-**Database Changes:**
-- `admin_settings` table mein 3 naye settings add honge:
-  - `new_seller_grace_enabled` (true/false) - Toggle for auto grace period
-  - `new_seller_grace_months` (default: 3) - Kitne months free
-  - `new_seller_grace_commission` (default: 0) - Grace period mein commission %
+**Current state:** The theme uses Deep Indigo + Coral with decent foundations but inconsistent styling across dashboards and pages.
 
-**New Files:**
-- `src/pages/dashboard/AdminCommissionManagementPage.tsx` - Main page with:
-  - Global commission rate settings (reusing `AdminCommissionSettings`)
-  - New seller policy card with toggle + months + rate inputs
-  - Sellers commission overview table with filters and search
-  - Dialog-based per-seller commission editor (using `SellerCommissionManager`)
+**Changes:**
 
-**Modified Files:**
-- `src/App.tsx` - Route add: `/admin/commission-management`
-- `src/components/admin/DynamicAdminSidebar.tsx` - Sidebar link add
-- `src/hooks/useAdminFinance.ts` - New seller policy settings ka fetch/update logic add
+1. **Refined CSS Variables** (`src/index.css`)
+   - Softer, more premium background tones (slightly warmer whites)
+   - Refined border colors with less visual noise
+   - Improved dark mode contrast ratios
+   - Add subtle gradient tokens for premium sections
 
-**Auto Grace Period Logic:**
-- Jab new seller verify hota hai aur `new_seller_grace_enabled = true`:
-  - Automatically `seller_commissions` mein entry create hogi
-  - `grace_period_months` = admin setting se
-  - `grace_commission_percentage` = admin setting se (default 0%)
-  - `grace_start_date` = verification date
-- Database trigger banayenge jo `seller_profiles.verification_status` change hone par fire ho
+2. **Storefront Components Polish**
+   - `ProductCard.tsx` - Tighter spacing, refined shadows, smoother hover states
+   - `MainHeader.tsx` - Cleaner search bar styling, better icon alignment
+   - `MobileHeader.tsx` - More refined mobile header with premium feel
+   - `MobileBottomNav.tsx` - Polished bottom nav with smoother active states
+   - `Footer.tsx` - Cleaner layout with better spacing
+   - `TopBar.tsx` - Refined utility bar
 
-**Seller Classification:**
-- "New Seller" = joined within last 3 months (or grace period active)
-- "Old Seller" = grace period expired or no grace period
+3. **Dashboard Theme Consistency**
+   - `AdminDashboardLayout.tsx` - Professional sidebar with better color scheme (move from slate-900 to a more refined dark surface)
+   - `SellerDashboardLayout.tsx` - Match admin's refined dark sidebar treatment
+   - Both dashboards: Better desktop header, refined mobile drawer
 
-**Data Flow:**
-- Page loads > fetch all seller_profiles + seller_commissions + admin_settings
-- Admin changes global policy > admin_settings update
-- Admin edits individual seller > seller_commissions upsert
-- New seller gets verified > trigger auto-creates commission entry with grace period
+4. **Homepage Sections**
+   - `MobileHomeLayout.tsx` / `Index.tsx` - Better section spacing and gradient treatments
+   - Category scroll, flash sale, product grid sections polished
+
+---
+
+### Phase 2: QR Code Scanner - Gallery Image Support
+
+**Current state:** QR scanner only uses camera via BarcodeDetector API.
+
+**Changes:**
+
+1. **Add gallery upload button** to `QRCodeScanner.tsx`
+   - Add an "Upload from Gallery" button alongside "Start Camera"
+   - Use hidden `<input type="file" accept="image/*">` to pick images
+   - Draw selected image to a `<canvas>`, then use BarcodeDetector API to scan it
+   - Fallback: If BarcodeDetector unavailable, use `jsQR` library or show unsupported message
+
+---
+
+### Phase 3: Dynamic Domain Links (Auto-detect)
+
+**Current state:** Links in QR codes, share buttons, etc. are hardcoded or use `window.location.origin`.
+
+**Changes:**
+
+1. **Add `site_domain` setting** to `site_settings` table via migration
+   - Key: `site_domain`, default value: current lovable domain
+
+2. **Create `useSiteDomain` hook**
+   - Reads `site_domain` from site_settings
+   - Falls back to `window.location.origin`
+   - Provides `buildUrl(path)` helper
+
+3. **Admin UI** - Add domain configuration field to `SocialSettingsPage.tsx`
+
+4. **Update link generators**
+   - `QRCodeDisplay.tsx` - Use domain from settings
+   - `SocialShareButtons.tsx` - Use domain from settings
+   - Any other share/link generation points
+
+---
+
+### Phase 4: Real-time Notifications (All Channels)
+
+**Current state:** Has basic Supabase Realtime notifications + browser Notification API + sonner toasts. Push notifications exist but partially implemented.
+
+**Changes:**
+
+1. **Ensure Realtime is fully wired**
+   - Verify `notifications` table has realtime enabled
+   - Confirm `useNotifications` hook properly subscribes
+
+2. **Fix Push Notification flow**
+   - Review `usePushNotifications` hook - ensure VAPID keys are configured
+   - Wire push subscription to backend
+   - Create/update edge function to send push notifications when DB notifications are created
+
+3. **In-app toast notifications** - Already working via sonner, verify consistency
+
+4. **Notification triggers audit**
+   - Ensure all major events fire notifications: order status changes, wallet credits, subscription events, KYC updates, messages
+
+---
+
+### Implementation Order
+
+I recommend implementing in this order:
+1. **Phase 1** (Theme) - Biggest visual impact, touches most files
+2. **Phase 2** (QR Gallery) - Quick, isolated change
+3. **Phase 3** (Domain Links) - DB migration + hook + UI
+4. **Phase 4** (Notifications) - Most complex, needs edge function work
+
+Each phase will be one message. Should I start with **Phase 1 (Premium Clean Theme)**?
+
