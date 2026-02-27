@@ -32,12 +32,12 @@ const MobileHomeLayout = () => {
         </Suspense>
 
         {/* Just For You */}
-        <section className="pt-2">
+        <section className="pt-3">
           <div className="mx-2.5">
-            <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-2.5 px-4 rounded-t-2xl">
-              <h2 className="text-sm font-display font-bold text-center">Just For You</h2>
+            <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-3 px-4 rounded-t-2xl">
+              <h2 className="text-sm font-display font-bold text-center tracking-wide">Just For You</h2>
             </div>
-            <div className="bg-card rounded-b-2xl p-2.5 border border-t-0 border-border">
+            <div className="bg-card rounded-b-2xl p-2.5 border border-t-0 border-border/40">
               <Suspense fallback={<SectionSkeleton />}>
                 <InfiniteProductGrid />
               </Suspense>

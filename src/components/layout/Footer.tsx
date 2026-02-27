@@ -41,7 +41,7 @@ const Footer = () => {
   };
   
   return (
-    <footer className="hidden md:block bg-foreground text-secondary mt-8">
+    <footer className="hidden md:block bg-[hsl(var(--fanzon-charcoal))] text-secondary mt-10">
       {/* Features Bar */}
       <div className="border-b border-muted-foreground/20">
         <div className="container mx-auto py-8">

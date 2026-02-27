@@ -45,12 +45,12 @@ const Index = () => {
             <Suspense fallback={null}>
               <RecentlyViewedSection />
             </Suspense>
-            <section className="py-6">
+            <section className="py-8">
               <div className="container mx-auto">
-                <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-3 px-5 rounded-t-2xl">
-                  <h2 className="text-base md:text-lg font-display font-bold text-center">Just For You</h2>
+                <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-3.5 px-5 rounded-t-2xl">
+                  <h2 className="text-base md:text-lg font-display font-bold text-center tracking-wide">Just For You</h2>
                 </div>
-                <div className="bg-card rounded-b-2xl p-4 border border-t-0 border-border">
+                <div className="bg-card rounded-b-2xl p-4 border border-t-0 border-border/50">
                   <Suspense fallback={<SectionSkeleton />}>
                     <InfiniteProductGrid />
                   </Suspense>

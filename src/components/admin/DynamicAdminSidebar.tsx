@@ -185,7 +185,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     return (
       <nav className="flex-1 p-4 space-y-1">
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="h-10 bg-slate-800 rounded-lg animate-pulse" />
+          <div key={i} className="h-10 bg-[hsl(var(--dashboard-sidebar-hover))] rounded-lg animate-pulse" />
         ))}
       </nav>
     );
@@ -217,7 +217,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
                 "flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-colors w-full",
                 hasActiveChild
                   ? "bg-primary/20 text-primary"
-                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  : "text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white"
               )}>
                 <div className="flex items-center gap-3">
                   <entry.icon size={20} />
@@ -238,7 +238,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
                 )}
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <div className="ml-4 mt-1 space-y-1 border-l border-slate-700 pl-4">
+                <div className="ml-4 mt-1 space-y-1 border-l border-[hsl(var(--dashboard-sidebar-border))] pl-4">
                   {entry.children.map((child) => (
                     <Link
                       key={child.href}
@@ -248,7 +248,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
                         "flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
                         isLinkActive(child.href)
                           ? "bg-primary text-primary-foreground"
-                          : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                          : "text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white"
                       )}
                     >
                       <div className="flex items-center gap-2">
@@ -278,7 +278,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
               "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
               isLinkActive(item.href)
                 ? "bg-primary text-primary-foreground"
-                : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                : "text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white"
             )}
           >
             <item.icon size={20} />
