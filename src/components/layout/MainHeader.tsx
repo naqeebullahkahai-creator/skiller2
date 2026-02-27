@@ -46,7 +46,7 @@ const MainHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border shadow-soft">
+    <header className="sticky top-0 z-50 bg-card/98 backdrop-blur-2xl border-b border-border/50 shadow-sm">
       <div className="container mx-auto">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Mobile Menu Button */}

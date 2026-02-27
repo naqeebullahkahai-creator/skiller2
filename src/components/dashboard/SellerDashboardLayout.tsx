@@ -1,41 +1,18 @@
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  Bell,
-  Search,
-  Store, // kept for sidebar icon
-  Plus,
-  ShieldCheck,
-  AlertCircle,
-  Wallet,
-  MessageSquare,
-  BarChart3,
-  Zap,
-  Star,
-  Ticket,
-  Upload,
-  Menu,
-  RotateCcw,
-  XCircle,
-  HelpCircle,
-  Home,
+  LayoutDashboard, Package, ShoppingCart, Settings,
+  ChevronLeft, ChevronRight, LogOut, Bell, Search,
+  Plus, ShieldCheck, AlertCircle, Wallet, MessageSquare,
+  BarChart3, Zap, Star, Ticket, Upload, Menu, RotateCcw,
+  XCircle, HelpCircle, Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -70,52 +47,31 @@ const SellerDashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
-  // Strict role isolation - no customer view
   const { isVerified, isPending, isRejected } = useSellerKyc();
   const { unreadCount } = useUnreadCount();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
+  useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
-
-  // Removed: handleViewStorefront - strict role isolation
+  const handleLogout = async () => { await logout(); navigate("/"); };
 
   const getVerificationBadge = () => {
-    if (isVerified) {
-      return (
-        <Badge className="bg-green-500 text-white hover:bg-green-600">
-          <ShieldCheck className="w-3 h-3 mr-1" />
-          {sidebarOpen ? "Verified Seller" : "V"}
-        </Badge>
-      );
-    }
-    if (isPending) {
-      return (
-        <Badge variant="outline" className="border-primary text-primary">
-          <AlertCircle className="w-3 h-3 mr-1" />
-          {sidebarOpen ? "Pending Review" : "P"}
-        </Badge>
-      );
-    }
-    if (isRejected) {
-      return <Badge variant="destructive">{sidebarOpen ? "Rejected" : "R"}</Badge>;
-    }
-    return (
-      <Badge variant="outline" className="border-muted-foreground text-muted-foreground">
-        {sidebarOpen ? "Not Verified" : "NV"}
+    if (isVerified) return (
+      <Badge className="bg-[hsl(var(--fanzon-success))] text-white hover:bg-[hsl(var(--fanzon-success))]/90">
+        <ShieldCheck className="w-3 h-3 mr-1" />{sidebarOpen ? "Verified Seller" : "V"}
       </Badge>
     );
+    if (isPending) return (
+      <Badge variant="outline" className="border-primary text-primary">
+        <AlertCircle className="w-3 h-3 mr-1" />{sidebarOpen ? "Pending Review" : "P"}
+      </Badge>
+    );
+    if (isRejected) return <Badge variant="destructive">{sidebarOpen ? "Rejected" : "R"}</Badge>;
+    return <Badge variant="outline" className="border-muted-foreground text-muted-foreground">{sidebarOpen ? "Not Verified" : "NV"}</Badge>;
   };
 
-  // Bottom nav items for mobile
   const bottomNavItems = [
     { icon: Home, label: "Home", href: "/seller/dashboard" },
     { icon: Package, label: "Products", href: "/seller/products" },
@@ -131,12 +87,12 @@ const SellerDashboardLayout = () => {
 
   const SidebarNav = ({ onNavigate }: { onNavigate?: () => void }) => (
     <>
-      <div className="p-4 border-b border-slate-700">
+      <div className="p-4 border-b border-[hsl(var(--dashboard-sidebar-border))]">
         {getVerificationBadge()}
       </div>
 
       {isVerified && (
-        <div className="p-4 border-b border-slate-700">
+        <div className="p-4 border-b border-[hsl(var(--dashboard-sidebar-border))]">
           <Button className="w-full bg-primary hover:bg-primary/90" onClick={() => { navigate("/seller/products/new"); onNavigate?.(); }}>
             <Plus size={16} className="mr-2" />Add Product
           </Button>
@@ -144,7 +100,7 @@ const SellerDashboardLayout = () => {
       )}
 
       {!isVerified && !isPending && (
-        <div className="p-4 border-b border-slate-700">
+        <div className="p-4 border-b border-[hsl(var(--dashboard-sidebar-border))]">
           <Button className="w-full" variant="outline" onClick={() => { navigate("/seller/kyc"); onNavigate?.(); }}>
             <ShieldCheck size={16} className="mr-2" />Complete KYC
           </Button>
@@ -170,14 +126,12 @@ const SellerDashboardLayout = () => {
                   ? "bg-primary text-primary-foreground"
                   : showKycHighlight
                   ? "text-primary bg-primary/10 hover:bg-primary/20"
-                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                  : "text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white"
               )}
             >
               <link.icon size={20} />
               <span className="text-sm">{link.name}</span>
-              {showKycHighlight && (
-                <Badge variant="destructive" className="ml-auto text-xs">Required</Badge>
-              )}
+              {showKycHighlight && <Badge variant="destructive" className="ml-auto text-xs">Required</Badge>}
               {isMessagesLink && unreadCount > 0 && (
                 <Badge className="ml-auto bg-destructive text-destructive-foreground text-xs h-5 min-w-5 flex items-center justify-center">
                   {unreadCount > 99 ? "99+" : unreadCount}
@@ -188,7 +142,7 @@ const SellerDashboardLayout = () => {
         })}
       </nav>
 
-      <div className="p-4 border-t border-slate-700">
+      <div className="p-4 border-t border-[hsl(var(--dashboard-sidebar-border))]">
         <button
           onClick={() => { handleLogout(); onNavigate?.(); }}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors w-full"
@@ -202,28 +156,27 @@ const SellerDashboardLayout = () => {
   return (
     <DashboardProvider>
       <div className="min-h-screen bg-muted">
-        {/* Mobile Header - Native App Style */}
-        <header className="md:hidden sticky top-0 z-50 bg-primary safe-area-top">
+        {/* Mobile Header */}
+        <header className="md:hidden sticky top-0 z-50 bg-[hsl(var(--dashboard-sidebar))] safe-area-top">
           <div className="flex items-center justify-between h-14 px-3">
             <div className="flex items-center gap-2">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <button className="text-primary-foreground p-1.5 active:scale-95 transition-transform">
+                  <button className="text-white/90 p-1.5 active:scale-95 transition-transform">
                     <Menu size={22} />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] p-0 bg-slate-900 border-slate-700 flex flex-col h-full">
-                  {/* Drawer Header */}
-                  <div className="p-4 bg-primary shrink-0">
+                <SheetContent side="left" className="w-[280px] p-0 bg-[hsl(var(--dashboard-sidebar))] border-[hsl(var(--dashboard-sidebar-border))] flex flex-col h-full">
+                  <div className="p-4 bg-primary/15 shrink-0">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12 border-2 border-primary-foreground/30">
+                      <Avatar className="h-12 w-12 border-2 border-white/15">
                         <AvatarImage src={profile?.avatar_url || undefined} className="object-cover" />
-                        <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground font-semibold">
+                        <AvatarFallback className="bg-primary/30 text-white font-semibold">
                           {profile?.full_name?.charAt(0) || "S"}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-primary-foreground">{profile?.full_name || "Seller"}</p>
+                        <p className="font-semibold text-white">{profile?.full_name || "Seller"}</p>
                         <div className="mt-1">{getVerificationBadge()}</div>
                       </div>
                     </div>
@@ -233,11 +186,11 @@ const SellerDashboardLayout = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-              <span className="text-primary-foreground font-bold text-lg">Seller Center</span>
+              <span className="text-white font-bold text-lg">Seller Center</span>
             </div>
 
             <div className="flex items-center gap-1">
-              <button className="text-primary-foreground p-2 active:scale-95 transition-transform rounded-full hover:bg-primary-foreground/10 relative">
+              <button className="text-white/80 p-2 active:scale-95 transition-transform rounded-full hover:bg-white/10 relative">
                 <MessageSquare size={20} />
                 {unreadCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center text-white text-[10px] font-bold rounded-full px-1 bg-destructive">
@@ -245,7 +198,7 @@ const SellerDashboardLayout = () => {
                   </span>
                 )}
               </button>
-              <button className="text-primary-foreground p-2 active:scale-95 transition-transform rounded-full hover:bg-primary-foreground/10">
+              <button className="text-white/80 p-2 active:scale-95 transition-transform rounded-full hover:bg-white/10">
                 <Bell size={20} />
               </button>
             </div>
@@ -254,16 +207,16 @@ const SellerDashboardLayout = () => {
 
         {/* Desktop Sidebar */}
         <aside className={cn(
-          "fixed left-0 top-0 z-40 h-screen bg-slate-900 text-white transition-all duration-300 hidden md:flex md:flex-col",
+          "fixed left-0 top-0 z-40 h-screen bg-[hsl(var(--dashboard-sidebar))] text-white transition-all duration-300 hidden md:flex md:flex-col",
           sidebarOpen ? "w-64" : "w-20"
         )}>
-          <div className="flex h-16 items-center justify-between px-4 border-b border-slate-700">
+          <div className="flex h-16 items-center justify-between px-4 border-b border-[hsl(var(--dashboard-sidebar-border))]">
             {sidebarOpen && (
               <Link to="/seller/dashboard" className="flex items-center gap-2">
                 <span className="text-xl font-bold text-primary">FANZON</span>
               </Link>
             )}
-            <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="text-white hover:bg-slate-800">
+            <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white">
               {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
             </Button>
           </div>
@@ -277,15 +230,15 @@ const SellerDashboardLayout = () => {
           !sidebarOpen && "md:ml-20"
         )}>
           {/* Desktop Header */}
-          <header className="hidden md:flex sticky top-0 z-30 h-16 bg-background border-b items-center justify-between px-6">
+          <header className="hidden md:flex sticky top-0 z-30 h-16 bg-card/98 backdrop-blur-xl border-b border-border/50 items-center justify-between px-6">
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search products..." className="pl-9 w-64" />
+                <Input placeholder="Search products..." className="pl-9 w-64 bg-secondary/60 border-border/50" />
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative"><Bell size={20} /></Button>
+              <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground"><Bell size={20} /></Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2">
@@ -295,7 +248,7 @@ const SellerDashboardLayout = () => {
                         {profile?.full_name?.charAt(0) || "S"}
                       </AvatarFallback>
                     </Avatar>
-                    <span>{profile?.full_name || "Seller"}</span>
+                    <span className="text-sm">{profile?.full_name || "Seller"}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-popover">
@@ -319,9 +272,9 @@ const SellerDashboardLayout = () => {
           </main>
         </div>
 
-        {/* Mobile Bottom Navigation - Native App Style */}
+        {/* Mobile Bottom Navigation */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
-          <div className="bg-card/90 backdrop-blur-xl border-t border-border/50">
+          <div className="bg-[hsl(var(--dashboard-sidebar))]/95 backdrop-blur-xl border-t border-[hsl(var(--dashboard-sidebar-border))]/50">
             <div className="flex items-center justify-around h-16">
               {bottomNavItems.map((item) => {
                 const active = isBottomActive(item.href);
@@ -339,12 +292,12 @@ const SellerDashboardLayout = () => {
                       strokeWidth={active ? 2.5 : 1.8}
                       className={cn(
                         "transition-all duration-200",
-                        active ? "text-primary" : "text-muted-foreground"
+                        active ? "text-primary" : "text-[hsl(var(--dashboard-sidebar-text))]"
                       )}
                     />
                     <span className={cn(
                       "text-[10px] font-medium mt-0.5 transition-all",
-                      active ? "text-primary font-semibold" : "text-muted-foreground"
+                      active ? "text-primary font-semibold" : "text-[hsl(var(--dashboard-sidebar-text))]"
                     )}>
                       {item.label}
                     </span>

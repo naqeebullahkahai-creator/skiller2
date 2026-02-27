@@ -27,7 +27,7 @@ const MobileHeader = () => {
 
   return (
     <>
-      <header className="md:hidden sticky top-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border safe-area-top">
+      <header className="md:hidden sticky top-0 z-50 bg-card/98 backdrop-blur-2xl border-b border-border/40 safe-area-top">
         {/* Main Row */}
         <div className="flex items-center gap-3 px-3 py-2.5">
           {/* Sidebar */}

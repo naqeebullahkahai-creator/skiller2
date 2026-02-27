@@ -41,7 +41,7 @@ const ProductCard = memo(({ product, showStockBar = false, priority = false }: P
   return (
     <Link
       to={`/product/${product.id}`}
-      className="group bg-card rounded-2xl border border-border hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-300 overflow-hidden block"
+      className="group bg-card rounded-2xl border border-border/60 hover:shadow-xl hover:border-border hover:-translate-y-0.5 transition-all duration-300 overflow-hidden block"
     >
       {/* Image Container */}
       <div className="relative aspect-square bg-secondary overflow-hidden rounded-t-2xl">

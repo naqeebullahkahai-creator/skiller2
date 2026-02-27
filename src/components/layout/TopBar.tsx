@@ -10,9 +10,9 @@ const TopBar = () => {
   const { isAuthenticated, role, isSuperAdmin } = useAuth();
   
   return (
-    <div className="hidden md:block bg-card border-b border-border">
+    <div className="hidden md:block bg-secondary/60 border-b border-border/60">
       <div className="container mx-auto">
-        <div className="flex items-center justify-between h-9 text-xs text-muted-foreground">
+        <div className="flex items-center justify-between h-8 text-[11px] text-muted-foreground">
           <div className="flex items-center gap-4">
             {isAuthenticated && isSuperAdmin && (
               <Link 

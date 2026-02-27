@@ -49,7 +49,6 @@ const AdminDashboardLayout = () => {
     navigate("/");
   };
 
-  // Mobile bottom nav items
   const bottomNavItems = [
     { icon: Home, label: "Home", href: "/admin/dashboard" },
     { icon: ShoppingCart, label: "Orders", href: "/admin/orders" },
@@ -66,44 +65,39 @@ const AdminDashboardLayout = () => {
   return (
     <PermissionsProvider>
       <div className="min-h-screen bg-muted">
-        {/* Mobile Header - Native App Style */}
-        <header className="md:hidden sticky top-0 z-50 bg-primary safe-area-top">
+        {/* Mobile Header */}
+        <header className="md:hidden sticky top-0 z-50 bg-[hsl(var(--dashboard-sidebar))] safe-area-top">
           <div className="flex items-center justify-between h-14 px-3">
             <div className="flex items-center gap-2">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <button className="text-primary-foreground p-1.5 active:scale-95 transition-transform">
+                  <button className="text-white/90 p-1.5 active:scale-95 transition-transform">
                     <Menu size={22} />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[280px] p-0 bg-slate-900 border-slate-700 flex flex-col h-full">
-                  {/* Drawer Header */}
-                  <div className="p-4 bg-primary shrink-0">
+                <SheetContent side="left" className="w-[280px] p-0 bg-[hsl(var(--dashboard-sidebar))] border-[hsl(var(--dashboard-sidebar-border))] flex flex-col h-full">
+                  <div className="p-4 bg-primary/15 shrink-0">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12 border-2 border-primary-foreground/30">
+                      <Avatar className="h-12 w-12 border-2 border-white/15">
                         {profile?.avatar_url ? (
                           <AvatarImage src={profile.avatar_url} alt={profile.full_name} className="object-cover" />
                         ) : null}
-                        <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground font-semibold">
+                        <AvatarFallback className="bg-primary/30 text-white font-semibold">
                           {profile?.full_name?.charAt(0) || "A"}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold text-primary-foreground">{profile?.full_name || "Admin"}</p>
-                        <Badge className="bg-primary-foreground/20 text-primary-foreground text-xs border-0">
+                        <p className="font-semibold text-white">{profile?.full_name || "Admin"}</p>
+                        <Badge className="bg-primary/20 text-primary-foreground text-xs border-0 mt-1">
                           Super Admin
                         </Badge>
                       </div>
                     </div>
                   </div>
-
-                  {/* Sidebar Navigation - scrollable */}
                   <div className="flex-1 overflow-y-auto min-h-0">
                     <DynamicAdminSidebar sidebarOpen={true} onNavigate={() => setMobileMenuOpen(false)} />
                   </div>
-                  
-                  {/* Footer */}
-                  <div className="p-3 border-t border-slate-700 shrink-0">
+                  <div className="p-3 border-t border-[hsl(var(--dashboard-sidebar-border))] shrink-0">
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 w-full active:scale-[0.97] transition-all"
@@ -114,18 +108,18 @@ const AdminDashboardLayout = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-              <span className="text-primary-foreground font-bold text-lg">Admin Panel</span>
+              <span className="text-white font-bold text-lg">Admin Panel</span>
             </div>
 
             <div className="flex items-center gap-1">
-              <button className="text-primary-foreground p-2 active:scale-95 transition-transform rounded-full hover:bg-primary-foreground/10">
+              <button className="text-white/80 p-2 active:scale-95 transition-transform rounded-full hover:bg-white/10">
                 <Bell size={20} />
               </button>
-              <Avatar className="h-8 w-8 border-2 border-primary-foreground/30">
+              <Avatar className="h-8 w-8 border-2 border-white/15">
                 {profile?.avatar_url ? (
                   <AvatarImage src={profile.avatar_url} className="object-cover" />
                 ) : null}
-                <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground text-xs font-semibold">
+                <AvatarFallback className="bg-primary/30 text-white text-xs font-semibold">
                   {profile?.full_name?.charAt(0) || "A"}
                 </AvatarFallback>
               </Avatar>
@@ -136,11 +130,11 @@ const AdminDashboardLayout = () => {
         {/* Desktop Sidebar */}
         <aside 
           className={cn(
-            "fixed left-0 top-0 z-40 h-screen bg-slate-900 text-white transition-all duration-300 hidden md:flex md:flex-col",
+            "fixed left-0 top-0 z-40 h-screen bg-[hsl(var(--dashboard-sidebar))] text-white transition-all duration-300 hidden md:flex md:flex-col",
             sidebarOpen ? "w-64" : "w-20"
           )}
         >
-          <div className="flex h-16 items-center justify-between px-4 border-b border-slate-700">
+          <div className="flex h-16 items-center justify-between px-4 border-b border-[hsl(var(--dashboard-sidebar-border))]">
             {sidebarOpen && (
               <Link to="/admin/dashboard" className="flex items-center gap-2">
                 <span className="text-xl font-bold text-primary">FANZON</span>
@@ -150,21 +144,21 @@ const AdminDashboardLayout = () => {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-white hover:bg-slate-800"
+              className="text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white"
             >
               {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
             </Button>
           </div>
 
-          <div className="p-4 border-b border-slate-700">
-            <Badge className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+          <div className="p-4 border-b border-[hsl(var(--dashboard-sidebar-border))]">
+            <Badge className="bg-accent text-accent-foreground hover:bg-accent/90">
               {sidebarOpen ? "Admin Panel" : "A"}
             </Badge>
           </div>
 
           <DynamicAdminSidebar sidebarOpen={sidebarOpen} />
 
-          <div className="p-4 border-t border-slate-700">
+          <div className="p-4 border-t border-[hsl(var(--dashboard-sidebar-border))]">
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors w-full"
@@ -182,16 +176,16 @@ const AdminDashboardLayout = () => {
           !sidebarOpen && "md:ml-20"
         )}>
           {/* Desktop Header */}
-          <header className="hidden md:flex sticky top-0 z-30 h-16 bg-background border-b items-center justify-between px-6">
+          <header className="hidden md:flex sticky top-0 z-30 h-16 bg-card/98 backdrop-blur-xl border-b border-border/50 items-center justify-between px-6">
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search..." className="pl-9 w-64" />
+                <Input placeholder="Search..." className="pl-9 w-64 bg-secondary/60 border-border/50" />
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
                 <Bell size={20} />
               </Button>
               <DropdownMenu>
@@ -205,7 +199,7 @@ const AdminDashboardLayout = () => {
                         {profile?.full_name?.charAt(0) || "A"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden md:inline">{profile?.full_name || "Admin"}</span>
+                    <span className="hidden md:inline text-sm">{profile?.full_name || "Admin"}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-popover">
@@ -226,9 +220,9 @@ const AdminDashboardLayout = () => {
           </main>
         </div>
 
-        {/* Mobile Bottom Navigation - Native App Style */}
+        {/* Mobile Bottom Navigation */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
-          <div className="bg-slate-900/95 backdrop-blur-xl border-t border-slate-700/50">
+          <div className="bg-[hsl(var(--dashboard-sidebar))]/95 backdrop-blur-xl border-t border-[hsl(var(--dashboard-sidebar-border))]/50">
             <div className="flex items-center justify-around h-16">
               {bottomNavItems.map((item) => {
                 const active = isBottomActive(item.href);
@@ -246,12 +240,12 @@ const AdminDashboardLayout = () => {
                       strokeWidth={active ? 2.5 : 1.8}
                       className={cn(
                         "transition-all duration-200",
-                        active ? "text-primary" : "text-slate-400"
+                        active ? "text-primary" : "text-[hsl(var(--dashboard-sidebar-text))]"
                       )}
                     />
                     <span className={cn(
                       "text-[10px] font-medium mt-0.5 transition-all",
-                      active ? "text-primary font-semibold" : "text-slate-400"
+                      active ? "text-primary font-semibold" : "text-[hsl(var(--dashboard-sidebar-text))]"
                     )}>
                       {item.label}
                     </span>
