@@ -404,11 +404,15 @@ const App = () => (
                             <Route path="categories" element={<AdminCategoryManager />} />
                             <Route path="approvals" element={<AdminProductApprovals />} />
                             <Route path="seller-kyc" element={<AdminSellerKyc />} />
+                            <Route path="seller-kyc/:sellerId" element={<AdminSellerDetail />} />
                             <Route path="returns" element={<AdminReturnsPage />} />
                             <Route path="cancellations" element={<AdminCancellationsPage />} />
+                            <Route path="cancelled" element={<AdminCancelledOrdersPage />} />
                             <Route path="analytics" element={<AdminAnalyticsPage />} />
                             <Route path="reviews" element={<AdminReviewsPage />} />
+                            <Route path="qa" element={<AdminQAModerationPage />} />
                             <Route path="flash-sales" element={<FlashSaleManager />} />
+                            <Route path="flash-nominations" element={<AdminFlashNominations />} />
                             <Route path="vouchers" element={<VoucherManager />} />
                             <Route path="banners" element={<BannerManager />} />
                             <Route path="subscriptions" element={<AdminSubscriptionPage />} />
@@ -417,14 +421,19 @@ const App = () => (
                             <Route path="payment-settings" element={<AdminPaymentSettingsPage />} />
                             <Route path="deposits/sellers" element={<AdminSellerDepositsPage />} />
                             <Route path="deposits/users" element={<AdminUserDepositsPage />} />
+                            <Route path="deposits/settings" element={<AdminDepositSettings />} />
+                            <Route path="payouts" element={<AdminPayoutManagement />} />
                             <Route path="roles" element={<AdminRolesPage />} />
                             <Route path="notifications" element={<AdminNotificationsPage />} />
                             <Route path="wallet" element={<AdminWalletPage />} />
                             <Route path="settings" element={<AdminAllSettingsPage />} />
+                            <Route path="site-settings" element={<SocialSettingsPage />} />
                             <Route path="brand-assets" element={<AdminBrandAssetsPage />} />
                             <Route path="content-manager" element={<AdminSiteContentPage />} />
+                            <Route path="chat-shortcuts" element={<AdminChatShortcutsPage />} />
                             <Route path="commission-management" element={<AdminCommissionManagementPage />} />
                             <Route path="security" element={<AdminSecurityPage />} />
+                            <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
                           </Route>
 
                           {/* Agent App - /agent-app */}
