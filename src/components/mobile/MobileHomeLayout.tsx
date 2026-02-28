@@ -18,30 +18,24 @@ const MobileHomeLayout = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <MobileHeader />
-      
-      <main className="flex-1 pb-20">
-        {/* Hero Banner */}
-        <MobileHeroBanner />
 
-        {/* Categories */}
+      <main className="flex-1 pb-16 space-y-2">
+        <MobileHeroBanner />
         <MobileCategoryScroll />
 
-        {/* Flash Sale */}
         <Suspense fallback={<SectionSkeleton />}>
           <MobileFlashSale />
         </Suspense>
 
         {/* Just For You */}
-        <section className="pt-3">
-          <div className="mx-2.5">
-            <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-3 px-4 rounded-t-2xl">
-              <h2 className="text-sm font-display font-bold text-center tracking-wide">Just For You</h2>
-            </div>
-            <div className="bg-card rounded-b-2xl p-2.5 border border-t-0 border-border/40">
-              <Suspense fallback={<SectionSkeleton />}>
-                <InfiniteProductGrid />
-              </Suspense>
-            </div>
+        <section className="bg-card">
+          <div className="flex items-center justify-between px-3 py-2.5 border-b border-border/50">
+            <h2 className="font-bold text-sm text-foreground">Just For You</h2>
+          </div>
+          <div className="p-1.5">
+            <Suspense fallback={<SectionSkeleton />}>
+              <InfiniteProductGrid />
+            </Suspense>
           </div>
         </section>
       </main>

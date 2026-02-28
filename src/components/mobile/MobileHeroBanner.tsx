@@ -12,8 +12,8 @@ import {
 const MobileHeroBanner = () => {
   const { banners, isLoading } = useActiveBanners();
   const [selectedIndex, setSelectedIndex] = useState(0);
-  
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true, align: "start", skipSnaps: false,
   });
 
@@ -35,12 +35,12 @@ const MobileHeroBanner = () => {
     return () => clearInterval(timer);
   }, [emblaApi, banners.length]);
 
-  if (isLoading) return <Skeleton className="w-full aspect-[16/9]" />;
+  if (isLoading) return <Skeleton className="w-full aspect-[2/1]" />;
 
   if (banners.length === 0) {
     return (
-      <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-6 text-center">
-        <h1 className="text-xl font-bold mb-1">Welcome to FANZON</h1>
+      <div className="bg-primary text-primary-foreground p-6 text-center">
+        <h1 className="text-xl font-bold mb-1">Welcome to FANZOON</h1>
         <p className="text-sm text-primary-foreground/80">Pakistan's Best Marketplace</p>
       </div>
     );
@@ -52,7 +52,6 @@ const MobileHeroBanner = () => {
         <div className="flex">
           {banners.map((banner, index) => {
             const isActive = index === selectedIndex;
-            // Use smaller sizes on mobile
             const mobileTitleSize = ["5xl", "6xl", "4xl"].includes(banner.title_size || "2xl")
               ? "xl" : (banner.title_size || "base");
             const mobileSubSize = ["3xl", "4xl", "5xl", "6xl"].includes(banner.subtitle_size || "base")
@@ -64,7 +63,7 @@ const MobileHeroBanner = () => {
                 to={banner.link_type === "category" ? `/category/${banner.link_value}` : banner.link_value || "/"}
                 className="flex-[0_0_100%] min-w-0"
               >
-                <div className="relative aspect-[16/9]">
+                <div className="relative aspect-[2/1]">
                   <img src={banner.image_url} alt={banner.title || "Banner"} className="w-full h-full object-cover" />
                   <div className="absolute inset-0" style={{ background: getGradientCSS(banner) }} />
                   <div className={cn(
@@ -91,7 +90,7 @@ const MobileHeroBanner = () => {
                       {banner.button_text && (
                         <span
                           className="inline-block mt-2 px-3 py-1.5 rounded text-xs font-semibold shadow-md"
-                          style={{ backgroundColor: banner.button_color || "#F85606", color: banner.button_text_color || "#FFFFFF" }}
+                          style={{ backgroundColor: banner.button_color || "hsl(348, 83%, 47%)", color: banner.button_text_color || "#FFFFFF" }}
                         >
                           {banner.button_text}
                         </span>
@@ -106,14 +105,14 @@ const MobileHeroBanner = () => {
       </div>
 
       {banners.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
           {banners.map((_, i) => (
             <button
               key={i}
               onClick={() => emblaApi?.scrollTo(i)}
               className={cn(
                 "h-1.5 rounded-full transition-all duration-300",
-                i === selectedIndex ? "w-5 bg-primary" : "w-1.5 bg-white/60"
+                i === selectedIndex ? "w-4 bg-primary" : "w-1.5 bg-white/60"
               )}
             />
           ))}
