@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { QrCode, Download, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useSiteDomain } from "@/hooks/useSiteDomain";
 
 interface QRCodeDisplayProps {
   url: string;
@@ -24,7 +25,8 @@ const QRCodeDisplay = ({
   triggerVariant = "icon",
 }: QRCodeDisplayProps) => {
   const { toast } = useToast();
-  const fullUrl = url.startsWith("http") ? url : `https://fanzon.pk${url}`;
+  const { buildUrl } = useSiteDomain();
+  const fullUrl = url.startsWith("http") ? url : buildUrl(url);
 
   const handleDownload = () => {
     const svg = document.getElementById("qr-code-svg");

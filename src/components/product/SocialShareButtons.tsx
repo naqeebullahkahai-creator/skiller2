@@ -10,6 +10,7 @@ import { MessageCircle, Copy, Share2, Facebook, Check, Link2, QrCode } from "luc
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import QRCodeDisplay from "@/components/shared/QRCodeDisplay";
+import { useSiteDomain } from "@/hooks/useSiteDomain";
 
 interface SocialShareButtonsProps {
   productName: string;
@@ -28,8 +29,9 @@ const SocialShareButtons = ({
 }: SocialShareButtonsProps) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  const { buildUrl } = useSiteDomain();
 
-  const fullUrl = `https://fanzon.pk${productUrl}`;
+  const fullUrl = buildUrl(productUrl);
   
   const whatsappMessage = productPrice
     ? `Check out this ${productName} for only Rs. ${productPrice.toLocaleString()} on FANZON! 🛍️\n\n${fullUrl}`
