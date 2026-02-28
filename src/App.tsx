@@ -44,6 +44,7 @@ import NotificationPermissionBanner from "./components/notifications/Notificatio
 import MobileFloatingBackButton from "./components/mobile/MobileFloatingBackButton";
 import SplashScreen from "./components/pwa/SplashScreen";
 import { useAdminInactivityLogout } from "./hooks/useAdminInactivityLogout";
+import { useLoginTracking } from "./hooks/useLoginTracking";
 import { useIsMobile } from "./hooks/use-mobile";
 
 // Account Pages
@@ -131,6 +132,7 @@ import SystemAnnouncementBanner from "./components/admin/SystemAnnouncementBanne
 import SellerStorefront from "./pages/SellerStorefront";
 import ReferralPage from "./pages/account/ReferralPage";
 import AgentDashboard from "./pages/agent/AgentDashboard";
+import AdminSecurityPage from "./pages/dashboard/AdminSecurityPage";
 
 // PWA App Shells
 import CustomerAppShell from "./components/pwa/CustomerAppShell";
@@ -183,6 +185,12 @@ const AdminInactivityGuard = () => {
   return null;
 };
 
+// Login tracking wrapper
+const LoginTracker = () => {
+  useLoginTracking();
+  return null;
+};
+
 const App = () => (
   <ErrorBoundary>
     <HelmetProvider>
@@ -206,6 +214,7 @@ const App = () => (
                           <InstallPrompt />
                           <NotificationPermissionBanner />
                           <AdminInactivityGuard />
+                          <LoginTracker />
                           <AuthModal />
                           <SupportChatWidget />
                           <WhatsAppFloatingButton />
@@ -320,6 +329,7 @@ const App = () => (
                             <Route path="notifications" element={<AdminNotificationsPage />} />
                             <Route path="commission-management" element={<AdminCommissionManagementPage />} />
                             <Route path="wallet" element={<AdminWalletPage />} />
+                            <Route path="security" element={<AdminSecurityPage />} />
                           </Route>
 
                           {/* Seller Routes - Nested under sidebar layout */}
@@ -414,6 +424,7 @@ const App = () => (
                             <Route path="brand-assets" element={<AdminBrandAssetsPage />} />
                             <Route path="content-manager" element={<AdminSiteContentPage />} />
                             <Route path="commission-management" element={<AdminCommissionManagementPage />} />
+                            <Route path="security" element={<AdminSecurityPage />} />
                           </Route>
 
                           {/* Agent App - /agent-app */}
