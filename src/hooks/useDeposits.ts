@@ -141,14 +141,34 @@ export const useDepositFeatureEnabled = () => {
   return useQuery({
     queryKey: ['deposit-feature-enabled'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Check both admin_settings and site_settings for the deposit toggle
+      const { data: adminData } = await supabase
+        .from('admin_settings')
+        .select('setting_value')
+        .eq('setting_key', 'manual_deposits_enabled')
+        .maybeSingle();
+      
+      // Also check if COD-only mode is active (disables deposits)
+      const { data: codData } = await supabase
+        .from('admin_settings')
+        .select('setting_value')
+        .eq('setting_key', 'cod_only_mode')
+        .maybeSingle();
+      
+      if (codData?.setting_value === 'true') return false; // COD-only disables deposits
+      
+      // Check admin_settings first, then site_settings fallback
+      if (adminData) {
+        return adminData.setting_value !== 'false';
+      }
+      
+      const { data: siteData } = await supabase
         .from('site_settings')
         .select('is_enabled')
         .eq('setting_key', 'manual_deposits_enabled')
-        .single();
+        .maybeSingle();
       
-      if (error) return true; // Default enabled
-      return data?.is_enabled ?? true;
+      return siteData?.is_enabled ?? true;
     },
   });
 };

@@ -58,21 +58,35 @@ const AdminBalanceAdjustment = () => {
       if (isNaN(numAmount) || numAmount <= 0) throw new Error("Invalid amount");
       if (!reason.trim()) throw new Error("Reason is required");
 
-      const fnName = selectedTarget.type === "customer"
-        ? "adjust_customer_wallet_balance"
-        : "adjust_seller_wallet_balance";
+      let data: any;
+      let error: any;
 
-      const paramKey = selectedTarget.type === "customer" ? "p_customer_id" : "p_seller_id";
+      if (selectedTarget.type === "customer") {
+        const result = await supabase.rpc("adjust_customer_wallet_balance" as any, {
+          p_customer_id: selectedTarget.id,
+          p_amount: numAmount,
+          p_adjustment_type: adjustType,
+          p_reason: reason.trim(),
+          p_admin_id: user.id,
+        });
+        data = result.data;
+        error = result.error;
+      } else {
+        const result = await supabase.rpc("adjust_seller_wallet_balance" as any, {
+          p_seller_id: selectedTarget.id,
+          p_amount: numAmount,
+          p_adjustment_type: adjustType,
+          p_reason: reason.trim(),
+          p_admin_id: user.id,
+        });
+        data = result.data;
+        error = result.error;
+      }
 
-      const { data, error } = await supabase.rpc(fnName as any, {
-        [paramKey]: selectedTarget.id,
-        p_amount: numAmount,
-        p_adjustment_type: adjustType,
-        p_reason: reason.trim(),
-        p_admin_id: user.id,
-      });
-
-      if (error) throw error;
+      if (error) {
+        console.error("RPC error:", error);
+        throw new Error(error.message || "Database error occurred");
+      }
       const result = data as any;
       if (!result?.success) throw new Error(result?.message || "Adjustment failed");
       return result;
