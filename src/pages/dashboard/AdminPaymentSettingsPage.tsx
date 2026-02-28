@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -46,14 +46,30 @@ const AdminPaymentSettingsPage = () => {
   const perOrderFeeAmount = getSetting('per_order_fee_amount') || '0';
   const [feeAmount, setFeeAmount] = useState(perOrderFeeAmount);
 
+  // Sync feeAmount when data loads
+  useEffect(() => {
+    if (perOrderFeeAmount && perOrderFeeAmount !== '0') {
+      setFeeAmount(perOrderFeeAmount);
+    }
+  }, [perOrderFeeAmount]);
+
   const updateSetting = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      // Upsert into admin_settings
-      const { error } = await supabase
+      // Try update first
+      const { data, error } = await supabase
         .from('admin_settings')
-        .update({ setting_value: value })
-        .eq('setting_key', key);
+        .update({ setting_value: value, updated_at: new Date().toISOString() })
+        .eq('setting_key', key)
+        .select();
       if (error) throw error;
+      
+      // If no rows updated, insert new setting
+      if (!data || data.length === 0) {
+        const { error: insertError } = await supabase
+          .from('admin_settings')
+          .insert({ setting_key: key, setting_value: value });
+        if (insertError) throw insertError;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-payment-settings'] });

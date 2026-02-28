@@ -25,7 +25,7 @@ const MobileHeader = () => {
           {/* Top row: Logo + Cart */}
           <div className="flex items-center justify-between mb-2">
             <Link to="/" className="flex items-center">
-              <img src="/fanzoon-logo.png" alt="FANZOON" className="h-7 object-contain" />
+              <img src="/fanzoon-icon.png" alt="FANZOON" className="h-8 w-8 object-contain" />
             </Link>
 
             <div className="flex items-center gap-0.5">

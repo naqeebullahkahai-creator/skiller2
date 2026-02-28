@@ -21,7 +21,7 @@ const AppHeader = ({ title, subtitle }: AppHeaderProps) => {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <img src="/fanzoon-icon.png" alt="FANZOON" className="h-6 w-6 object-contain" />
+          <img src="/fanzoon-icon.png" alt="FANZOON" className="h-7 w-7 object-contain" />
           <button
             onClick={() => logout()}
             className="p-2 text-primary-foreground/70 active:scale-95 transition-all"
