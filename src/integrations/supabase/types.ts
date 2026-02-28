@@ -229,6 +229,36 @@ export type Database = {
           },
         ]
       }
+      brands: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bulk_upload_logs: {
         Row: {
           completed_at: string | null
@@ -3095,6 +3125,45 @@ export type Database = {
           },
         ]
       }
+      support_agent_profiles: {
+        Row: {
+          avatar_url: string | null
+          average_rating: number | null
+          created_at: string | null
+          display_name: string
+          id: string
+          is_online: boolean | null
+          max_concurrent_chats: number | null
+          total_resolved: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          average_rating?: number | null
+          created_at?: string | null
+          display_name: string
+          id?: string
+          is_online?: boolean | null
+          max_concurrent_chats?: number | null
+          total_resolved?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          average_rating?: number | null
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          is_online?: boolean | null
+          max_concurrent_chats?: number | null
+          total_resolved?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       support_agent_status: {
         Row: {
           active_chats: number
@@ -3660,6 +3729,10 @@ export type Database = {
           p_transaction_reference: string
         }
         Returns: boolean
+      }
+      process_per_order_fee: {
+        Args: { p_order_id: string; p_seller_id: string }
+        Returns: Json
       }
       process_refund_deduction: {
         Args: { p_amount: number; p_order_id: string; p_seller_id: string }

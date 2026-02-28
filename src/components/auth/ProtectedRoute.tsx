@@ -89,12 +89,15 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
   }
 
   // Check role-based session locking - strict isolation
-  // Sellers and admins cannot access customer account pages
+  // Sellers, admins, and agents cannot access customer account pages
   if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
     return <Navigate to="/seller/dashboard" replace />;
   }
   if (role === "admin" && !canAccessAccountPage(role, location.pathname)) {
     return <Navigate to="/admin/dashboard" replace />;
+  }
+  if (role === "support_agent" && !canAccessAccountPage(role, location.pathname)) {
+    return <Navigate to="/agent/dashboard" replace />;
   }
 
   // If specific roles are required, check if user has one of them

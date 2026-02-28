@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, CreditCard, ShieldAlert } from "lucide-react";
+import { Loader2, CreditCard, ShieldAlert, Receipt } from "lucide-react";
 import { useAdminPaymentMethods } from "@/hooks/useDeposits";
-import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import AdminPaymentMethodsManager from "@/components/dashboard/AdminPaymentMethodsManager";
 import {
   AlertDialog,
@@ -20,12 +23,44 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const AdminPaymentSettingsPage = () => {
-  const { settings, isLoading: settingsLoading, updateSetting } = useSiteSettings();
+  const queryClient = useQueryClient();
   const [showCodConfirm, setShowCodConfirm] = useState(false);
 
-  const codOnlyMode = settings?.find(s => s.setting_key === 'cod_only_mode')?.setting_value === 'true';
-  const depositEnabled = settings?.find(s => s.setting_key === 'manual_deposits_enabled')?.is_enabled ?? true;
+  const { data: adminSettings, isLoading: settingsLoading } = useQuery({
+    queryKey: ['admin-payment-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admin_settings')
+        .select('*')
+        .in('setting_key', ['cod_only_mode', 'per_order_fee_enabled', 'per_order_fee_amount', 'manual_deposits_enabled']);
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
+  const getSetting = (key: string) => adminSettings?.find(s => s.setting_key === key)?.setting_value || '';
+
+  const codOnlyMode = getSetting('cod_only_mode') === 'true';
+  const depositEnabled = getSetting('manual_deposits_enabled') !== 'false';
+  const perOrderFeeEnabled = getSetting('per_order_fee_enabled') === 'true';
+  const perOrderFeeAmount = getSetting('per_order_fee_amount') || '0';
+  const [feeAmount, setFeeAmount] = useState(perOrderFeeAmount);
+
+  const updateSetting = useMutation({
+    mutationFn: async ({ key, value }: { key: string; value: string }) => {
+      // Upsert into admin_settings
+      const { error } = await supabase
+        .from('admin_settings')
+        .update({ setting_value: value })
+        .eq('setting_key', key);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-payment-settings'] });
+      toast.success('Setting updated');
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
   const handleCodToggle = () => {
     setShowCodConfirm(true);
   };
@@ -42,7 +77,6 @@ const AdminPaymentSettingsPage = () => {
     await updateSetting.mutateAsync({
       key: 'manual_deposits_enabled',
       value: enabled ? 'true' : 'false',
-      isEnabled: enabled,
     });
   };
 
@@ -120,6 +154,58 @@ const AdminPaymentSettingsPage = () => {
             <p className="text-xs text-destructive mt-2">
               Manual deposits are disabled because COD-Only mode is active.
             </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Per-Order Fee Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Receipt size={20} />
+            Per-Order Seller Fee
+            {perOrderFeeEnabled && <Badge>Active</Badge>}
+          </CardTitle>
+          <CardDescription>
+            Charge sellers a flat fee on every delivered order (deducted from wallet)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+            <div>
+              <Label>Enable Per-Order Fee</Label>
+              <p className="text-sm text-muted-foreground">Deduct flat fee from seller wallet on delivery</p>
+            </div>
+            <Switch
+              checked={perOrderFeeEnabled}
+              onCheckedChange={async (checked) => {
+                await updateSetting.mutateAsync({ key: 'per_order_fee_enabled', value: checked ? 'true' : 'false' });
+              }}
+              disabled={updateSetting.isPending}
+            />
+          </div>
+          {perOrderFeeEnabled && (
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <Label>Fee Amount (PKR)</Label>
+                <Input
+                  type="number"
+                  value={feeAmount}
+                  onChange={(e) => setFeeAmount(e.target.value)}
+                  placeholder="e.g. 50"
+                  min="0"
+                />
+              </div>
+              <Button
+                className="mt-5"
+                onClick={async () => {
+                  await updateSetting.mutateAsync({ key: 'per_order_fee_amount', value: feeAmount });
+                }}
+                disabled={updateSetting.isPending}
+              >
+                Save
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

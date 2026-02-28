@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { categories } from "@/data/mockData";
-import { brands } from "@/data/dashboardData";
+import BrandCombobox from "@/components/product/BrandCombobox";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -330,21 +330,10 @@ const AddProductForm = ({ onClose, onSuccess }: AddProductFormProps) => {
 
               <div className="space-y-2">
                 <Label>Brand</Label>
-                <Select
+                <BrandCombobox
                   value={formData.brand}
-                  onValueChange={(value) => updateFormData("brand", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select brand" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {brands.map((brand) => (
-                      <SelectItem key={brand.id} value={brand.slug}>
-                        {brand.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={(value) => updateFormData("brand", value)}
+                />
               </div>
             </div>
 

@@ -167,6 +167,21 @@ export const useOrders = ({ role, sellerId }: UseOrdersOptions) => {
       // Send email notification for status change (fire & forget)
       const order = orders.find((o) => o.id === orderId);
       if (order) {
+        // Process per-order fee when order is delivered
+        if (newStatus === "delivered") {
+          const items = order.items as any[];
+          const sellerIds = [...new Set(items?.map((item: any) => item.seller_id).filter(Boolean))];
+          for (const sid of sellerIds) {
+            try {
+              const { data: feeResult } = await supabase.rpc("process_per_order_fee", { p_order_id: orderId, p_seller_id: sid });
+              const result = feeResult as any;
+              if (result?.success) console.log("Per-order fee deducted:", result.fee_amount);
+            } catch (e) {
+              console.error("Per-order fee error:", e);
+            }
+          }
+        }
+
         const emailType = newStatus === "shipped" ? "order_shipped" 
           : newStatus === "delivered" ? "order_delivered" 
           : "order_status_update";
