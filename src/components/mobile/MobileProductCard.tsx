@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Star, MapPin, Truck } from "lucide-react";
+import { Star, Truck } from "lucide-react";
 import { DatabaseProduct, formatPKR } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -21,7 +21,8 @@ const MobileProductCard = ({ product }: MobileProductCardProps) => {
   return (
     <Link
       to={`/product/${product.id}`}
-      className="bg-card overflow-hidden block active:opacity-90 transition-opacity border border-border/50"
+      className="bg-card overflow-hidden block active:opacity-90 transition-opacity rounded-xl"
+      style={{ boxShadow: 'var(--shadow-1)' }}
     >
       {/* Image */}
       <div className="relative aspect-square bg-muted overflow-hidden">
@@ -35,32 +36,32 @@ const MobileProductCard = ({ product }: MobileProductCardProps) => {
           loading="lazy"
           onLoad={() => setImgLoaded(true)}
         />
-        {!imgLoaded && <div className="absolute inset-0 animate-shimmer" />}
+        {!imgLoaded && <div className="absolute inset-0 animate-shimmer rounded-t-xl" />}
 
-        {/* Free Delivery */}
+        {/* Free Delivery badge */}
         {product.free_shipping && (
-          <div className="absolute top-0 left-0 bg-fanzon-success text-white text-[8px] font-bold px-1.5 py-[2px] flex items-center gap-0.5">
-            <Truck size={8} />
-            Free Delivery
+          <div className="absolute top-0 left-0 bg-fanzon-success text-primary-foreground text-[9px] font-bold px-2 py-[3px] flex items-center gap-0.5 rounded-br-lg">
+            <Truck size={10} />
+            Free
           </div>
         )}
 
-        {/* Discount */}
+        {/* Discount badge */}
         {discount > 0 && (
-          <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-[2px]">
+          <div className="absolute top-0 right-0 bg-accent text-accent-foreground text-[10px] font-bold px-2 py-[3px] rounded-bl-lg">
             -{discount}%
           </div>
         )}
       </div>
 
-      {/* Content */}
+      {/* Content — 8px padding */}
       <div className="p-2 space-y-1">
-        <h3 className="text-[11px] text-foreground line-clamp-2 leading-snug min-h-[30px]">
+        <h3 className="text-[12px] text-foreground line-clamp-2 leading-snug min-h-[32px]">
           {product.title}
         </h3>
 
         {/* Price */}
-        <p className="text-primary font-bold text-sm leading-none">
+        <p className="text-accent font-bold text-[14px] leading-none">
           {formatPKR(displayPrice)}
         </p>
 
@@ -70,26 +71,16 @@ const MobileProductCard = ({ product }: MobileProductCardProps) => {
             <span className="text-[10px] text-muted-foreground line-through">
               {formatPKR(product.price_pkr)}
             </span>
-            <span className="text-[10px] text-primary font-semibold">
-              -{discount}%
-            </span>
           </div>
         )}
 
-        {/* Rating + Sold + Location */}
-        <div className="flex items-center gap-1 flex-wrap pt-0.5">
-          <div className="flex items-center gap-0.5">
-            <Star size={9} className="fill-fanzon-star text-fanzon-star" />
-            <span className="text-[9px] text-muted-foreground">4.5</span>
-          </div>
+        {/* Rating + Sold */}
+        <div className="flex items-center gap-1 pt-0.5">
+          <Star size={10} className="fill-fanzon-star text-fanzon-star" />
+          <span className="text-[10px] text-muted-foreground">4.5</span>
           {product.sold_count > 0 && (
-            <span className="text-[9px] text-muted-foreground">
+            <span className="text-[10px] text-muted-foreground">
               · {product.sold_count} sold
-            </span>
-          )}
-          {product.location && (
-            <span className="text-[9px] text-muted-foreground flex items-center gap-0.5">
-              · <MapPin size={7} /> {product.location}
             </span>
           )}
         </div>

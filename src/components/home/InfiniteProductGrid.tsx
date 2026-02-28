@@ -1,9 +1,21 @@
 import { useEffect, useRef, useCallback, memo } from "react";
-import ProductCard from "@/components/product/ProductCard";
-import ProductCardSkeleton from "@/components/ui/product-card-skeleton";
+import MobileProductCard from "@/components/mobile/MobileProductCard";
 import { useInfiniteProducts } from "@/hooks/useInfiniteProducts";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
-import { PackageOpen, ArrowDown } from "lucide-react";
+import { PackageOpen } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const ProductSkeleton = () => (
+  <div className="bg-card rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-1)' }}>
+    <Skeleton className="aspect-square w-full" />
+    <div className="p-2 space-y-2">
+      <Skeleton className="h-3 w-full" />
+      <Skeleton className="h-3 w-3/4" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-2 w-1/3" />
+    </div>
+  </div>
+);
 
 const InfiniteProductGrid = memo(() => {
   const {
@@ -42,111 +54,54 @@ const InfiniteProductGrid = memo(() => {
   }, [handleObserver]);
 
   const allProducts = data?.pages.flatMap((page) => page.products) || [];
-  const totalCount = data?.pages[0]?.totalCount || 0;
 
   if (isLoading) {
     return (
-      <section className="py-8 md:py-12 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-6 md:mb-8">
-            <div>
-              <div className="h-8 w-48 bg-muted rounded-lg animate-pulse" />
-              <div className="h-4 w-32 bg-muted rounded mt-2 animate-pulse" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
-            ))}
-          </div>
-        </div>
-      </section>
+      <div className="grid grid-cols-2 gap-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <ProductSkeleton key={i} />
+        ))}
+      </div>
     );
   }
 
   if (isError) {
     return (
-      <section className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-md mx-auto">
-            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PackageOpen className="w-8 h-8 text-destructive" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Failed to load products</h3>
-            <p className="text-muted-foreground">Please try again later</p>
-          </div>
-        </div>
-      </section>
+      <div className="flex flex-col items-center justify-center py-12">
+        <PackageOpen className="w-10 h-10 text-muted-foreground mb-3" />
+        <p className="text-[14px] font-medium text-foreground">Failed to load</p>
+        <p className="text-[12px] text-muted-foreground">Please try again later</p>
+      </div>
     );
   }
 
   if (allProducts.length === 0) {
     return (
-      <section className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-md mx-auto">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PackageOpen className="w-10 h-10 text-primary" />
-            </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">No products yet</h3>
-            <p className="text-muted-foreground">Check back soon for amazing deals!</p>
-          </div>
-        </div>
-      </section>
+      <div className="flex flex-col items-center justify-center py-12">
+        <PackageOpen className="w-12 h-12 text-primary mb-3" />
+        <p className="text-[16px] font-semibold text-foreground">No products yet</p>
+        <p className="text-[12px] text-muted-foreground">Check back soon!</p>
+      </div>
     );
   }
 
   return (
-    <section className="py-8 md:py-12 bg-muted/30">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 md:mb-8">
-          <div>
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">
-              Just For You
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              {totalCount} products available
-            </p>
-          </div>
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-          {allProducts.map((product, index) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              priority={index < 4}
-            />
-          ))}
-        </div>
-
-        {/* Load More Trigger */}
-        <div ref={loadMoreRef} className="flex flex-col items-center justify-center py-10">
-          {isFetchingNextPage && (
-            <div className="flex flex-col items-center gap-3">
-              <FanzonSpinner size="md" />
-              <p className="text-sm text-muted-foreground">Loading more...</p>
-            </div>
-          )}
-          {!hasNextPage && allProducts.length > 0 && (
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                <PackageOpen className="w-6 h-6" />
-              </div>
-              <p className="text-sm font-medium">You've seen all products</p>
-            </div>
-          )}
-          {hasNextPage && !isFetchingNextPage && (
-            <div className="flex flex-col items-center gap-2 text-muted-foreground animate-bounce">
-              <ArrowDown className="w-5 h-5" />
-              <p className="text-sm">Scroll for more</p>
-            </div>
-          )}
-        </div>
+    <>
+      {/* 2-column grid, 8px gap */}
+      <div className="grid grid-cols-2 gap-2">
+        {allProducts.map((product) => (
+          <MobileProductCard key={product.id} product={product} />
+        ))}
       </div>
-    </section>
+
+      {/* Load More Trigger */}
+      <div ref={loadMoreRef} className="flex items-center justify-center py-8">
+        {isFetchingNextPage && <FanzonSpinner size="md" />}
+        {!hasNextPage && allProducts.length > 0 && (
+          <p className="text-[12px] text-muted-foreground">You've seen all products</p>
+        )}
+      </div>
+    </>
   );
 });
 

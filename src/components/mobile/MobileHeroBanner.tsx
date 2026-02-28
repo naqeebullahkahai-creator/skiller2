@@ -39,9 +39,9 @@ const MobileHeroBanner = () => {
 
   if (banners.length === 0) {
     return (
-      <div className="bg-primary text-primary-foreground p-6 text-center">
-        <h1 className="text-xl font-bold mb-1">Welcome to FANZOON</h1>
-        <p className="text-sm text-primary-foreground/80">Pakistan's Best Marketplace</p>
+      <div className="bg-primary text-primary-foreground p-8 text-center">
+        <h1 className="text-[20px] font-bold mb-1">Welcome to FANZOON</h1>
+        <p className="text-[14px] text-primary-foreground/80">Pakistan's Best Marketplace</p>
       </div>
     );
   }
@@ -67,7 +67,7 @@ const MobileHeroBanner = () => {
                   <img src={banner.image_url} alt={banner.title || "Banner"} className="w-full h-full object-cover" />
                   <div className="absolute inset-0" style={{ background: getGradientCSS(banner) }} />
                   <div className={cn(
-                    "absolute inset-0 flex flex-col justify-end p-3",
+                    "absolute inset-0 flex flex-col justify-end p-4",
                     getAlignmentClass(banner.text_alignment),
                   )}>
                     <div className={cn(isActive ? getAnimationClass(banner.animation_type, true) : "")}>
@@ -82,15 +82,15 @@ const MobileHeroBanner = () => {
                       {banner.subtitle && (
                         <p
                           style={getSubtitleStyle(banner)}
-                          className={cn(SIZE_MAP[mobileSubSize], "drop-shadow-md mt-0.5 line-clamp-1")}
+                          className={cn(SIZE_MAP[mobileSubSize], "drop-shadow-md mt-1 line-clamp-1")}
                         >
                           {banner.subtitle}
                         </p>
                       )}
                       {banner.button_text && (
                         <span
-                          className="inline-block mt-2 px-3 py-1.5 rounded text-xs font-semibold shadow-md"
-                          style={{ backgroundColor: banner.button_color || "hsl(348, 83%, 47%)", color: banner.button_text_color || "#FFFFFF" }}
+                          className="inline-block mt-2 px-4 py-2 rounded-lg text-[12px] font-semibold elevation-2"
+                          style={{ backgroundColor: banner.button_color || "hsl(12, 85%, 55%)", color: banner.button_text_color || "#FFFFFF" }}
                         >
                           {banner.button_text}
                         </span>
@@ -105,14 +105,14 @@ const MobileHeroBanner = () => {
       </div>
 
       {banners.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
           {banners.map((_, i) => (
             <button
               key={i}
               onClick={() => emblaApi?.scrollTo(i)}
               className={cn(
-                "h-1.5 rounded-full transition-all duration-300",
-                i === selectedIndex ? "w-4 bg-primary" : "w-1.5 bg-white/60"
+                "h-[6px] rounded-full transition-all duration-300",
+                i === selectedIndex ? "w-5 bg-primary-foreground" : "w-[6px] bg-primary-foreground/40"
               )}
             />
           ))}

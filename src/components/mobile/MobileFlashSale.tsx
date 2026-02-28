@@ -32,34 +32,36 @@ const MobileFlashSale = () => {
   return (
     <section className="bg-card mt-2">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2.5 border-b border-border/50">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
         <div className="flex items-center gap-2">
-          <Zap size={16} className="text-primary fill-primary" />
-          <span className="font-bold text-sm text-foreground">Flash Sale</span>
+          <div className="w-6 h-6 rounded-md bg-accent flex items-center justify-center">
+            <Zap size={14} className="text-accent-foreground fill-accent-foreground" />
+          </div>
+          <span className="font-bold text-[14px] text-foreground">Flash Sale</span>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-muted-foreground">Closing in</span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-muted-foreground">Ends in</span>
           {[fmt(timeLeft.hours), fmt(timeLeft.minutes), fmt(timeLeft.seconds)].map((v, i) => (
             <span key={i} className="flex items-center gap-0.5">
-              {i > 0 && <span className="text-muted-foreground text-[10px]">:</span>}
-              <span className="bg-foreground text-background text-[10px] font-mono font-bold px-1 py-0.5 rounded-sm min-w-[20px] text-center">
+              {i > 0 && <span className="text-muted-foreground text-[10px] font-bold">:</span>}
+              <span className="bg-foreground text-background text-[10px] font-mono font-bold px-1.5 py-0.5 rounded min-w-[22px] text-center">
                 {v}
               </span>
             </span>
           ))}
 
-          <Link to="/products?sale=true" className="ml-1.5">
-            <ChevronRight size={16} className="text-primary" />
+          <Link to="/products?sale=true" className="ml-1 touch-target flex items-center justify-center">
+            <ChevronRight size={18} className="text-primary" />
           </Link>
         </div>
       </div>
 
-      {/* Products horizontal scroll */}
-      <div className="overflow-x-auto scrollbar-hide px-2 py-2">
+      {/* Horizontal scroll products */}
+      <div className="overflow-x-auto scrollbar-hide px-4 py-3">
         <div className="flex gap-2" style={{ width: "max-content" }}>
           {products.map((item) => (
-            <div key={item.id} className="w-[120px] flex-shrink-0">
+            <div key={item.id} className="w-[128px] flex-shrink-0">
               <FlashSaleProductCard
                 product={item.product}
                 flashPrice={item.flash_price_pkr}
