@@ -1,7 +1,60 @@
-import { Wrench, Mail, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Wrench, Mail, RefreshCw, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMaintenanceMode } from "@/hooks/useMaintenanceMode";
+
+const CountdownTimer = ({ endTime }: { endTime: string }) => {
+  const [remaining, setRemaining] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const calc = () => {
+      const diff = new Date(endTime).getTime() - Date.now();
+      if (diff <= 0) {
+        setRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      setRemaining({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+    calc();
+    const interval = setInterval(calc, 1000);
+    return () => clearInterval(interval);
+  }, [endTime]);
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+        <Clock className="w-4 h-4" />
+        <span>Estimated time remaining</span>
+      </div>
+      <div className="flex items-center justify-center gap-3">
+        {[
+          { value: remaining.days, label: "Days" },
+          { value: remaining.hours, label: "Hours" },
+          { value: remaining.minutes, label: "Min" },
+          { value: remaining.seconds, label: "Sec" },
+        ].map((unit) => (
+          <div key={unit.label} className="text-center">
+            <div className="bg-primary/10 text-primary text-2xl font-bold rounded-xl w-16 h-16 flex items-center justify-center tabular-nums">
+              {pad(unit.value)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">{unit.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const Maintenance = () => {
+  const { maintenanceConfig } = useMaintenanceMode();
+
   const handleRefresh = () => {
     window.location.reload();
   };
@@ -29,18 +82,17 @@ const Maintenance = () => {
             We'll Be Back Shortly!
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            We are currently updating the store for a better experience. 
-            We will be back shortly!
+            {maintenanceConfig.message}
           </p>
         </div>
 
+        {/* Countdown Timer */}
+        {maintenanceConfig.endTime && maintenanceConfig.endTime.length > 0 && (
+          <CountdownTimer endTime={maintenanceConfig.endTime} />
+        )}
+
         {/* Refresh Button */}
-        <Button 
-          onClick={handleRefresh} 
-          variant="outline" 
-          size="lg"
-          className="gap-2"
-        >
+        <Button onClick={handleRefresh} variant="outline" size="lg" className="gap-2">
           <RefreshCw className="w-4 h-4" />
           Check Again
         </Button>

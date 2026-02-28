@@ -3744,6 +3744,9 @@ export type Database = {
         | "refund_deduction"
         | "adjustment"
         | "platform_fee"
+        | "admin_credit"
+        | "admin_debit"
+        | "flash_sale_fee"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3927,6 +3930,9 @@ export const Constants = {
         "refund_deduction",
         "adjustment",
         "platform_fee",
+        "admin_credit",
+        "admin_debit",
+        "flash_sale_fee",
       ],
     },
   },

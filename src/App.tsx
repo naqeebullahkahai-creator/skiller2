@@ -97,6 +97,8 @@ import AdminSellerDepositsPage from "./pages/dashboard/AdminSellerDepositsPage";
 import AdminUserDepositsPage from "./pages/dashboard/AdminUserDepositsPage";
 import AdminBalanceAdjustmentsPage from "./pages/dashboard/AdminBalanceAdjustmentsPage";
 import AdminPaymentMethodsPage from "./pages/dashboard/AdminPaymentMethodsPage";
+import AdminPaymentSettingsPage from "./pages/dashboard/AdminPaymentSettingsPage";
+import AdminAllSettingsPage from "./pages/dashboard/AdminAllSettingsPage";
 import AdminDirectOrdersPage from "./pages/dashboard/AdminDirectOrdersPage";
 import AdminVendorOrdersPage from "./pages/dashboard/AdminVendorOrdersPage";
 import AdminChatShortcutsPage from "./pages/dashboard/AdminChatShortcutsPage";
@@ -300,6 +302,8 @@ const App = () => (
                             <Route path="deposits/settings" element={<AdminDepositSettings />} />
                             <Route path="balance-adjustments" element={<AdminBalanceAdjustmentsPage />} />
                             <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
+                            <Route path="payment-settings" element={<AdminPaymentSettingsPage />} />
+                            <Route path="all-settings" element={<AdminAllSettingsPage />} />
                             <Route path="chat-shortcuts" element={<AdminChatShortcutsPage />} />
                             <Route path="content-manager" element={<AdminSiteContentPage />} />
                             <Route path="brand-assets" element={<AdminBrandAssetsPage />} />

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Bell, Lock, Store, User, Globe, Save, Wrench, AlertTriangle, Megaphone } from "lucide-react";
+import { useState } from "react";
+import { Bell, Lock, Store, User, Globe, Save, Wrench, AlertTriangle, Megaphone, Clock, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,10 +34,14 @@ import SystemAnnouncementManager from "@/components/admin/SystemAnnouncementMana
 const DashboardSettings = () => {
   const { role } = useDashboard();
   const { toast } = useToast();
-  const { isMaintenanceMode, toggleMaintenanceMode, isLoading: isMaintenanceLoading } = useMaintenanceMode();
+  const { isMaintenanceMode, maintenanceConfig, toggleMaintenanceMode, isLoading: isMaintenanceLoading } = useMaintenanceMode();
   const { getSetting, updateSetting } = useSiteSettings();
   const [showMaintenanceConfirm, setShowMaintenanceConfirm] = useState(false);
   const [pendingMaintenanceState, setPendingMaintenanceState] = useState(false);
+  const [maintenanceEndDate, setMaintenanceEndDate] = useState('');
+  const [maintenanceEndTime, setMaintenanceEndTime] = useState('');
+  const [maintenanceMessage, setMaintenanceMessage] = useState('');
+  const [maintenanceAllowedRoles, setMaintenanceAllowedRoles] = useState<string[]>(['admin']);
   
   const pwaInstallEnabled = getSetting('pwa_install_prompt')?.is_enabled ?? true;
   
@@ -61,7 +65,18 @@ const DashboardSettings = () => {
   };
 
   const confirmMaintenanceToggle = () => {
-    toggleMaintenanceMode.mutate(pendingMaintenanceState);
+    const endTimeISO = maintenanceEndDate && maintenanceEndTime
+      ? new Date(`${maintenanceEndDate}T${maintenanceEndTime}`).toISOString()
+      : maintenanceEndDate
+        ? new Date(`${maintenanceEndDate}T23:59:59`).toISOString()
+        : '';
+    
+    toggleMaintenanceMode.mutate({
+      enabled: pendingMaintenanceState,
+      endTime: pendingMaintenanceState ? endTimeISO : '',
+      allowedRoles: maintenanceAllowedRoles,
+      message: maintenanceMessage || undefined,
+    });
     setShowMaintenanceConfirm(false);
   };
 
@@ -317,15 +332,15 @@ const DashboardSettings = () => {
                     )}
                   </CardTitle>
                   <CardDescription>
-                    When enabled, all non-admin users will see a maintenance page
+                    When enabled, restricted users will see a maintenance page with countdown timer
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                     <div>
                       <p className="font-medium">Enable Maintenance Mode</p>
                       <p className="text-sm text-muted-foreground">
-                        Temporarily disable the storefront for all users
+                        Temporarily disable the storefront for users
                       </p>
                     </div>
                     <Switch
@@ -334,15 +349,70 @@ const DashboardSettings = () => {
                       disabled={isMaintenanceLoading || toggleMaintenanceMode.isPending}
                     />
                   </div>
+
+                  {/* Timer Settings */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2"><Calendar size={14} /> End Date</Label>
+                      <Input
+                        type="date"
+                        value={maintenanceEndDate}
+                        onChange={(e) => setMaintenanceEndDate(e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2"><Clock size={14} /> End Time</Label>
+                      <Input
+                        type="time"
+                        value={maintenanceEndTime}
+                        onChange={(e) => setMaintenanceEndTime(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Custom Message */}
+                  <div className="space-y-2">
+                    <Label>Custom Message</Label>
+                    <Textarea
+                      placeholder="We are currently updating the store for a better experience."
+                      value={maintenanceMessage}
+                      onChange={(e) => setMaintenanceMessage(e.target.value)}
+                      rows={2}
+                    />
+                  </div>
+
+                  {/* Allowed Roles */}
+                  <div className="space-y-2">
+                    <Label>Who can access during maintenance?</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {['admin', 'seller', 'support_agent'].map((r) => (
+                        <Button
+                          key={r}
+                          size="sm"
+                          variant={maintenanceAllowedRoles.includes(r) ? "default" : "outline"}
+                          onClick={() => {
+                            setMaintenanceAllowedRoles(prev =>
+                              prev.includes(r) ? prev.filter(x => x !== r) : [...prev, r]
+                            );
+                          }}
+                        >
+                          {r === 'admin' ? 'Admin' : r === 'seller' ? 'Sellers' : 'Support Agents'}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                   
                   {isMaintenanceMode && (
-                    <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3">
+                    <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3">
                       <AlertTriangle className="text-destructive shrink-0 mt-0.5" size={18} />
                       <div>
                         <p className="font-medium text-destructive">Maintenance Mode is Active</p>
                         <p className="text-sm text-muted-foreground">
-                          All customers and sellers are currently seeing the maintenance page. 
-                          Only super admins can access the dashboard.
+                          Restricted users see the maintenance page.
+                          {maintenanceConfig.endTime && (
+                            <> Scheduled to end: {new Date(maintenanceConfig.endTime).toLocaleString()}</>
+                          )}
                         </p>
                       </div>
                     </div>

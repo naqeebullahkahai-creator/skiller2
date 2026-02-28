@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -108,6 +109,24 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
+
+  // COD-only mode check
+  const { data: codOnlySetting } = useQuery({
+    queryKey: ['cod-only-mode'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('admin_settings')
+        .select('setting_value')
+        .eq('setting_key', 'cod_only_mode')
+        .maybeSingle();
+      return data?.setting_value === 'true';
+    },
+    staleTime: 60 * 1000,
+  });
+
+  const availablePaymentMethods = codOnlySetting
+    ? PAYMENT_METHODS.filter(m => m.id === 'cod')
+    : PAYMENT_METHODS;
 
   const form = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
@@ -563,7 +582,7 @@ const Checkout = () => {
                   onValueChange={setPaymentMethod}
                   className="space-y-3"
                 >
-                  {PAYMENT_METHODS.map((method) => (
+                  {availablePaymentMethods.map((method) => (
                     <div
                       key={method.id}
                       className={cn(

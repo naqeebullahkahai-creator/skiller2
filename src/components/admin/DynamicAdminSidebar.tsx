@@ -5,6 +5,7 @@ import {
   ShoppingCart, 
   FolderOpen, 
   Settings,
+  Settings2,
   ShieldCheck,
   Wallet,
   Zap,
@@ -160,8 +161,10 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     { name: "Chat Shortcuts", href: "/admin/chat-shortcuts", icon: Headphones, feature: 'settings' },
     { name: "Content Manager", href: "/admin/content-manager", icon: FileText, feature: 'settings' },
     { name: "Site Settings", href: "/admin/site-settings", icon: Globe, feature: 'settings' },
+    { name: "Payment Settings", href: "/admin/payment-settings", icon: CreditCard, feature: 'settings' },
     { name: "Brand Assets", href: "/admin/brand-assets", icon: Image, feature: 'settings' },
     { name: "Send Notification", href: "/admin/notifications", icon: UserCircle, feature: 'settings' },
+    { name: "All Settings", href: "/admin/all-settings", icon: Settings, feature: 'settings' },
     { name: "Settings", href: "/admin/settings", icon: Settings, feature: 'settings' },
   ];
 
