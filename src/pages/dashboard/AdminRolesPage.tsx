@@ -56,6 +56,8 @@ import { useAdminUsers } from "@/hooks/useAdminUsers";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const FEATURES: { key: PermissionFeature; label: string; description: string }[] = [
   { key: 'banners', label: 'Banners', description: 'Hero banners and promotional content' },
@@ -76,6 +78,10 @@ const AdminRolesPage = () => {
   const [selectedRole, setSelectedRole] = useState<StaffRole | null>(null);
   const [showCreateRole, setShowCreateRole] = useState(false);
   const [showAssignRole, setShowAssignRole] = useState(false);
+  const [showChangeRole, setShowChangeRole] = useState(false);
+  const [changeRoleUserId, setChangeRoleUserId] = useState<string | null>(null);
+  const [changeRoleTarget, setChangeRoleTarget] = useState<string>("");
+  const [changeRoleSearch, setChangeRoleSearch] = useState("");
   const [newRoleName, setNewRoleName] = useState("");
   const [newRoleDescription, setNewRoleDescription] = useState("");
   const [userSearchQuery, setUserSearchQuery] = useState("");
@@ -92,7 +98,9 @@ const AdminRolesPage = () => {
   const { data: permissions = [], isLoading: permissionsLoading } = useRolePermissions(selectedRole?.id || null);
   const { data: assignments = [] } = useStaffRoleAssignments();
   const { users, isLoading: usersLoading } = useAdminUsers(userSearchQuery);
+  const { users: changeRoleUsers } = useAdminUsers(changeRoleSearch);
   const { createRole, updateRolePermissions, deleteRole, assignRole, removeRole } = useRoleMutations();
+  const qc = useQueryClient();
   
   // Initialize editing permissions when a role is selected
   const handleSelectRole = (role: StaffRole) => {
@@ -201,6 +209,27 @@ const AdminRolesPage = () => {
     setShowAssignRole(false);
   };
   
+  const handleChangeUserRole = async () => {
+    if (!changeRoleUserId || !changeRoleTarget) {
+      toast.error("Select a user and a target role");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from("user_roles")
+        .update({ role: changeRoleTarget as any })
+        .eq("user_id", changeRoleUserId);
+      if (error) throw error;
+      toast.success("User primary role changed successfully!");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      setShowChangeRole(false);
+      setChangeRoleUserId(null);
+      setChangeRoleTarget("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to change role");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -212,12 +241,16 @@ const AdminRolesPage = () => {
           </h1>
           <p className="text-muted-foreground">Manage staff roles and their access permissions</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => setShowAssignRole(true)} variant="outline">
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => setShowChangeRole(true)} variant="outline" size="sm">
             <Plus size={16} className="mr-2" />
-            Assign Role
+            Change User Role
           </Button>
-          <Button onClick={() => setShowCreateRole(true)}>
+          <Button onClick={() => setShowAssignRole(true)} variant="outline" size="sm">
+            <Plus size={16} className="mr-2" />
+            Assign Staff Role
+          </Button>
+          <Button onClick={() => setShowCreateRole(true)} size="sm">
             <Plus size={16} className="mr-2" />
             Create Role
           </Button>
@@ -540,6 +573,78 @@ const AdminRolesPage = () => {
               disabled={assignRole.isPending || !selectedUserId || !selectedRoleIdForAssignment}
             >
               {assignRole.isPending ? 'Assigning...' : 'Assign Role'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change User Primary Role Dialog */}
+      <Dialog open={showChangeRole} onOpenChange={setShowChangeRole}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Change User Primary Role</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Search User</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={changeRoleSearch}
+                  onChange={(e) => setChangeRoleSearch(e.target.value)}
+                  placeholder="Search by name or email..."
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            
+            <div className="max-h-48 overflow-y-auto space-y-2 border rounded-lg p-2">
+              {changeRoleUsers.length === 0 ? (
+                <p className="text-center py-4 text-muted-foreground">No users found</p>
+              ) : (
+                changeRoleUsers.slice(0, 10).map(user => (
+                  <button
+                    key={user.id}
+                    onClick={() => setChangeRoleUserId(user.id)}
+                    className={`w-full p-2 rounded-lg flex items-center gap-3 text-left transition-colors ${
+                      changeRoleUserId === user.id
+                        ? 'bg-primary/10 border border-primary'
+                        : 'hover:bg-muted border border-transparent'
+                    }`}
+                  >
+                    <Avatar className="h-8 w-8 shrink-0">
+                      {user.avatar_url && <AvatarImage src={user.avatar_url} className="object-cover aspect-square" />}
+                      <AvatarFallback>{user.full_name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm truncate">{user.full_name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    </div>
+                    <Badge variant="outline" className="text-xs shrink-0">{user.role}</Badge>
+                  </button>
+                ))
+              )}
+            </div>
+            
+            <div>
+              <Label>New Primary Role</Label>
+              <Select value={changeRoleTarget} onValueChange={setChangeRoleTarget}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="customer">Customer</SelectItem>
+                  <SelectItem value="seller">Seller</SelectItem>
+                  <SelectItem value="support_agent">Support Agent</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowChangeRole(false)}>Cancel</Button>
+            <Button onClick={handleChangeUserRole} disabled={!changeRoleUserId || !changeRoleTarget}>
+              Change Role
             </Button>
           </DialogFooter>
         </DialogContent>
