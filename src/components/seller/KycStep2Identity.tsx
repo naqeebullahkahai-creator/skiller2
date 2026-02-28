@@ -16,9 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Upload, X, Image as ImageIcon, Calendar, AlertTriangle, Camera, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Shield, Upload, X, Image as ImageIcon, Calendar, AlertTriangle, Camera, User, Loader2, ScanLine, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GENDER_OPTIONS, calculateCnicExpiry, isAtLeast18 } from "@/hooks/useSellerKyc";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface KycStep2Props {
   form: UseFormReturn<any>;
@@ -37,15 +40,21 @@ const FileUploadZone = ({
   onChange,
   error,
   aspectSquare = false,
+  onScanResult,
+  scannable = false,
 }: {
   label: string;
   value: File | null;
   onChange: (file: File | null) => void;
   error?: string;
   aspectSquare?: boolean;
+  onScanResult?: (data: any) => void;
+  scannable?: boolean;
 }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanned, setScanned] = useState(false);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -54,7 +63,9 @@ const FileUploadZone = ({
       const file = e.dataTransfer.files?.[0];
       if (file && file.type.startsWith("image/")) {
         onChange(file);
-        setPreview(URL.createObjectURL(file));
+        const url = URL.createObjectURL(file);
+        setPreview(url);
+        setScanned(false);
       }
     },
     [onChange]
@@ -65,37 +76,94 @@ const FileUploadZone = ({
     if (file) {
       onChange(file);
       setPreview(URL.createObjectURL(file));
+      setScanned(false);
     }
   };
 
   const handleRemove = () => {
     onChange(null);
     setPreview(null);
+    setScanned(false);
+  };
+
+  const handleScan = async () => {
+    if (!value || !onScanResult) return;
+    setScanning(true);
+    try {
+      // Convert file to base64 data URL for AI processing
+      const reader = new FileReader();
+      const dataUrl = await new Promise<string>((resolve) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(value);
+      });
+
+      const { data, error } = await supabase.functions.invoke("scan-image", {
+        body: { imageUrl: dataUrl, scanType: "cnic" },
+      });
+
+      if (error) throw error;
+      if (data?.success && data?.data) {
+        onScanResult(data.data);
+        setScanned(true);
+        toast.success("CNIC scanned successfully! Fields auto-filled.");
+      } else {
+        toast.error(data?.error || "Could not read CNIC data");
+      }
+    } catch (err: any) {
+      toast.error("Scan failed: " + (err.message || "Unknown error"));
+    } finally {
+      setScanning(false);
+    }
   };
 
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">{label} *</label>
       {preview ? (
-        <div className={cn(
-          "relative rounded-lg border overflow-hidden",
-          aspectSquare ? "aspect-square w-40 mx-auto" : "w-full"
-        )}>
-          <img
-            src={preview}
-            alt={label}
-            className={cn(
-              "object-cover",
-              aspectSquare ? "w-full h-full aspect-square" : "w-full h-40"
+        <div className="space-y-2">
+          <div className={cn(
+            "relative rounded-lg border overflow-hidden",
+            aspectSquare ? "aspect-square w-40 mx-auto" : "w-full"
+          )}>
+            <img
+              src={preview}
+              alt={label}
+              className={cn(
+                "object-cover",
+                aspectSquare ? "w-full h-full aspect-square" : "w-full h-40"
+              )}
+            />
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            {scanned && (
+              <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> Scanned
+              </div>
             )}
-          />
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          </div>
+          {scannable && !aspectSquare && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleScan}
+              disabled={scanning}
+              className="w-full"
+            >
+              {scanning ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Scanning CNIC...</>
+              ) : scanned ? (
+                <><CheckCircle2 className="w-4 h-4 mr-2 text-green-500" /> Re-scan CNIC</>
+              ) : (
+                <><ScanLine className="w-4 h-4 mr-2" /> Scan CNIC & Auto-fill</>
+              )}
+            </Button>
+          )}
         </div>
       ) : (
         <div
@@ -151,7 +219,6 @@ const KycStep2Identity = ({ form }: KycStep2Props) => {
   const dobValue = form.watch("date_of_birth");
   const issueDateValue = form.watch("cnic_issue_date");
 
-  // Auto-calculate expiry date when issue date changes
   useEffect(() => {
     if (issueDateValue) {
       const expiryDate = calculateCnicExpiry(issueDateValue);
@@ -160,6 +227,27 @@ const KycStep2Identity = ({ form }: KycStep2Props) => {
   }, [issueDateValue, form]);
 
   const ageValid = dobValue ? isAtLeast18(dobValue) : true;
+
+  const handleCnicScanResult = (data: any) => {
+    if (data.cnic_number) {
+      form.setValue("cnic_number", formatCnic(data.cnic_number.replace(/\D/g, "")));
+    }
+    if (data.date_of_birth) {
+      form.setValue("date_of_birth", data.date_of_birth);
+    }
+    if (data.date_of_issue) {
+      form.setValue("cnic_issue_date", data.date_of_issue);
+    }
+    if (data.gender) {
+      const g = data.gender.charAt(0).toUpperCase() + data.gender.slice(1).toLowerCase();
+      if (GENDER_OPTIONS.includes(g)) {
+        form.setValue("gender", g);
+      }
+    }
+    if (data.full_name) {
+      // Optionally set name
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -173,6 +261,17 @@ const KycStep2Identity = ({ form }: KycStep2Props) => {
             We need to verify your identity
           </p>
         </div>
+      </div>
+
+      {/* AI Scan Info */}
+      <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+        <div className="flex items-center gap-2">
+          <ScanLine className="w-5 h-5 text-primary" />
+          <p className="text-sm font-medium">AI-Powered CNIC Scanning</p>
+        </div>
+        <p className="text-xs text-muted-foreground mt-1">
+          Upload your CNIC front image and click "Scan CNIC" to auto-fill your details
+        </p>
       </div>
 
       {/* Selfie/Profile Photo */}
@@ -335,6 +434,8 @@ const KycStep2Identity = ({ form }: KycStep2Props) => {
                 value={field.value}
                 onChange={field.onChange}
                 error={form.formState.errors.cnic_front?.message as string}
+                scannable
+                onScanResult={handleCnicScanResult}
               />
             </FormItem>
           )}
