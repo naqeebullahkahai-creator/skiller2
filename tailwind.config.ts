@@ -78,6 +78,7 @@ export default {
           star: "hsl(var(--fanzon-star))",
           emerald: "hsl(var(--fanzon-emerald))",
           orange: "hsl(var(--fanzon-orange))",
+          "orange-hover": "hsl(var(--fanzon-primary-hover))",
           "orange-light": "hsl(var(--fanzon-orange-light))",
           coral: "hsl(var(--fanzon-coral))",
           "coral-light": "hsl(var(--fanzon-coral-light))",

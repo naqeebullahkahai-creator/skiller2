@@ -35,7 +35,7 @@ const MobileBottomNav = () => {
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
       <div className="bg-card border-t border-border" style={{ boxShadow: '0 -2px 12px rgba(0,0,0,0.08)' }}>
-        <div className="flex items-center justify-around h-14">
+        <div className="flex items-center justify-around h-14 max-w-[100vw]">
           {navItems.map((item) => {
             const active = isActive(item.path);
             const isCartCenter = item.isCenter;
