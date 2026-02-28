@@ -8,16 +8,26 @@ interface MaintenanceGuardProps {
 }
 
 const MaintenanceGuard = ({ children }: MaintenanceGuardProps) => {
-  const { isMaintenanceMode, isLoading } = useMaintenanceMode();
-  const { isSuperAdmin, isLoading: isAuthLoading } = useAuth();
+  const { maintenanceConfig, isLoading } = useMaintenanceMode();
+  const { role, isSuperAdmin, isLoading: isAuthLoading } = useAuth();
 
   // Don't block while loading
   if (isLoading || isAuthLoading) {
     return <>{children}</>;
   }
 
-  // If maintenance mode is on and user is NOT super admin, show maintenance page
-  if (isMaintenanceMode && !isSuperAdmin) {
+  // If maintenance mode is on, check if user has access
+  if (maintenanceConfig.isEnabled) {
+    // Super admin always has access
+    if (isSuperAdmin) return <>{children}</>;
+
+    // Check if user's role is in the allowed roles list
+    const userRole = role || 'guest';
+    if (maintenanceConfig.allowedRoles.includes(userRole)) {
+      return <>{children}</>;
+    }
+
+    // Block access - show maintenance page
     return <Maintenance />;
   }
 
