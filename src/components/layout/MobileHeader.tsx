@@ -1,62 +1,50 @@
 import { useState } from "react";
-import { Search, ShoppingCart, MessageCircle, Bell } from "lucide-react";
+import { Search, ShoppingCart, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
-import { useUnreadCount } from "@/hooks/useMessaging";
 import MobileSearchOverlay from "@/components/mobile/MobileSearchOverlay";
-import NotificationBell from "@/components/notifications/NotificationBell";
 
 const MobileHeader = () => {
   const { isAuthenticated } = useAuth();
   const { t } = useLanguage();
   const [searchOpen, setSearchOpen] = useState(false);
   const { items } = useCart();
-  const { unreadCount } = useUnreadCount();
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <>
-      <header className="md:hidden sticky top-0 z-50 safe-area-top">
-        {/* Primary bar */}
-        <div className="bg-primary px-3 pt-2 pb-2.5">
-          {/* Top row: Logo + icons */}
+      <header className="sticky top-0 z-50 safe-area-top">
+        <div className="bg-primary px-4 pt-2 pb-3">
+          {/* Top row: Logo + Cart */}
           <div className="flex items-center justify-between mb-2">
-            <Link to="/" className="flex items-center gap-1.5">
-              <span className="text-lg font-black tracking-tight text-primary-foreground">
+            <Link to="/" className="flex items-center">
+              <span className="text-[20px] font-black tracking-tight text-primary-foreground">
                 FANZOON
               </span>
             </Link>
 
-            <div className="flex items-center gap-1">
-              {/* Messages */}
-              {isAuthenticated && (
-                <Link to="/account/messages" className="relative p-2 text-primary-foreground/90 active:scale-90 transition-transform">
-                  <MessageCircle size={20} />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 flex items-center justify-center bg-accent text-accent-foreground text-[9px] font-bold rounded-full px-1">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
-                </Link>
-              )}
-
-              {/* Cart */}
-              <Link to="/checkout" className="relative p-2 text-primary-foreground/90 active:scale-90 transition-transform">
-                <ShoppingCart size={20} />
+            <div className="flex items-center gap-0.5">
+              <Link
+                to="/checkout"
+                className="relative p-2.5 text-primary-foreground/90 active:scale-90 transition-transform touch-target flex items-center justify-center"
+              >
+                <ShoppingCart size={22} />
                 {cartCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-4 flex items-center justify-center bg-accent text-accent-foreground text-[9px] font-bold rounded-full px-1">
+                  <span className="absolute top-1 right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-accent text-accent-foreground text-[10px] font-bold rounded-full px-1">
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
               </Link>
 
-              {/* Notifications */}
               {isAuthenticated && (
-                <div className="text-primary-foreground/90">
-                  <NotificationBell />
-                </div>
+                <Link
+                  to="/account/notifications"
+                  className="p-2.5 text-primary-foreground/90 active:scale-90 transition-transform touch-target flex items-center justify-center"
+                >
+                  <Bell size={22} />
+                </Link>
               )}
             </div>
           </div>
@@ -64,10 +52,10 @@ const MobileHeader = () => {
           {/* Search bar */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="w-full flex items-center gap-2.5 h-9 px-3 bg-white rounded-md text-muted-foreground text-sm active:scale-[0.99] transition-all"
+            className="w-full flex items-center gap-3 h-10 px-4 bg-primary-foreground rounded-lg text-muted-foreground active:scale-[0.99] transition-all elevation-1"
           >
-            <Search size={16} className="text-primary" />
-            <span className="text-muted-foreground/70 text-xs">{t("search.placeholder")}</span>
+            <Search size={18} className="text-muted-foreground/60" />
+            <span className="text-muted-foreground/60 text-[13px]">{t("search.placeholder")}</span>
           </button>
         </div>
       </header>

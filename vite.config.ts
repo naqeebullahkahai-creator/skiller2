@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => ({
         name: "FANZON - Pakistan's Premium Store",
         short_name: "FANZON",
         description: "Shop authentic products at FANZON - Pakistan's Premium Multi-Vendor Store",
-        theme_color: "#f85606",
+        theme_color: "#1a8a7a",
         background_color: "#ffffff",
         display: "standalone",
         orientation: "portrait",
@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => ({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB limit
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,webp}"],
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api/, /^\/admin/],
+        navigateFallbackDenylist: [/^\/api/, /^\/admin/, /^\/~oauth/],
         // Precache critical assets
         additionalManifestEntries: [
           { url: "/fanzon-icon-512.png", revision: "2" },

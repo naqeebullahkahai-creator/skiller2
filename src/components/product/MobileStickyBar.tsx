@@ -24,70 +24,45 @@ const MobileStickyBar = ({
   visible = true,
 }: MobileStickyBarProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Show sticky bar after scrolling past 400px (past the action buttons)
-      if (currentScrollY > 400) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-      
-      setLastScrollY(currentScrollY);
+      setIsVisible(window.scrollY > 400);
     };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   if (!visible) return null;
-
-  const discount = originalPrice && originalPrice > price
-    ? Math.round(((originalPrice - price) / originalPrice) * 100)
-    : 0;
 
   return (
     <div
       className={cn(
-        "md:hidden fixed bottom-16 left-0 right-0 z-40 bg-card border-t border-border shadow-lg safe-area-bottom transition-transform duration-300",
-        isVisible ? "translate-y-0" : "translate-y-full"
+        "md:hidden fixed bottom-14 left-0 right-0 z-40 bg-card border-t border-border safe-area-bottom transition-transform duration-300",
       )}
+      style={{ boxShadow: 'var(--shadow-3)', transform: isVisible ? 'translateY(0)' : 'translateY(100%)' }}
     >
-      <div className="flex items-center gap-3 p-3">
-        {/* Product Info */}
+      <div className="flex items-center gap-3 px-4 py-2">
+        {/* Price */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate text-foreground">
-            {productTitle}
+          <p className="text-[16px] font-bold text-accent">
+            {formatPKR(price)}
           </p>
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-primary">
-              {formatPKR(price)}
-            </span>
-            {discount > 0 && (
-              <>
-                <span className="text-xs text-muted-foreground line-through">
-                  {formatPKR(originalPrice!)}
-                </span>
-                <span className="text-xs font-medium text-fanzon-success">
-                  -{discount}%
-                </span>
-              </>
-            )}
-          </div>
+          {originalPrice && originalPrice > price && (
+            <p className="text-[10px] text-muted-foreground line-through">
+              {formatPKR(originalPrice)}
+            </p>
+          )}
         </div>
 
-        {/* Action Buttons */}
+        {/* Buttons */}
         <div className="flex gap-2 flex-shrink-0">
           <Button
             variant="outline"
             size="sm"
             disabled={disabled}
             onClick={onAddToCart}
-            className="h-10 px-3 border-primary text-primary active:scale-[0.98] transition-transform"
+            className="h-11 px-3 border-primary text-primary active:scale-[0.98] transition-transform touch-target rounded-xl"
           >
             <ShoppingCart size={18} />
           </Button>
@@ -95,7 +70,7 @@ const MobileStickyBar = ({
             size="sm"
             disabled={disabled}
             onClick={onBuyNow}
-            className="h-10 px-4 bg-primary hover:bg-primary/90 active:scale-[0.98] transition-transform font-semibold"
+            className="h-11 px-5 bg-accent hover:bg-accent/90 text-accent-foreground active:scale-[0.98] transition-transform font-semibold touch-target rounded-xl"
           >
             Buy Now
           </Button>
