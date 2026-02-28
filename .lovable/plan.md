@@ -33,8 +33,12 @@
 
 ---
 
-### Phase 4: Real-time Notifications (All Channels)
+### Phase 4: Real-time Notifications (All Channels) ✅ DONE
 
-1. Verify Realtime on notifications table
-2. Fix Push Notification flow (VAPID)
-3. Notification triggers audit
+1. ✅ Enabled Realtime on `notifications` table (was missing)
+2. ✅ Realtime subscription in `useNotifications` hook already working
+3. ✅ Browser Notification API integrated (shows native notifications)
+4. ✅ Sonner toast notifications with type-based styling
+5. ✅ NotificationBell with animated unread badge
+6. ✅ DB triggers: order status, messages, support sessions
+7. ⚠️ Push VAPID key is placeholder — needs real VAPID keys for production push notifications
