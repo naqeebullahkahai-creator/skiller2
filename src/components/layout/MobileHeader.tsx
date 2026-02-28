@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 import MobileSearchOverlay from "@/components/mobile/MobileSearchOverlay";
 
 const MobileHeader = () => {
@@ -12,10 +13,14 @@ const MobileHeader = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { items } = useCart();
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const hidden = useScrollDirection();
 
   return (
     <>
-      <header className="sticky top-0 z-50 safe-area-top">
+      <header
+        className="sticky top-0 z-50 safe-area-top transition-transform duration-300 will-change-transform"
+        style={{ transform: hidden ? "translateY(-100%)" : "translateY(0)" }}
+      >
         <div className="bg-primary px-4 pt-2 pb-3">
           {/* Top row: Logo + Cart */}
           <div className="flex items-center justify-between mb-2">

@@ -26,11 +26,22 @@ const MobileProductCard = ({ product }: MobileProductCardProps) => {
     >
       {/* Image */}
       <div className="relative aspect-square bg-muted overflow-hidden">
+        {/* Blur-up placeholder */}
+        <img
+          src={image}
+          alt=""
+          aria-hidden
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover scale-110 blur-lg transition-opacity duration-500",
+            imgLoaded ? "opacity-0" : "opacity-60"
+          )}
+          loading="lazy"
+        />
         <img
           src={image}
           alt={product.title}
           className={cn(
-            "w-full h-full object-cover transition-opacity duration-300",
+            "relative w-full h-full object-cover transition-opacity duration-300",
             imgLoaded ? "opacity-100" : "opacity-0"
           )}
           loading="lazy"

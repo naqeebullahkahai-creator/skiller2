@@ -1,9 +1,12 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useCallback } from "react";
 import MobileHeader from "@/components/layout/MobileHeader";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import MobileHeroBanner from "./MobileHeroBanner";
 import MobileCategoryScroll from "./MobileCategoryScroll";
+import PullToRefresh from "./PullToRefresh";
+import TopProgressBar from "@/components/pwa/TopProgressBar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MobileFlashSale = lazy(() => import("./MobileFlashSale"));
 const InfiniteProductGrid = lazy(() => import("@/components/home/InfiniteProductGrid"));
@@ -25,30 +28,39 @@ const SectionSkeleton = () => (
 );
 
 const MobileHomeLayout = () => {
+  const queryClient = useQueryClient();
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries();
+  }, [queryClient]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+      <TopProgressBar />
       <MobileHeader />
 
-      <main className="flex-1 pb-16 page-enter">
-        <MobileHeroBanner />
-        <MobileCategoryScroll />
+      <PullToRefresh onRefresh={handleRefresh}>
+        <main className="flex-1 pb-16 page-enter">
+          <MobileHeroBanner />
+          <MobileCategoryScroll />
 
-        <Suspense fallback={<SectionSkeleton />}>
-          <MobileFlashSale />
-        </Suspense>
+          <Suspense fallback={<SectionSkeleton />}>
+            <MobileFlashSale />
+          </Suspense>
 
-        {/* Just For You */}
-        <section className="bg-card mt-2">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-            <h2 className="font-bold text-[16px] text-foreground">Just For You</h2>
-          </div>
-          <div className="p-2">
-            <Suspense fallback={<SectionSkeleton />}>
-              <InfiniteProductGrid />
-            </Suspense>
-          </div>
-        </section>
-      </main>
+          {/* Just For You */}
+          <section className="bg-card mt-2">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+              <h2 className="font-bold text-[16px] text-foreground">Just For You</h2>
+            </div>
+            <div className="p-2">
+              <Suspense fallback={<SectionSkeleton />}>
+                <InfiniteProductGrid />
+              </Suspense>
+            </div>
+          </section>
+        </main>
+      </PullToRefresh>
 
       <MobileBottomNav />
     </div>
