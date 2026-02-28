@@ -229,6 +229,30 @@ export type Database = {
           },
         ]
       }
+      blocked_ips: {
+        Row: {
+          blocked_at: string
+          blocked_by: string | null
+          id: string
+          ip_address: string
+          reason: string | null
+        }
+        Insert: {
+          blocked_at?: string
+          blocked_by?: string | null
+          id?: string
+          ip_address: string
+          reason?: string | null
+        }
+        Update: {
+          blocked_at?: string
+          blocked_by?: string | null
+          id?: string
+          ip_address?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           created_at: string | null
@@ -1579,6 +1603,72 @@ export type Database = {
           months?: number
           name?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      login_sessions: {
+        Row: {
+          browser_name: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          device_name: string | null
+          device_type: string | null
+          id: string
+          ip_address: string | null
+          is_new_device: boolean | null
+          is_suspicious: boolean | null
+          login_at: string
+          login_status: string
+          logout_at: string | null
+          os_name: string | null
+          session_duration_minutes: number | null
+          suspicious_reason: string | null
+          user_email: string
+          user_id: string
+          user_role: string
+        }
+        Insert: {
+          browser_name?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_new_device?: boolean | null
+          is_suspicious?: boolean | null
+          login_at?: string
+          login_status?: string
+          logout_at?: string | null
+          os_name?: string | null
+          session_duration_minutes?: number | null
+          suspicious_reason?: string | null
+          user_email: string
+          user_id: string
+          user_role?: string
+        }
+        Update: {
+          browser_name?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          is_new_device?: boolean | null
+          is_suspicious?: boolean | null
+          login_at?: string
+          login_status?: string
+          logout_at?: string | null
+          os_name?: string | null
+          session_duration_minutes?: number | null
+          suspicious_reason?: string | null
+          user_email?: string
+          user_id?: string
+          user_role?: string
         }
         Relationships: []
       }

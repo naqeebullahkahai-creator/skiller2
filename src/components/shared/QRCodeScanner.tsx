@@ -5,6 +5,7 @@ import { ScanLine, Camera, ImagePlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import jsQR from "jsqr";
 
 interface QRCodeScannerProps {
   className?: string;
@@ -19,10 +20,15 @@ const QRCodeScanner = ({ className, variant = "icon" }: QRCodeScannerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const animFrameRef = useRef<number | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const stopCamera = () => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -35,20 +41,31 @@ const QRCodeScanner = ({ className, variant = "icon" }: QRCodeScannerProps) => {
     return () => stopCamera();
   }, [open]);
 
-  const hasBarcodeDetector = "BarcodeDetector" in window;
+  const hasBarcodeDetector = typeof window !== "undefined" && "BarcodeDetector" in window;
+
+  const scanWithJsQR = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): string | null => {
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+      inversionAttempts: "dontInvert",
+    });
+    return code?.data || null;
+  };
 
   const startScanning = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
+        video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 } }
       });
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        await videoRef.current.play();
       }
       setScanning(true);
+
+      const canvas = canvasRef.current!;
+      const ctx = canvas.getContext("2d")!;
 
       if (hasBarcodeDetector) {
         const detector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
@@ -61,15 +78,27 @@ const QRCodeScanner = ({ className, variant = "icon" }: QRCodeScannerProps) => {
               return;
             }
           } catch {}
-          if (streamRef.current) requestAnimationFrame(scanLoop);
+          if (streamRef.current) animFrameRef.current = requestAnimationFrame(scanLoop);
         };
-        setTimeout(scanLoop, 1000);
+        setTimeout(scanLoop, 500);
       } else {
-        toast({
-          title: "QR Scanner",
-          description: "QR scanning requires a modern browser. Try Chrome on your phone.",
-          variant: "destructive",
-        });
+        // Fallback: use jsQR with canvas frames
+        const scanLoop = () => {
+          if (!videoRef.current || !streamRef.current) return;
+          const video = videoRef.current;
+          if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const result = scanWithJsQR(canvas, ctx);
+            if (result) {
+              handleScanResult(result);
+              return;
+            }
+          }
+          if (streamRef.current) animFrameRef.current = requestAnimationFrame(scanLoop);
+        };
+        setTimeout(scanLoop, 500);
       }
     } catch (err) {
       toast({
@@ -83,15 +112,6 @@ const QRCodeScanner = ({ className, variant = "icon" }: QRCodeScannerProps) => {
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    if (!hasBarcodeDetector) {
-      toast({
-        title: "Not Supported",
-        description: "QR scanning from images requires a modern browser (Chrome 83+).",
-        variant: "destructive",
-      });
-      return;
-    }
 
     setProcessing(true);
 
@@ -112,11 +132,23 @@ const QRCodeScanner = ({ className, variant = "icon" }: QRCodeScannerProps) => {
       ctx.drawImage(img, 0, 0);
       URL.revokeObjectURL(url);
 
-      const detector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
-      const barcodes = await detector.detect(canvas);
+      // Try BarcodeDetector first, fallback to jsQR
+      let result: string | null = null;
 
-      if (barcodes.length > 0) {
-        handleScanResult(barcodes[0].rawValue);
+      if (hasBarcodeDetector) {
+        try {
+          const detector = new (window as any).BarcodeDetector({ formats: ["qr_code"] });
+          const barcodes = await detector.detect(canvas);
+          if (barcodes.length > 0) result = barcodes[0].rawValue;
+        } catch {}
+      }
+
+      if (!result) {
+        result = scanWithJsQR(canvas, ctx);
+      }
+
+      if (result) {
+        handleScanResult(result);
       } else {
         toast({
           title: "No QR Code Found",
@@ -142,7 +174,7 @@ const QRCodeScanner = ({ className, variant = "icon" }: QRCodeScannerProps) => {
 
     try {
       const url = new URL(rawValue);
-      if (url.hostname.includes("fanzon") || url.hostname.includes("lovable")) {
+      if (url.hostname.includes("fanzon") || url.hostname.includes("fanzoon") || url.hostname.includes("lovable")) {
         navigate(url.pathname);
         toast({ title: "QR Scanned!", description: "Navigating to the scanned page." });
       } else {
@@ -212,7 +244,7 @@ const QRCodeScanner = ({ className, variant = "icon" }: QRCodeScannerProps) => {
             )}
           </div>
           <p className="text-sm text-muted-foreground text-center">
-            Point your camera at a FANZON QR code or upload a photo from your gallery.
+            Point your camera at a FANZOON QR code or upload a photo from your gallery.
           </p>
           <input
             ref={fileInputRef}

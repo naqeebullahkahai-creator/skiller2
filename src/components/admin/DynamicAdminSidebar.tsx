@@ -32,6 +32,8 @@ import {
   FileText,
   Headphones,
   Percent,
+  ShieldAlert,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -117,6 +119,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
       ],
     },
     { name: "Roles & Permissions", href: "/admin/roles", icon: Shield, requireSuperAdmin: true },
+    { name: "Security & Logins", href: "/admin/security", icon: ShieldAlert, requireSuperAdmin: true },
     {
       name: "Order Management",
       icon: ShoppingCart,
@@ -163,8 +166,8 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     { name: "Site Settings", href: "/admin/site-settings", icon: Globe, feature: 'settings' },
     { name: "Payment Settings", href: "/admin/payment-settings", icon: CreditCard, feature: 'settings' },
     { name: "Brand Assets", href: "/admin/brand-assets", icon: Image, feature: 'settings' },
-    { name: "Send Notification", href: "/admin/notifications", icon: UserCircle, feature: 'settings' },
-    { name: "All Settings", href: "/admin/all-settings", icon: Settings, feature: 'settings' },
+    { name: "Send Notification", href: "/admin/notifications", icon: Bell, feature: 'settings' },
+    { name: "All Settings", href: "/admin/all-settings", icon: Settings2, feature: 'settings' },
     { name: "Settings", href: "/admin/settings", icon: Settings, feature: 'settings' },
   ];
 
@@ -223,7 +226,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
                   : "text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white"
               )}>
                 <div className="flex items-center gap-3">
-                  <entry.icon size={20} />
+                  <entry.icon size={sidebarOpen ? 20 : 24} className="shrink-0" />
                   {sidebarOpen && <span className="text-sm">{entry.name}</span>}
                 </div>
                 {sidebarOpen && (
@@ -284,7 +287,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
                 : "text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white"
             )}
           >
-            <item.icon size={20} />
+            <item.icon size={sidebarOpen ? 20 : 24} className="shrink-0" />
             {sidebarOpen && <span className="text-sm">{item.name}</span>}
           </Link>
         );
