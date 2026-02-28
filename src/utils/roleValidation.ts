@@ -118,7 +118,7 @@ export const getRoleRedirectPath = (role: RoleType | null): string => {
     case "seller":
       return "/seller/dashboard";
     case "support_agent":
-      return "/admin/dashboard";
+      return "/agent/dashboard";
     case "customer":
       return "/";
     default:

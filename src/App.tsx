@@ -129,6 +129,7 @@ import TrackOrder from "./pages/TrackOrder";
 import SystemAnnouncementBanner from "./components/admin/SystemAnnouncementBanner";
 import SellerStorefront from "./pages/SellerStorefront";
 import ReferralPage from "./pages/account/ReferralPage";
+import AgentDashboard from "./pages/agent/AgentDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -332,6 +333,9 @@ const App = () => (
                             <Route path="settings" element={<SellerSettingsPage />} />
                             <Route path="fee-guide" element={<SellerFeeGuidePage />} />
                           </Route>
+
+                          {/* Support Agent Routes */}
+                          <Route path="/agent/dashboard" element={<ProtectedRoute allowedRoles={["support_agent"]}><AgentDashboard /></ProtectedRoute>} />
 
                           {/* Legacy route redirects */}
                           <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
