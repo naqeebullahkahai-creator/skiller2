@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck, XCircle } from "lucide-react";
+import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck, XCircle, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,7 @@ import { useOrders, Order } from "@/hooks/useOrders";
 import { useOrderCancellation } from "@/hooks/useOrderCancellation";
 import { formatPKR } from "@/hooks/useProducts";
 import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
+import { generateShippingLabel } from "@/utils/generateShippingLabel";
 import ShippingDialog from "@/components/orders/ShippingDialog";
 import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
 import { cn } from "@/lib/utils";
@@ -93,6 +94,23 @@ const OrderManagement = () => {
 
   const handlePrintInvoice = (order: Order) => {
     generateOrderInvoice({
+      id: order.id,
+      order_number: order.order_number,
+      customer_name: order.customer_name,
+      customer_phone: order.customer_phone,
+      shipping_address: order.shipping_address,
+      payment_method: order.payment_method,
+      total_amount_pkr: order.total_amount_pkr,
+      order_status: order.order_status,
+      items: order.items,
+      created_at: order.created_at,
+      tracking_id: order.tracking_id,
+      courier_name: order.courier_name,
+    });
+  };
+
+  const handlePrintLabel = (order: Order) => {
+    generateShippingLabel({
       id: order.id,
       order_number: order.order_number,
       customer_name: order.customer_name,
@@ -313,6 +331,10 @@ const OrderManagement = () => {
                             <DropdownMenuItem onClick={() => handlePrintInvoice(order)}>
                               <Printer className="h-4 w-4 mr-2" />
                               Print Invoice
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handlePrintLabel(order)}>
+                              <Tag className="h-4 w-4 mr-2" />
+                              Print Shipping Label
                             </DropdownMenuItem>
                             {order.order_status === "processing" && (
                               <>
