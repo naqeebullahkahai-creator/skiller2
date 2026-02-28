@@ -37,9 +37,11 @@ import {
   FileText,
   XCircle,
   Settings,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
+import { generateShippingLabel } from "@/utils/generateShippingLabel";
 import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
 import OrderStatusDropdown from "@/components/orders/OrderStatusDropdown";
 
@@ -331,7 +333,11 @@ const OrderDetailPage = () => {
           )}
           <Button variant="outline" size="sm" onClick={() => generateOrderInvoice(order)}>
             <FileText className="h-4 w-4 mr-2" />
-            Download Invoice
+            Invoice
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => generateShippingLabel(order)}>
+            <Tag className="h-4 w-4 mr-2" />
+            Shipping Label
           </Button>
         </div>
       </div>
