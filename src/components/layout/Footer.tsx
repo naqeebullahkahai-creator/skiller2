@@ -157,7 +157,7 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div className="border-t border-muted-foreground/20">
         <div className="container mx-auto py-5 flex items-center justify-between">
-          <FanzonLogo size="sm" textClassName="text-secondary/80" />
+          <img src="/fanzoon-logo.png" alt="FANZOON" className="h-8 object-contain opacity-80" />
           <p className="text-xs text-muted-foreground">
             © 2026 FANZOON. All rights reserved.
           </p>
