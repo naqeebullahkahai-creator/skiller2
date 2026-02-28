@@ -1,27 +1,25 @@
-import { Home, MessageCircle, ShoppingCart, Heart, User } from "lucide-react";
+import { Home, Grid3X3, ShoppingCart, Heart, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/hooks/useWishlist";
-import { useUnreadCount } from "@/hooks/useMessaging";
 
 const MobileBottomNav = () => {
   const location = useLocation();
   const { items } = useCart();
   const { isAuthenticated, setShowAuthModal, setAuthModalMode } = useAuth();
   const { wishlistItems } = useWishlist();
-  
+
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlistItems?.length ?? 0;
-  const { unreadCount } = useUnreadCount();
 
   const navItems = [
-    { icon: Home, label: "Home", path: "/", isCenter: false },
-    { icon: MessageCircle, label: "Chats", path: "/account/messages", badge: unreadCount > 0 ? unreadCount : undefined, requiresAuth: true, isCenter: false },
-    { icon: ShoppingCart, label: "Cart", path: "/checkout", badge: cartCount > 0 ? cartCount : undefined, isCenter: true },
-    { icon: Heart, label: "Wishlist", path: "/account/wishlist", badge: wishlistCount > 0 ? wishlistCount : undefined, requiresAuth: true, isCenter: false },
-    { icon: User, label: "Account", path: "/account", requiresAuth: true, isCenter: false },
+    { icon: Home, label: "Home", path: "/", requiresAuth: false },
+    { icon: Grid3X3, label: "Categories", path: "/categories", requiresAuth: false },
+    { icon: ShoppingCart, label: "Cart", path: "/checkout", isCenter: true, requiresAuth: false },
+    { icon: Heart, label: "Wishlist", path: "/account/wishlist", requiresAuth: true },
+    { icon: User, label: "Account", path: "/account", requiresAuth: true },
   ];
 
   const isActive = (path: string) => {
@@ -39,12 +37,12 @@ const MobileBottomNav = () => {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
-      <div className="bg-card/98 backdrop-blur-2xl border-t border-border/30 shadow-lg">
-        <div className="flex items-center justify-around h-16">
+      <div className="bg-card border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
+        <div className="flex items-center justify-around h-14">
           {navItems.map((item) => {
             const active = isActive(item.path);
             const isCartCenter = item.isCenter;
-            
+
             return (
               <Link
                 key={item.path}
@@ -52,48 +50,42 @@ const MobileBottomNav = () => {
                 onClick={(e) => handleNavClick(e, item)}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 h-full relative",
-                  "active:scale-[0.92] transition-all duration-200",
-                  isCartCenter && "-mt-5"
+                  "active:scale-[0.92] transition-all duration-150"
                 )}
               >
-                <div className={cn(
-                  "relative",
-                  isCartCenter && "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-primary to-accent"
-                )}>
-                  <item.icon
-                    size={isCartCenter ? 22 : 20}
-                    strokeWidth={active && !isCartCenter ? 2.5 : 1.8}
-                    className={cn(
-                      "transition-all duration-200",
-                      isCartCenter 
-                        ? "text-primary-foreground" 
-                        : active 
-                          ? "text-primary" 
-                          : "text-muted-foreground"
+                {isCartCenter ? (
+                  <div className="relative -mt-6 w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-lg border-[3px] border-card">
+                    <item.icon size={20} className="text-primary-foreground" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-accent text-accent-foreground text-[9px] font-bold rounded-full px-1">
+                        {cartCount > 99 ? "99+" : cartCount}
+                      </span>
                     )}
-                  />
-                  {item.badge && (
-                    <span className={cn(
-                      "absolute min-w-[16px] h-4 flex items-center justify-center text-primary-foreground text-[9px] font-bold rounded-full px-1",
-                      isCartCenter 
-                        ? "-top-0.5 -right-0.5 bg-destructive" 
-                        : "-top-1 -right-2.5 bg-accent"
-                    )}>
-                      {item.badge > 99 ? "99+" : item.badge}
-                    </span>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <item.icon
+                      size={20}
+                      strokeWidth={active ? 2.5 : 1.8}
+                      className={cn(
+                        "transition-colors duration-150",
+                        active ? "text-primary" : "text-muted-foreground"
+                      )}
+                    />
+                    {item.label === "Wishlist" && wishlistCount > 0 && (
+                      <span className="absolute -top-1.5 -right-2 min-w-[14px] h-[14px] flex items-center justify-center bg-primary text-primary-foreground text-[8px] font-bold rounded-full px-0.5">
+                        {wishlistCount > 99 ? "99+" : wishlistCount}
+                      </span>
+                    )}
+                  </div>
+                )}
                 <span className={cn(
-                  "text-[10px] font-medium transition-all duration-200",
-                  isCartCenter ? "mt-1 text-primary font-semibold" : "mt-0.5",
-                  !isCartCenter && (active ? "text-primary font-semibold" : "text-muted-foreground")
+                  "text-[10px] font-medium transition-colors duration-150",
+                  isCartCenter ? "mt-0.5" : "mt-0.5",
+                  active ? "text-primary font-semibold" : "text-muted-foreground"
                 )}>
                   {item.label}
                 </span>
-                
-                {active && !isCartCenter && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-b" />
-                )}
               </Link>
             );
           })}
