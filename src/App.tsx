@@ -131,6 +131,13 @@ import SellerStorefront from "./pages/SellerStorefront";
 import ReferralPage from "./pages/account/ReferralPage";
 import AgentDashboard from "./pages/agent/AgentDashboard";
 
+// PWA App Shells
+import CustomerAppShell from "./components/pwa/CustomerAppShell";
+import SellerAppShell from "./components/pwa/SellerAppShell";
+import AdminAppShell from "./components/pwa/AdminAppShell";
+import AgentAppShell from "./components/pwa/AgentAppShell";
+import CustomerAppHome from "./pages/pwa/CustomerAppHome";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -336,6 +343,50 @@ const App = () => (
 
                           {/* Support Agent Routes */}
                           <Route path="/agent/dashboard" element={<ProtectedRoute allowedRoles={["support_agent"]}><AgentDashboard /></ProtectedRoute>} />
+
+                          {/* === PWA Mobile Apps === */}
+                          {/* Customer App - /app */}
+                          <Route path="/app" element={<CustomerAppShell />}>
+                            <Route index element={<CustomerAppHome />} />
+                            <Route path="orders" element={<OrdersPage />} />
+                            <Route path="orders/:orderId" element={<OrderDetailPage />} />
+                            <Route path="wishlist" element={<WishlistPage />} />
+                            <Route path="messages" element={<CustomerMessagesPage />} />
+                            <Route path="wallet" element={<WalletPage />} />
+                            <Route path="profile" element={<ProfilePage />} />
+                            <Route path="addresses" element={<AddressesPage />} />
+                            <Route path="notifications" element={<NotificationsPage />} />
+                            <Route path="referrals" element={<ReferralPage />} />
+                          </Route>
+
+                          {/* Seller App - /seller-app */}
+                          <Route path="/seller-app" element={<SellerAppShell />}>
+                            <Route index element={<SellerDashboardHome />} />
+                            <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
+                            <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
+                            <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
+                            <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
+                            <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
+                            <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
+                            <Route path="settings" element={<SellerSettingsPage />} />
+                            <Route path="kyc" element={<SellerKyc />} />
+                          </Route>
+
+                          {/* Admin App - /admin-app */}
+                          <Route path="/admin-app" element={<AdminAppShell />}>
+                            <Route index element={<AdminDashboardHome />} />
+                            <Route path="orders" element={<AdminOrderManagement />} />
+                            <Route path="users" element={<AdminUserDirectory />} />
+                            <Route path="sellers" element={<AdminSellersDirectory />} />
+                            <Route path="products" element={<AdminProductCatalog />} />
+                            <Route path="settings" element={<AdminAllSettingsPage />} />
+                            <Route path="wallet" element={<AdminWalletPage />} />
+                          </Route>
+
+                          {/* Agent App - /agent-app */}
+                          <Route path="/agent-app" element={<AgentAppShell />}>
+                            <Route index element={<AgentDashboard />} />
+                          </Route>
 
                           {/* Legacy route redirects */}
                           <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
