@@ -3,9 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 
 const logos = [
-  { name: "FANZON Icon (512px)", file: "/fanzon-icon-512.png", size: "512×512" },
-  { name: "PWA Icon (192px)", file: "/pwa-192x192.png", size: "192×192" },
-  { name: "PWA Icon (512px)", file: "/pwa-512x512.png", size: "512×512" },
+  { name: "FANZOON Logo (Full)", file: "/fanzoon-logo.png", size: "512×512" },
+  { name: "FANZOON App Icon", file: "/fanzoon-icon.png", size: "512×512" },
   { name: "Favicon", file: "/favicon.ico", size: "ICO" },
 ];
 
