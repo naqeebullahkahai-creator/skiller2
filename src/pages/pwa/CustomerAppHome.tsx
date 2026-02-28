@@ -1,7 +1,9 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useCallback } from "react";
 import MobileHeroBanner from "@/components/mobile/MobileHeroBanner";
 import MobileCategoryScroll from "@/components/mobile/MobileCategoryScroll";
+import PullToRefresh from "@/components/mobile/PullToRefresh";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MobileFlashSale = lazy(() => import("@/components/mobile/MobileFlashSale"));
 const InfiniteProductGrid = lazy(() => import("@/components/home/InfiniteProductGrid"));
@@ -23,31 +25,34 @@ const SectionSkeleton = () => (
 );
 
 const CustomerAppHome = () => {
+  const queryClient = useQueryClient();
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries();
+  }, [queryClient]);
+
   return (
-    <div className="page-enter">
-      {/* Banner Slider */}
-      <MobileHeroBanner />
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="page-enter">
+        <MobileHeroBanner />
+        <MobileCategoryScroll />
 
-      {/* Category Scroll */}
-      <MobileCategoryScroll />
+        <Suspense fallback={<SectionSkeleton />}>
+          <MobileFlashSale />
+        </Suspense>
 
-      {/* Flash Deals */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <MobileFlashSale />
-      </Suspense>
-
-      {/* Just For You — 2-column grid */}
-      <section className="bg-card mt-2">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
-          <h2 className="font-bold text-[16px] text-foreground">Just For You</h2>
-        </div>
-        <div className="p-2">
-          <Suspense fallback={<SectionSkeleton />}>
-            <InfiniteProductGrid />
-          </Suspense>
-        </div>
-      </section>
-    </div>
+        <section className="bg-card mt-2">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+            <h2 className="font-bold text-[16px] text-foreground">Just For You</h2>
+          </div>
+          <div className="p-2">
+            <Suspense fallback={<SectionSkeleton />}>
+              <InfiniteProductGrid />
+            </Suspense>
+          </div>
+        </section>
+      </div>
+    </PullToRefresh>
   );
 };
 
