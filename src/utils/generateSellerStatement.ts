@@ -1,5 +1,15 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import {
+  COLORS,
+  drawHeader,
+  drawSectionHeader,
+  drawFooter,
+  formatPKR,
+  setHeading,
+  setBody,
+  setBold,
+} from "./pdfTheme";
 
 interface EarningsDataPoint {
   date: string;
@@ -14,155 +24,110 @@ interface TotalStats {
   avgOrderValue: number;
 }
 
-const formatPKR = (amount: number): string => {
-  return `Rs. ${amount.toLocaleString('en-PK')}`;
-};
-
 export const generateSellerStatementPDF = async (
   selectedMonth: string,
   earningsData: EarningsDataPoint[],
   stats: TotalStats
 ): Promise<void> => {
   const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 20;
-  let yPos = 20;
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
 
-  // Colors
-  const primaryColor: [number, number, number] = [248, 86, 6]; // FANZON Orange
-  const grayColor: [number, number, number] = [100, 100, 100];
+  let y = drawHeader(doc, pw, "SELLER MONTHLY STATEMENT");
 
-  // Header with FANZON branding
-  doc.setFillColor(...primaryColor);
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  // Period info bar
+  const monthDate = new Date(selectedMonth + "-01");
+  const monthName = monthDate.toLocaleDateString("en-PK", { month: "long", year: "numeric" });
 
-  // Logo text
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(28);
-  doc.setFont('helvetica', 'bold');
-  doc.text('FANZON', margin, 27);
+  doc.setFillColor(...COLORS.grayLight);
+  doc.roundedRect(15, y, pw - 30, 14, 2, 2, "F");
+  doc.setTextColor(...COLORS.grayDark);
+  setBold(doc, 10);
+  doc.text(`Period: ${monthName}`, 20, y + 9);
+  setBody(doc, 8);
+  doc.setTextColor(...COLORS.gray);
+  doc.text(`Generated: ${new Date().toLocaleDateString("en-PK", { year: "numeric", month: "long", day: "numeric" })}`, pw - 20, y + 9, { align: "right" });
 
-  // Subtitle
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Monthly Sales Statement', margin, 35);
+  y += 22;
 
-  yPos = 55;
+  // ===== SUMMARY CARDS =====
+  y = drawSectionHeader(doc, y, "Performance Summary", pw);
 
-  // Statement period
-  const monthDate = new Date(selectedMonth + '-01');
-  const monthName = monthDate.toLocaleDateString('en-PK', { month: 'long', year: 'numeric' });
-
-  doc.setTextColor(...grayColor);
-  doc.setFontSize(10);
-  doc.text(`Statement Period: ${monthName}`, margin, yPos);
-  doc.text(`Generated: ${new Date().toLocaleDateString('en-PK', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })}`, pageWidth - margin, yPos, { align: 'right' });
-
-  yPos += 20;
-
-  // Summary Section
-  doc.setTextColor(0, 0, 0);
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Summary', margin, yPos);
-  
-  yPos += 5;
-  doc.setDrawColor(...primaryColor);
-  doc.setLineWidth(0.5);
-  doc.line(margin, yPos, pageWidth - margin, yPos);
-  yPos += 5;
-
-  // Filter earnings for the selected month
-  const monthEarnings = earningsData.filter(e => e.date.startsWith(selectedMonth));
+  const monthEarnings = earningsData.filter((e) => e.date.startsWith(selectedMonth));
   const monthTotal = monthEarnings.reduce((sum, e) => sum + e.earnings, 0);
 
   const summaryData = [
-    ['Total Earnings (This Month)', formatPKR(monthTotal)],
-    ['Total Earnings (All Time)', formatPKR(stats.totalEarnings)],
-    ['Total Orders', stats.totalOrders.toString()],
-    ['Delivered Orders', stats.deliveredOrders.toString()],
-    ['Average Order Value', formatPKR(stats.avgOrderValue)],
+    ["Total Earnings (This Month)", formatPKR(monthTotal)],
+    ["Total Earnings (All Time)", formatPKR(stats.totalEarnings)],
+    ["Total Orders", stats.totalOrders.toString()],
+    ["Delivered Orders", stats.deliveredOrders.toString()],
+    ["Average Order Value", formatPKR(stats.avgOrderValue)],
   ];
 
   autoTable(doc, {
-    startY: yPos,
+    startY: y,
     head: [],
     body: summaryData,
-    theme: 'plain',
-    styles: { fontSize: 11, cellPadding: 4 },
+    theme: "plain",
+    styles: { fontSize: 10, cellPadding: 5 },
     columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 80 },
-      1: { cellWidth: 'auto', halign: 'right' },
+      0: { fontStyle: "bold", cellWidth: 80 },
+      1: { cellWidth: "auto", halign: "right" },
     },
-    margin: { left: margin, right: margin },
+    margin: { left: 15, right: 15 },
+    didParseCell: (data) => {
+      if (data.row.index === 0 && data.column.index === 1) {
+        data.cell.styles.textColor = COLORS.accent;
+        data.cell.styles.fontStyle = "bold";
+        data.cell.styles.fontSize = 12;
+      }
+    },
   });
 
-  yPos = (doc as any).lastAutoTable.finalY + 20;
+  y = (doc as any).lastAutoTable.finalY + 15;
 
-  // Daily Earnings Section
-  doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
-  doc.text('Daily Earnings Breakdown', margin, yPos);
-  
-  yPos += 5;
-  doc.line(margin, yPos, pageWidth - margin, yPos);
-  yPos += 5;
+  // ===== DAILY BREAKDOWN =====
+  y = drawSectionHeader(doc, y, "Daily Earnings Breakdown", pw);
 
   if (monthEarnings.length > 0) {
-    const dailyData = monthEarnings.map(e => [
-      new Date(e.date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' }),
-      formatPKR(e.earnings)
+    const dailyData = monthEarnings.map((e) => [
+      new Date(e.date).toLocaleDateString("en-PK", { day: "numeric", month: "short" }),
+      formatPKR(e.earnings),
     ]);
 
     autoTable(doc, {
-      startY: yPos,
-      head: [['Date', 'Earnings']],
+      startY: y,
+      head: [["Date", "Earnings"]],
       body: dailyData,
-      theme: 'striped',
-      styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: primaryColor },
+      theme: "grid",
+      styles: { fontSize: 9, cellPadding: 4, lineColor: COLORS.grayMid, lineWidth: 0.2 },
+      headStyles: { fillColor: COLORS.primary, textColor: COLORS.white, fontStyle: "bold" },
       columnStyles: {
-        0: { cellWidth: 60 },
-        1: { cellWidth: 'auto', halign: 'right' },
+        0: { cellWidth: 50 },
+        1: { cellWidth: "auto", halign: "right" },
       },
-      margin: { left: margin, right: margin },
+      alternateRowStyles: { fillColor: [250, 250, 250] },
+      margin: { left: 15, right: 15 },
     });
 
-    // Add total row
-    yPos = (doc as any).lastAutoTable.finalY + 5;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Monthly Total: ${formatPKR(monthTotal)}`, pageWidth - margin, yPos, { align: 'right' });
+    y = (doc as any).lastAutoTable.finalY + 8;
+    doc.setTextColor(...COLORS.accent);
+    setHeading(doc, 11);
+    doc.text(`Monthly Total: ${formatPKR(monthTotal)}`, pw - 15, y, { align: "right" });
   } else {
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'italic');
-    doc.setTextColor(...grayColor);
-    doc.text('No earnings data for this month', margin, yPos + 10);
+    doc.setTextColor(...COLORS.gray);
+    setBody(doc, 10);
+    doc.text("No earnings data for this month", 15, y + 10);
   }
 
-  // Footer
+  // Footer on all pages
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    doc.setFontSize(8);
-    doc.setTextColor(...grayColor);
-    doc.text(
-      `FANZON Seller Statement - Page ${i} of ${pageCount}`,
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 10,
-      { align: 'center' }
-    );
+    drawFooter(doc, pw, ph);
   }
 
-  // Save the PDF
-  const filename = `FANZON_Statement_${selectedMonth}.pdf`;
-  doc.save(filename);
+  doc.save(`FANZOON_Statement_${selectedMonth}.pdf`);
 };
 
 export const generateSellerStatementCSV = async (
@@ -170,39 +135,27 @@ export const generateSellerStatementCSV = async (
   earningsData: EarningsDataPoint[],
   stats: TotalStats
 ): Promise<void> => {
-  const monthEarnings = earningsData.filter(e => e.date.startsWith(selectedMonth));
+  const monthEarnings = earningsData.filter((e) => e.date.startsWith(selectedMonth));
   const monthTotal = monthEarnings.reduce((sum, e) => sum + e.earnings, 0);
 
-  // Build CSV content
-  let csvContent = 'FANZON Seller Statement\n';
-  csvContent += `Statement Period,${new Date(selectedMonth + '-01').toLocaleDateString('en-PK', { month: 'long', year: 'numeric' })}\n`;
-  csvContent += `Generated,${new Date().toISOString()}\n\n`;
+  let csv = "FANZOON Seller Statement\n";
+  csv += `Statement Period,${new Date(selectedMonth + "-01").toLocaleDateString("en-PK", { month: "long", year: "numeric" })}\n`;
+  csv += `Generated,${new Date().toISOString()}\n\n`;
+  csv += "SUMMARY\n";
+  csv += `Total Earnings (This Month),${monthTotal}\n`;
+  csv += `Total Earnings (All Time),${stats.totalEarnings}\n`;
+  csv += `Total Orders,${stats.totalOrders}\n`;
+  csv += `Delivered Orders,${stats.deliveredOrders}\n`;
+  csv += `Average Order Value,${stats.avgOrderValue}\n\n`;
+  csv += "DAILY EARNINGS\nDate,Earnings (PKR)\n";
+  monthEarnings.forEach((e) => { csv += `${e.date},${e.earnings}\n`; });
+  csv += `\nMONTHLY TOTAL,${monthTotal}\n`;
 
-  csvContent += 'SUMMARY\n';
-  csvContent += `Total Earnings (This Month),${monthTotal}\n`;
-  csvContent += `Total Earnings (All Time),${stats.totalEarnings}\n`;
-  csvContent += `Total Orders,${stats.totalOrders}\n`;
-  csvContent += `Delivered Orders,${stats.deliveredOrders}\n`;
-  csvContent += `Average Order Value,${stats.avgOrderValue}\n\n`;
-
-  csvContent += 'DAILY EARNINGS\n';
-  csvContent += 'Date,Earnings (PKR)\n';
-  
-  monthEarnings.forEach(e => {
-    csvContent += `${e.date},${e.earnings}\n`;
-  });
-
-  csvContent += `\nMONTHLY TOTAL,${monthTotal}\n`;
-
-  // Create and download the file
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `FANZON_Statement_${selectedMonth}.csv`);
-  link.style.visibility = 'hidden';
-  
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `FANZOON_Statement_${selectedMonth}.csv`;
+  link.style.visibility = "hidden";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
