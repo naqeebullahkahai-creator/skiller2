@@ -60,6 +60,7 @@ const SocialSettingsPage = () => {
 
   const socialSettings = settings?.filter(s => s.setting_key.startsWith('social_')) || [];
   const contactSettings = settings?.filter(s => s.setting_key.startsWith('contact_')) || [];
+  const domainSetting = settings?.find(s => s.setting_key === 'site_domain');
 
   const handleToggle = async (setting: SiteSetting) => {
     setSavingKeys(prev => [...prev, setting.setting_key]);
@@ -116,6 +117,58 @@ const SocialSettingsPage = () => {
           Manage social media links and contact information displayed on the website
         </p>
       </div>
+
+      {/* Site Domain */}
+      {domainSetting && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Globe className="w-5 h-5 text-primary" />
+              </div>
+              Site Domain
+            </CardTitle>
+            <CardDescription>
+              Primary domain used for QR codes, share links, and all generated URLs across the platform.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 rounded-lg border bg-background">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <div>
+                  <Label className="text-base font-medium">Domain</Label>
+                  <p className="text-xs text-muted-foreground">e.g. fanzon.pk or your custom domain</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="fanzon.pk"
+                  value={editedValues['site_domain'] ?? domainSetting.setting_value ?? ''}
+                  onChange={(e) => setEditedValues(prev => ({
+                    ...prev,
+                    site_domain: e.target.value
+                  }))}
+                  className="flex-1"
+                />
+                <Button
+                  size="sm"
+                  onClick={() => handleSave(domainSetting)}
+                  disabled={!hasChanges(domainSetting) || savingKeys.includes('site_domain')}
+                >
+                  {savingKeys.includes('site_domain') ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Social Media Links */}
       <Card>

@@ -1,5 +1,6 @@
 
 
+
 ## Plan: Complete Platform Overhaul (Theme + QR Gallery + Domain Links + Notifications)
 
 ---
@@ -14,20 +15,21 @@
 
 ---
 
-### Phase 2: QR Code Scanner - Gallery Image Support (NEXT)
+### Phase 2: QR Code Scanner - Gallery Image Support ✅ DONE
 
-1. Add gallery upload button to `QRCodeScanner.tsx`
-2. Use hidden `<input type="file" accept="image/*">` + canvas + BarcodeDetector
-3. Fallback for unsupported browsers
+1. Added gallery upload button to `QRCodeScanner.tsx`
+2. Uses hidden `<input type="file" accept="image/*">` + canvas + BarcodeDetector
+3. Loading state while processing gallery image
+4. Fallback message for unsupported browsers
 
 ---
 
-### Phase 3: Dynamic Domain Links (Auto-detect)
+### Phase 3: Dynamic Domain Links (Auto-detect) ✅ DONE
 
-1. Add `site_domain` setting to `site_settings` table
-2. Create `useSiteDomain` hook
-3. Admin UI in `SocialSettingsPage.tsx`
-4. Update QRCodeDisplay, SocialShareButtons
+1. Added `site_domain` setting to `site_settings` table
+2. Created `useSiteDomain` hook with `buildUrl(path)` helper
+3. Admin UI in `SocialSettingsPage.tsx` for domain configuration
+4. Updated QRCodeDisplay and SocialShareButtons to use dynamic domain
 
 ---
 
