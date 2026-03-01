@@ -1,44 +1,88 @@
 
 
+## Plan: Convert All Admin Sections into Category Sub-Dashboards
 
-## Plan: Complete Platform Overhaul (Theme + QR Gallery + Domain Links + Notifications)
+### Current State
+The admin sidebar has ~30+ individual page links spread across collapsible groups. Three sub-dashboards already exist (Sellers, Customers, Agents) with the pattern: gradient header + stat cards + tabs (Quick Actions / Directory).
 
----
+### Goal
+Group ALL remaining sidebar items into **category sub-dashboards**, so the sidebar becomes clean with only ~10 top-level entries. Each sub-dashboard follows the same design pattern as the existing three.
 
-### Phase 1: Premium Clean Theme Overhaul ✅ DONE
+### New Sub-Dashboards to Create
 
-- Refined CSS variables: warmer backgrounds, softer borders, premium dashboard tokens
-- Added `--dashboard-sidebar-*` semantic tokens for consistent sidebar theming
-- Polished storefront: ProductCard, MainHeader, MobileHeader, MobileBottomNav, Footer, TopBar
-- Unified Admin & Seller dashboard sidebars using design tokens (no more hardcoded slate colors)
-- Homepage sections refined with better gradients and spacing
+**1. Orders Management Dashboard** (`AdminOrdersManagement.tsx`)
+- Route: `/admin/orders-management`
+- Stats: Total Orders, Pending, Shipped, Cancelled, Returns
+- Quick Actions: All Orders, Direct Orders, Vendor Orders, Cancellations, Returns
+- Directory tab: Recent orders table with status filters
 
----
+**2. Products & Catalog Dashboard** (`AdminProductsManagement.tsx`)
+- Route: `/admin/products-management`
+- Stats: Total Products, Pending Approval, Categories, Bulk Uploads
+- Quick Actions: Product Catalog, Category Manager, Product Approvals, Bulk Upload Logs
 
-### Phase 2: QR Code Scanner - Gallery Image Support ✅ DONE
+**3. Financial Controls Dashboard** (`AdminFinanceManagement.tsx`)
+- Route: `/admin/finance-management`
+- Stats: Platform Balance, Commission Revenue, Pending Payouts, Deposits
+- Quick Actions: Admin Wallet, Payouts, Commission, Subscriptions, Payment Methods, Payment Settings, Balance Adjustments, Seller Deposits, Customer Deposits, Deposit Settings
 
-1. Added gallery upload button to `QRCodeScanner.tsx`
-2. Uses hidden `<input type="file" accept="image/*">` + canvas + BarcodeDetector
-3. Loading state while processing gallery image
-4. Fallback message for unsupported browsers
+**4. Marketing & Promotions Dashboard** (`AdminMarketingManagement.tsx`)
+- Route: `/admin/marketing-management`
+- Stats: Active Flash Sales, Vouchers, Banners, Nominations
+- Quick Actions: Flash Sales, Flash Nominations, Vouchers, Banners
 
----
+**5. Content & Settings Dashboard** (`AdminContentManagement.tsx`)
+- Route: `/admin/content-management`
+- Stats: Reviews count, Q&A count, Notifications sent
+- Quick Actions: Reviews, Q&A Moderation, Site Settings, Content Manager, Brand Assets, Chat Shortcuts, Notifications, All Settings, Platform Settings
 
-### Phase 3: Dynamic Domain Links (Auto-detect) ✅ DONE
+**6. Security & Access Dashboard** (`AdminSecurityManagement.tsx`)
+- Route: `/admin/security-management`
+- Stats: Total Logins, Blocked IPs, Staff Roles, Active Sessions
+- Quick Actions: Security & Logins, Roles & Permissions
 
-1. Added `site_domain` setting to `site_settings` table
-2. Created `useSiteDomain` hook with `buildUrl(path)` helper
-3. Admin UI in `SocialSettingsPage.tsx` for domain configuration
-4. Updated QRCodeDisplay and SocialShareButtons to use dynamic domain
+### Sidebar Restructure (`DynamicAdminSidebar.tsx`)
+Replace all individual links and collapsible groups with clean top-level entries:
+1. Dashboard (home)
+2. Sellers Management
+3. Customers Management
+4. Agents Management
+5. Orders Management (new)
+6. Products & Catalog (new)
+7. Financial Controls (new)
+8. Marketing (new)
+9. Content & Settings (new)
+10. Security & Access (new)
 
----
+### Route Updates (`App.tsx`)
+- Add 6 new routes under `/admin/*` and `/admin-app/*`
+- Keep all existing child routes (individual pages still accessible)
 
-### Phase 4: Real-time Notifications (All Channels) ✅ DONE
+### Design Pattern (consistent across all)
+```text
++----------------------------------------------+
+| Gradient Header (role color + icon + title)   |
++----------------------------------------------+
+| [Stat] [Stat] [Stat] [Stat]                  |
++----------------------------------------------+
+| [Quick Actions Tab] | [Directory/List Tab]    |
+|  - Action Card 1                              |
+|  - Action Card 2                              |
+|  - ...                                        |
++----------------------------------------------+
+```
 
-1. ✅ Enabled Realtime on `notifications` table (was missing)
-2. ✅ Realtime subscription in `useNotifications` hook already working
-3. ✅ Browser Notification API integrated (shows native notifications)
-4. ✅ Sonner toast notifications with type-based styling
-5. ✅ NotificationBell with animated unread badge
-6. ✅ DB triggers: order status, messages, support sessions
-7. ⚠️ Push VAPID key is placeholder — needs real VAPID keys for production push notifications
+### Files to Create (6)
+- `src/pages/dashboard/AdminOrdersManagement.tsx`
+- `src/pages/dashboard/AdminProductsManagement.tsx`
+- `src/pages/dashboard/AdminFinanceManagement.tsx`
+- `src/pages/dashboard/AdminMarketingManagement.tsx`
+- `src/pages/dashboard/AdminContentManagement.tsx`
+- `src/pages/dashboard/AdminSecurityManagement.tsx`
+
+### Files to Modify (3)
+- `src/components/admin/DynamicAdminSidebar.tsx` - Replace all items with 10 clean dashboard links
+- `src/App.tsx` - Add 6 new routes for both `/admin` and `/admin-app`
+- `src/pages/dashboard/AdminDashboardHome.tsx` - Update Command Center to link to new dashboards
+- `src/pages/admin/AdminDashboard.tsx` - Update PWA mobile dashboard sections
+
