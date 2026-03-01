@@ -100,8 +100,11 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
 
   const navEntries: NavEntry[] = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "Sellers Management", href: "/admin/sellers-management", icon: Store, feature: 'users' },
+    { name: "Customers Management", href: "/admin/customers-management", icon: UserCircle, feature: 'users' },
+    { name: "Agents Management", href: "/admin/agents-management", icon: Headphones, feature: 'users' },
     {
-      name: "User Management",
+      name: "User Directory",
       icon: Users,
       feature: 'users',
       children: [

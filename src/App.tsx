@@ -109,6 +109,9 @@ import AdminBrandAssetsPage from "./pages/dashboard/AdminBrandAssetsPage";
 import AdminNotificationsPage from "./pages/dashboard/AdminNotificationsPage";
 import AdminCommissionManagementPage from "./pages/dashboard/AdminCommissionManagementPage";
 import AdminWalletPage from "./pages/dashboard/AdminWalletPage";
+import AdminSellersManagement from "./pages/dashboard/AdminSellersManagement";
+import AdminCustomersManagement from "./pages/dashboard/AdminCustomersManagement";
+import AdminAgentsManagement from "./pages/dashboard/AdminAgentsManagement";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -288,6 +291,9 @@ const App = () => (
                           {/* Admin Routes - Nested under sidebar layout */}
                           <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboardLayout /></ProtectedRoute>}>
                             <Route path="dashboard" element={<AdminDashboardHome />} />
+                            <Route path="sellers-management" element={<AdminSellersManagement />} />
+                            <Route path="customers-management" element={<AdminCustomersManagement />} />
+                            <Route path="agents-management" element={<AdminAgentsManagement />} />
                             <Route path="users" element={<AdminUserDirectory />} />
                             <Route path="sellers" element={<AdminSellersDirectory />} />
                             <Route path="sellers/:sellerId" element={<AdminSellerDetailPage />} />
@@ -394,6 +400,9 @@ const App = () => (
                           {/* Admin App - /admin-app */}
                           <Route path="/admin-app" element={<AdminAppShell />}>
                             <Route index element={<AdminDashboardHome />} />
+                            <Route path="sellers-management" element={<AdminSellersManagement />} />
+                            <Route path="customers-management" element={<AdminCustomersManagement />} />
+                            <Route path="agents-management" element={<AdminAgentsManagement />} />
                             <Route path="orders" element={<AdminOrderManagement />} />
                             <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
                             <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />

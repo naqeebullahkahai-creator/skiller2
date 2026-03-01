@@ -3,7 +3,7 @@ import {
   Users, Package, ShoppingCart, Wallet, Image, Zap, Shield, BarChart3,
   Settings, Tags, MessageSquare, RotateCcw, Star, FileCheck, TrendingUp,
   DollarSign, UserCheck, ChevronRight, AlertTriangle, Store, Percent,
-  CreditCard, Bell, Wrench, RefreshCw
+  CreditCard, Bell, Wrench, RefreshCw, Headphones
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -100,9 +100,11 @@ const AdminDashboardHome = () => {
   ];
 
   const commandCenterActions: CommandCardProps[] = [
+    { icon: <Store className="w-6 h-6 text-white" />, title: "Sellers Management", description: "KYC, products, earnings, subscriptions", href: "/admin/sellers-management", color: "bg-blue-500" },
+    { icon: <Users className="w-6 h-6 text-white" />, title: "Customers Management", description: "Orders, wallets, deposits, support", href: "/admin/customers-management", color: "bg-cyan-500" },
+    { icon: <Headphones className="w-6 h-6 text-white" />, title: "Agents Management", description: "Support agents, performance, chat", href: "/admin/agents-management", color: "bg-indigo-500" },
     { icon: <UserCheck className="w-6 h-6 text-white" />, title: "Approve Sellers", badge: (stats?.pendingApprovals || 0) > 0 ? `${stats?.pendingApprovals} pending` : undefined, badgeVariant: "destructive", description: "KYC & Seller Applications", href: "/admin/seller-kyc", color: "bg-primary" },
     { icon: <BarChart3 className="w-6 h-6 text-white" />, title: "Platform Stats", description: "Analytics & Insights", href: "/admin/analytics", color: "bg-violet-500" },
-    { icon: <Image className="w-6 h-6 text-white" />, title: "Edit Banners", description: "Homepage Carousel", href: "/admin/banners", color: "bg-pink-500" },
     { icon: <Shield className="w-6 h-6 text-white" />, title: "Role Management", description: "Staff & Permissions", href: "/admin/roles", color: "bg-slate-700" },
   ];
 
