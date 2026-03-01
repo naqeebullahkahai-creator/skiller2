@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   User, Search, Eye, Package, Wallet, Calendar, ShoppingCart,
-  PiggyBank, Scale, ChevronRight, Download, BarChart3, Shield
+  PiggyBank, Scale, ChevronRight, Download, BarChart3, Shield, ArrowLeft
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,7 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
 };
 
 const AdminCustomersManagement = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -93,6 +94,9 @@ const AdminCustomersManagement = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-xl p-5 text-white">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/dashboard")} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
+          <ArrowLeft className="h-4 w-4" /> Return to Admin Panel
+        </Button>
         <h1 className="text-xl font-bold flex items-center gap-2">
           <User className="h-6 w-6" />
           Customers Management

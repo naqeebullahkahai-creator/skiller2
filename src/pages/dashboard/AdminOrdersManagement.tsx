@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ShoppingCart, ClipboardList, Store, Users, XCircle, RotateCcw,
-  ChevronRight, Package, Truck, Clock
+  ChevronRight, Package, Truck, Clock, ArrowLeft
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,6 +34,7 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
 };
 
 const AdminOrdersManagement = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
   const statCards = [
@@ -53,6 +55,9 @@ const AdminOrdersManagement = () => {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl p-5 text-white">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/dashboard")} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
+          <ArrowLeft className="h-4 w-4" /> Return to Admin Panel
+        </Button>
         <h1 className="text-xl font-bold flex items-center gap-2"><ShoppingCart className="h-6 w-6" /> Orders Management</h1>
         <p className="text-white/80 text-sm mt-1">Track, manage & fulfill all platform orders</p>
       </div>
