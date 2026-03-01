@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Package, FolderOpen, CheckCircle, Upload, ChevronRight, Tag, Layers
+  Package, FolderOpen, CheckCircle, Upload, ChevronRight, Tag, Layers, ArrowLeft
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,6 +33,7 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
 };
 
 const AdminProductsManagement = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
 
   const statCards = [
@@ -51,6 +53,9 @@ const AdminProductsManagement = () => {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-teal-600 to-emerald-500 rounded-xl p-5 text-white">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/dashboard")} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
+          <ArrowLeft className="h-4 w-4" /> Return to Admin Panel
+        </Button>
         <h1 className="text-xl font-bold flex items-center gap-2"><Package className="h-6 w-6" /> Products & Catalog</h1>
         <p className="text-white/80 text-sm mt-1">Manage products, categories, approvals & bulk uploads</p>
       </div>

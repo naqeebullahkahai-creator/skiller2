@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Headphones, Search, Users, CheckCircle, XCircle, Star,
-  MessageSquare, ChevronRight, Shield, Clock, BarChart3
+  MessageSquare, ChevronRight, Shield, Clock, BarChart3, ArrowLeft
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -136,6 +136,7 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
 };
 
 const AdminAgentsManagement = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const { data, isLoading } = useAdminAgents(searchQuery);
@@ -159,6 +160,9 @@ const AdminAgentsManagement = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-xl p-5 text-white">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/dashboard")} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
+          <ArrowLeft className="h-4 w-4" /> Return to Admin Panel
+        </Button>
         <h1 className="text-xl font-bold flex items-center gap-2">
           <Headphones className="h-6 w-6" />
           Agents Management

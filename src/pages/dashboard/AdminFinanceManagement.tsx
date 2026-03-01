@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Wallet, CreditCard, DollarSign, Percent, PiggyBank, Scale, Settings,
-  ChevronRight, TrendingUp, Receipt, BarChart3
+  ChevronRight, TrendingUp, Receipt, BarChart3, ArrowLeft
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,6 +40,7 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
 };
 
 const AdminFinanceManagement = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const { stats, isLoading } = useExecutiveAnalytics();
   const { pendingCount: pendingSellerDeposits } = useAdminDepositRequests("seller");
@@ -67,6 +69,9 @@ const AdminFinanceManagement = () => {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-violet-600 to-purple-500 rounded-xl p-5 text-white">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/dashboard")} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
+          <ArrowLeft className="h-4 w-4" /> Return to Admin Panel
+        </Button>
         <h1 className="text-xl font-bold flex items-center gap-2"><DollarSign className="h-6 w-6" /> Financial Controls</h1>
         <p className="text-white/80 text-sm mt-1">Wallet, payouts, commissions, subscriptions & deposits</p>
       </div>
