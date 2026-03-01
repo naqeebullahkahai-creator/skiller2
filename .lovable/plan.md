@@ -1,88 +1,121 @@
 
 
-## Plan: Convert All Admin Sections into Category Sub-Dashboards
+## Plan: Agent Real-time, Scroll Fix, Role Enforcement, Agent Dashboard, Wallet PIN Fix, Mobile UI & Back Buttons
 
-### Current State
-The admin sidebar has ~30+ individual page links spread across collapsible groups. Three sub-dashboards already exist (Sellers, Customers, Agents) with the pattern: gradient header + stat cards + tabs (Quick Actions / Directory).
+This is a large multi-area fix covering 7 distinct issues. Here's the breakdown:
 
-### Goal
-Group ALL remaining sidebar items into **category sub-dashboards**, so the sidebar becomes clean with only ~10 top-level entries. Each sub-dashboard follows the same design pattern as the existing three.
+---
 
-### New Sub-Dashboards to Create
+### 1. ScrollToTop Fix (Scrolling not working)
 
-**1. Orders Management Dashboard** (`AdminOrdersManagement.tsx`)
-- Route: `/admin/orders-management`
-- Stats: Total Orders, Pending, Shipped, Cancelled, Returns
-- Quick Actions: All Orders, Direct Orders, Vendor Orders, Cancellations, Returns
-- Directory tab: Recent orders table with status filters
+**Problem**: No `ScrollToTop` component exists — pages don't scroll to top on navigation.
 
-**2. Products & Catalog Dashboard** (`AdminProductsManagement.tsx`)
-- Route: `/admin/products-management`
-- Stats: Total Products, Pending Approval, Categories, Bulk Uploads
-- Quick Actions: Product Catalog, Category Manager, Product Approvals, Bulk Upload Logs
+**Solution**: Create `src/components/ScrollToTop.tsx` using `useLocation` + `useEffect` to call `window.scrollTo(0,0)` on every pathname change. Add it inside `<BrowserRouter>` in `App.tsx`.
 
-**3. Financial Controls Dashboard** (`AdminFinanceManagement.tsx`)
-- Route: `/admin/finance-management`
-- Stats: Platform Balance, Commission Revenue, Pending Payouts, Deposits
-- Quick Actions: Admin Wallet, Payouts, Commission, Subscriptions, Payment Methods, Payment Settings, Balance Adjustments, Seller Deposits, Customer Deposits, Deposit Settings
+---
 
-**4. Marketing & Promotions Dashboard** (`AdminMarketingManagement.tsx`)
-- Route: `/admin/marketing-management`
-- Stats: Active Flash Sales, Vouchers, Banners, Nominations
-- Quick Actions: Flash Sales, Flash Nominations, Vouchers, Banners
+### 2. Agent Real-time Connection
 
-**5. Content & Settings Dashboard** (`AdminContentManagement.tsx`)
-- Route: `/admin/content-management`
-- Stats: Reviews count, Q&A count, Notifications sent
-- Quick Actions: Reviews, Q&A Moderation, Site Settings, Content Manager, Brand Assets, Chat Shortcuts, Notifications, All Settings, Platform Settings
+**Problem**: Agent chat uses polling (`refetchInterval: 5000/10000`). No real-time Supabase channel for new waiting sessions.
 
-**6. Security & Access Dashboard** (`AdminSecurityManagement.tsx`)
-- Route: `/admin/security-management`
-- Stats: Total Logins, Blocked IPs, Staff Roles, Active Sessions
-- Quick Actions: Security & Logins, Roles & Permissions
+**Solution**: In `AgentDashboard.tsx`, add Supabase Realtime subscriptions:
+- Subscribe to `support_chat_sessions` for new waiting sessions (instant notification when customer/seller needs help)
+- Keep existing realtime for `support_messages` (already works)
+- Add sound/toast notification when new session arrives in queue
+- Auto-invalidate queries on realtime events instead of polling
 
-### Sidebar Restructure (`DynamicAdminSidebar.tsx`)
-Replace all individual links and collapsible groups with clean top-level entries:
-1. Dashboard (home)
-2. Sellers Management
-3. Customers Management
-4. Agents Management
-5. Orders Management (new)
-6. Products & Catalog (new)
-7. Financial Controls (new)
-8. Marketing (new)
-9. Content & Settings (new)
-10. Security & Access (new)
+---
 
-### Route Updates (`App.tsx`)
-- Add 6 new routes under `/admin/*` and `/admin-app/*`
-- Keep all existing child routes (individual pages still accessible)
+### 3. Role Enforcement: Agent Role = Only Agent
 
-### Design Pattern (consistent across all)
-```text
-+----------------------------------------------+
-| Gradient Header (role color + icon + title)   |
-+----------------------------------------------+
-| [Stat] [Stat] [Stat] [Stat]                  |
-+----------------------------------------------+
-| [Quick Actions Tab] | [Directory/List Tab]    |
-|  - Action Card 1                              |
-|  - Action Card 2                              |
-|  - ...                                        |
-+----------------------------------------------+
+**Problem**: When admin assigns `support_agent` role via "Change User Role", only `user_roles.role` is updated — old role data remains.
+
+**Solution**: In `AdminRolesPage.tsx` `handleChangeUserRole`, after updating `user_roles`, ensure the role is exclusive (the table already enforces `unique(user_id, role)` so only one role per user). The current code already does `UPDATE user_roles SET role = ... WHERE user_id = ...` which replaces the old role. This is working correctly. Add a confirmation dialog warning that changing to `support_agent` will remove their previous role access.
+
+---
+
+### 4. Agent Dashboard Hub (Sub-dashboards like Admin)
+
+**Problem**: Agent only has a single chat page. No separate management sections for income, withdrawals, salary, performance etc.
+
+**Solution**: Create a full Agent dashboard layout similar to Admin's hub pattern:
+
+**New Files**:
+- `src/components/dashboard/AgentDashboardLayout.tsx` — Layout with sidebar + bottom nav (matching Admin/Seller pattern)
+- `src/pages/agent/AgentDashboardHome.tsx` — Command center with stat cards + quick actions
+- `src/pages/agent/AgentChatsPage.tsx` — The existing chat interface (moved from AgentDashboard)
+- `src/pages/agent/AgentEarningsPage.tsx` — Income, salary, withdraw requests
+- `src/pages/agent/AgentPerformancePage.tsx` — Ratings, sessions resolved, metrics
+- `src/pages/agent/AgentSettingsPage.tsx` — Profile, availability, preferences
+
+**Route Changes** in `App.tsx`:
+```
+/agent → AgentDashboardLayout (nested)
+  /agent/dashboard → AgentDashboardHome
+  /agent/chats → AgentChatsPage
+  /agent/earnings → AgentEarningsPage
+  /agent/performance → AgentPerformancePage
+  /agent/settings → AgentSettingsPage
 ```
 
-### Files to Create (6)
-- `src/pages/dashboard/AdminOrdersManagement.tsx`
-- `src/pages/dashboard/AdminProductsManagement.tsx`
-- `src/pages/dashboard/AdminFinanceManagement.tsx`
-- `src/pages/dashboard/AdminMarketingManagement.tsx`
-- `src/pages/dashboard/AdminContentManagement.tsx`
-- `src/pages/dashboard/AdminSecurityManagement.tsx`
+Update `/agent-app` PWA routes similarly with `AgentBottomNav` updated to match.
 
-### Files to Modify (3)
-- `src/components/admin/DynamicAdminSidebar.tsx` - Replace all items with 10 clean dashboard links
-- `src/App.tsx` - Add 6 new routes for both `/admin` and `/admin-app`
-- `src/pages/dashboard/AdminDashboardHome.tsx` - Update Command Center to link to new dashboards
-- `src/pages/admin/AdminDashboard.tsx` - Update PWA mobile dashboard sections
+---
+
+### 5. Admin Wallet PIN Fix
+
+**Problem**: The `set_admin_wallet_pin` function does `INSERT ... ON CONFLICT DO NOTHING` then `UPDATE admin_wallet SET pin_hash=...`. The issue is the `ON CONFLICT DO NOTHING` prevents insert if wallet exists, and the subsequent `UPDATE` has no `WHERE` clause — it updates ALL rows. But the real issue is likely that `pin_set` returns `false` when wallet row doesn't exist yet (query returns `null`).
+
+**Fix**: 
+- In `useAdminWallet.ts`, when `wallet` is `null` (no row exists), treat `isPinSet` as `false` and allow the "Set PIN" flow
+- The `set_admin_wallet_pin` function already handles insert-or-update. The issue is the `verifyPin` mutation doesn't show error feedback on failure. Add `toast.error('Invalid PIN')` on `false` result.
+- Also in `AdminWalletPage.tsx`, the verify flow doesn't show error when PIN is wrong (line 23-24 just clears input silently). Add toast feedback.
+
+---
+
+### 6. Mobile UI for All Dashboards
+
+**Problem**: Sub-dashboards need responsive mobile layouts with proper text sizing, no horizontal scroll, no scrollbar artifacts.
+
+**Solution**: Audit and fix all 9 management hub pages + agent pages:
+- Add `overflow-x-hidden` to all dashboard wrappers
+- Use `text-sm` / `text-xs` consistently on mobile
+- Grid columns: `grid-cols-2` on mobile, `grid-cols-4` on desktop for stat cards
+- Quick action cards: single column on mobile
+- Ensure all text uses `truncate` or `line-clamp` to prevent overflow
+- Add `max-w-full` constraints on card content
+
+---
+
+### 7. Back Button on Every Page for All Roles
+
+**Problem**: `MobileFloatingBackButton` hides on some routes but doesn't cover all role dashboards. Agent pages have no back button.
+
+**Solution**: 
+- Update `MobileFloatingBackButton.tsx` to include agent dashboard root (`/agent/dashboard`, `/agent-app`) in `hideOnRoutes`
+- Ensure it shows on ALL other pages regardless of role
+- Add desktop back button in `AgentDashboardLayout` header (matching Admin/Seller pattern)
+- Each sub-dashboard already has "Return to Admin Panel" button — keep those
+
+---
+
+### Files to Create (6)
+- `src/components/ScrollToTop.tsx`
+- `src/components/dashboard/AgentDashboardLayout.tsx`
+- `src/pages/agent/AgentDashboardHome.tsx`
+- `src/pages/agent/AgentChatsPage.tsx`
+- `src/pages/agent/AgentEarningsPage.tsx`
+- `src/pages/agent/AgentSettingsPage.tsx`
+
+### Files to Modify (7)
+- `src/App.tsx` — Add ScrollToTop, restructure agent routes
+- `src/pages/agent/AgentDashboard.tsx` — Extract chat logic to AgentChatsPage
+- `src/components/pwa/AgentBottomNav.tsx` — Update nav items for new pages
+- `src/components/pwa/AgentAppShell.tsx` — Update routes
+- `src/components/mobile/MobileFloatingBackButton.tsx` — Add agent routes to hideOnRoutes
+- `src/hooks/useAdminWallet.ts` — Fix PIN verification feedback
+- `src/pages/dashboard/AdminWalletPage.tsx` — Add toast on wrong PIN
+
+### Database Changes
+- Enable Supabase Realtime for `support_chat_sessions` table (migration: `ALTER PUBLICATION supabase_realtime ADD TABLE public.support_chat_sessions;`)
 
