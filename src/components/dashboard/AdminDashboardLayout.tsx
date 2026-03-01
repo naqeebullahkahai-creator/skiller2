@@ -12,6 +12,7 @@ import {
   Users,
   Settings,
   BarChart3,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ const AdminDashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
+  const isSubPage = location.pathname !== "/admin/dashboard";
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -108,7 +110,14 @@ const AdminDashboardLayout = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-              <span className="text-white font-bold text-lg">Admin Panel</span>
+              {isSubPage && (
+                <button 
+                  onClick={() => navigate(-1)} 
+                  className="text-white/90 p-1.5 active:scale-95 transition-transform"
+                >
+                  <ArrowLeft size={22} />
+                </button>
+              )}
             </div>
 
             <div className="flex items-center gap-1">
@@ -178,6 +187,16 @@ const AdminDashboardLayout = () => {
           {/* Desktop Header */}
           <header className="hidden md:flex sticky top-0 z-30 h-16 bg-card/98 backdrop-blur-xl border-b border-border/50 items-center justify-between px-6">
             <div className="flex items-center gap-4">
+              {isSubPage && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(-1)}
+                  className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowLeft size={20} />
+                </Button>
+              )}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input placeholder="Search..." className="pl-9 w-64 bg-secondary/60 border-border/50" />
