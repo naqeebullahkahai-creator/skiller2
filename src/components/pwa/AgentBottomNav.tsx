@@ -1,4 +1,4 @@
-import { Home, MessageSquare, Settings } from "lucide-react";
+import { Home, MessageSquare, DollarSign, BarChart3, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,7 @@ const AgentBottomNav = () => {
   const navItems = [
     { icon: Home, label: "Dashboard", path: "/agent-app" },
     { icon: MessageSquare, label: "Chats", path: "/agent-app/chats" },
+    { icon: DollarSign, label: "Earnings", path: "/agent-app/earnings" },
     { icon: Settings, label: "Settings", path: "/agent-app/settings" },
   ];
 

@@ -24,6 +24,9 @@ const AdminWalletPage = () => {
     else { setPinInput(""); }
   };
 
+  // Show error state for wrong PIN
+  const pinVerifyFailed = verifyPin.isSuccess && verifyPin.data === false;
+
   const handleSetPin = async () => {
     if (newPin.length < 4 || newPin !== confirmPin) return;
     await setPin.mutateAsync(newPin);
