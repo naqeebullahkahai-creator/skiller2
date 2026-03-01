@@ -76,6 +76,9 @@ export const useAdminWallet = () => {
       if (error) throw error;
       return data as boolean;
     },
+    onSuccess: (result) => {
+      if (!result) toast.error('Invalid PIN. Please try again.');
+    },
   });
 
   // Export transactions as CSV

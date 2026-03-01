@@ -141,6 +141,11 @@ import SystemAnnouncementBanner from "./components/admin/SystemAnnouncementBanne
 import SellerStorefront from "./pages/SellerStorefront";
 import ReferralPage from "./pages/account/ReferralPage";
 import AgentDashboard from "./pages/agent/AgentDashboard";
+import AgentDashboardHome from "./pages/agent/AgentDashboardHome";
+import AgentChatsPage from "./pages/agent/AgentChatsPage";
+import AgentEarningsPage from "./pages/agent/AgentEarningsPage";
+import AgentSettingsPage from "./pages/agent/AgentSettingsPage";
+import AgentDashboardLayout from "./components/dashboard/AgentDashboardLayout";
 import AdminSecurityPage from "./pages/dashboard/AdminSecurityPage";
 
 // PWA App Shells
@@ -149,6 +154,8 @@ import SellerAppShell from "./components/pwa/SellerAppShell";
 import AdminAppShell from "./components/pwa/AdminAppShell";
 import AgentAppShell from "./components/pwa/AgentAppShell";
 import CustomerAppHome from "./pages/pwa/CustomerAppHome";
+
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -219,6 +226,7 @@ const App = () => (
                           <SplashScreen />
                           <BrowserRouter>
                           <SystemAnnouncementBanner />
+                          <ScrollToTop />
                           {/* Strict role isolation - no cross-role features */}
                           <InstallPrompt />
                           <NotificationPermissionBanner />
@@ -372,8 +380,13 @@ const App = () => (
                             <Route path="fee-guide" element={<SellerFeeGuidePage />} />
                           </Route>
 
-                          {/* Support Agent Routes */}
-                          <Route path="/agent/dashboard" element={<ProtectedRoute allowedRoles={["support_agent"]}><AgentDashboard /></ProtectedRoute>} />
+                          {/* Support Agent Routes - Nested under layout */}
+                          <Route path="/agent" element={<AgentDashboardLayout />}>
+                            <Route path="dashboard" element={<AgentDashboardHome />} />
+                            <Route path="chats" element={<AgentChatsPage />} />
+                            <Route path="earnings" element={<AgentEarningsPage />} />
+                            <Route path="settings" element={<AgentSettingsPage />} />
+                          </Route>
 
                           {/* === PWA Mobile Apps === */}
                           {/* Customer App - /app */}
@@ -467,7 +480,10 @@ const App = () => (
 
                           {/* Agent App - /agent-app */}
                           <Route path="/agent-app" element={<AgentAppShell />}>
-                            <Route index element={<AgentDashboard />} />
+                            <Route index element={<AgentDashboardHome />} />
+                            <Route path="chats" element={<AgentChatsPage />} />
+                            <Route path="earnings" element={<AgentEarningsPage />} />
+                            <Route path="settings" element={<AgentSettingsPage />} />
                           </Route>
 
                           {/* Legacy route redirects */}

@@ -3,7 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 // Pages where back button should NOT show
-const hideOnRoutes = ["/", "/account", "/admin/dashboard", "/seller/dashboard"];
+const hideOnRoutes = ["/", "/account", "/admin/dashboard", "/seller/dashboard", "/agent/dashboard", "/agent-app"];
 
 const MobileFloatingBackButton = () => {
   const navigate = useNavigate();
