@@ -218,6 +218,10 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 
+  /* Global scrollbar hide for native app feel */
+  * { scrollbar-width: none; -ms-overflow-style: none; }
+  *::-webkit-scrollbar { display: none; }
+
   /* 44px minimum tap targets */
   .touch-target { min-height: 44px; min-width: 44px; }
 
