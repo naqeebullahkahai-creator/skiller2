@@ -1,9 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { 
-  Users, Package, ShoppingCart, Wallet, Image, Zap, Shield, BarChart3,
-  Settings, Tags, MessageSquare, RotateCcw, Star, FileCheck, TrendingUp,
-  DollarSign, UserCheck, ChevronRight, AlertTriangle, Store, Percent,
-  CreditCard, Bell, Wrench, RefreshCw, Headphones
+  Users, Package, ShoppingCart, Wallet, Zap, Shield, BarChart3,
+  Settings, TrendingUp, DollarSign, ChevronRight, AlertTriangle, 
+  Store, Percent, CreditCard, Bell, Wrench, Headphones
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -103,24 +102,12 @@ const AdminDashboardHome = () => {
     { icon: <Store className="w-6 h-6 text-white" />, title: "Sellers Management", description: "KYC, products, earnings, subscriptions", href: "/admin/sellers-management", color: "bg-blue-500" },
     { icon: <Users className="w-6 h-6 text-white" />, title: "Customers Management", description: "Orders, wallets, deposits, support", href: "/admin/customers-management", color: "bg-cyan-500" },
     { icon: <Headphones className="w-6 h-6 text-white" />, title: "Agents Management", description: "Support agents, performance, chat", href: "/admin/agents-management", color: "bg-indigo-500" },
-    { icon: <UserCheck className="w-6 h-6 text-white" />, title: "Approve Sellers", badge: (stats?.pendingApprovals || 0) > 0 ? `${stats?.pendingApprovals} pending` : undefined, badgeVariant: "destructive", description: "KYC & Seller Applications", href: "/admin/seller-kyc", color: "bg-primary" },
-    { icon: <BarChart3 className="w-6 h-6 text-white" />, title: "Platform Stats", description: "Analytics & Insights", href: "/admin/analytics", color: "bg-violet-500" },
-    { icon: <Shield className="w-6 h-6 text-white" />, title: "Role Management", description: "Staff & Permissions", href: "/admin/roles", color: "bg-slate-700" },
-  ];
-
-  const managementActions: CommandCardProps[] = [
-    { icon: <ShoppingCart className="w-6 h-6 text-white" />, title: "Order Management", description: "View & update orders", href: "/admin/orders", color: "bg-blue-500" },
-    { icon: <Package className="w-6 h-6 text-white" />, title: "Product Catalog", description: "Approve & manage products", href: "/admin/products", color: "bg-emerald-500" },
-    { icon: <Users className="w-6 h-6 text-white" />, title: "User Directory", description: "Customers & Sellers", href: "/admin/users", color: "bg-cyan-500" },
-    { icon: <Wallet className="w-6 h-6 text-white" />, title: "Payout Management", description: "Seller withdrawals", href: "/admin/payouts", color: "bg-amber-500" },
-    { icon: <Zap className="w-6 h-6 text-white" />, title: "Flash Sales", description: "Campaigns & Nominations", href: "/admin/flash-sales", color: "bg-rose-500" },
-    { icon: <Tags className="w-6 h-6 text-white" />, title: "Categories", description: "Manage categories", href: "/admin/categories", color: "bg-indigo-500" },
-    { icon: <RotateCcw className="w-6 h-6 text-white" />, title: "Returns", description: "Handle returns", href: "/admin/returns", color: "bg-orange-500" },
-    { icon: <Star className="w-6 h-6 text-white" />, title: "Reviews", description: "Moderate reviews", href: "/admin/reviews", color: "bg-yellow-500" },
-    { icon: <MessageSquare className="w-6 h-6 text-white" />, title: "Q&A Moderation", description: "Product questions", href: "/admin/qa", color: "bg-teal-500" },
-    { icon: <FileCheck className="w-6 h-6 text-white" />, title: "Cancellations", description: "Order cancellations", href: "/admin/cancellations", color: "bg-red-500" },
-    { icon: <Tags className="w-6 h-6 text-white" />, title: "Vouchers", description: "Discount codes", href: "/admin/vouchers", color: "bg-purple-500" },
-    { icon: <Settings className="w-6 h-6 text-white" />, title: "Settings", description: "Platform configuration", href: "/admin/settings", color: "bg-slate-500" },
+    { icon: <ShoppingCart className="w-6 h-6 text-white" />, title: "Orders Management", description: "All orders, cancellations, returns", href: "/admin/orders-management", color: "bg-blue-600" },
+    { icon: <Package className="w-6 h-6 text-white" />, title: "Products & Catalog", description: "Products, categories, approvals", href: "/admin/products-management", color: "bg-teal-500" },
+    { icon: <DollarSign className="w-6 h-6 text-white" />, title: "Financial Controls", description: "Wallet, payouts, commissions", href: "/admin/finance-management", color: "bg-violet-500" },
+    { icon: <Zap className="w-6 h-6 text-white" />, title: "Marketing & Promotions", description: "Flash sales, vouchers, banners", href: "/admin/marketing-management", color: "bg-rose-500" },
+    { icon: <Settings className="w-6 h-6 text-white" />, title: "Content & Settings", description: "Reviews, Q&A, site config", href: "/admin/content-management", color: "bg-slate-600" },
+    { icon: <Shield className="w-6 h-6 text-white" />, title: "Security & Access", description: "Roles, permissions, audit logs", href: "/admin/security-management", color: "bg-red-600" },
   ];
 
   return (
@@ -265,19 +252,11 @@ const AdminDashboardHome = () => {
         ))}
       </div>
 
-      {/* Command Center */}
+      {/* Management Hubs */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground px-1">Command Center</h2>
+        <h2 className="text-lg font-semibold text-foreground px-1">Management Hubs</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {commandCenterActions.map((action, index) => <CommandCard key={index} {...action} />)}
-        </div>
-      </div>
-
-      {/* Management */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground px-1">Management</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {managementActions.map((action, index) => <CommandCard key={index} {...action} />)}
         </div>
       </div>
     </div>
