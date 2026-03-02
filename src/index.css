@@ -13,9 +13,24 @@
     text-rendering: optimizeLegibility;
     overscroll-behavior: none;
     overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
+
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 100%;
+    touch-action: pan-y;
+  }
+
+  #root {
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
   img { content-visibility: auto; }
-  body { overflow-x: hidden; }
 }
 
 /* Native App Theme — Deep Teal + Warm Coral
@@ -177,7 +192,9 @@
     line-height: 1.5;
     overscroll-behavior-y: contain;
     max-width: 100vw;
+    min-height: 100%;
     overflow-x: hidden;
+    overflow-y: auto;
   }
 
   h1, h2, h3, h4, h5, h6 {
