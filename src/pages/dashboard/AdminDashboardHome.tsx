@@ -111,7 +111,7 @@ const AdminDashboardHome = () => {
   ];
 
   return (
-    <div className="space-y-6 pb-6">
+    <div className="space-y-6 pb-6 overflow-x-hidden">
       {/* Welcome Header */}
       <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-xl p-5 text-white">
         <h1 className="text-xl font-bold mb-1">Admin Control Center</h1>

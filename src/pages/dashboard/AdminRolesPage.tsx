@@ -56,6 +56,7 @@ import { useAdminUsers } from "@/hooks/useAdminUsers";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -231,7 +232,7 @@ const AdminRolesPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between gap-4">
         <div>
@@ -640,11 +641,26 @@ const AdminRolesPage = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {changeRoleTarget && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3 text-sm">
+                <p className="font-medium text-amber-800 dark:text-amber-200 flex items-center gap-1.5">
+                  <AlertTriangle className="h-4 w-4 shrink-0" /> Warning
+                </p>
+                <p className="text-amber-700 dark:text-amber-300 mt-1">
+                  Changing a user's role will <strong>remove their previous role access</strong>. 
+                  {changeRoleTarget === "support_agent" && " They will only be able to access the Support Agent dashboard and will lose all customer/seller access."}
+                  {changeRoleTarget === "admin" && " They will gain full admin access to the platform."}
+                  {changeRoleTarget === "seller" && " They will only be able to access the Seller dashboard."}
+                  {changeRoleTarget === "customer" && " They will only be able to access customer pages."}
+                </p>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowChangeRole(false)}>Cancel</Button>
-            <Button onClick={handleChangeUserRole} disabled={!changeRoleUserId || !changeRoleTarget}>
-              Change Role
+            <Button onClick={handleChangeUserRole} disabled={!changeRoleUserId || !changeRoleTarget} variant="destructive">
+              Confirm Role Change
             </Button>
           </DialogFooter>
         </DialogContent>
