@@ -4,6 +4,8 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
+const CACHE_VERSION = "2026-03-03-1";
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -58,7 +60,7 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/api/, /^\/admin/, /^\/~oauth/],
         // Precache critical assets
         additionalManifestEntries: [
-          { url: "/fanzoon-icon.png", revision: "3" },
+          { url: "/fanzoon-icon.png", revision: CACHE_VERSION },
         ],
         runtimeCaching: [
           // Cache Google Fonts
@@ -66,7 +68,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "StaleWhileRevalidate",
             options: {
-              cacheName: "google-fonts-stylesheets",
+              cacheName: `google-fonts-stylesheets-${CACHE_VERSION}`,
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
@@ -77,7 +79,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "google-fonts-webfonts",
+              cacheName: `google-fonts-webfonts-${CACHE_VERSION}`,
               expiration: {
                 maxEntries: 30,
                 maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
@@ -92,7 +94,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/images\.unsplash\.com\/.*/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "unsplash-images",
+              cacheName: `unsplash-images-${CACHE_VERSION}`,
               expiration: {
                 maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
@@ -107,7 +109,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/.*supabase\.co\/storage\/.*/i,
             handler: "CacheFirst",
             options: {
-              cacheName: "supabase-storage",
+              cacheName: `supabase-storage-${CACHE_VERSION}`,
               expiration: {
                 maxEntries: 500,
                 maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
@@ -122,7 +124,7 @@ export default defineConfig(({ mode }) => ({
             urlPattern: /^https:\/\/.*supabase\.co\/rest\/.*/i,
             handler: "NetworkFirst",
             options: {
-              cacheName: "supabase-api",
+              cacheName: `supabase-api-${CACHE_VERSION}`,
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 5, // 5 minutes
@@ -130,12 +132,12 @@ export default defineConfig(({ mode }) => ({
               networkTimeoutSeconds: 5,
             },
           },
-          // Static assets - cache first
+          // Static assets - stale-while-revalidate to avoid stale publish issues
           {
             urlPattern: /\.(?:js|css|woff2?)$/i,
-            handler: "CacheFirst",
+            handler: "StaleWhileRevalidate",
             options: {
-              cacheName: "static-assets",
+              cacheName: `static-assets-${CACHE_VERSION}`,
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
