@@ -5,6 +5,7 @@ import MobileHeroBanner from "./MobileHeroBanner";
 import MobileCategoryScroll from "./MobileCategoryScroll";
 import PullToRefresh from "./PullToRefresh";
 import TopProgressBar from "@/components/pwa/TopProgressBar";
+import SectionErrorBoundary from "@/components/SectionErrorBoundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -14,7 +15,7 @@ const InfiniteProductGrid = lazy(() => import("@/components/home/InfiniteProduct
 const SectionSkeleton = () => (
   <div className="px-2 py-4">
     <div className="grid grid-cols-2 gap-2">
-      {[1,2,3,4].map(i => (
+      {[1, 2, 3, 4].map((i) => (
         <div key={i} className="bg-card rounded-xl overflow-hidden elevation-1">
           <Skeleton className="aspect-square w-full" />
           <div className="p-2 space-y-2">
@@ -35,18 +36,25 @@ const MobileHomeLayout = () => {
   }, [queryClient]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+    <div className="min-h-screen bg-background flex flex-col">
       <TopProgressBar />
       <MobileHeader />
 
       <PullToRefresh onRefresh={handleRefresh}>
         <main className="flex-1 pb-16 page-enter">
-          <MobileHeroBanner />
-          <MobileCategoryScroll />
+          <SectionErrorBoundary fallbackMessage="Banner couldn't load">
+            <MobileHeroBanner />
+          </SectionErrorBoundary>
 
-          <Suspense fallback={<SectionSkeleton />}>
-            <MobileFlashSale />
-          </Suspense>
+          <SectionErrorBoundary fallbackMessage="Categories couldn't load">
+            <MobileCategoryScroll />
+          </SectionErrorBoundary>
+
+          <SectionErrorBoundary fallbackMessage="Flash sale couldn't load">
+            <Suspense fallback={<SectionSkeleton />}>
+              <MobileFlashSale />
+            </Suspense>
+          </SectionErrorBoundary>
 
           {/* Just For You */}
           <section className="bg-card mt-2">
@@ -54,9 +62,11 @@ const MobileHomeLayout = () => {
               <h2 className="font-bold text-[16px] text-foreground">Just For You</h2>
             </div>
             <div className="p-2">
-              <Suspense fallback={<SectionSkeleton />}>
-                <InfiniteProductGrid />
-              </Suspense>
+              <SectionErrorBoundary fallbackMessage="Products couldn't load">
+                <Suspense fallback={<SectionSkeleton />}>
+                  <InfiniteProductGrid />
+                </Suspense>
+              </SectionErrorBoundary>
             </div>
           </section>
         </main>
