@@ -21,6 +21,7 @@ const ProductSkeleton = () => (
 );
 
 const InfiniteProductGrid = memo(() => {
+  const isMobile = useIsMobile();
   const {
     data,
     fetchNextPage,
@@ -28,6 +29,7 @@ const InfiniteProductGrid = memo(() => {
     isFetchingNextPage,
     isLoading,
     isError,
+    refetch,
   } = useInfiniteProducts();
 
   const observerRef = useRef<IntersectionObserver | null>(null);
