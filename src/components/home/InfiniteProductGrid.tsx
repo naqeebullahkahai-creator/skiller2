@@ -74,8 +74,12 @@ const InfiniteProductGrid = memo(() => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <PackageOpen className="w-10 h-10 text-muted-foreground mb-3" />
-        <p className="text-[14px] font-medium text-foreground">Failed to load</p>
-        <p className="text-[12px] text-muted-foreground">Please try again later</p>
+        <p className="text-[14px] font-medium text-foreground">Failed to load products</p>
+        <p className="text-[12px] text-muted-foreground mb-3">Please check your connection</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
+          <RefreshCw size={14} />
+          Try Again
+        </Button>
       </div>
     );
   }
