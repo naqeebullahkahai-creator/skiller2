@@ -1,9 +1,12 @@
 import { useEffect, useRef, useCallback, memo } from "react";
 import MobileProductCard from "@/components/mobile/MobileProductCard";
+import ProductCard from "@/components/product/ProductCard";
 import { useInfiniteProducts } from "@/hooks/useInfiniteProducts";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 const ProductSkeleton = () => (
   <div className="bg-card rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-1)' }}>
@@ -18,6 +21,7 @@ const ProductSkeleton = () => (
 );
 
 const InfiniteProductGrid = memo(() => {
+  const isMobile = useIsMobile();
   const {
     data,
     fetchNextPage,
@@ -25,6 +29,7 @@ const InfiniteProductGrid = memo(() => {
     isFetchingNextPage,
     isLoading,
     isError,
+    refetch,
   } = useInfiniteProducts();
 
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -69,8 +74,12 @@ const InfiniteProductGrid = memo(() => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <PackageOpen className="w-10 h-10 text-muted-foreground mb-3" />
-        <p className="text-[14px] font-medium text-foreground">Failed to load</p>
-        <p className="text-[12px] text-muted-foreground">Please try again later</p>
+        <p className="text-[14px] font-medium text-foreground">Failed to load products</p>
+        <p className="text-[12px] text-muted-foreground mb-3">Please check your connection</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
+          <RefreshCw size={14} />
+          Try Again
+        </Button>
       </div>
     );
   }
@@ -87,10 +96,13 @@ const InfiniteProductGrid = memo(() => {
 
   return (
     <>
-      {/* 2-column grid, 8px gap */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className={isMobile ? "grid grid-cols-2 gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"}>
         {allProducts.map((product) => (
-          <MobileProductCard key={product.id} product={product} />
+          isMobile ? (
+            <MobileProductCard key={product.id} product={product} />
+          ) : (
+            <ProductCard key={product.id} product={product} />
+          )
         ))}
       </div>
 
