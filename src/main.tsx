@@ -4,7 +4,7 @@ import App from "./App.tsx";
 import ErrorBoundary from "./components/ErrorBoundary.tsx";
 import "./index.css";
 
-const APP_RUNTIME_RESET_VERSION = "2026-03-06-1";
+const APP_RUNTIME_RESET_VERSION = "2026-03-06-phase1";
 const APP_RUNTIME_RESET_STORAGE_KEY = "fanzon-runtime-reset-version";
 const APP_RUNTIME_RELOAD_GUARD_KEY = `fanzon-runtime-reset-reloaded-${APP_RUNTIME_RESET_VERSION}`;
 
