@@ -1,9 +1,12 @@
 import { useEffect, useRef, useCallback, memo } from "react";
 import MobileProductCard from "@/components/mobile/MobileProductCard";
+import ProductCard from "@/components/product/ProductCard";
 import { useInfiniteProducts } from "@/hooks/useInfiniteProducts";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 const ProductSkeleton = () => (
   <div className="bg-card rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-1)' }}>
