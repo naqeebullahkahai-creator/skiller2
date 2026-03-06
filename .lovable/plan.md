@@ -1,107 +1,121 @@
 
 
-# FANZOON Complete Site Rebuild — Phased Plan
+## Plan: Agent Real-time, Scroll Fix, Role Enforcement, Agent Dashboard, Wallet PIN Fix, Mobile UI & Back Buttons
 
-## Current Issues Identified
-1. **Scroll lock** — `ScrollToTop` aggressively fights scroll locks but doesn't always win on all devices/browsers
-2. **Data not loading** — Products, categories depend on Supabase queries that may silently fail
-3. **UI broken on mobile** — ProductDetail page uses desktop-first layout on mobile (no separate mobile view)
-4. **No mobile ProductDetail** — Unlike Index which has `MobileHomeLayout`, ProductDetail serves same layout to all screens
-5. **PWA cache staleness** — Old service workers serve broken cached pages
+This is a large multi-area fix covering 7 distinct issues. Here's the breakdown:
 
 ---
 
-## Phase Breakdown (8 Phases)
+### 1. ScrollToTop Fix (Scrolling not working)
 
-### Phase 1: Nuclear Scroll Fix + CSS Foundation Reset
-**Files:** `src/index.css`, `src/components/ScrollToTop.tsx`, `src/main.tsx`, `vite.config.ts`
+**Problem**: No `ScrollToTop` component exists — pages don't scroll to top on navigation.
 
-- Remove all complex scroll enforcement logic from ScrollToTop — replace with simple, bulletproof approach using `!important` CSS rules directly on `html` and `body`
-- Add CSS rule: `html, body { overflow-y: auto !important; overflow-x: hidden !important; position: static !important; }`
-- Simplify ScrollToTop to just scroll to top on route change — no MutationObserver, no intervals, no style overrides
-- Bump PWA cache version to force fresh load
-- Remove service worker cache complexity — use `NetworkFirst` for all resources
-
-### Phase 2: Home Page Rebuild (Mobile + Desktop)
-**Files:** `src/pages/Index.tsx`, `src/components/mobile/MobileHomeLayout.tsx`, `src/components/layout/MobileHeader.tsx`, `src/components/layout/MobileBottomNav.tsx`, `src/components/home/HeroCarousel.tsx`, `src/components/home/Categories.tsx`
-
-- Rebuild mobile home with clean sections: Hero → Categories → Flash Sale → Just For You grid
-- Fix MobileHeader hide-on-scroll behavior
-- Ensure MobileBottomNav doesn't overlap content (proper `pb-16`)
-- Desktop home: clean Header → Hero → Categories → Flash Sale → Products → Footer
-- Add proper error boundaries around each section so one failing section doesn't break the page
-- Add loading/error/empty states for all data sections
-
-### Phase 3: Product Detail Page Rebuild
-**Files:** `src/pages/ProductDetail.tsx`, new `src/components/mobile/MobileProductDetail.tsx`
-
-- Create dedicated mobile product detail layout like Daraz/Amazon app:
-  - Full-width image gallery swiper
-  - Price + discount badge
-  - Variant selector
-  - Add to Cart / Buy Now sticky bottom bar
-  - Collapsible description/specs
-  - Reviews section
-- Desktop: 3-column layout (Gallery | Info | Delivery) — keep current but clean up
-- Add `isMobile` check to render correct layout
-- Proper loading skeleton and error states
-
-### Phase 4: Product Listing + Category Pages
-**Files:** `src/pages/ProductListing.tsx`, `src/pages/CategoryPage.tsx`, `src/components/product/ProductCard.tsx`, `src/components/mobile/MobileProductCard.tsx`
-
-- Rebuild product cards with consistent sizing
-- Mobile: 2-column grid, compact cards
-- Desktop: responsive grid with filters sidebar
-- Fix InfiniteProductGrid error handling
-- Add "No products found" empty states
-
-### Phase 5: Auth + Account Pages Polish  
-**Files:** `src/pages/auth/CustomerAuth.tsx`, `src/components/account/AccountLayout.tsx`, account sub-pages
-
-- Clean auth forms (login/signup) for mobile
-- Account page mobile menu grid
-- Orders, Wallet, Profile pages — consistent card-based layout
-- Ensure all protected routes redirect properly
-
-### Phase 6: Checkout + Order Flow
-**Files:** `src/pages/Checkout.tsx`, `src/pages/OrderSuccess.tsx`, `src/pages/TrackOrder.tsx`
-
-- Mobile-optimized checkout steps
-- Order success page with clear CTA
-- Track order with status stepper
-
-### Phase 7: Dashboard Pages (Admin + Seller)
-**Files:** Admin management hubs, Seller dashboard pages
-
-- Ensure all hub pages render correctly on mobile with `overflow-x-hidden`
-- Fix any data loading issues in dashboard analytics
-- Consistent card/table layouts across all management pages
-
-### Phase 8: Final QA + PWA Polish
-**Files:** `vite.config.ts`, `src/main.tsx`, various component files
-
-- Final scroll verification across all pages
-- PWA manifest and icons check
-- Performance audit — lazy loading, code splitting
-- Test all routes for 404s or broken links
-- Final cache version bump for production deploy
+**Solution**: Create `src/components/ScrollToTop.tsx` using `useLocation` + `useEffect` to call `window.scrollTo(0,0)` on every pathname change. Add it inside `<BrowserRouter>` in `App.tsx`.
 
 ---
 
-## Technical Details
+### 2. Agent Real-time Connection
 
-**Scroll Fix Strategy (Phase 1):**
-The current approach of fighting scroll locks with JS is fragile. Instead, add a CSS layer with `!important` that cannot be overridden by any library (Radix, Vaul). For modals/drawers, use a CSS class `.scroll-locked` that temporarily allows the lock, and remove it on close.
+**Problem**: Agent chat uses polling (`refetchInterval: 5000/10000`). No real-time Supabase channel for new waiting sessions.
 
-**Data Loading Pattern:**
-Every section that loads from database will have 3 states: Loading (skeleton), Error (retry button), Empty (illustration + message). This prevents blank white screens.
-
-**Mobile-First Approach:**
-Each page will check `useIsMobile()` and render a dedicated mobile component, same pattern as `Index.tsx` already uses with `MobileHomeLayout`.
+**Solution**: In `AgentDashboard.tsx`, add Supabase Realtime subscriptions:
+- Subscribe to `support_chat_sessions` for new waiting sessions (instant notification when customer/seller needs help)
+- Keep existing realtime for `support_messages` (already works)
+- Add sound/toast notification when new session arrives in queue
+- Auto-invalidate queries on realtime events instead of polling
 
 ---
 
-## Estimated: 8 phases, each done in 1-2 messages = ~10-16 messages total
+### 3. Role Enforcement: Agent Role = Only Agent
 
-Kya main Phase 1 (Scroll fix + CSS foundation) se shuru karoon?
+**Problem**: When admin assigns `support_agent` role via "Change User Role", only `user_roles.role` is updated — old role data remains.
+
+**Solution**: In `AdminRolesPage.tsx` `handleChangeUserRole`, after updating `user_roles`, ensure the role is exclusive (the table already enforces `unique(user_id, role)` so only one role per user). The current code already does `UPDATE user_roles SET role = ... WHERE user_id = ...` which replaces the old role. This is working correctly. Add a confirmation dialog warning that changing to `support_agent` will remove their previous role access.
+
+---
+
+### 4. Agent Dashboard Hub (Sub-dashboards like Admin)
+
+**Problem**: Agent only has a single chat page. No separate management sections for income, withdrawals, salary, performance etc.
+
+**Solution**: Create a full Agent dashboard layout similar to Admin's hub pattern:
+
+**New Files**:
+- `src/components/dashboard/AgentDashboardLayout.tsx` — Layout with sidebar + bottom nav (matching Admin/Seller pattern)
+- `src/pages/agent/AgentDashboardHome.tsx` — Command center with stat cards + quick actions
+- `src/pages/agent/AgentChatsPage.tsx` — The existing chat interface (moved from AgentDashboard)
+- `src/pages/agent/AgentEarningsPage.tsx` — Income, salary, withdraw requests
+- `src/pages/agent/AgentPerformancePage.tsx` — Ratings, sessions resolved, metrics
+- `src/pages/agent/AgentSettingsPage.tsx` — Profile, availability, preferences
+
+**Route Changes** in `App.tsx`:
+```
+/agent → AgentDashboardLayout (nested)
+  /agent/dashboard → AgentDashboardHome
+  /agent/chats → AgentChatsPage
+  /agent/earnings → AgentEarningsPage
+  /agent/performance → AgentPerformancePage
+  /agent/settings → AgentSettingsPage
+```
+
+Update `/agent-app` PWA routes similarly with `AgentBottomNav` updated to match.
+
+---
+
+### 5. Admin Wallet PIN Fix
+
+**Problem**: The `set_admin_wallet_pin` function does `INSERT ... ON CONFLICT DO NOTHING` then `UPDATE admin_wallet SET pin_hash=...`. The issue is the `ON CONFLICT DO NOTHING` prevents insert if wallet exists, and the subsequent `UPDATE` has no `WHERE` clause — it updates ALL rows. But the real issue is likely that `pin_set` returns `false` when wallet row doesn't exist yet (query returns `null`).
+
+**Fix**: 
+- In `useAdminWallet.ts`, when `wallet` is `null` (no row exists), treat `isPinSet` as `false` and allow the "Set PIN" flow
+- The `set_admin_wallet_pin` function already handles insert-or-update. The issue is the `verifyPin` mutation doesn't show error feedback on failure. Add `toast.error('Invalid PIN')` on `false` result.
+- Also in `AdminWalletPage.tsx`, the verify flow doesn't show error when PIN is wrong (line 23-24 just clears input silently). Add toast feedback.
+
+---
+
+### 6. Mobile UI for All Dashboards
+
+**Problem**: Sub-dashboards need responsive mobile layouts with proper text sizing, no horizontal scroll, no scrollbar artifacts.
+
+**Solution**: Audit and fix all 9 management hub pages + agent pages:
+- Add `overflow-x-hidden` to all dashboard wrappers
+- Use `text-sm` / `text-xs` consistently on mobile
+- Grid columns: `grid-cols-2` on mobile, `grid-cols-4` on desktop for stat cards
+- Quick action cards: single column on mobile
+- Ensure all text uses `truncate` or `line-clamp` to prevent overflow
+- Add `max-w-full` constraints on card content
+
+---
+
+### 7. Back Button on Every Page for All Roles
+
+**Problem**: `MobileFloatingBackButton` hides on some routes but doesn't cover all role dashboards. Agent pages have no back button.
+
+**Solution**: 
+- Update `MobileFloatingBackButton.tsx` to include agent dashboard root (`/agent/dashboard`, `/agent-app`) in `hideOnRoutes`
+- Ensure it shows on ALL other pages regardless of role
+- Add desktop back button in `AgentDashboardLayout` header (matching Admin/Seller pattern)
+- Each sub-dashboard already has "Return to Admin Panel" button — keep those
+
+---
+
+### Files to Create (6)
+- `src/components/ScrollToTop.tsx`
+- `src/components/dashboard/AgentDashboardLayout.tsx`
+- `src/pages/agent/AgentDashboardHome.tsx`
+- `src/pages/agent/AgentChatsPage.tsx`
+- `src/pages/agent/AgentEarningsPage.tsx`
+- `src/pages/agent/AgentSettingsPage.tsx`
+
+### Files to Modify (7)
+- `src/App.tsx` — Add ScrollToTop, restructure agent routes
+- `src/pages/agent/AgentDashboard.tsx` — Extract chat logic to AgentChatsPage
+- `src/components/pwa/AgentBottomNav.tsx` — Update nav items for new pages
+- `src/components/pwa/AgentAppShell.tsx` — Update routes
+- `src/components/mobile/MobileFloatingBackButton.tsx` — Add agent routes to hideOnRoutes
+- `src/hooks/useAdminWallet.ts` — Fix PIN verification feedback
+- `src/pages/dashboard/AdminWalletPage.tsx` — Add toast on wrong PIN
+
+### Database Changes
+- Enable Supabase Realtime for `support_chat_sessions` table (migration: `ALTER PUBLICATION supabase_realtime ADD TABLE public.support_chat_sessions;`)
 
