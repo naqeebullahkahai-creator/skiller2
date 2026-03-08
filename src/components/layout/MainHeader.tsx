@@ -189,7 +189,7 @@ const MainHeader = () => {
 
       {/* Mobile Menu Dropdown */}
       <div
-        className={`md:hidden bg-accent border-t border-primary/10 overflow-hidden transition-all duration-300 ease-out ${
+        className={`md:hidden bg-card border-t border-border overflow-hidden transition-all duration-300 ease-out ${
           isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
