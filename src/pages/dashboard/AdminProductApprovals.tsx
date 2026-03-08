@@ -27,6 +27,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { formatPKR } from "@/hooks/useProducts";
 import { useRealtimePendingProducts } from "@/hooks/useRealtimeProducts";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Search,
   Check,
@@ -36,9 +38,12 @@ import {
   Package,
   Loader2,
   RefreshCw,
+  Percent,
+  DollarSign,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Database } from "@/integrations/supabase/types";
+import { useCommissionWallet } from "@/hooks/useCommissionWallet";
 
 type Product = Database["public"]["Tables"]["products"]["Row"];
 
