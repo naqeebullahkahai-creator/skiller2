@@ -147,7 +147,7 @@ const MainHeader = () => {
             {isAuthenticated && (
               <Link 
                 to="/account/messages" 
-                className="hidden md:flex relative p-2 text-accent-foreground/50 hover:text-primary hover:bg-accent-foreground/5 rounded-xl transition-colors"
+                className="hidden md:flex relative p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-xl transition-colors"
                 title="Messages"
               >
                 <MessageCircle size={20} />
