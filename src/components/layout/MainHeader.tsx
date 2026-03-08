@@ -51,7 +51,7 @@ const MainHeader = () => {
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-accent-foreground p-2 hover:bg-accent-foreground/10 rounded-xl transition-colors"
+            className="md:hidden text-foreground p-2 hover:bg-secondary rounded-xl transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
