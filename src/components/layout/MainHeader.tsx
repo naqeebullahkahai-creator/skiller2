@@ -130,7 +130,7 @@ const MainHeader = () => {
             {isAuthenticated && role === "customer" && (
               <Link
                 to="/account/wallet"
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-xl text-primary font-semibold transition-colors"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-xl text-primary font-semibold transition-colors border border-primary/15"
                 title="Wallet"
               >
                 <Wallet size={16} />
