@@ -725,26 +725,28 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
-                    <ChevronLeft size={18} className="mr-2" />
-                    Back
-                  </Button>
-                  <Button
-                    onClick={handlePlaceOrder}
-                    disabled={isSubmitting}
-                    className="flex-1"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 size={18} className="mr-2 animate-spin" />
-                        Placing Order...
-                      </>
-                    ) : (
-                      "Place Order"
-                    )}
-                  </Button>
-                </div>
+                {!isMobile && (
+                  <div className="flex gap-3">
+                    <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                      <ChevronLeft size={18} className="mr-2" />
+                      Back
+                    </Button>
+                    <Button
+                      onClick={handlePlaceOrder}
+                      disabled={isSubmitting}
+                      className="flex-1"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={18} className="mr-2 animate-spin" />
+                          Placing Order...
+                        </>
+                      ) : (
+                        "Place Order"
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>
