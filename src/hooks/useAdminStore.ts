@@ -82,17 +82,17 @@ export const useAdminStore = () => {
     enabled: !!user,
   });
 
-  // Admin products
+  // Admin products - use any type to avoid deep type instantiation
   const { data: adminProducts, isLoading: productsLoading } = useQuery({
     queryKey: ["admin-store-products"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("products")
         .select("*")
-        .eq("is_admin_product" as any, true)
+        .eq("is_admin_product", true)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     },
     enabled: !!user,
   });
@@ -101,18 +101,17 @@ export const useAdminStore = () => {
   const { data: adminOrders, isLoading: ordersLoading } = useQuery({
     queryKey: ["admin-store-orders"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("orders")
         .select("*")
         .eq("is_admin_order", true)
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) {
-        // Fallback: if is_admin_order column doesn't exist yet, return empty
         console.warn("Admin orders query failed:", error);
-        return [];
+        return [] as any[];
       }
-      return data || [];
+      return (data || []) as any[];
     },
     enabled: !!user,
   });
