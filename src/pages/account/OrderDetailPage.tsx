@@ -515,40 +515,40 @@ const OrderDetailPage = () => {
 
       {/* Order Items */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package size={20} />
-            Order Items ({order.items.length})
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Package size={18} />
+            Items ({order.items.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {order.items.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-4 p-4 bg-muted/50 rounded-lg"
+                className="flex gap-3 p-3 bg-muted/50 rounded-lg"
               >
-                <Link to={`/product/${item.product_id}`}>
+                <Link to={`/product/${item.product_id}`} className="shrink-0">
                   <img
                     src={
                       item.image_url ||
                       "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100"
                     }
                     alt={item.title}
-                    className="w-20 h-20 object-cover rounded-md"
+                    className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-md"
                   />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link
                     to={`/product/${item.product_id}`}
-                    className="font-medium hover:text-primary line-clamp-2"
+                    className="font-medium text-sm hover:text-primary line-clamp-2"
                   >
                     {item.title}
                   </Link>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Qty: {item.quantity} × {formatPKR(item.price_pkr)}
                   </p>
-                  <p className="font-semibold text-primary mt-1">
+                  <p className="font-semibold text-primary text-sm mt-1">
                     {formatPKR(item.price_pkr * item.quantity)}
                   </p>
 
@@ -557,16 +557,16 @@ const OrderDetailPage = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="mt-2"
+                      className="mt-2 h-7 text-xs"
                       onClick={() => handleOpenReview(item)}
                     >
-                      <Star size={14} className="mr-2" />
-                      Write a Review
+                      <Star size={12} className="mr-1.5" />
+                      Review
                     </Button>
                   )}
                   {existingReviews[item.product_id] && (
-                    <Badge variant="secondary" className="mt-2">
-                      <CheckCircle size={12} className="mr-1" />
+                    <Badge variant="secondary" className="mt-2 text-xs">
+                      <CheckCircle size={10} className="mr-1" />
                       Reviewed
                     </Badge>
                   )}
