@@ -139,52 +139,52 @@ const SellerWalletPage = () => {
       <SellerSubscriptionCard />
 
       {/* Earnings Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
         {/* Current Balance Card - Highlighted */}
-        <Card className="md:col-span-2 bg-gradient-to-br from-green-500 to-green-600 text-white">
-          <CardContent className="pt-6">
+        <Card className="col-span-2 bg-gradient-to-br from-green-500 to-green-600 text-white">
+          <CardContent className="pt-5 pb-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-green-100 text-sm">Current Balance</p>
-                <p className="text-3xl font-bold mt-1">
+                <p className="text-green-100 text-xs">Current Balance</p>
+                <p className="text-2xl md:text-3xl font-bold mt-1">
                   {formatPKR(wallet?.current_balance || 0)}
                 </p>
-                <div className="flex items-center gap-1 mt-2 text-green-100">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm">Available for withdrawal</span>
+                <div className="flex items-center gap-1 mt-1.5 text-green-100">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span className="text-xs">Available for withdrawal</span>
                 </div>
               </div>
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Wallet className="w-8 h-8" />
+              <div className="p-2.5 bg-white/20 rounded-lg">
+                <Wallet className="w-6 h-6" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Earnings</p>
-                <p className="text-2xl font-bold text-green-500">
+                <p className="text-xs text-muted-foreground">Total Earnings</p>
+                <p className="text-lg md:text-2xl font-bold text-green-500">
                   {formatPKR(wallet?.total_earnings || 0)}
                 </p>
               </div>
-              <TrendingUp className="w-8 h-8 text-green-500" />
+              <TrendingUp className="w-6 h-6 text-green-500 hidden md:block" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Withdrawn</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs text-muted-foreground">Total Withdrawn</p>
+                <p className="text-lg md:text-2xl font-bold">
                   {formatPKR(wallet?.total_withdrawn || 0)}
                 </p>
               </div>
-              <ArrowDownToLine className="w-8 h-8 text-muted-foreground" />
+              <ArrowDownToLine className="w-6 h-6 text-muted-foreground hidden md:block" />
             </div>
           </CardContent>
         </Card>
