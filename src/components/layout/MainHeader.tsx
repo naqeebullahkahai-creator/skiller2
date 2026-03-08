@@ -172,7 +172,7 @@ const MainHeader = () => {
 
         {/* Mobile Search Bar */}
         <div className="md:hidden pb-3 px-1">
-          <form onSubmit={handleSearch} className="flex w-full bg-secondary rounded-xl overflow-hidden border border-border">
+          <form onSubmit={handleSearch} className="flex w-full bg-accent-foreground/5 rounded-xl overflow-hidden border border-primary/15">
             <Input
               type="text"
               placeholder={t("search.placeholder")}
