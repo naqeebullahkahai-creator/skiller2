@@ -110,6 +110,7 @@ import AdminNotificationsPage from "./pages/dashboard/AdminNotificationsPage";
 import AdminCommissionManagementPage from "./pages/dashboard/AdminCommissionManagementPage";
 import AdminWalletPage from "./pages/dashboard/AdminWalletPage";
 import AdminCommissionWalletPage from "./pages/dashboard/AdminCommissionWalletPage";
+import AdminSubscriptionWalletPage from "./pages/dashboard/AdminSubscriptionWalletPage";
 import AdminSellersManagement from "./pages/dashboard/AdminSellersManagement";
 import AdminCustomersManagement from "./pages/dashboard/AdminCustomersManagement";
 import AdminAgentsManagement from "./pages/dashboard/AdminAgentsManagement";
