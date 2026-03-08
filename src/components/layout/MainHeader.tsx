@@ -104,7 +104,7 @@ const MainHeader = () => {
               />
               <Button 
                  type="submit"
-                 className="rounded-none px-6 btn-gold"
+                 className="rounded-none px-6 bg-primary hover:bg-primary/90 transition-colors"
                >
                  <Search size={18} />
               </Button>
