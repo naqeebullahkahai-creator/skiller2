@@ -120,9 +120,9 @@ const ContactUs = () => {
           </div>
         </section>
 
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <section className="py-8 md:py-16 pb-24 md:pb-16">
+          <div className="container mx-auto px-3 md:px-4">
+            <div className="grid lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
               
               {/* Contact Information Cards */}
               <div className="lg:col-span-1 space-y-6">

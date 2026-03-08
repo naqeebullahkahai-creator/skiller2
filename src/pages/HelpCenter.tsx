@@ -282,18 +282,18 @@ const HelpCenter = () => {
           )}
 
           {/* Still Need Help */}
-          <div className="bg-muted/50 rounded-lg p-6 text-center mt-8">
-            <MessageCircle size={32} className="mx-auto text-primary mb-3" />
-            <h3 className="text-lg font-semibold mb-2">Still need help?</h3>
-            <p className="text-muted-foreground mb-4">
-              Our support team is available 24/7 to assist you
+          <div className="bg-muted/50 rounded-lg p-5 md:p-6 text-center mt-6">
+            <MessageCircle size={28} className="mx-auto text-primary mb-2" />
+            <h3 className="text-base font-semibold mb-1.5">Still need help?</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Our support team is available 24/7
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button>
-                <MessageCircle size={18} className="mr-2" />
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Button size="sm">
+                <MessageCircle size={16} className="mr-1.5" />
                 Chat with Us
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" size="sm">
                 Email: support@fanzon.pk
               </Button>
             </div>
