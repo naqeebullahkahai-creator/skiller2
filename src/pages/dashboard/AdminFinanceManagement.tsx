@@ -55,9 +55,11 @@ const AdminFinanceManagement = () => {
 
   const quickActions: QuickActionProps[] = [
     { icon: <Wallet className="w-5 h-5 text-white" />, title: "Admin Wallet", description: "Platform earnings & balance", href: "/admin/wallet", color: "bg-violet-500" },
+    { icon: <Percent className="w-5 h-5 text-white" />, title: "Commission Wallet", description: "Per-product commission earnings", href: "/admin/commission-wallet", color: "bg-amber-500" },
+    { icon: <CreditCard className="w-5 h-5 text-white" />, title: "Subscription Wallet", description: "Subscription fee earnings & status", href: "/admin/subscription-wallet", color: "bg-blue-500" },
     { icon: <DollarSign className="w-5 h-5 text-white" />, title: "Payouts", description: "Seller withdrawal requests", href: "/admin/payouts", color: "bg-emerald-500" },
-    { icon: <Percent className="w-5 h-5 text-white" />, title: "Commission & Fees", description: "Manage platform commission", href: "/admin/commission-management", color: "bg-amber-500" },
-    { icon: <Receipt className="w-5 h-5 text-white" />, title: "Subscriptions", description: "Seller plans & billing", href: "/admin/subscriptions", color: "bg-blue-500" },
+    { icon: <Percent className="w-5 h-5 text-white" />, title: "Commission & Fees", description: "Manage platform commission", href: "/admin/commission-management", color: "bg-orange-500" },
+    { icon: <Receipt className="w-5 h-5 text-white" />, title: "Subscriptions", description: "Seller plans & billing", href: "/admin/subscriptions", color: "bg-teal-500" },
     { icon: <CreditCard className="w-5 h-5 text-white" />, title: "Payment Methods", description: "Bank accounts & wallets", href: "/admin/payment-methods", color: "bg-cyan-500" },
     { icon: <Settings className="w-5 h-5 text-white" />, title: "Payment Settings", description: "COD, wallet, limits", href: "/admin/payment-settings", color: "bg-slate-500" },
     { icon: <Scale className="w-5 h-5 text-white" />, title: "Balance Adjustments", description: "Credit/debit user wallets", href: "/admin/balance-adjustments", color: "bg-rose-500" },

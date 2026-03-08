@@ -110,6 +110,7 @@ import AdminNotificationsPage from "./pages/dashboard/AdminNotificationsPage";
 import AdminCommissionManagementPage from "./pages/dashboard/AdminCommissionManagementPage";
 import AdminWalletPage from "./pages/dashboard/AdminWalletPage";
 import AdminCommissionWalletPage from "./pages/dashboard/AdminCommissionWalletPage";
+import AdminSubscriptionWalletPage from "./pages/dashboard/AdminSubscriptionWalletPage";
 import AdminSellersManagement from "./pages/dashboard/AdminSellersManagement";
 import AdminCustomersManagement from "./pages/dashboard/AdminCustomersManagement";
 import AdminAgentsManagement from "./pages/dashboard/AdminAgentsManagement";
@@ -358,6 +359,7 @@ const App = () => (
                             <Route path="notifications" element={<AdminNotificationsPage />} />
                             <Route path="commission-management" element={<AdminCommissionManagementPage />} />
                             <Route path="commission-wallet" element={<AdminCommissionWalletPage />} />
+                            <Route path="subscription-wallet" element={<AdminSubscriptionWalletPage />} />
                             <Route path="wallet" element={<AdminWalletPage />} />
                             <Route path="security" element={<AdminSecurityPage />} />
                           </Route>
