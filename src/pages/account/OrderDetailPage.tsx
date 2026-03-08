@@ -293,51 +293,46 @@ const OrderDetailPage = () => {
   return (
     <div className="space-y-6">
       {/* Back Button & Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9" asChild>
             <Link to="/account/orders">
               <ChevronLeft size={20} />
             </Link>
           </Button>
-          <div>
-            <h1 className="text-xl font-bold">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-base md:text-xl font-bold truncate">
               {order.order_number || `Order #${order.id.slice(0, 8)}`}
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Placed on {new Date(order.created_at).toLocaleDateString("en-PK", {
-                weekday: "long",
+            <p className="text-xs md:text-sm text-muted-foreground">
+              {new Date(order.created_at).toLocaleDateString("en-PK", {
                 year: "numeric",
-                month: "long",
+                month: "short",
                 day: "numeric",
               })}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Action buttons - scrollable on mobile */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 no-scrollbar">
           {canCancel && (
             <Button 
               variant="outline" 
               size="sm" 
-              className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+              className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground shrink-0 h-8 text-xs"
               onClick={() => setShowCancelDialog(true)}
             >
-              <XCircle className="h-4 w-4 mr-2" />
-              Cancel Order
+              <XCircle className="h-3.5 w-3.5 mr-1.5" />
+              Cancel
             </Button>
           )}
-          {!canCancel && !isCancelled && order.order_status === "shipped" && (
-            <p className="text-xs text-muted-foreground max-w-[200px]">
-              {cancelMessage}
-            </p>
-          )}
-          <Button variant="outline" size="sm" onClick={() => generateOrderInvoice(order)}>
-            <FileText className="h-4 w-4 mr-2" />
+          <Button variant="outline" size="sm" className="shrink-0 h-8 text-xs" onClick={() => generateOrderInvoice(order)}>
+            <FileText className="h-3.5 w-3.5 mr-1.5" />
             Invoice
           </Button>
-          <Button variant="outline" size="sm" onClick={() => generateShippingLabel(order)}>
-            <Tag className="h-4 w-4 mr-2" />
-            Shipping Label
+          <Button variant="outline" size="sm" className="shrink-0 h-8 text-xs" onClick={() => generateShippingLabel(order)}>
+            <Tag className="h-3.5 w-3.5 mr-1.5" />
+            Label
           </Button>
         </div>
       </div>
@@ -520,40 +515,40 @@ const OrderDetailPage = () => {
 
       {/* Order Items */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package size={20} />
-            Order Items ({order.items.length})
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Package size={18} />
+            Items ({order.items.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {order.items.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-4 p-4 bg-muted/50 rounded-lg"
+                className="flex gap-3 p-3 bg-muted/50 rounded-lg"
               >
-                <Link to={`/product/${item.product_id}`}>
+                <Link to={`/product/${item.product_id}`} className="shrink-0">
                   <img
                     src={
                       item.image_url ||
                       "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100"
                     }
                     alt={item.title}
-                    className="w-20 h-20 object-cover rounded-md"
+                    className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-md"
                   />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link
                     to={`/product/${item.product_id}`}
-                    className="font-medium hover:text-primary line-clamp-2"
+                    className="font-medium text-sm hover:text-primary line-clamp-2"
                   >
                     {item.title}
                   </Link>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Qty: {item.quantity} × {formatPKR(item.price_pkr)}
                   </p>
-                  <p className="font-semibold text-primary mt-1">
+                  <p className="font-semibold text-primary text-sm mt-1">
                     {formatPKR(item.price_pkr * item.quantity)}
                   </p>
 
@@ -562,16 +557,16 @@ const OrderDetailPage = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="mt-2"
+                      className="mt-2 h-7 text-xs"
                       onClick={() => handleOpenReview(item)}
                     >
-                      <Star size={14} className="mr-2" />
-                      Write a Review
+                      <Star size={12} className="mr-1.5" />
+                      Review
                     </Button>
                   )}
                   {existingReviews[item.product_id] && (
-                    <Badge variant="secondary" className="mt-2">
-                      <CheckCircle size={12} className="mr-1" />
+                    <Badge variant="secondary" className="mt-2 text-xs">
+                      <CheckCircle size={10} className="mr-1" />
                       Reviewed
                     </Badge>
                   )}
