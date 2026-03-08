@@ -52,7 +52,6 @@ const TopBar = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <ThemeToggle variant="compact" />
             <LanguageSwitcher variant="compact" />
             <Link 
               to="/help" 
