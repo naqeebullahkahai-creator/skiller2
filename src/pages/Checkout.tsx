@@ -112,6 +112,7 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
+  const isMobile = useIsMobile();
 
   // COD-only mode check
   const { data: codOnlySetting } = useQuery({
