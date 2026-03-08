@@ -52,7 +52,10 @@ const AdminProductApprovals = () => {
   const [actionProductId, setActionProductId] = useState<string | null>(null);
   const [actionType, setActionType] = useState<"approve" | "reject" | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [commissionType, setCommissionType] = useState<"percentage" | "fixed">("percentage");
+  const [commissionValue, setCommissionValue] = useState<number>(5);
   const queryClient = useQueryClient();
+  const { setProductCommission } = useCommissionWallet();
 
   // Fetch pending products
   const { data: initialProducts = [], isLoading, refetch } = useQuery({
