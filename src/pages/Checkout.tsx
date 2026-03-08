@@ -745,57 +745,115 @@ const Checkout = () => {
             )}
           </div>
 
-          {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-card border border-border rounded-lg p-6 sticky top-24">
-              <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+          {/* Order Summary Sidebar - Desktop only */}
+          {!isMobile && (
+            <div className="lg:col-span-1">
+              <div className="bg-card border border-border rounded-lg p-6 sticky top-24">
+                <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
 
-              <div className="space-y-3 mb-4">
-                {items.slice(0, 3).map((item) => {
-                  const price = item.product.discount_price_pkr || item.product.price_pkr;
-                  return (
-                    <div key={item.product.id} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground line-clamp-1 flex-1 mr-2">
-                        {item.product.title} × {item.quantity}
-                      </span>
-                      <span>{formatPKR(price * item.quantity)}</span>
-                    </div>
-                  );
-                })}
-                {items.length > 3 && (
-                  <p className="text-sm text-muted-foreground">
-                    +{items.length - 3} more items
-                  </p>
+                <div className="space-y-3 mb-4">
+                  {items.slice(0, 3).map((item) => {
+                    const price = item.product.discount_price_pkr || item.product.price_pkr;
+                    return (
+                      <div key={item.product.id} className="flex justify-between text-sm">
+                        <span className="text-muted-foreground line-clamp-1 flex-1 mr-2">
+                          {item.product.title} × {item.quantity}
+                        </span>
+                        <span>{formatPKR(price * item.quantity)}</span>
+                      </div>
+                    );
+                  })}
+                  {items.length > 3 && (
+                    <p className="text-sm text-muted-foreground">
+                      +{items.length - 3} more items
+                    </p>
+                  )}
+                </div>
+
+                <div className="border-t border-border pt-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>{formatPKR(getSubtotal())}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Shipping</span>
+                    <span>{formatPKR(SHIPPING_FEE)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
+                    <span>Total</span>
+                    <span className="text-primary">{formatPKR(getCartTotal())}</span>
+                  </div>
+                </div>
+
+                {selectedAddress && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-1">Deliver to:</p>
+                    <p className="text-sm font-medium">{selectedAddress.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{selectedAddress.city}, {selectedAddress.province}</p>
+                  </div>
                 )}
               </div>
+            </div>
+          )}
+        </div>
+      </main>
 
-              <div className="border-t border-border pt-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>{formatPKR(getSubtotal())}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{formatPKR(SHIPPING_FEE)}</span>
-                </div>
-                <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
-                  <span>Total</span>
-                  <span className="text-primary">{formatPKR(getCartTotal())}</span>
-                </div>
+      {/* Mobile Sticky Bottom Summary Bar */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.1)] safe-area-bottom">
+          <div className="px-4 py-3">
+            {/* Price row */}
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <p className="text-xs text-muted-foreground">{items.reduce((sum, i) => sum + i.quantity, 0)} items</p>
+                <p className="text-lg font-bold text-primary">{formatPKR(getCartTotal())}</p>
               </div>
-
-              {/* Delivery Info */}
-              {selectedAddress && (
-                <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-xs text-muted-foreground mb-1">Deliver to:</p>
-                  <p className="text-sm font-medium">{selectedAddress.full_name}</p>
-                  <p className="text-xs text-muted-foreground">{selectedAddress.city}, {selectedAddress.province}</p>
+              {step === 1 && (
+                <Button
+                  onClick={handleContinueToPayment}
+                  disabled={!selectedAddressId}
+                  className="h-12 px-6 text-base font-semibold"
+                >
+                  Continue
+                  <ChevronRight size={18} className="ml-1" />
+                </Button>
+              )}
+              {step === 2 && (
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setStep(1)}>
+                    <ChevronLeft size={16} />
+                  </Button>
+                  <Button onClick={() => setStep(3)} className="h-12 px-6 text-base font-semibold">
+                    Review
+                    <ChevronRight size={18} className="ml-1" />
+                  </Button>
+                </div>
+              )}
+              {step === 3 && (
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setStep(2)}>
+                    <ChevronLeft size={16} />
+                  </Button>
+                  <Button
+                    onClick={handlePlaceOrder}
+                    disabled={isSubmitting}
+                    className="h-12 px-6 text-base font-semibold"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={18} className="mr-2 animate-spin" />
+                        Placing...
+                      </>
+                    ) : (
+                      "Place Order"
+                    )}
+                  </Button>
                 </div>
               )}
             </div>
           </div>
         </div>
-      </main>
+      )}
 
       {/* Add Address Modal */}
       <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
@@ -846,7 +904,7 @@ const Checkout = () => {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter recipient's full name" {...field} />
+                      <Input placeholder="Enter recipient's full name" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -860,7 +918,7 @@ const Checkout = () => {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="0300-1234567" {...field} />
+                      <Input placeholder="0300-1234567" inputMode="tel" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -882,7 +940,7 @@ const Checkout = () => {
                       value={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12">
                           <SelectValue placeholder="Select province" />
                         </SelectTrigger>
                       </FormControl>
@@ -911,7 +969,7 @@ const Checkout = () => {
                       disabled={!selectedProvince}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12">
                           <SelectValue placeholder="Select city" />
                         </SelectTrigger>
                       </FormControl>
@@ -935,7 +993,7 @@ const Checkout = () => {
                   <FormItem>
                     <FormLabel>Area / Sector (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., DHA Phase 5, Gulberg" {...field} />
+                      <Input placeholder="e.g., DHA Phase 5, Gulberg" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -951,6 +1009,7 @@ const Checkout = () => {
                     <FormControl>
                       <Input
                         placeholder="House/Flat No., Street, Landmark"
+                        className="h-12 text-base"
                         {...field}
                       />
                     </FormControl>
@@ -982,11 +1041,11 @@ const Checkout = () => {
                   type="button"
                   variant="outline"
                   onClick={() => setShowAddressModal(false)}
-                  className="flex-1"
+                  className="flex-1 h-12"
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1 h-12">
                   Save Address
                 </Button>
               </div>
@@ -995,8 +1054,7 @@ const Checkout = () => {
         </DialogContent>
       </Dialog>
 
-      <Footer />
-      <MobileBottomNav />
+      {!isMobile && <Footer />}
     </div>
   );
 };
