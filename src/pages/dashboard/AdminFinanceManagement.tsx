@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Wallet, CreditCard, DollarSign, Percent, PiggyBank, Scale, Settings,
-  ChevronRight, TrendingUp, Receipt, BarChart3, ArrowLeft
+  ChevronRight, TrendingUp, Receipt, BarChart3, ArrowLeft, Store
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
