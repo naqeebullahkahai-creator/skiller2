@@ -365,9 +365,15 @@ const App = () => (
                             <Route path="commission-management" element={<AdminCommissionManagementPage />} />
                             <Route path="commission-wallet" element={<AdminCommissionWalletPage />} />
                             <Route path="subscription-wallet" element={<AdminSubscriptionWalletPage />} />
-                            <Route path="wallet" element={<AdminWalletPage />} />
-                            <Route path="security" element={<AdminSecurityPage />} />
-                          </Route>
+                             <Route path="wallet" element={<AdminWalletPage />} />
+                             <Route path="security" element={<AdminSecurityPage />} />
+                             {/* Admin Store Routes */}
+                             <Route path="store" element={<AdminStorePage />} />
+                             <Route path="store/products" element={<AdminStoreProductsPage />} />
+                             <Route path="store/products/new" element={<AdminStoreAddProductPage />} />
+                             <Route path="store/wallet" element={<AdminStoreWalletPage />} />
+                             <Route path="store/orders" element={<AdminStoreOrdersPage />} />
+                           </Route>
 
                           {/* Seller Routes - Nested under sidebar layout */}
                           <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
