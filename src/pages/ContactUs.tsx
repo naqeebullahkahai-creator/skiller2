@@ -107,22 +107,22 @@ const ContactUs = () => {
 
       <main className="min-h-screen bg-gradient-to-b from-background to-muted/30">
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background py-16 md:py-24">
+        <section className="relative bg-gradient-to-r from-primary/10 via-primary/5 to-background py-10 md:py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
                 Get in Touch
               </h1>
-              <p className="text-lg text-muted-foreground">
-                Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+              <p className="text-sm md:text-lg text-muted-foreground">
+                Have questions? We'd love to hear from you.
               </p>
             </div>
           </div>
         </section>
 
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <section className="py-8 md:py-16 pb-24 md:pb-16">
+          <div className="container mx-auto px-3 md:px-4">
+            <div className="grid lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
               
               {/* Contact Information Cards */}
               <div className="lg:col-span-1 space-y-6">

@@ -172,11 +172,11 @@ const HelpCenter = () => {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <div className="bg-primary text-primary-foreground py-12 px-4">
+        <div className="bg-primary text-primary-foreground py-8 md:py-12 px-4">
           <div className="container mx-auto text-center">
-            <HelpCircle size={48} className="mx-auto mb-4" />
-            <h1 className="text-3xl font-bold mb-2">How can we help you?</h1>
-            <p className="text-primary-foreground/80 mb-6">
+            <HelpCircle size={36} className="mx-auto mb-3 md:mb-4" />
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">How can we help you?</h1>
+            <p className="text-primary-foreground/80 text-sm md:text-base mb-5 md:mb-6">
               Find answers to frequently asked questions
             </p>
             <div className="max-w-lg mx-auto relative">
@@ -185,21 +185,21 @@ const HelpCenter = () => {
                 placeholder="Search for help..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background text-foreground"
+                className="pl-10 bg-background text-foreground h-11"
               />
             </div>
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-3 md:px-4 py-6 md:py-8 pb-24 md:pb-8">
           {/* Search Results */}
           {searchQuery && (
-            <div className="mb-8">
-              <h2 className="text-lg font-semibold mb-4">
+            <div className="mb-6">
+              <h2 className="text-base md:text-lg font-semibold mb-3">
                 Search Results ({filteredFaqs.length})
               </h2>
               {filteredFaqs.length === 0 ? (
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   No results found. Try a different search term.
                 </p>
               ) : (
@@ -208,17 +208,17 @@ const HelpCenter = () => {
                     <AccordionItem
                       key={index}
                       value={`search-${index}`}
-                      className="border rounded-lg px-4"
+                      className="border rounded-lg px-3 md:px-4"
                     >
-                      <AccordionTrigger className="text-left">
+                      <AccordionTrigger className="text-left text-sm md:text-base">
                         <div>
-                          <span className="text-xs text-primary mb-1 block">
+                          <span className="text-xs text-primary mb-0.5 block">
                             {faq.category}
                           </span>
                           {faq.q}
                         </div>
                       </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground">
+                      <AccordionContent className="text-muted-foreground text-sm">
                         {faq.a}
                       </AccordionContent>
                     </AccordionItem>
@@ -232,21 +232,21 @@ const HelpCenter = () => {
           {!searchQuery && (
             <>
               {/* Category Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-8">
                 {faqCategories.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() =>
                       setActiveCategory(activeCategory === cat.id ? null : cat.id)
                     }
-                    className={`p-4 rounded-lg border text-center transition-colors ${
+                    className={`p-3 md:p-4 rounded-lg border text-center transition-colors active:scale-[0.97] ${
                       activeCategory === cat.id
                         ? "bg-primary text-primary-foreground border-primary"
                         : "bg-card border-border hover:border-primary"
                     }`}
                   >
-                    <cat.icon size={32} className="mx-auto mb-2" />
-                    <span className="text-sm font-medium">{cat.title}</span>
+                    <cat.icon size={24} className="mx-auto mb-1.5" />
+                    <span className="text-xs md:text-sm font-medium leading-tight line-clamp-2">{cat.title}</span>
                   </button>
                 ))}
               </div>
@@ -255,22 +255,22 @@ const HelpCenter = () => {
               {faqCategories
                 .filter((cat) => !activeCategory || cat.id === activeCategory)
                 .map((cat) => (
-                  <div key={cat.id} className="mb-8">
-                    <div className="flex items-center gap-2 mb-4">
-                      <cat.icon size={24} className="text-primary" />
-                      <h2 className="text-xl font-semibold">{cat.title}</h2>
+                  <div key={cat.id} className="mb-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <cat.icon size={20} className="text-primary" />
+                      <h2 className="text-base md:text-xl font-semibold">{cat.title}</h2>
                     </div>
-                    <Accordion type="single" collapsible className="space-y-2">
+                    <Accordion type="single" collapsible className="space-y-1.5">
                       {cat.faqs.map((faq, index) => (
                         <AccordionItem
                           key={index}
                           value={`${cat.id}-${index}`}
-                          className="border rounded-lg px-4"
+                          className="border rounded-lg px-3 md:px-4"
                         >
-                          <AccordionTrigger className="text-left">
+                          <AccordionTrigger className="text-left text-sm md:text-base py-3">
                             {faq.q}
                           </AccordionTrigger>
-                          <AccordionContent className="text-muted-foreground">
+                          <AccordionContent className="text-muted-foreground text-sm">
                             {faq.a}
                           </AccordionContent>
                         </AccordionItem>
@@ -282,18 +282,18 @@ const HelpCenter = () => {
           )}
 
           {/* Still Need Help */}
-          <div className="bg-muted/50 rounded-lg p-6 text-center mt-8">
-            <MessageCircle size={32} className="mx-auto text-primary mb-3" />
-            <h3 className="text-lg font-semibold mb-2">Still need help?</h3>
-            <p className="text-muted-foreground mb-4">
-              Our support team is available 24/7 to assist you
+          <div className="bg-muted/50 rounded-lg p-5 md:p-6 text-center mt-6">
+            <MessageCircle size={28} className="mx-auto text-primary mb-2" />
+            <h3 className="text-base font-semibold mb-1.5">Still need help?</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Our support team is available 24/7
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button>
-                <MessageCircle size={18} className="mr-2" />
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Button size="sm">
+                <MessageCircle size={16} className="mr-1.5" />
                 Chat with Us
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" size="sm">
                 Email: support@fanzon.pk
               </Button>
             </div>
