@@ -166,13 +166,14 @@ const Checkout = () => {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <Header />
+        {isMobile ? <MobileHeader /> : <Header />}
         <main className="flex-1 container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
           <p className="text-muted-foreground mb-6">Add some products to proceed to checkout.</p>
           <Button onClick={() => navigate("/products")}>Continue Shopping</Button>
         </main>
-        <Footer />
+        {!isMobile && <Footer />}
+        {isMobile && <MobileBottomNav />}
       </div>
     );
   }
