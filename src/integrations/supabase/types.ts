@@ -98,6 +98,104 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_store_settings: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          store_banner_url: string | null
+          store_description: string | null
+          store_logo_url: string | null
+          store_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          store_banner_url?: string | null
+          store_description?: string | null
+          store_logo_url?: string | null
+          store_name?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          store_banner_url?: string | null
+          store_description?: string | null
+          store_logo_url?: string | null
+          store_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      admin_store_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          order_id: string | null
+          product_title: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_id?: string | null
+          product_title?: string | null
+          transaction_type?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_id?: string | null
+          product_title?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_store_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_store_wallet: {
+        Row: {
+          created_at: string
+          id: string
+          total_balance: number
+          total_earnings: number
+          total_orders: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          total_balance?: number
+          total_earnings?: number
+          total_orders?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          total_balance?: number
+          total_earnings?: number
+          total_orders?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_wallet: {
         Row: {
           created_at: string
@@ -2326,6 +2424,7 @@ export type Database = {
           free_shipping: boolean
           id: string
           images: string[] | null
+          is_admin_product: boolean
           location: string | null
           price_pkr: number
           seller_id: string
@@ -2349,6 +2448,7 @@ export type Database = {
           free_shipping?: boolean
           id?: string
           images?: string[] | null
+          is_admin_product?: boolean
           location?: string | null
           price_pkr: number
           seller_id: string
@@ -2372,6 +2472,7 @@ export type Database = {
           free_shipping?: boolean
           id?: string
           images?: string[] | null
+          is_admin_product?: boolean
           location?: string | null
           price_pkr?: number
           seller_id?: string

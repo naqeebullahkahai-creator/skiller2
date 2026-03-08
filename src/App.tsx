@@ -120,6 +120,11 @@ import AdminFinanceManagement from "./pages/dashboard/AdminFinanceManagement";
 import AdminMarketingManagement from "./pages/dashboard/AdminMarketingManagement";
 import AdminContentManagement from "./pages/dashboard/AdminContentManagement";
 import AdminSecurityManagement from "./pages/dashboard/AdminSecurityManagement";
+import AdminStorePage from "./pages/dashboard/AdminStorePage";
+import AdminStoreProductsPage from "./pages/dashboard/AdminStoreProductsPage";
+import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
+import AdminStoreOrdersPage from "./pages/dashboard/AdminStoreOrdersPage";
+import AdminStoreAddProductPage from "./pages/dashboard/AdminStoreAddProductPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
@@ -360,9 +365,15 @@ const App = () => (
                             <Route path="commission-management" element={<AdminCommissionManagementPage />} />
                             <Route path="commission-wallet" element={<AdminCommissionWalletPage />} />
                             <Route path="subscription-wallet" element={<AdminSubscriptionWalletPage />} />
-                            <Route path="wallet" element={<AdminWalletPage />} />
-                            <Route path="security" element={<AdminSecurityPage />} />
-                          </Route>
+                             <Route path="wallet" element={<AdminWalletPage />} />
+                             <Route path="security" element={<AdminSecurityPage />} />
+                             {/* Admin Store Routes */}
+                             <Route path="store" element={<AdminStorePage />} />
+                             <Route path="store/products" element={<AdminStoreProductsPage />} />
+                             <Route path="store/products/new" element={<AdminStoreAddProductPage />} />
+                             <Route path="store/wallet" element={<AdminStoreWalletPage />} />
+                             <Route path="store/orders" element={<AdminStoreOrdersPage />} />
+                           </Route>
 
                           {/* Seller Routes - Nested under sidebar layout */}
                           <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
