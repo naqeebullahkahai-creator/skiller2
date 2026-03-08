@@ -613,16 +613,18 @@ const Checkout = () => {
                   ))}
                 </RadioGroup>
 
-                <div className="flex gap-3 mt-6">
-                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
-                    <ChevronLeft size={18} className="mr-2" />
-                    Back
-                  </Button>
-                  <Button onClick={() => setStep(3)} className="flex-1">
-                    Review Order
-                    <ChevronRight size={18} className="ml-2" />
-                  </Button>
-                </div>
+                {!isMobile && (
+                  <div className="flex gap-3 mt-6">
+                    <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                      <ChevronLeft size={18} className="mr-2" />
+                      Back
+                    </Button>
+                    <Button onClick={() => setStep(3)} className="flex-1">
+                      Review Order
+                      <ChevronRight size={18} className="ml-2" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
