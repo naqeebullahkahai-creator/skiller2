@@ -1,7 +1,6 @@
 import { Download, HelpCircle, Store, LayoutDashboard, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
-import ThemeToggle from "@/components/theme/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -10,9 +9,9 @@ const TopBar = () => {
   const { isAuthenticated, role, isSuperAdmin } = useAuth();
   
   return (
-    <div className="hidden md:block bg-accent border-b border-primary/8">
+    <div className="hidden md:block bg-secondary border-b border-border">
       <div className="container mx-auto">
-        <div className="flex items-center justify-between h-8 text-[11px] text-accent-foreground/60">
+        <div className="flex items-center justify-between h-8 text-[11px] text-muted-foreground">
           <div className="flex items-center gap-4">
             {isAuthenticated && isSuperAdmin && (
               <Link 
@@ -53,7 +52,6 @@ const TopBar = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <ThemeToggle variant="compact" />
             <LanguageSwitcher variant="compact" />
             <Link 
               to="/help" 

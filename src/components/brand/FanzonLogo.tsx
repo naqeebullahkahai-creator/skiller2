@@ -36,9 +36,9 @@ const FanzonLogo = ({ className, textClassName, size = "md", showText = true, ic
       />
       {showText && (
         <span className={cn(
-          "font-display font-bold tracking-tight leading-none",
+          "font-bold tracking-tight leading-none",
           config.text,
-          textClassName || "text-gradient-gold"
+          textClassName || "text-foreground"
         )}>
           FANZON
         </span>

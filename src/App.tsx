@@ -213,7 +213,7 @@ const App = () => (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <LanguageProvider>
-           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+           <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false}>
            <AuthProvider>
               <VisualEditProvider>
                 <CartProvider>
