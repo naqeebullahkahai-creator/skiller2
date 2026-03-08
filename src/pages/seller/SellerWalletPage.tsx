@@ -274,60 +274,73 @@ const SellerWalletPage = () => {
 
       {/* Transaction History */}
       <Card>
-        <CardHeader>
-          <CardTitle>Transaction History</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Transaction History</CardTitle>
         </CardHeader>
         <CardContent>
           {transactions && transactions.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead className="text-right">Gross Amount</TableHead>
-                  <TableHead className="text-right">Commission</TableHead>
-                  <TableHead className="text-right">Net Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop Table */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Order ID</TableHead>
+                      <TableHead className="text-right">Gross</TableHead>
+                      <TableHead className="text-right">Commission</TableHead>
+                      <TableHead className="text-right">Net</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((txn) => (
+                      <TableRow key={txn.id}>
+                        <TableCell>{new Date(txn.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {getTransactionIcon(txn.transaction_type)}
+                            <span className="capitalize">{txn.transaction_type.replace('_', ' ')}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{txn.order_id ? txn.order_id.slice(0, 8) : "-"}</TableCell>
+                        <TableCell className="text-right">{formatPKR(txn.gross_amount)}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">
+                          {txn.commission_amount > 0 ? `${formatPKR(txn.commission_amount)} (${txn.commission_percentage}%)` : "-"}
+                        </TableCell>
+                        <TableCell className={cn("text-right font-medium", txn.net_amount >= 0 ? "text-green-500" : "text-destructive")}>
+                          {txn.net_amount >= 0 ? "+" : ""}{formatPKR(Math.abs(txn.net_amount))}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {/* Mobile Cards */}
+              <div className="md:hidden space-y-2">
                 {transactions.map((txn) => (
-                  <TableRow key={txn.id}>
-                    <TableCell>
-                      {new Date(txn.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
+                  <div key={txn.id} className="p-3 rounded-lg border bg-muted/30">
+                    <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         {getTransactionIcon(txn.transaction_type)}
-                        <span className="capitalize">
-                          {txn.transaction_type.replace('_', ' ')}
-                        </span>
+                        <span className="text-sm font-medium capitalize">{txn.transaction_type.replace('_', ' ')}</span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {txn.order_id ? txn.order_id.slice(0, 8) : "-"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {formatPKR(txn.gross_amount)}
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      {txn.commission_amount > 0 
-                        ? `${formatPKR(txn.commission_amount)} (${txn.commission_percentage}%)`
-                        : "-"
-                      }
-                    </TableCell>
-                    <TableCell className={cn(
-                      "text-right font-medium",
-                      txn.net_amount >= 0 ? "text-green-500" : "text-destructive"
-                    )}>
-                      {txn.net_amount >= 0 ? "+" : ""}{formatPKR(Math.abs(txn.net_amount))}
-                    </TableCell>
-                  </TableRow>
+                      <span className={cn("text-sm font-bold", txn.net_amount >= 0 ? "text-green-500" : "text-destructive")}>
+                        {txn.net_amount >= 0 ? "+" : ""}{formatPKR(Math.abs(txn.net_amount))}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground flex items-center justify-between">
+                      <span>{new Date(txn.created_at).toLocaleDateString()}</span>
+                      {txn.commission_amount > 0 && (
+                        <span>Commission: {txn.commission_percentage}%</span>
+                      )}
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-muted-foreground text-sm">
               No transactions yet. Earnings will appear here after orders are delivered.
             </div>
           )}
