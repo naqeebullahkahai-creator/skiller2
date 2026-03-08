@@ -485,6 +485,7 @@ const App = () => (
                             <Route index element={<AgentDashboardHome />} />
                             <Route path="chats" element={<AgentChatsPage />} />
                             <Route path="earnings" element={<AgentEarningsPage />} />
+                            <Route path="performance" element={<AgentPerformancePage />} />
                             <Route path="settings" element={<AgentSettingsPage />} />
                           </Route>
 
