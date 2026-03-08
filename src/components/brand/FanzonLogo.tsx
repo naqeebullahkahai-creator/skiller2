@@ -21,7 +21,7 @@ const FanzonLogo = ({ className, textClassName, size = "md", showText = true, ic
     return (
       <img
         src="/fanzoon-icon.png"
-        alt="FANZOON"
+        alt="FANZON"
         className={cn(config.icon, "object-contain", className)}
       />
     );
@@ -31,16 +31,16 @@ const FanzonLogo = ({ className, textClassName, size = "md", showText = true, ic
     <div className={cn("inline-flex items-center", config.gap, className)}>
       <img
         src="/fanzoon-icon.png"
-        alt="FANZOON"
+        alt="FANZON"
         className={cn(config.icon, "object-contain flex-shrink-0")}
       />
       {showText && (
         <span className={cn(
           "font-display font-bold tracking-tight leading-none",
           config.text,
-          textClassName
+          textClassName || "text-gradient-gold"
         )}>
-          FANZOON
+          FANZON
         </span>
       )}
     </div>

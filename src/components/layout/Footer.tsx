@@ -1,15 +1,8 @@
 import { Link } from "react-router-dom";
 import { 
-  Facebook, 
-  Twitter, 
-  Instagram, 
-  Youtube,
-  CreditCard,
-  Truck,
-  Shield,
-  Headphones,
-  Music2,
-  MessageCircle
+  Facebook, Twitter, Instagram, Youtube,
+  CreditCard, Truck, Shield, Headphones,
+  Music2, MessageCircle
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,7 +22,6 @@ const socialIconMap: Record<string, React.ReactNode> = {
 const Footer = () => {
   const { t } = useLanguage();
   const { getSocialLinks, isLoading } = useSiteSettings();
-  
   const socialLinks = getSocialLinks();
 
   const getSocialUrl = (setting: { setting_key: string; setting_value: string | null }) => {
@@ -41,9 +33,9 @@ const Footer = () => {
   };
   
   return (
-    <footer className="hidden md:block bg-[hsl(var(--fanzon-charcoal))] text-secondary mt-10">
+    <footer className="hidden md:block bg-accent text-accent-foreground mt-10">
       {/* Features Bar */}
-      <div className="border-b border-muted-foreground/20">
+      <div className="border-b border-primary/10">
         <div className="container mx-auto py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
@@ -53,12 +45,12 @@ const Footer = () => {
               { icon: Headphones, title: t("footer.support_24_7"), desc: t("footer.support_desc") },
             ].map((feature) => (
               <div key={feature.title} className="flex items-center gap-4">
-                <div className="p-3 bg-primary/15 rounded-2xl">
+                <div className="p-3 bg-primary/10 rounded-2xl border border-primary/15">
                   <feature.icon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">{feature.title}</p>
-                  <p className="text-xs text-muted-foreground">{feature.desc}</p>
+                  <p className="font-semibold text-sm text-accent-foreground">{feature.title}</p>
+                  <p className="text-xs text-accent-foreground/50">{feature.desc}</p>
                 </div>
               </div>
             ))}
@@ -69,10 +61,9 @@ const Footer = () => {
       {/* Main Footer */}
       <div className="container mx-auto py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          {/* Customer Care */}
           <div>
-            <h4 className="font-display font-semibold text-sm mb-4">{t("footer.customer_care")}</h4>
-            <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <h4 className="font-display font-semibold text-sm mb-4 text-primary">{t("footer.customer_care")}</h4>
+            <ul className="space-y-2.5 text-sm text-accent-foreground/60">
               <li><Link to="/help" className="hover:text-primary transition-colors">{t("nav.help")}</Link></li>
               <li><Link to="/how-to-buy" className="hover:text-primary transition-colors">How to Buy</Link></li>
               <li><Link to="/returns" className="hover:text-primary transition-colors">Returns & Refunds</Link></li>
@@ -80,10 +71,9 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* About */}
           <div>
-            <h4 className="font-display font-semibold text-sm mb-4">{t("footer.about")}</h4>
-            <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <h4 className="font-display font-semibold text-sm mb-4 text-primary">{t("footer.about")}</h4>
+            <ul className="space-y-2.5 text-sm text-accent-foreground/60">
               <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link to="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
               <li><Link to="/terms" className="hover:text-primary transition-colors">Terms & Conditions</Link></li>
@@ -91,10 +81,9 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Make Money */}
           <div>
-            <h4 className="font-display font-semibold text-sm mb-4">Make Money with Us</h4>
-            <ul className="space-y-2.5 text-sm text-muted-foreground">
+            <h4 className="font-display font-semibold text-sm mb-4 text-primary">Make Money with Us</h4>
+            <ul className="space-y-2.5 text-sm text-accent-foreground/60">
               <li><Link to="/business/signup" className="hover:text-primary transition-colors">Become a Partner</Link></li>
               <li><Link to="/business/login" className="hover:text-primary transition-colors">Seller Central</Link></li>
               <li><Link to="/affiliate" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
@@ -102,33 +91,30 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Payment Methods */}
           <div>
-            <h4 className="font-display font-semibold text-sm mb-4">{t("footer.payment")}</h4>
+            <h4 className="font-display font-semibold text-sm mb-4 text-primary">{t("footer.payment")}</h4>
             <div className="flex flex-wrap gap-2">
               {["Visa", "Mastercard", "JazzCash", "Easypaisa", "COD"].map((method) => (
-                <div key={method} className="bg-card/10 border border-muted-foreground/20 px-2.5 py-1 rounded-lg text-xs text-secondary">
+                <div key={method} className="bg-primary/5 border border-primary/15 px-2.5 py-1 rounded-lg text-xs text-accent-foreground/70">
                   {method}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Newsletter */}
           <div>
-            <h4 className="font-display font-semibold text-sm mb-4">{t("footer.stay_connected")}</h4>
-            <p className="text-sm text-muted-foreground mb-3">{t("footer.subscribe_desc")}</p>
+            <h4 className="font-display font-semibold text-sm mb-4 text-primary">{t("footer.stay_connected")}</h4>
+            <p className="text-sm text-accent-foreground/50 mb-3">{t("footer.subscribe_desc")}</p>
             <div className="flex gap-2">
               <Input 
                 type="email" 
                 placeholder="Your email" 
-                className="bg-muted/10 border-muted-foreground/30 text-sm h-10 rounded-xl"
+                className="bg-accent-foreground/5 border-primary/15 text-sm h-10 rounded-xl text-accent-foreground placeholder:text-accent-foreground/30"
               />
-              <Button size="sm" className="h-10 rounded-xl px-4">
+              <Button size="sm" className="h-10 rounded-xl px-4 btn-gold">
                 {t("footer.subscribe")}
               </Button>
             </div>
-            {/* Social Links */}
             <div className="flex gap-3 mt-5">
               {!isLoading && socialLinks.length > 0 ? (
                 socialLinks.map((setting) => (
@@ -137,14 +123,14 @@ const Footer = () => {
                     href={getSocialUrl(setting)} 
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-xl bg-card/10 border border-muted-foreground/20 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
+                    className="w-9 h-9 rounded-xl bg-primary/5 border border-primary/15 flex items-center justify-center text-accent-foreground/50 hover:text-primary hover:border-primary/40 transition-all"
                   >
                     {socialIconMap[setting.setting_key]}
                   </a>
                 ))
               ) : (
                 [Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
-                  <a key={i} href="#" className="w-9 h-9 rounded-xl bg-card/10 border border-muted-foreground/20 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all">
+                  <a key={i} href="#" className="w-9 h-9 rounded-xl bg-primary/5 border border-primary/15 flex items-center justify-center text-accent-foreground/50 hover:text-primary hover:border-primary/40 transition-all">
                     <Icon size={18} />
                   </a>
                 ))
@@ -155,11 +141,11 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-muted-foreground/20">
+      <div className="border-t border-primary/10">
         <div className="container mx-auto py-5 flex items-center justify-between">
-          <img src="/fanzoon-icon.png" alt="FANZOON" className="h-8 w-8 object-contain opacity-80" />
-          <p className="text-xs text-muted-foreground">
-            © 2026 FANZOON. All rights reserved.
+          <img src="/fanzoon-icon.png" alt="FANZON" className="h-8 w-8 object-contain opacity-80" />
+          <p className="text-xs text-accent-foreground/40">
+            © 2026 FANZON. All rights reserved.
           </p>
         </div>
       </div>

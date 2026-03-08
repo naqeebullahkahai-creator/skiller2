@@ -46,12 +46,12 @@ const MainHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-card/98 backdrop-blur-2xl border-b border-border/50 shadow-sm">
+    <header className="sticky top-0 z-50 bg-accent/98 backdrop-blur-2xl border-b border-primary/10 shadow-sm">
       <div className="container mx-auto">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-foreground p-2 hover:bg-muted rounded-xl transition-colors"
+            className="md:hidden text-accent-foreground p-2 hover:bg-accent-foreground/10 rounded-xl transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -59,15 +59,15 @@ const MainHeader = () => {
 
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <FanzonLogo size="md" textClassName="text-foreground" />
+            <FanzonLogo size="md" />
           </Link>
 
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-2xl relative">
-            <form onSubmit={handleSearch} className="flex w-full bg-secondary rounded-xl overflow-hidden border border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+            <form onSubmit={handleSearch} className="flex w-full bg-accent-foreground/5 rounded-xl overflow-hidden border border-primary/15 focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:bg-muted border-r border-border whitespace-nowrap transition-colors duration-200">
+                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-accent-foreground/60 hover:bg-accent-foreground/5 border-r border-primary/10 whitespace-nowrap transition-colors duration-200">
                     {selectedCategory}
                     <ChevronDown size={14} />
                   </button>
@@ -93,7 +93,7 @@ const MainHeader = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
-                className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
+                className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none text-accent-foreground placeholder:text-accent-foreground/40"
               />
               <VoiceSearchButton
                 onResult={(text) => {
@@ -103,14 +103,14 @@ const MainHeader = () => {
                 size={18}
               />
               <Button 
-                type="submit"
-                className="rounded-none px-6 bg-primary hover:bg-primary/90 transition-colors duration-200"
-              >
-                <Search size={18} />
+                 type="submit"
+                 className="rounded-none px-6 btn-gold"
+               >
+                 <Search size={18} />
               </Button>
             </form>
             <div className="flex items-center ml-2">
-              <QRCodeScanner className="text-muted-foreground hover:text-primary hover:bg-muted rounded-xl" />
+              <QRCodeScanner className="text-accent-foreground/50 hover:text-primary hover:bg-accent-foreground/5 rounded-xl" />
             </div>
             <SearchSuggestions
               query={searchQuery}
@@ -130,7 +130,7 @@ const MainHeader = () => {
             {isAuthenticated && role === "customer" && (
               <Link
                 to="/account/wallet"
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-xl text-primary font-semibold transition-colors"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-xl text-primary font-semibold transition-colors border border-primary/15"
                 title="Wallet"
               >
                 <Wallet size={16} />
@@ -147,12 +147,12 @@ const MainHeader = () => {
             {isAuthenticated && (
               <Link 
                 to="/account/messages" 
-                className="hidden md:flex relative p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-xl transition-colors"
+                className="hidden md:flex relative p-2 text-accent-foreground/50 hover:text-primary hover:bg-accent-foreground/5 rounded-xl transition-colors"
                 title="Messages"
               >
                 <MessageCircle size={20} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-accent text-accent-foreground text-[10px] font-bold rounded-full px-1">
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-primary text-primary-foreground text-[10px] font-bold rounded-full px-1">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
@@ -172,7 +172,7 @@ const MainHeader = () => {
 
         {/* Mobile Search Bar */}
         <div className="md:hidden pb-3 px-1">
-          <form onSubmit={handleSearch} className="flex w-full bg-secondary rounded-xl overflow-hidden border border-border">
+          <form onSubmit={handleSearch} className="flex w-full bg-accent-foreground/5 rounded-xl overflow-hidden border border-primary/15">
             <Input
               type="text"
               placeholder={t("search.placeholder")}
@@ -189,7 +189,7 @@ const MainHeader = () => {
 
       {/* Mobile Menu Dropdown */}
       <div
-        className={`md:hidden bg-card border-t border-border overflow-hidden transition-all duration-300 ease-out ${
+        className={`md:hidden bg-accent border-t border-primary/10 overflow-hidden transition-all duration-300 ease-out ${
           isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
