@@ -60,6 +60,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import MobileHeader from "@/components/layout/MobileHeader";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 
 const addressSchema = z.object({
   full_name: z.string().min(3, "Full name must be at least 3 characters").max(100),
