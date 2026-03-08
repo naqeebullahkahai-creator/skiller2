@@ -54,6 +54,7 @@ const AdminFinanceManagement = () => {
   ];
 
   const quickActions: QuickActionProps[] = [
+    { icon: <Store className="w-5 h-5 text-white" />, title: "Admin Store", description: "Your personal marketplace store", href: "/admin/store", color: "bg-emerald-500" },
     { icon: <Wallet className="w-5 h-5 text-white" />, title: "Admin Wallet", description: "Platform earnings & balance", href: "/admin/wallet", color: "bg-violet-500" },
     { icon: <Percent className="w-5 h-5 text-white" />, title: "Commission Wallet", description: "Per-product commission earnings", href: "/admin/commission-wallet", color: "bg-amber-500" },
     { icon: <CreditCard className="w-5 h-5 text-white" />, title: "Subscription Wallet", description: "Subscription fee earnings & status", href: "/admin/subscription-wallet", color: "bg-blue-500" },
