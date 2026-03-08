@@ -386,6 +386,7 @@ const App = () => (
                             <Route path="dashboard" element={<AgentDashboardHome />} />
                             <Route path="chats" element={<AgentChatsPage />} />
                             <Route path="earnings" element={<AgentEarningsPage />} />
+                            <Route path="performance" element={<AgentPerformancePage />} />
                             <Route path="settings" element={<AgentSettingsPage />} />
                           </Route>
 
