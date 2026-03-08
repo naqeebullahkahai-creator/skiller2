@@ -21,18 +21,18 @@ const MobileHeader = () => {
         className="sticky top-0 z-50 safe-area-top transition-transform duration-300 will-change-transform"
         style={{ transform: hidden ? "translateY(-100%)" : "translateY(0)" }}
       >
-        <div className="bg-accent px-4 pt-2 pb-3">
+        <div className="bg-card border-b border-border px-4 pt-2 pb-3" style={{ boxShadow: 'var(--shadow-2)' }}>
           {/* Top row: Logo + Cart */}
           <div className="flex items-center justify-between mb-2">
             <Link to="/" className="flex items-center gap-2">
               <img src="/fanzoon-icon.png" alt="FANZON" className="h-8 w-8 object-contain" />
-              <span className="font-display font-bold text-primary text-lg tracking-tight">FANZON</span>
+              <span className="font-bold text-foreground text-lg tracking-tight">FANZON</span>
             </Link>
 
             <div className="flex items-center gap-0.5">
               <Link
                 to="/checkout"
-                className="relative p-2.5 text-accent-foreground/80 active:scale-90 transition-transform touch-target flex items-center justify-center"
+                className="relative p-2.5 text-foreground/70 active:scale-90 transition-transform touch-target flex items-center justify-center"
               >
                 <ShoppingCart size={22} />
                 {cartCount > 0 && (
@@ -45,7 +45,7 @@ const MobileHeader = () => {
               {isAuthenticated && (
                 <Link
                   to="/account/notifications"
-                  className="p-2.5 text-accent-foreground/80 active:scale-90 transition-transform touch-target flex items-center justify-center"
+                  className="p-2.5 text-foreground/70 active:scale-90 transition-transform touch-target flex items-center justify-center"
                 >
                   <Bell size={22} />
                 </Link>
@@ -56,10 +56,10 @@ const MobileHeader = () => {
           {/* Search bar */}
           <button
             onClick={() => setSearchOpen(true)}
-            className="w-full flex items-center gap-3 h-10 px-4 bg-accent-foreground/10 backdrop-blur-sm rounded-lg text-accent-foreground/50 active:scale-[0.99] transition-all border border-accent-foreground/10"
+            className="w-full flex items-center gap-3 h-10 px-4 bg-secondary rounded-lg text-muted-foreground active:scale-[0.99] transition-all border border-border"
           >
-            <Search size={18} className="text-accent-foreground/40" />
-            <span className="text-accent-foreground/40 text-[13px]">{t("search.placeholder")}</span>
+            <Search size={18} className="text-muted-foreground/60" />
+            <span className="text-muted-foreground/60 text-[13px]">{t("search.placeholder")}</span>
           </button>
         </div>
       </header>

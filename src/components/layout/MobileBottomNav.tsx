@@ -34,7 +34,7 @@ const MobileBottomNav = () => {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom">
-      <div className="bg-accent border-t border-primary/10" style={{ boxShadow: '0 -2px 16px rgba(0,0,0,0.2)' }}>
+      <div className="bg-card border-t border-border" style={{ boxShadow: '0 -1px 8px rgba(0,0,0,0.06)' }}>
         <div className="flex items-center justify-around h-14 max-w-[100vw]">
           {navItems.map((item) => {
             const active = isActive(item.path);
@@ -51,7 +51,7 @@ const MobileBottomNav = () => {
                 )}
               >
                 {isCartCenter ? (
-                  <div className="relative -mt-5 w-[52px] h-[52px] rounded-full bg-primary flex items-center justify-center border-[3px] border-accent elevation-3">
+                  <div className="relative -mt-5 w-[52px] h-[52px] rounded-full bg-primary flex items-center justify-center border-[3px] border-card elevation-3">
                     <item.icon size={22} className="text-primary-foreground" />
                     {cartCount > 0 && (
                       <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full px-1">
@@ -66,7 +66,7 @@ const MobileBottomNav = () => {
                       strokeWidth={active ? 2.5 : 1.8}
                       className={cn(
                         "transition-colors duration-150",
-                        active ? "text-primary" : "text-accent-foreground/50"
+                        active ? "text-primary" : "text-muted-foreground"
                       )}
                     />
                   </div>
@@ -74,7 +74,7 @@ const MobileBottomNav = () => {
                 <span className={cn(
                   "text-[10px] font-medium transition-colors duration-150",
                   isCartCenter ? "mt-0.5" : "mt-1",
-                  active ? "text-primary font-semibold" : "text-accent-foreground/50"
+                  active ? "text-primary font-semibold" : "text-muted-foreground"
                 )}>
                   {item.label}
                 </span>
