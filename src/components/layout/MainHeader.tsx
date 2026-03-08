@@ -93,7 +93,7 @@ const MainHeader = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
-                className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none text-accent-foreground placeholder:text-accent-foreground/40"
+                className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
               />
               <VoiceSearchButton
                 onResult={(text) => {
