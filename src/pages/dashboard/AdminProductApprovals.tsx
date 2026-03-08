@@ -328,17 +328,72 @@ const AdminProductApprovals = () => {
           setActionType(null);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {actionType === "approve" ? "Approve Product?" : "Reject Product?"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {actionType === "approve"
-                ? "This product will be published and visible to all customers on the marketplace."
-                : "This product will be rejected and the seller will be notified. It won't be visible on the marketplace."}
+                ? "Set commission for this product before approving."
+                : "This product will be rejected and the seller will be notified."}
             </AlertDialogDescription>
           </AlertDialogHeader>
+
+          {/* Commission Fields - only show on approve */}
+          {actionType === "approve" && (
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1.5">
+                  <Percent size={14} />
+                  Commission Type
+                </Label>
+                <Select
+                  value={commissionType}
+                  onValueChange={(v) => setCommissionType(v as "percentage" | "fixed")}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="percentage">Percentage (%)</SelectItem>
+                    <SelectItem value="fixed">Fixed Amount (Rs.)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1.5">
+                  {commissionType === "percentage" ? <Percent size={14} /> : <DollarSign size={14} />}
+                  Commission {commissionType === "percentage" ? "Rate" : "Amount"}
+                </Label>
+                <div className="relative">
+                  <Input
+                    type="number"
+                    value={commissionValue}
+                    onChange={(e) => setCommissionValue(parseFloat(e.target.value) || 0)}
+                    min={0}
+                    max={commissionType === "percentage" ? 100 : 100000}
+                    step={commissionType === "percentage" ? 0.5 : 10}
+                    className="pr-10"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                    {commissionType === "percentage" ? "%" : "Rs."}
+                  </span>
+                </div>
+              </div>
+              {/* Preview */}
+              <div className="p-3 rounded-lg bg-muted text-sm">
+                <p className="text-muted-foreground">Preview on Rs. 10,000 sale:</p>
+                <p className="font-semibold text-primary">
+                  Commission: {commissionType === "percentage"
+                    ? `Rs. ${(10000 * commissionValue / 100).toLocaleString()}`
+                    : `Rs. ${commissionValue.toLocaleString()}`
+                  }
+                </p>
+              </div>
+            </div>
+          )}
+
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isProcessing}>Cancel</AlertDialogCancel>
             <AlertDialogAction
@@ -351,7 +406,7 @@ const AdminProductApprovals = () => {
               }
             >
               {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {actionType === "approve" ? "Yes, Approve" : "Yes, Reject"}
+              {actionType === "approve" ? "Approve & Set Commission" : "Yes, Reject"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
