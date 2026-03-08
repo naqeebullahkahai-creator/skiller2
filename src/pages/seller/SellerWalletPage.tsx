@@ -129,10 +129,10 @@ const SellerWalletPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       <div>
-        <h1 className="text-2xl font-bold">Seller Wallet</h1>
-        <p className="text-muted-foreground">Manage your earnings, payouts & subscription</p>
+        <h1 className="text-xl md:text-2xl font-bold">Seller Wallet</h1>
+        <p className="text-sm text-muted-foreground">Manage your earnings, payouts & subscription</p>
       </div>
 
       {/* Subscription Card */}
