@@ -59,7 +59,7 @@ const MainHeader = () => {
 
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <FanzonLogo size="md" textClassName="text-foreground" />
+            <FanzonLogo size="md" />
           </Link>
 
           {/* Search Bar - Desktop */}
