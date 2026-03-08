@@ -432,9 +432,9 @@ const Checkout = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={cn("grid gap-6", isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-3")}>
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className={isMobile ? "" : "lg:col-span-2"}>
             {/* Step 1: Shipping Address */}
             {step === 1 && (
               <div className="space-y-4">
