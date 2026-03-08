@@ -801,6 +801,87 @@ export type Database = {
           },
         ]
       }
+      commission_transactions: {
+        Row: {
+          commission_amount: number
+          commission_type: string
+          commission_value: number
+          created_at: string
+          id: string
+          order_id: string | null
+          product_id: string | null
+          product_title: string | null
+          sale_amount: number
+          seller_id: string
+          seller_name: string | null
+        }
+        Insert: {
+          commission_amount: number
+          commission_type: string
+          commission_value: number
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          product_title?: string | null
+          sale_amount: number
+          seller_id: string
+          seller_name?: string | null
+        }
+        Update: {
+          commission_amount?: number
+          commission_type?: string
+          commission_value?: number
+          created_at?: string
+          id?: string
+          order_id?: string | null
+          product_id?: string | null
+          product_title?: string | null
+          sale_amount?: number
+          seller_id?: string
+          seller_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commission_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commission_transactions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commission_wallet: {
+        Row: {
+          created_at: string
+          id: string
+          total_balance: number
+          total_earned: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          total_balance?: number
+          total_earned?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          total_balance?: number
+          total_earned?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
@@ -2026,6 +2107,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      product_commissions: {
+        Row: {
+          commission_type: string
+          commission_value: number
+          created_at: string
+          id: string
+          product_id: string
+          seller_id: string
+          set_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          commission_type?: string
+          commission_value?: number
+          created_at?: string
+          id?: string
+          product_id: string
+          seller_id: string
+          set_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commission_type?: string
+          commission_value?: number
+          created_at?: string
+          id?: string
+          product_id?: string
+          seller_id?: string
+          set_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_commissions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_questions: {
         Row: {
@@ -3822,6 +3944,15 @@ export type Database = {
       }
       process_per_order_fee: {
         Args: { p_order_id: string; p_seller_id: string }
+        Returns: Json
+      }
+      process_product_commission: {
+        Args: {
+          p_order_id: string
+          p_product_id: string
+          p_sale_amount: number
+          p_seller_id: string
+        }
         Returns: Json
       }
       process_refund_deduction: {
