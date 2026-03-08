@@ -110,7 +110,7 @@ const MainHeader = () => {
               </Button>
             </form>
             <div className="flex items-center ml-2">
-              <QRCodeScanner className="text-accent-foreground/50 hover:text-primary hover:bg-accent-foreground/5 rounded-xl" />
+              <QRCodeScanner className="text-muted-foreground hover:text-primary hover:bg-muted rounded-xl" />
             </div>
             <SearchSuggestions
               query={searchQuery}
