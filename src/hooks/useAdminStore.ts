@@ -89,7 +89,7 @@ export const useAdminStore = () => {
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .eq("is_admin_product", true)
+        .eq("is_admin_product" as any, true)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data || [];

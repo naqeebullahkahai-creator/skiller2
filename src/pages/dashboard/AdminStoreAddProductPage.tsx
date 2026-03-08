@@ -53,14 +53,14 @@ const AdminStoreAddProductPage = () => {
         price_pkr: parseFloat(form.price_pkr),
         compare_at_price_pkr: form.compare_at_price_pkr ? parseFloat(form.compare_at_price_pkr) : null,
         stock_count: parseInt(form.stock_count) || 0,
-        category_id: form.category_id || null,
+        category: form.category_id || "General",
         sku: form.sku || null,
         images: form.images,
         seller_id: user.id,
         is_admin_product: true,
         is_active: true,
         approval_status: "approved",
-      });
+      } as any);
       if (error) throw error;
       toast.success("Product added to your store!");
       navigate("/admin/store/products");

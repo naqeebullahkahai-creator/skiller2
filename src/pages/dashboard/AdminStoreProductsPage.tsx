@@ -28,7 +28,7 @@ const AdminStoreProductsPage = () => {
   const toggleActive = async (productId: string, currentActive: boolean) => {
     const { error } = await supabase
       .from("products")
-      .update({ is_active: !currentActive })
+      .update({ is_active: !currentActive } as any)
       .eq("id", productId);
     if (error) {
       toast.error("Failed to update product");
