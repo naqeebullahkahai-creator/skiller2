@@ -129,62 +129,62 @@ const SellerWalletPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       <div>
-        <h1 className="text-2xl font-bold">Seller Wallet</h1>
-        <p className="text-muted-foreground">Manage your earnings, payouts & subscription</p>
+        <h1 className="text-xl md:text-2xl font-bold">Seller Wallet</h1>
+        <p className="text-sm text-muted-foreground">Manage your earnings, payouts & subscription</p>
       </div>
 
       {/* Subscription Card */}
       <SellerSubscriptionCard />
 
       {/* Earnings Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
         {/* Current Balance Card - Highlighted */}
-        <Card className="md:col-span-2 bg-gradient-to-br from-green-500 to-green-600 text-white">
-          <CardContent className="pt-6">
+        <Card className="col-span-2 bg-gradient-to-br from-green-500 to-green-600 text-white">
+          <CardContent className="pt-5 pb-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-green-100 text-sm">Current Balance</p>
-                <p className="text-3xl font-bold mt-1">
+                <p className="text-green-100 text-xs">Current Balance</p>
+                <p className="text-2xl md:text-3xl font-bold mt-1">
                   {formatPKR(wallet?.current_balance || 0)}
                 </p>
-                <div className="flex items-center gap-1 mt-2 text-green-100">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm">Available for withdrawal</span>
+                <div className="flex items-center gap-1 mt-1.5 text-green-100">
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  <span className="text-xs">Available for withdrawal</span>
                 </div>
               </div>
-              <div className="p-3 bg-white/20 rounded-lg">
-                <Wallet className="w-8 h-8" />
+              <div className="p-2.5 bg-white/20 rounded-lg">
+                <Wallet className="w-6 h-6" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Earnings</p>
-                <p className="text-2xl font-bold text-green-500">
+                <p className="text-xs text-muted-foreground">Total Earnings</p>
+                <p className="text-lg md:text-2xl font-bold text-green-500">
                   {formatPKR(wallet?.total_earnings || 0)}
                 </p>
               </div>
-              <TrendingUp className="w-8 h-8 text-green-500" />
+              <TrendingUp className="w-6 h-6 text-green-500 hidden md:block" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Withdrawn</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs text-muted-foreground">Total Withdrawn</p>
+                <p className="text-lg md:text-2xl font-bold">
                   {formatPKR(wallet?.total_withdrawn || 0)}
                 </p>
               </div>
-              <ArrowDownToLine className="w-8 h-8 text-muted-foreground" />
+              <ArrowDownToLine className="w-6 h-6 text-muted-foreground hidden md:block" />
             </div>
           </CardContent>
         </Card>
@@ -223,98 +223,124 @@ const SellerWalletPage = () => {
       {/* Payout Requests */}
       {payoutRequests && payoutRequests.length > 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle>Payout Requests</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Payout Requests</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Bank</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Reference</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payoutRequests.map((payout) => (
-                  <TableRow key={payout.id}>
-                    <TableCell>
-                      {new Date(payout.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatPKR(payout.amount)}
-                    </TableCell>
-                    <TableCell>{payout.bank_name}</TableCell>
-                    <TableCell>{getPayoutStatusBadge(payout.status)}</TableCell>
-                    <TableCell>
-                      {payout.transaction_reference || "-"}
-                    </TableCell>
+            {/* Desktop Table */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Bank</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Reference</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {payoutRequests.map((payout) => (
+                    <TableRow key={payout.id}>
+                      <TableCell>{new Date(payout.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="font-medium">{formatPKR(payout.amount)}</TableCell>
+                      <TableCell>{payout.bank_name}</TableCell>
+                      <TableCell>{getPayoutStatusBadge(payout.status)}</TableCell>
+                      <TableCell>{payout.transaction_reference || "-"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-2">
+              {payoutRequests.map((payout) => (
+                <div key={payout.id} className="p-3 rounded-lg border bg-muted/30">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-semibold text-sm">{formatPKR(payout.amount)}</span>
+                    {getPayoutStatusBadge(payout.status)}
+                  </div>
+                  <div className="text-xs text-muted-foreground space-y-0.5">
+                    <p>{payout.bank_name}</p>
+                    <p>{new Date(payout.created_at).toLocaleDateString()}</p>
+                    {payout.transaction_reference && <p className="font-mono">Ref: {payout.transaction_reference}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Transaction History */}
       <Card>
-        <CardHeader>
-          <CardTitle>Transaction History</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Transaction History</CardTitle>
         </CardHeader>
         <CardContent>
           {transactions && transactions.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Order ID</TableHead>
-                  <TableHead className="text-right">Gross Amount</TableHead>
-                  <TableHead className="text-right">Commission</TableHead>
-                  <TableHead className="text-right">Net Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <>
+              {/* Desktop Table */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Order ID</TableHead>
+                      <TableHead className="text-right">Gross</TableHead>
+                      <TableHead className="text-right">Commission</TableHead>
+                      <TableHead className="text-right">Net</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((txn) => (
+                      <TableRow key={txn.id}>
+                        <TableCell>{new Date(txn.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {getTransactionIcon(txn.transaction_type)}
+                            <span className="capitalize">{txn.transaction_type.replace('_', ' ')}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{txn.order_id ? txn.order_id.slice(0, 8) : "-"}</TableCell>
+                        <TableCell className="text-right">{formatPKR(txn.gross_amount)}</TableCell>
+                        <TableCell className="text-right text-muted-foreground">
+                          {txn.commission_amount > 0 ? `${formatPKR(txn.commission_amount)} (${txn.commission_percentage}%)` : "-"}
+                        </TableCell>
+                        <TableCell className={cn("text-right font-medium", txn.net_amount >= 0 ? "text-green-500" : "text-destructive")}>
+                          {txn.net_amount >= 0 ? "+" : ""}{formatPKR(Math.abs(txn.net_amount))}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {/* Mobile Cards */}
+              <div className="md:hidden space-y-2">
                 {transactions.map((txn) => (
-                  <TableRow key={txn.id}>
-                    <TableCell>
-                      {new Date(txn.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
+                  <div key={txn.id} className="p-3 rounded-lg border bg-muted/30">
+                    <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         {getTransactionIcon(txn.transaction_type)}
-                        <span className="capitalize">
-                          {txn.transaction_type.replace('_', ' ')}
-                        </span>
+                        <span className="text-sm font-medium capitalize">{txn.transaction_type.replace('_', ' ')}</span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {txn.order_id ? txn.order_id.slice(0, 8) : "-"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {formatPKR(txn.gross_amount)}
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      {txn.commission_amount > 0 
-                        ? `${formatPKR(txn.commission_amount)} (${txn.commission_percentage}%)`
-                        : "-"
-                      }
-                    </TableCell>
-                    <TableCell className={cn(
-                      "text-right font-medium",
-                      txn.net_amount >= 0 ? "text-green-500" : "text-destructive"
-                    )}>
-                      {txn.net_amount >= 0 ? "+" : ""}{formatPKR(Math.abs(txn.net_amount))}
-                    </TableCell>
-                  </TableRow>
+                      <span className={cn("text-sm font-bold", txn.net_amount >= 0 ? "text-green-500" : "text-destructive")}>
+                        {txn.net_amount >= 0 ? "+" : ""}{formatPKR(Math.abs(txn.net_amount))}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground flex items-center justify-between">
+                      <span>{new Date(txn.created_at).toLocaleDateString()}</span>
+                      {txn.commission_amount > 0 && (
+                        <span>Commission: {txn.commission_percentage}%</span>
+                      )}
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-muted-foreground text-sm">
               No transactions yet. Earnings will appear here after orders are delivered.
             </div>
           )}

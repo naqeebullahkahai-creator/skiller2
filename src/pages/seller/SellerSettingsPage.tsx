@@ -152,35 +152,35 @@ const SellerSettingsPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 overflow-x-hidden">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Seller Settings</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">Seller Settings</h1>
+        <p className="text-sm text-muted-foreground">
           Manage your store profile, contact info, and bank details
         </p>
       </div>
 
-      <Tabs defaultValue="store" className="space-y-6">
-        <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
-          <TabsTrigger value="store" className="gap-2">
-            <Store size={16} />
+      <Tabs defaultValue="store" className="space-y-5">
+        <TabsList className="bg-muted/50 w-full overflow-x-auto no-scrollbar flex h-auto gap-0.5 p-1">
+          <TabsTrigger value="store" className="gap-1.5 text-xs md:text-sm px-2.5 md:px-3">
+            <Store size={14} />
             Store
           </TabsTrigger>
-          <TabsTrigger value="contact" className="gap-2">
-            <Phone size={16} />
+          <TabsTrigger value="contact" className="gap-1.5 text-xs md:text-sm px-2.5 md:px-3">
+            <Phone size={14} />
             Contact
           </TabsTrigger>
-          <TabsTrigger value="bank" className="gap-2">
-            <CreditCard size={16} />
+          <TabsTrigger value="bank" className="gap-1.5 text-xs md:text-sm px-2.5 md:px-3">
+            <CreditCard size={14} />
             Bank
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell size={16} />
-            Notifications
+          <TabsTrigger value="notifications" className="gap-1.5 text-xs md:text-sm px-2.5 md:px-3">
+            <Bell size={14} />
+            Alerts
           </TabsTrigger>
-          <TabsTrigger value="security" className="gap-2">
-            <Lock size={16} />
+          <TabsTrigger value="security" className="gap-1.5 text-xs md:text-sm px-2.5 md:px-3">
+            <Lock size={14} />
             Security
           </TabsTrigger>
         </TabsList>
