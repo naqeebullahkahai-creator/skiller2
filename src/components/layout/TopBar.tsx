@@ -1,7 +1,6 @@
 import { Download, HelpCircle, Store, LayoutDashboard, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
-import ThemeToggle from "@/components/theme/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 
