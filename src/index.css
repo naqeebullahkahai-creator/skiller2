@@ -254,8 +254,25 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-  * { scrollbar-width: none; -ms-overflow-style: none; }
-  *::-webkit-scrollbar { display: none; }
+  /* Luxury thin scrollbar — gold accent */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(43 74% 49% / 0.3) transparent;
+  }
+  *::-webkit-scrollbar { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: hsl(43 74% 49% / 0.25);
+    border-radius: 10px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: hsl(43 74% 49% / 0.45);
+  }
+  /* Hide scrollbar on mobile for native feel */
+  @media (max-width: 767px) {
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    *::-webkit-scrollbar { display: none; }
+  }
 
   .touch-target { min-height: 44px; min-width: 44px; }
 
