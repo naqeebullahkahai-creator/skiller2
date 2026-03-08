@@ -120,6 +120,11 @@ import AdminFinanceManagement from "./pages/dashboard/AdminFinanceManagement";
 import AdminMarketingManagement from "./pages/dashboard/AdminMarketingManagement";
 import AdminContentManagement from "./pages/dashboard/AdminContentManagement";
 import AdminSecurityManagement from "./pages/dashboard/AdminSecurityManagement";
+import AdminStorePage from "./pages/dashboard/AdminStorePage";
+import AdminStoreProductsPage from "./pages/dashboard/AdminStoreProductsPage";
+import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
+import AdminStoreOrdersPage from "./pages/dashboard/AdminStoreOrdersPage";
+import AdminStoreAddProductPage from "./pages/dashboard/AdminStoreAddProductPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
