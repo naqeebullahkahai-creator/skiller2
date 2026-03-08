@@ -223,38 +223,51 @@ const SellerWalletPage = () => {
       {/* Payout Requests */}
       {payoutRequests && payoutRequests.length > 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle>Payout Requests</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Payout Requests</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Bank</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Reference</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payoutRequests.map((payout) => (
-                  <TableRow key={payout.id}>
-                    <TableCell>
-                      {new Date(payout.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatPKR(payout.amount)}
-                    </TableCell>
-                    <TableCell>{payout.bank_name}</TableCell>
-                    <TableCell>{getPayoutStatusBadge(payout.status)}</TableCell>
-                    <TableCell>
-                      {payout.transaction_reference || "-"}
-                    </TableCell>
+            {/* Desktop Table */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Bank</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Reference</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {payoutRequests.map((payout) => (
+                    <TableRow key={payout.id}>
+                      <TableCell>{new Date(payout.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="font-medium">{formatPKR(payout.amount)}</TableCell>
+                      <TableCell>{payout.bank_name}</TableCell>
+                      <TableCell>{getPayoutStatusBadge(payout.status)}</TableCell>
+                      <TableCell>{payout.transaction_reference || "-"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-2">
+              {payoutRequests.map((payout) => (
+                <div key={payout.id} className="p-3 rounded-lg border bg-muted/30">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-semibold text-sm">{formatPKR(payout.amount)}</span>
+                    {getPayoutStatusBadge(payout.status)}
+                  </div>
+                  <div className="text-xs text-muted-foreground space-y-0.5">
+                    <p>{payout.bank_name}</p>
+                    <p>{new Date(payout.created_at).toLocaleDateString()}</p>
+                    {payout.transaction_reference && <p className="font-mono">Ref: {payout.transaction_reference}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
