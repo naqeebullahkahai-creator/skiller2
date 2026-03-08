@@ -15,7 +15,7 @@ import { toast } from "sonner";
 const AdminStoreAddProductPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { categories } = useCategories();
+  const { data: categories } = useCategories();
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     title: "",
