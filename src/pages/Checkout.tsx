@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -60,6 +59,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import MobileHeader from "@/components/layout/MobileHeader";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 
 const addressSchema = z.object({
   full_name: z.string().min(3, "Full name must be at least 3 characters").max(100),
@@ -109,6 +111,7 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
+  const isMobile = useIsMobile();
 
   // COD-only mode check
   const { data: codOnlySetting } = useQuery({
@@ -163,13 +166,14 @@ const Checkout = () => {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <Header />
+        {isMobile ? <MobileHeader /> : <Header />}
         <main className="flex-1 container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
           <p className="text-muted-foreground mb-6">Add some products to proceed to checkout.</p>
           <Button onClick={() => navigate("/products")}>Continue Shopping</Button>
         </main>
-        <Footer />
+        {!isMobile && <Footer />}
+        {isMobile && <MobileBottomNav />}
       </div>
     );
   }
@@ -384,20 +388,24 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
+      {isMobile ? <MobileHeader /> : <Header />}
 
-      <main className="flex-1 container mx-auto px-4 py-6 pb-24 md:pb-6 overflow-x-hidden">
-        <h1 className="text-xl md:text-2xl font-bold mb-6">Checkout</h1>
+      <main className={cn(
+        "flex-1 overflow-x-hidden",
+        isMobile ? "px-3 py-4 pb-40" : "container mx-auto px-4 py-6 pb-6"
+      )}>
+        {!isMobile && <h1 className="text-2xl font-bold mb-6">Checkout</h1>}
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-8">
+        {/* Progress Steps - Compact on mobile */}
+        <div className={cn("flex items-center justify-center", isMobile ? "mb-4" : "mb-8")}>
           {steps.map((s, index) => (
             <div key={s.number} className="flex items-center">
               <button
                 onClick={() => s.number < step && setStep(s.number)}
                 disabled={s.number > step}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full transition-colors",
+                  "flex items-center gap-1.5 rounded-full transition-colors",
+                  isMobile ? "px-3 py-1.5 text-xs" : "px-4 py-2 gap-2",
                   step >= s.number
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground",
@@ -405,16 +413,17 @@ const Checkout = () => {
                 )}
               >
                 {step > s.number ? (
-                  <Check size={18} />
+                  <Check size={isMobile ? 14 : 18} />
                 ) : (
-                  <s.icon size={18} />
+                  <s.icon size={isMobile ? 14 : 18} />
                 )}
-                <span className="font-medium hidden sm:inline">{s.title}</span>
+                <span className="font-medium">{s.title}</span>
               </button>
               {index < steps.length - 1 && (
                 <div
                   className={cn(
-                    "w-8 md:w-16 h-0.5 mx-2",
+                    "h-0.5 mx-1.5",
+                    isMobile ? "w-6" : "w-8 md:w-16 mx-2",
                     step > s.number ? "bg-primary" : "bg-muted"
                   )}
                 />
@@ -423,9 +432,9 @@ const Checkout = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={cn("grid gap-6", isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-3")}>
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className={isMobile ? "" : "lg:col-span-2"}>
             {/* Step 1: Shipping Address */}
             {step === 1 && (
               <div className="space-y-4">
@@ -558,14 +567,16 @@ const Checkout = () => {
                   </div>
                 )}
 
-                <Button
-                  onClick={handleContinueToPayment}
-                  disabled={!selectedAddressId}
-                  className="w-full"
-                >
-                  Continue to Payment
-                  <ChevronRight size={18} className="ml-2" />
-                </Button>
+                {!isMobile && (
+                  <Button
+                    onClick={handleContinueToPayment}
+                    disabled={!selectedAddressId}
+                    className="w-full"
+                  >
+                    Continue to Payment
+                    <ChevronRight size={18} className="ml-2" />
+                  </Button>
+                )}
               </div>
             )}
 
@@ -602,16 +613,18 @@ const Checkout = () => {
                   ))}
                 </RadioGroup>
 
-                <div className="flex gap-3 mt-6">
-                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
-                    <ChevronLeft size={18} className="mr-2" />
-                    Back
-                  </Button>
-                  <Button onClick={() => setStep(3)} className="flex-1">
-                    Review Order
-                    <ChevronRight size={18} className="ml-2" />
-                  </Button>
-                </div>
+                {!isMobile && (
+                  <div className="flex gap-3 mt-6">
+                    <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                      <ChevronLeft size={18} className="mr-2" />
+                      Back
+                    </Button>
+                    <Button onClick={() => setStep(3)} className="flex-1">
+                      Review Order
+                      <ChevronRight size={18} className="ml-2" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -712,81 +725,141 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
-                    <ChevronLeft size={18} className="mr-2" />
-                    Back
+                {!isMobile && (
+                  <div className="flex gap-3">
+                    <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                      <ChevronLeft size={18} className="mr-2" />
+                      Back
+                    </Button>
+                    <Button
+                      onClick={handlePlaceOrder}
+                      disabled={isSubmitting}
+                      className="flex-1"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={18} className="mr-2 animate-spin" />
+                          Placing Order...
+                        </>
+                      ) : (
+                        "Place Order"
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Order Summary Sidebar - Desktop only */}
+          {!isMobile && (
+            <div className="lg:col-span-1">
+              <div className="bg-card border border-border rounded-lg p-6 sticky top-24">
+                <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+
+                <div className="space-y-3 mb-4">
+                  {items.slice(0, 3).map((item) => {
+                    const price = item.product.discount_price_pkr || item.product.price_pkr;
+                    return (
+                      <div key={item.product.id} className="flex justify-between text-sm">
+                        <span className="text-muted-foreground line-clamp-1 flex-1 mr-2">
+                          {item.product.title} × {item.quantity}
+                        </span>
+                        <span>{formatPKR(price * item.quantity)}</span>
+                      </div>
+                    );
+                  })}
+                  {items.length > 3 && (
+                    <p className="text-sm text-muted-foreground">
+                      +{items.length - 3} more items
+                    </p>
+                  )}
+                </div>
+
+                <div className="border-t border-border pt-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>{formatPKR(getSubtotal())}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Shipping</span>
+                    <span>{formatPKR(SHIPPING_FEE)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
+                    <span>Total</span>
+                    <span className="text-primary">{formatPKR(getCartTotal())}</span>
+                  </div>
+                </div>
+
+                {selectedAddress && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-1">Deliver to:</p>
+                    <p className="text-sm font-medium">{selectedAddress.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{selectedAddress.city}, {selectedAddress.province}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Mobile Sticky Bottom Summary Bar */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.1)] safe-area-bottom">
+          <div className="px-4 py-3">
+            {/* Price row */}
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <p className="text-xs text-muted-foreground">{items.reduce((sum, i) => sum + i.quantity, 0)} items</p>
+                <p className="text-lg font-bold text-primary">{formatPKR(getCartTotal())}</p>
+              </div>
+              {step === 1 && (
+                <Button
+                  onClick={handleContinueToPayment}
+                  disabled={!selectedAddressId}
+                  className="h-12 px-6 text-base font-semibold"
+                >
+                  Continue
+                  <ChevronRight size={18} className="ml-1" />
+                </Button>
+              )}
+              {step === 2 && (
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setStep(1)}>
+                    <ChevronLeft size={16} />
+                  </Button>
+                  <Button onClick={() => setStep(3)} className="h-12 px-6 text-base font-semibold">
+                    Review
+                    <ChevronRight size={18} className="ml-1" />
+                  </Button>
+                </div>
+              )}
+              {step === 3 && (
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setStep(2)}>
+                    <ChevronLeft size={16} />
                   </Button>
                   <Button
                     onClick={handlePlaceOrder}
                     disabled={isSubmitting}
-                    className="flex-1"
+                    className="h-12 px-6 text-base font-semibold"
                   >
                     {isSubmitting ? (
                       <>
                         <Loader2 size={18} className="mr-2 animate-spin" />
-                        Placing Order...
+                        Placing...
                       </>
                     ) : (
                       "Place Order"
                     )}
                   </Button>
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-card border border-border rounded-lg p-6 sticky top-24">
-              <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
-
-              <div className="space-y-3 mb-4">
-                {items.slice(0, 3).map((item) => {
-                  const price = item.product.discount_price_pkr || item.product.price_pkr;
-                  return (
-                    <div key={item.product.id} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground line-clamp-1 flex-1 mr-2">
-                        {item.product.title} × {item.quantity}
-                      </span>
-                      <span>{formatPKR(price * item.quantity)}</span>
-                    </div>
-                  );
-                })}
-                {items.length > 3 && (
-                  <p className="text-sm text-muted-foreground">
-                    +{items.length - 3} more items
-                  </p>
-                )}
-              </div>
-
-              <div className="border-t border-border pt-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>{formatPKR(getSubtotal())}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{formatPKR(SHIPPING_FEE)}</span>
-                </div>
-                <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
-                  <span>Total</span>
-                  <span className="text-primary">{formatPKR(getCartTotal())}</span>
-                </div>
-              </div>
-
-              {/* Delivery Info */}
-              {selectedAddress && (
-                <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-xs text-muted-foreground mb-1">Deliver to:</p>
-                  <p className="text-sm font-medium">{selectedAddress.full_name}</p>
-                  <p className="text-xs text-muted-foreground">{selectedAddress.city}, {selectedAddress.province}</p>
-                </div>
               )}
             </div>
           </div>
         </div>
-      </main>
+      )}
 
       {/* Add Address Modal */}
       <Dialog open={showAddressModal} onOpenChange={setShowAddressModal}>
@@ -837,7 +910,7 @@ const Checkout = () => {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter recipient's full name" {...field} />
+                      <Input placeholder="Enter recipient's full name" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -851,7 +924,7 @@ const Checkout = () => {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="0300-1234567" {...field} />
+                      <Input placeholder="0300-1234567" inputMode="tel" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -873,7 +946,7 @@ const Checkout = () => {
                       value={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12">
                           <SelectValue placeholder="Select province" />
                         </SelectTrigger>
                       </FormControl>
@@ -902,7 +975,7 @@ const Checkout = () => {
                       disabled={!selectedProvince}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12">
                           <SelectValue placeholder="Select city" />
                         </SelectTrigger>
                       </FormControl>
@@ -926,7 +999,7 @@ const Checkout = () => {
                   <FormItem>
                     <FormLabel>Area / Sector (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., DHA Phase 5, Gulberg" {...field} />
+                      <Input placeholder="e.g., DHA Phase 5, Gulberg" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -942,6 +1015,7 @@ const Checkout = () => {
                     <FormControl>
                       <Input
                         placeholder="House/Flat No., Street, Landmark"
+                        className="h-12 text-base"
                         {...field}
                       />
                     </FormControl>
@@ -973,11 +1047,11 @@ const Checkout = () => {
                   type="button"
                   variant="outline"
                   onClick={() => setShowAddressModal(false)}
-                  className="flex-1"
+                  className="flex-1 h-12"
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1 h-12">
                   Save Address
                 </Button>
               </div>
@@ -986,8 +1060,7 @@ const Checkout = () => {
         </DialogContent>
       </Dialog>
 
-      <Footer />
-      <MobileBottomNav />
+      {!isMobile && <Footer />}
     </div>
   );
 };
