@@ -3337,6 +3337,66 @@ export type Database = {
           },
         ]
       }
+      subscription_fee_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          deduction_log_id: string | null
+          id: string
+          plan_type: string
+          seller_id: string
+          seller_name: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          deduction_log_id?: string | null
+          id?: string
+          plan_type: string
+          seller_id: string
+          seller_name?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          deduction_log_id?: string | null
+          id?: string
+          plan_type?: string
+          seller_id?: string
+          seller_name?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      subscription_fee_wallet: {
+        Row: {
+          created_at: string
+          id: string
+          total_balance: number
+          total_earned: number
+          total_sellers_paid: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          total_balance?: number
+          total_earned?: number
+          total_sellers_paid?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          total_balance?: number
+          total_earned?: number
+          total_sellers_paid?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       support_agent_profiles: {
         Row: {
           avatar_url: string | null
