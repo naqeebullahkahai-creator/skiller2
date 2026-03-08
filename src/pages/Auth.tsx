@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Crown } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,11 +42,8 @@ const Auth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      if (isSuperAdmin || role === "admin") {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (role === "seller") {
-        navigate("/seller/dashboard", { replace: true });
-      }
+      if (isSuperAdmin || role === "admin") navigate("/admin/dashboard", { replace: true });
+      else if (role === "seller") navigate("/seller/dashboard", { replace: true });
     }
   }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
 
@@ -58,19 +55,14 @@ const Auth = () => {
 
   const validateForm = () => {
     try {
-      if (mode === "login") {
-        loginSchema.parse({ email: formData.email, password: formData.password });
-      } else {
-        signupSchema.parse(formData);
-      }
+      if (mode === "login") loginSchema.parse({ email: formData.email, password: formData.password });
+      else signupSchema.parse(formData);
       setErrors({});
       return true;
     } catch (err) {
       if (err instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
-        err.errors.forEach((error) => {
-          if (error.path[0]) newErrors[error.path[0] as string] = error.message;
-        });
+        err.errors.forEach((error) => { if (error.path[0]) newErrors[error.path[0] as string] = error.message; });
         setErrors(newErrors);
       }
       return false;
@@ -80,41 +72,22 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
     setIsSubmitting(true);
     try {
       let result;
       if (mode === "login") {
         result = await login(formData.email, formData.password);
-        
         if (result.success) {
           const { data: { user } } = await supabase.auth.getUser();
-          
           if (user) {
-            const isSuperAdminUser = user.email === "alxteam001@gmail.com";
-            
-            if (isSuperAdminUser) {
+            if (user.email === "alxteam001@gmail.com") {
               toast({ title: "Welcome Admin!", description: "Redirecting to Admin Dashboard..." });
-              navigate("/admin/dashboard", { replace: true });
-              return;
+              navigate("/admin/dashboard", { replace: true }); return;
             }
-            
-            const { data: roleData } = await supabase
-              .from("user_roles").select("role").eq("user_id", user.id).maybeSingle();
-            
-            if (roleData?.role === "admin") {
-              toast({ title: "Welcome Admin!", description: "Redirecting to Admin Dashboard..." });
-              navigate("/admin/dashboard", { replace: true });
-              return;
-            }
-            
-            if (roleData?.role === "seller") {
-              toast({ title: "Redirecting to Seller Portal", description: "You have a seller account." });
-              navigate("/seller/dashboard", { replace: true });
-              return;
-            }
+            const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", user.id).maybeSingle();
+            if (roleData?.role === "admin") { toast({ title: "Welcome Admin!" }); navigate("/admin/dashboard", { replace: true }); return; }
+            if (roleData?.role === "seller") { toast({ title: "Seller Portal" }); navigate("/seller/dashboard", { replace: true }); return; }
           }
-          
           toast({ title: "Welcome back!", description: "You have successfully logged in." });
           navigate("/", { replace: true });
         } else {
@@ -122,9 +95,8 @@ const Auth = () => {
         }
       } else {
         result = await signup(formData.name, formData.email, formData.password, false);
-        
         if (result.success) {
-          toast({ title: "Account created!", description: "Your account has been created. Welcome to FANZON!" });
+          toast({ title: "Account created!", description: "Welcome to FANZON!" });
           setFormData({ name: "", email: "", password: "", confirmPassword: "" });
         } else {
           toast({ title: "Error", description: result.error || "Something went wrong.", variant: "destructive" });
@@ -132,50 +104,44 @@ const Auth = () => {
       }
     } catch (error) {
       toast({ title: "Error", description: "An unexpected error occurred.", variant: "destructive" });
-    } finally {
-      setIsSubmitting(false);
-    }
+    } finally { setIsSubmitting(false); }
   };
 
-  const switchMode = () => {
-    setMode(mode === "login" ? "signup" : "login");
-    setErrors({});
-    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
-  };
+  const switchMode = () => { setMode(mode === "login" ? "signup" : "login"); setErrors({}); setFormData({ name: "", email: "", password: "", confirmPassword: "" }); };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-accent">
-        <span className="text-3xl font-display font-bold text-gradient-gold tracking-tight mb-4">FANZON</span>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <span className="text-3xl font-bold text-foreground tracking-tight mb-4">FANZON</span>
         <FanzonSpinner size="lg" />
-        <p className="text-sm text-accent-foreground/50 mt-4 animate-pulse">Loading...</p>
+        <p className="text-sm text-muted-foreground mt-4 animate-pulse">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-accent flex items-center justify-center p-4 safe-area-top safe-area-bottom">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 safe-area-top safe-area-bottom">
       <div className="w-full max-w-md animate-fade-in">
-        {/* Logo Section */}
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 mb-4 shadow-gold">
-            <Crown className="h-8 w-8 text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary mb-4" style={{ boxShadow: 'var(--shadow-gold)' }}>
+            <span className="text-2xl font-bold text-primary-foreground">F</span>
           </div>
-          <h1 className="text-3xl font-display font-bold text-gradient-gold tracking-tight">FANZON</h1>
-          <p className="text-accent-foreground/50 mt-1 text-sm font-body">Pakistan's Premier Marketplace</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">FANZON</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Pakistan's Premier Marketplace</p>
         </div>
 
-        {/* Auth Card */}
+        {/* Card */}
         <div className="bg-card rounded-2xl border border-border p-6 sm:p-8" style={{ boxShadow: 'var(--shadow-3)' }}>
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-primary/15">
-              <Crown className="h-3 w-3" />
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold mb-3">
+              <ShoppingBag className="h-3 w-3" />
               Customer Portal
             </div>
-            <h2 className="text-xl font-display font-semibold text-card-foreground">
+            <h2 className="text-xl font-semibold text-foreground">
               {mode === "login" ? "Welcome Back" : "Create Account"}
             </h2>
-            <p className="text-muted-foreground text-sm mt-1 font-body">
+            <p className="text-muted-foreground text-sm mt-1">
               {mode === "login" ? "Sign in to continue shopping" : "Join FANZON today"}
             </p>
           </div>
@@ -183,34 +149,33 @@ const Auth = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-sm font-medium font-body">Full Name</Label>
+                <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input id="name" name="name" type="text" placeholder="John Doe" value={formData.name} onChange={handleInputChange}
-                    className={cn("pl-10 h-12 text-base bg-secondary/50 border-border focus:bg-background transition-colors touch-target", errors.name && "border-destructive")} />
+                    className={cn("pl-10 h-12 text-base bg-secondary border-border focus:bg-card transition-colors touch-target", errors.name && "border-destructive")} />
                 </div>
                 {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
               </div>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium font-body">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input id="email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="you@example.com" value={formData.email} onChange={handleInputChange}
-                  className={cn("pl-10 h-12 text-base bg-secondary/50 border-border focus:bg-background transition-colors touch-target", errors.email && "border-destructive")} />
+                  className={cn("pl-10 h-12 text-base bg-secondary border-border focus:bg-card transition-colors touch-target", errors.email && "border-destructive")} />
               </div>
               {errors.email && <p className="text-destructive text-xs">{errors.email}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-medium font-body">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input id="password" name="password" type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="••••••••" value={formData.password} onChange={handleInputChange}
-                  className={cn("pl-10 pr-10 h-12 text-base bg-secondary/50 border-border focus:bg-background transition-colors touch-target", errors.password && "border-destructive")} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
-                  aria-label={showPassword ? "Hide password" : "Show password"}>
+                  className={cn("pl-10 pr-10 h-12 text-base bg-secondary border-border focus:bg-card transition-colors touch-target", errors.password && "border-destructive")} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 touch-target">
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
@@ -219,13 +184,12 @@ const Auth = () => {
 
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium font-body">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" value={formData.confirmPassword} onChange={handleInputChange}
-                    className={cn("pl-10 pr-10 h-12 text-base bg-secondary/50 border-border focus:bg-background transition-colors touch-target", errors.confirmPassword && "border-destructive")} />
-                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 touch-target"
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}>
+                    className={cn("pl-10 pr-10 h-12 text-base bg-secondary border-border focus:bg-card transition-colors touch-target", errors.confirmPassword && "border-destructive")} />
+                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 touch-target">
                     {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
@@ -241,7 +205,7 @@ const Auth = () => {
               </div>
             )}
 
-            <Button type="submit" className="w-full h-12 text-base btn-gold font-semibold rounded-xl touch-target" disabled={isSubmitting}>
+            <Button type="submit" className="w-full h-12 text-base font-semibold rounded-xl touch-target bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isSubmitting}>
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <span className="animate-spin rounded-full h-4 w-4 border-2 border-primary-foreground border-t-transparent"></span>
@@ -259,11 +223,11 @@ const Auth = () => {
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
             <div className="relative flex justify-center">
-              <span className="bg-card px-3 text-xs text-muted-foreground uppercase tracking-wider font-body">Or</span>
+              <span className="bg-card px-3 text-xs text-muted-foreground uppercase tracking-wider">Or</span>
             </div>
           </div>
 
-          <p className="text-center text-sm text-muted-foreground font-body">
+          <p className="text-center text-sm text-muted-foreground">
             {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
             <button type="button" onClick={switchMode} className="text-primary font-semibold hover:text-primary/80 transition-colors">
               {mode === "login" ? "Sign Up" : "Sign In"}
@@ -272,14 +236,13 @@ const Auth = () => {
         </div>
 
         <div className="text-center mt-6">
-          <p className="text-xs text-accent-foreground/40 mb-2 font-body">Want to sell on FANZON?</p>
-          <Link to="/business/signup" className="text-sm text-primary font-medium hover:text-primary/80 transition-colors inline-flex items-center gap-1 font-body">
-            Become a Partner
-            <ArrowRight size={14} />
+          <p className="text-xs text-muted-foreground mb-2">Want to sell on FANZON?</p>
+          <Link to="/business/signup" className="text-sm text-primary font-medium hover:text-primary/80 transition-colors inline-flex items-center gap-1">
+            Become a Partner <ArrowRight size={14} />
           </Link>
         </div>
 
-        <p className="text-center text-xs text-accent-foreground/30 mt-4 font-body">
+        <p className="text-center text-xs text-muted-foreground/60 mt-4">
           By continuing, you agree to FANZON's Terms of Service and Privacy Policy
         </p>
       </div>
