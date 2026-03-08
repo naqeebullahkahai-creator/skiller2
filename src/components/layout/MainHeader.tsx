@@ -67,7 +67,7 @@ const MainHeader = () => {
             <form onSubmit={handleSearch} className="flex w-full bg-secondary rounded-xl overflow-hidden border border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-accent-foreground/60 hover:bg-accent-foreground/5 border-r border-primary/10 whitespace-nowrap transition-colors duration-200">
+                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:bg-muted border-r border-border whitespace-nowrap transition-colors duration-200">
                     {selectedCategory}
                     <ChevronDown size={14} />
                   </button>
