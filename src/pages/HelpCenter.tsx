@@ -255,22 +255,22 @@ const HelpCenter = () => {
               {faqCategories
                 .filter((cat) => !activeCategory || cat.id === activeCategory)
                 .map((cat) => (
-                  <div key={cat.id} className="mb-8">
-                    <div className="flex items-center gap-2 mb-4">
-                      <cat.icon size={24} className="text-primary" />
-                      <h2 className="text-xl font-semibold">{cat.title}</h2>
+                  <div key={cat.id} className="mb-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <cat.icon size={20} className="text-primary" />
+                      <h2 className="text-base md:text-xl font-semibold">{cat.title}</h2>
                     </div>
-                    <Accordion type="single" collapsible className="space-y-2">
+                    <Accordion type="single" collapsible className="space-y-1.5">
                       {cat.faqs.map((faq, index) => (
                         <AccordionItem
                           key={index}
                           value={`${cat.id}-${index}`}
-                          className="border rounded-lg px-4"
+                          className="border rounded-lg px-3 md:px-4"
                         >
-                          <AccordionTrigger className="text-left">
+                          <AccordionTrigger className="text-left text-sm md:text-base py-3">
                             {faq.q}
                           </AccordionTrigger>
-                          <AccordionContent className="text-muted-foreground">
+                          <AccordionContent className="text-muted-foreground text-sm">
                             {faq.a}
                           </AccordionContent>
                         </AccordionItem>
