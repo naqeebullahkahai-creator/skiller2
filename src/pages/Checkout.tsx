@@ -567,14 +567,16 @@ const Checkout = () => {
                   </div>
                 )}
 
-                <Button
-                  onClick={handleContinueToPayment}
-                  disabled={!selectedAddressId}
-                  className="w-full"
-                >
-                  Continue to Payment
-                  <ChevronRight size={18} className="ml-2" />
-                </Button>
+                {!isMobile && (
+                  <Button
+                    onClick={handleContinueToPayment}
+                    disabled={!selectedAddressId}
+                    className="w-full"
+                  >
+                    Continue to Payment
+                    <ChevronRight size={18} className="ml-2" />
+                  </Button>
+                )}
               </div>
             )}
 
