@@ -145,6 +145,7 @@ import AgentDashboardHome from "./pages/agent/AgentDashboardHome";
 import AgentChatsPage from "./pages/agent/AgentChatsPage";
 import AgentEarningsPage from "./pages/agent/AgentEarningsPage";
 import AgentSettingsPage from "./pages/agent/AgentSettingsPage";
+import AgentPerformancePage from "./pages/agent/AgentPerformancePage";
 import AgentDashboardLayout from "./components/dashboard/AgentDashboardLayout";
 import AdminSecurityPage from "./pages/dashboard/AdminSecurityPage";
 
@@ -385,6 +386,7 @@ const App = () => (
                             <Route path="dashboard" element={<AgentDashboardHome />} />
                             <Route path="chats" element={<AgentChatsPage />} />
                             <Route path="earnings" element={<AgentEarningsPage />} />
+                            <Route path="performance" element={<AgentPerformancePage />} />
                             <Route path="settings" element={<AgentSettingsPage />} />
                           </Route>
 
@@ -483,6 +485,7 @@ const App = () => (
                             <Route index element={<AgentDashboardHome />} />
                             <Route path="chats" element={<AgentChatsPage />} />
                             <Route path="earnings" element={<AgentEarningsPage />} />
+                            <Route path="performance" element={<AgentPerformancePage />} />
                             <Route path="settings" element={<AgentSettingsPage />} />
                           </Route>
 
