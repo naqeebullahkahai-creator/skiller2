@@ -89,6 +89,9 @@ const AdminProductApprovals = () => {
     try {
       const newStatus = actionType === "approve" ? "active" : "rejected";
       
+      // Get seller_id for this product
+      const product = pendingProducts.find(p => p.id === actionProductId);
+      
       const { error } = await supabase
         .from("products")
         .update({ status: newStatus, updated_at: new Date().toISOString() })
@@ -96,10 +99,20 @@ const AdminProductApprovals = () => {
 
       if (error) throw error;
 
+      // If approving, save commission settings
+      if (actionType === "approve" && product?.seller_id && commissionValue > 0) {
+        await setProductCommission.mutateAsync({
+          productId: actionProductId,
+          sellerId: product.seller_id,
+          commissionType,
+          commissionValue,
+        });
+      }
+
       toast({
         title: actionType === "approve" ? "Product Approved ✓" : "Product Rejected",
         description: actionType === "approve"
-          ? "The product is now live on the marketplace."
+          ? `Product approved with ${commissionType === 'percentage' ? commissionValue + '%' : 'Rs. ' + commissionValue} commission.`
           : "The product has been rejected and won't be visible.",
       });
 
