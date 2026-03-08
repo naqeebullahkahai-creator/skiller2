@@ -396,15 +396,16 @@ const Checkout = () => {
       )}>
         {!isMobile && <h1 className="text-2xl font-bold mb-6">Checkout</h1>}
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-8">
+        {/* Progress Steps - Compact on mobile */}
+        <div className={cn("flex items-center justify-center", isMobile ? "mb-4" : "mb-8")}>
           {steps.map((s, index) => (
             <div key={s.number} className="flex items-center">
               <button
                 onClick={() => s.number < step && setStep(s.number)}
                 disabled={s.number > step}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full transition-colors",
+                  "flex items-center gap-1.5 rounded-full transition-colors",
+                  isMobile ? "px-3 py-1.5 text-xs" : "px-4 py-2 gap-2",
                   step >= s.number
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground",
@@ -412,16 +413,17 @@ const Checkout = () => {
                 )}
               >
                 {step > s.number ? (
-                  <Check size={18} />
+                  <Check size={isMobile ? 14 : 18} />
                 ) : (
-                  <s.icon size={18} />
+                  <s.icon size={isMobile ? 14 : 18} />
                 )}
-                <span className="font-medium hidden sm:inline">{s.title}</span>
+                <span className="font-medium">{s.title}</span>
               </button>
               {index < steps.length - 1 && (
                 <div
                   className={cn(
-                    "w-8 md:w-16 h-0.5 mx-2",
+                    "h-0.5 mx-1.5",
+                    isMobile ? "w-6" : "w-8 md:w-16 mx-2",
                     step > s.number ? "bg-primary" : "bg-muted"
                   )}
                 />
