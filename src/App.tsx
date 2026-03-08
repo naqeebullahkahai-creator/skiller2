@@ -145,6 +145,7 @@ import AgentDashboardHome from "./pages/agent/AgentDashboardHome";
 import AgentChatsPage from "./pages/agent/AgentChatsPage";
 import AgentEarningsPage from "./pages/agent/AgentEarningsPage";
 import AgentSettingsPage from "./pages/agent/AgentSettingsPage";
+import AgentPerformancePage from "./pages/agent/AgentPerformancePage";
 import AgentDashboardLayout from "./components/dashboard/AgentDashboardLayout";
 import AdminSecurityPage from "./pages/dashboard/AdminSecurityPage";
 
