@@ -388,10 +388,13 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
+      {isMobile ? <MobileHeader /> : <Header />}
 
-      <main className="flex-1 container mx-auto px-4 py-6 pb-24 md:pb-6 overflow-x-hidden">
-        <h1 className="text-xl md:text-2xl font-bold mb-6">Checkout</h1>
+      <main className={cn(
+        "flex-1 overflow-x-hidden",
+        isMobile ? "px-3 py-4 pb-40" : "container mx-auto px-4 py-6 pb-6"
+      )}>
+        {!isMobile && <h1 className="text-2xl font-bold mb-6">Checkout</h1>}
 
         {/* Progress Steps */}
         <div className="flex items-center justify-center mb-8">
