@@ -6,9 +6,10 @@ const AgentBottomNav = () => {
   const location = useLocation();
 
   const navItems = [
-    { icon: Home, label: "Dashboard", path: "/agent-app" },
+    { icon: Home, label: "Home", path: "/agent-app" },
     { icon: MessageSquare, label: "Chats", path: "/agent-app/chats" },
     { icon: DollarSign, label: "Earnings", path: "/agent-app/earnings" },
+    { icon: BarChart3, label: "Stats", path: "/agent-app/performance" },
     { icon: Settings, label: "Settings", path: "/agent-app/settings" },
   ];
 
