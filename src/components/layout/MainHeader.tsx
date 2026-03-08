@@ -103,10 +103,10 @@ const MainHeader = () => {
                 size={18}
               />
               <Button 
-                type="submit"
-                className="rounded-none px-6 bg-primary hover:bg-primary/90 transition-colors duration-200"
-              >
-                <Search size={18} />
+                 type="submit"
+                 className="rounded-none px-6 btn-gold"
+               >
+                 <Search size={18} />
               </Button>
             </form>
             <div className="flex items-center ml-2">
