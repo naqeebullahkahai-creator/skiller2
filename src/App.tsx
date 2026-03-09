@@ -419,10 +419,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Support Agent Routes - main & agent domains */}
-                          {(domainRole === 'main' || domainRole === 'agent') && (
-                            <Route path="/agent" element={<AgentDashboardLayout />}>
-                              <Route path="dashboard" element={<AgentDashboardHome />} />
+                           {/* Support Agent Routes - agent domain (and dev/preview) */}
+                           {((domainRole === 'agent') || devAllowsAll) && (
+                             <Route path="/agent" element={<AgentDashboardLayout />}>
+                               <Route path="dashboard" element={<AgentDashboardHome />} />
                               <Route path="chats" element={<AgentChatsPage />} />
                               <Route path="earnings" element={<AgentEarningsPage />} />
                               <Route path="performance" element={<AgentPerformancePage />} />
