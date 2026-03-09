@@ -201,7 +201,7 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs">Additional Price (PKR)</Label>
+            <Label className="text-xs">Variant Price (PKR)</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">
                 Rs.
@@ -216,6 +216,7 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
                 }
               />
             </div>
+            <p className="text-[10px] text-muted-foreground">This will be the price when this variant is selected</p>
           </div>
 
           <div className="space-y-2">
