@@ -90,6 +90,7 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariant | null>>({});
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [autoSelected, setAutoSelected] = useState(false);
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
