@@ -11,6 +11,7 @@ import { ComparisonProvider } from "@/contexts/ComparisonContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { VisualEditProvider } from "@/contexts/VisualEditContext";
 import AuthModal from "@/components/auth/AuthModal";
+import CrossDomainAuthRedirector from "@/components/auth/CrossDomainAuthRedirector";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -164,9 +165,10 @@ import AgentAppShell from "./components/pwa/AgentAppShell";
 import CustomerAppHome from "./pages/pwa/CustomerAppHome";
 
 import ScrollToTop from "./components/ScrollToTop";
-import { getDomainRole, getDefaultPathForRole, type DomainRole } from "./utils/domainRouting";
+import { getDomainRole, getDefaultPathForRole, isProductionDomain } from "./utils/domainRouting";
 
 const domainRole = getDomainRole();
+const devAllowsAll = !isProductionDomain();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -244,6 +246,7 @@ const App = () => (
                           <AdminInactivityGuard />
                           <LoginTracker />
                           <AuthModal />
+                          <CrossDomainAuthRedirector />
                           <SupportChatWidget />
                           <WhatsAppFloatingButton />
                           <ComparisonBar />
@@ -329,10 +332,10 @@ const App = () => (
                             </>
                           )}
                           
-                          {/* Admin Routes - main & admin domains */}
-                          {(domainRole === 'main' || domainRole === 'admin') && (
-                            <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboardLayout /></ProtectedRoute>}>
-                              <Route path="dashboard" element={<AdminDashboardHome />} />
+                           {/* Admin Routes - admin domain (and dev/preview) */}
+                           {((domainRole === 'admin') || devAllowsAll) && (
+                             <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboardLayout /></ProtectedRoute>}>
+                               <Route path="dashboard" element={<AdminDashboardHome />} />
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
@@ -394,10 +397,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Seller Routes - main & seller domains */}
-                          {(domainRole === 'main' || domainRole === 'seller') && (
-                            <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
-                              <Route path="dashboard" element={<SellerDashboardHome />} />
+                           {/* Seller Routes - seller domain (and dev/preview) */}
+                           {((domainRole === 'seller') || devAllowsAll) && (
+                             <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
+                               <Route path="dashboard" element={<SellerDashboardHome />} />
                               <Route path="kyc" element={<SellerKyc />} />
                               <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
                               <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
@@ -417,10 +420,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Support Agent Routes - main & agent domains */}
-                          {(domainRole === 'main' || domainRole === 'agent') && (
-                            <Route path="/agent" element={<AgentDashboardLayout />}>
-                              <Route path="dashboard" element={<AgentDashboardHome />} />
+                           {/* Support Agent Routes - agent domain (and dev/preview) */}
+                           {((domainRole === 'agent') || devAllowsAll) && (
+                             <Route path="/agent" element={<AgentDashboardLayout />}>
+                               <Route path="dashboard" element={<AgentDashboardHome />} />
                               <Route path="chats" element={<AgentChatsPage />} />
                               <Route path="earnings" element={<AgentEarningsPage />} />
                               <Route path="performance" element={<AgentPerformancePage />} />
@@ -445,10 +448,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Seller App - /seller-app - main & seller domains */}
-                          {(domainRole === 'main' || domainRole === 'seller') && (
-                            <Route path="/seller-app" element={<SellerAppShell />}>
-                              <Route index element={<SellerDashboardHome />} />
+                           {/* Seller App - /seller-app - seller domain (and dev/preview) */}
+                           {((domainRole === 'seller') || devAllowsAll) && (
+                             <Route path="/seller-app" element={<SellerAppShell />}>
+                               <Route index element={<SellerDashboardHome />} />
                               <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
                               <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
                               <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
@@ -467,10 +470,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Admin App - /admin-app - main & admin domains */}
-                          {(domainRole === 'main' || domainRole === 'admin') && (
-                            <Route path="/admin-app" element={<AdminAppShell />}>
-                              <Route index element={<AdminDashboardHome />} />
+                           {/* Admin App - /admin-app - admin domain (and dev/preview) */}
+                           {((domainRole === 'admin') || devAllowsAll) && (
+                             <Route path="/admin-app" element={<AdminAppShell />}>
+                               <Route index element={<AdminDashboardHome />} />
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
@@ -523,10 +526,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Agent App - /agent-app - main & agent domains */}
-                          {(domainRole === 'main' || domainRole === 'agent') && (
-                            <Route path="/agent-app" element={<AgentAppShell />}>
-                              <Route index element={<AgentDashboardHome />} />
+                           {/* Agent App - /agent-app - agent domain (and dev/preview) */}
+                           {((domainRole === 'agent') || devAllowsAll) && (
+                             <Route path="/agent-app" element={<AgentAppShell />}>
+                               <Route index element={<AgentDashboardHome />} />
                               <Route path="chats" element={<AgentChatsPage />} />
                               <Route path="earnings" element={<AgentEarningsPage />} />
                               <Route path="performance" element={<AgentPerformancePage />} />
