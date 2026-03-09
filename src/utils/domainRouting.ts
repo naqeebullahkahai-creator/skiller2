@@ -1,44 +1,76 @@
 /**
  * Domain-based routing configuration.
- * Maps hostnames to the role/interface that should be rendered.
+ * Detects which role/interface should be rendered based on the current hostname.
  */
 
 export type DomainRole = 'main' | 'admin' | 'seller' | 'customer' | 'agent';
 
-const DOMAIN_MAP: Record<string, DomainRole> = {
-  'admin-fanzon.2bd.net': 'admin',
-  'seller-fanzon.2bd.net': 'seller',
-  'customer-fanzon.2bd.net': 'customer',
-  'agent-fanzon.2bd.net': 'agent',
-  'fanzon.2bd.net': 'main',
-};
+type RoleSlug = 'admin' | 'seller' | 'customer' | 'agent' | 'main';
+
+function normalizeHostname(hostname: string): string {
+  return hostname.trim().toLowerCase();
+}
 
 /**
- * Reverse map: role → subdomain URL
+ * We support both brand spellings that may exist in DNS:
+ * - fanzon.2bd.net
+ * - fanzoon.2bd.net
+ * and their role-prefixed subdomains.
  */
-const ROLE_DOMAIN_MAP: Record<string, string> = {
-  'admin': 'https://admin-fanzon.2bd.net',
-  'seller': 'https://seller-fanzon.2bd.net',
-  'customer': 'https://customer-fanzon.2bd.net',
-  'support_agent': 'https://agent-fanzon.2bd.net',
-};
+function parse2bdDomain(hostname: string): { baseLabel: string; roleSlug: RoleSlug } | null {
+  const host = normalizeHostname(hostname);
+
+  // role subdomains first
+  const roleMatch = host.match(/^(admin|seller|customer|agent)-([a-z0-9-]+)\.2bd\.net$/i);
+  if (roleMatch) {
+    const roleSlug = roleMatch[1].toLowerCase() as RoleSlug;
+    const baseLabel = roleMatch[2].toLowerCase();
+    return { baseLabel, roleSlug };
+  }
+
+  // main domain
+  const mainMatch = host.match(/^([a-z0-9-]+)\.2bd\.net$/i);
+  if (mainMatch) {
+    return { baseLabel: mainMatch[1].toLowerCase(), roleSlug: 'main' };
+  }
+
+  return null;
+}
+
+function roleSlugToDomainRole(roleSlug: RoleSlug): DomainRole {
+  switch (roleSlug) {
+    case 'admin':
+      return 'admin';
+    case 'seller':
+      return 'seller';
+    case 'customer':
+      return 'customer';
+    case 'agent':
+      return 'agent';
+    case 'main':
+    default:
+      return 'main';
+  }
+}
+
+function build2bdDomainForRole(baseLabel: string, role: DomainRole): string {
+  const cleanBase = baseLabel.toLowerCase();
+  if (role === 'main') return `${cleanBase}.2bd.net`;
+  return `${role}-${cleanBase}.2bd.net`;
+}
 
 /**
  * Detect the current domain role based on window.location.hostname.
- * Falls back to 'main' for localhost, preview URLs, and the primary lovable domain.
+ * Falls back to 'main' for localhost, preview URLs, and non-2bd domains.
  */
 export function getDomainRole(): DomainRole {
   if (typeof window === 'undefined') return 'main';
-  
-  const hostname = window.location.hostname;
-  
-  // Check exact match first
-  if (DOMAIN_MAP[hostname]) {
-    return DOMAIN_MAP[hostname];
-  }
-  
-  // Fallback: localhost, preview, lovable.app → main (all routes)
-  return 'main';
+
+  const hostname = normalizeHostname(window.location.hostname);
+  const parsed = parse2bdDomain(hostname);
+  if (!parsed) return 'main';
+
+  return roleSlugToDomainRole(parsed.roleSlug);
 }
 
 /**
@@ -46,12 +78,17 @@ export function getDomainRole(): DomainRole {
  */
 export function getDefaultPathForRole(role: DomainRole): string {
   switch (role) {
-    case 'admin': return '/admin/dashboard';
-    case 'seller': return '/seller/dashboard';
-    case 'customer': return '/account';
-    case 'agent': return '/agent/dashboard';
+    case 'admin':
+      return '/admin/dashboard';
+    case 'seller':
+      return '/seller/dashboard';
+    case 'customer':
+      return '/account';
+    case 'agent':
+      return '/agent/dashboard';
     case 'main':
-    default: return '/';
+    default:
+      return '/';
   }
 }
 
@@ -60,7 +97,7 @@ export function getDefaultPathForRole(role: DomainRole): string {
  */
 export function isProductionDomain(): boolean {
   if (typeof window === 'undefined') return false;
-  return window.location.hostname.endsWith('.2bd.net');
+  return normalizeHostname(window.location.hostname).endsWith('.2bd.net');
 }
 
 /**
@@ -70,33 +107,35 @@ export function isProductionDomain(): boolean {
  */
 export function getCrossDomainRedirectUrl(userRole: string): string | null {
   if (!isProductionDomain()) return null;
-  
-  const currentDomainRole = getDomainRole();
-  
-  // Map user roles to domain roles for comparison
+  if (typeof window === 'undefined') return null;
+
+  const hostname = normalizeHostname(window.location.hostname);
+  const parsed = parse2bdDomain(hostname);
+  if (!parsed) return null;
+
+  // Map app roles to domain roles
   const roleToDomainRole: Record<string, DomainRole> = {
-    'admin': 'admin',
-    'seller': 'seller',
-    'customer': 'customer',
-    'support_agent': 'agent',
+    admin: 'admin',
+    seller: 'seller',
+    customer: 'customer',
+    support_agent: 'agent',
   };
-  
+
   const targetDomainRole = roleToDomainRole[userRole];
-  
+  if (!targetDomainRole) return null;
+
+  const currentDomainRole = getDomainRole();
+
   // Already on the correct domain
   if (currentDomainRole === targetDomainRole) return null;
-  
+
   // Customer on main domain is fine
   if (userRole === 'customer' && currentDomainRole === 'main') return null;
-  
-  // Get target subdomain URL
-  const targetBaseUrl = ROLE_DOMAIN_MAP[userRole];
-  if (!targetBaseUrl) return null;
-  
-  // Get default path for the target role
-  const defaultPath = getDefaultPathForRole(targetDomainRole || 'main');
-  
-  return `${targetBaseUrl}${defaultPath}`;
+
+  const targetHost = build2bdDomainForRole(parsed.baseLabel, targetDomainRole);
+  const defaultPath = getDefaultPathForRole(targetDomainRole);
+
+  return `https://${targetHost}${defaultPath}`;
 }
 
 /**
@@ -104,10 +143,14 @@ export function getCrossDomainRedirectUrl(userRole: string): string | null {
  */
 export function getInAppRedirectPath(userRole: string): string {
   switch (userRole) {
-    case 'admin': return '/admin/dashboard';
-    case 'seller': return '/seller/dashboard';
-    case 'support_agent': return '/agent/dashboard';
+    case 'admin':
+      return '/admin/dashboard';
+    case 'seller':
+      return '/seller/dashboard';
+    case 'support_agent':
+      return '/agent/dashboard';
     case 'customer':
-    default: return '/';
+    default:
+      return '/';
   }
 }

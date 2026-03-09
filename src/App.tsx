@@ -525,10 +525,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Agent App - /agent-app - main & agent domains */}
-                          {(domainRole === 'main' || domainRole === 'agent') && (
-                            <Route path="/agent-app" element={<AgentAppShell />}>
-                              <Route index element={<AgentDashboardHome />} />
+                           {/* Agent App - /agent-app - agent domain (and dev/preview) */}
+                           {((domainRole === 'agent') || devAllowsAll) && (
+                             <Route path="/agent-app" element={<AgentAppShell />}>
+                               <Route index element={<AgentDashboardHome />} />
                               <Route path="chats" element={<AgentChatsPage />} />
                               <Route path="earnings" element={<AgentEarningsPage />} />
                               <Route path="performance" element={<AgentPerformancePage />} />
