@@ -142,7 +142,8 @@ const AdminSellersManagement = () => {
             <Input placeholder="Search by ID, shop, name (FZN-SEL-...)" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
           </div>
 
-          <Card>
+          {/* Desktop Table */}
+          <Card className="hidden md:block">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
@@ -150,8 +151,8 @@ const AdminSellersManagement = () => {
                     <TableHead>ID</TableHead>
                     <TableHead>Seller / Shop</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">Products</TableHead>
-                    <TableHead className="hidden md:table-cell">Wallet</TableHead>
+                    <TableHead>Products</TableHead>
+                    <TableHead>Wallet</TableHead>
                     <TableHead className="hidden lg:table-cell">City</TableHead>
                     <TableHead className="hidden lg:table-cell">Joined</TableHead>
                     <TableHead>Actions</TableHead>
@@ -162,7 +163,7 @@ const AdminSellersManagement = () => {
                     [...Array(5)].map((_, i) => (
                       <TableRow key={i}>
                         {[...Array(8)].map((_, j) => (
-                          <TableCell key={j} className={j > 3 ? "hidden md:table-cell" : ""}><Skeleton className="h-6 w-20" /></TableCell>
+                          <TableCell key={j}><Skeleton className="h-6 w-20" /></TableCell>
                         ))}
                       </TableRow>
                     ))
@@ -189,8 +190,8 @@ const AdminSellersManagement = () => {
                           </div>
                         </TableCell>
                         <TableCell>{getVerificationBadge(seller.verification_status)}</TableCell>
-                        <TableCell className="hidden md:table-cell">{seller.products_count}</TableCell>
-                        <TableCell className="hidden md:table-cell">{formatPKR(seller.wallet_balance)}</TableCell>
+                        <TableCell>{seller.products_count}</TableCell>
+                        <TableCell>{formatPKR(seller.wallet_balance)}</TableCell>
                         <TableCell className="hidden lg:table-cell">{seller.city || "-"}</TableCell>
                         <TableCell className="hidden lg:table-cell">{format(new Date(seller.created_at), "MMM dd, yyyy")}</TableCell>
                         <TableCell>
@@ -205,6 +206,55 @@ const AdminSellersManagement = () => {
               </Table>
             </CardContent>
           </Card>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {isLoading ? (
+              [...Array(4)].map((_, i) => (
+                <Card key={i} className="border-0 shadow-sm">
+                  <CardContent className="p-4 space-y-3">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : sellers.length === 0 ? (
+              <Card><CardContent className="p-6 text-center text-muted-foreground">No sellers found</CardContent></Card>
+            ) : (
+              sellers.map((seller) => (
+                <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => navigate(`/admin/sellers/${seller.id}`)}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Avatar className="h-10 w-10 shrink-0">
+                        {seller.avatar_url && <AvatarImage src={seller.avatar_url} alt={seller.shop_name} className="object-cover aspect-square" />}
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">{seller.shop_name?.charAt(0).toUpperCase() || "S"}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{seller.shop_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{seller.full_name}</p>
+                      </div>
+                      {getVerificationBadge(seller.verification_status)}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Products</p>
+                        <p className="text-sm font-bold">{seller.products_count}</p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Wallet</p>
+                        <p className="text-sm font-bold truncate">{formatPKR(seller.wallet_balance)}</p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">City</p>
+                        <p className="text-sm font-bold truncate">{seller.city || "—"}</p>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-2 font-mono">{seller.display_id || `FZN-SEL-${seller.id.slice(0, 5).toUpperCase()}`}</p>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>
