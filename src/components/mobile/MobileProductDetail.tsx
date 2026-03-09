@@ -59,6 +59,7 @@ const MobileProductDetail = ({
   onVariantSelect,
   selectedVariant,
   reviewStats,
+  sellerName = "FANZON Seller",
 }: MobileProductDetailProps) => {
   const navigate = useNavigate();
   const [selectedIndex, setSelectedIndex] = useState(0);
