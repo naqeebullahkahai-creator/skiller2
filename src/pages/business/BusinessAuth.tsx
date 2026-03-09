@@ -12,6 +12,7 @@ import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import { checkEmailRoleConflict } from "@/utils/roleValidation";
+import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainRouting";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RealTimeFieldValidator from "@/components/auth/RealTimeFieldValidator";
 
