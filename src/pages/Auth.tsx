@@ -12,6 +12,7 @@ import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainRouting";
+import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -45,7 +46,9 @@ const Auth = () => {
     if (!isLoading && isAuthenticated && role) {
       const crossDomainUrl = getCrossDomainRedirectUrl(role);
       if (crossDomainUrl) {
-        window.location.href = crossDomainUrl;
+        buildCrossDomainUrl(crossDomainUrl).then((url) => {
+          window.location.href = url;
+        });
         return;
       }
       navigate(getInAppRedirectPath(role), { replace: true });
@@ -92,7 +95,9 @@ const Auth = () => {
             const crossDomainUrl = getCrossDomainRedirectUrl(detectedRole);
             if (crossDomainUrl) {
               toast({ title: "Redirecting...", description: `Taking you to your ${detectedRole} dashboard.` });
-              window.location.href = crossDomainUrl;
+              buildCrossDomainUrl(crossDomainUrl).then((url) => {
+                window.location.href = url;
+              });
               return;
             }
             

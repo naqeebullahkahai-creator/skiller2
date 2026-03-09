@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import { checkEmailRoleConflict } from "@/utils/roleValidation";
 import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainRouting";
+import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RealTimeFieldValidator from "@/components/auth/RealTimeFieldValidator";
 
@@ -60,10 +61,11 @@ const CustomerAuth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      // Check for cross-domain redirect first (production domains)
       const crossDomainUrl = getCrossDomainRedirectUrl(role);
       if (crossDomainUrl) {
-        window.location.href = crossDomainUrl;
+        buildCrossDomainUrl(crossDomainUrl).then((url) => {
+          window.location.href = url;
+        });
         return;
       }
       
