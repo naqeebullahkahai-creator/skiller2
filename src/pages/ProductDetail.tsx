@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Star, Heart, Minus, Plus, ShoppingCart, Truck, Shield,
   RotateCcw, Store, Package, MapPin, Clock, CreditCard, Loader2,
@@ -90,6 +92,20 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariant | null>>({});
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [autoSelected, setAutoSelected] = useState(false);
+
+  // Auto-select first variant of each type
+  useEffect(() => {
+    if (!autoSelected && variants.length > 0 && Object.keys(groupedVariants).length > 0) {
+      const initialSelection: Record<string, ProductVariant | null> = {};
+      Object.entries(groupedVariants).forEach(([name, variantList]) => {
+        const firstAvailable = variantList.find(v => v.stock_count > 0) || variantList[0];
+        initialSelection[name] = firstAvailable;
+      });
+      setSelectedVariants(initialSelection);
+      setAutoSelected(true);
+    }
+  }, [variants, groupedVariants, autoSelected]);
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
@@ -97,6 +113,20 @@ const ProductDetail = () => {
       .filter((p) => p.category === product.category && p.id !== product.id)
       .slice(0, 6);
   }, [product, allProducts]);
+
+  // Fetch seller profile
+  const { data: sellerProfile } = useQuery({
+    queryKey: ["seller-profile-mini", product?.seller_id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("seller_profiles")
+        .select("shop_name, legal_name, city, verification_status")
+        .eq("user_id", product!.seller_id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!product?.seller_id,
+  });
 
   if (isLoading) {
     return isMobile ? <MobileProductDetailSkeleton /> : <ProductDetailSkeleton />;
@@ -119,14 +149,27 @@ const ProductDetail = () => {
 
   const images = product.images?.length ? product.images : ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop"];
   const selectedVariant = Object.values(selectedVariants).find(v => v !== null) || null;
-  const additionalPrice = selectedVariant?.additional_price_pkr || 0;
-  const basePrice = product.discount_price_pkr || product.price_pkr;
-  const displayPrice = basePrice + additionalPrice;
-  const discount = product.discount_price_pkr && product.discount_price_pkr < product.price_pkr
-    ? Math.round(((product.price_pkr - product.discount_price_pkr) / product.price_pkr) * 100) : 0;
-  const availableStock = selectedVariant ? selectedVariant.stock_count : product.stock_count;
+  
+  // Variant price IS the display price (not added to base)
   const hasVariants = variants.length > 0;
+  const variantPrice = selectedVariant?.additional_price_pkr || 0;
+  const displayPrice = hasVariants && selectedVariant && variantPrice > 0 
+    ? variantPrice 
+    : (product.discount_price_pkr || product.price_pkr);
+  const originalPrice = hasVariants && selectedVariant && variantPrice > 0 
+    ? product.price_pkr 
+    : product.price_pkr;
+  const discount = displayPrice < originalPrice
+    ? Math.round(((originalPrice - displayPrice) / originalPrice) * 100) : 0;
+  const availableStock = selectedVariant ? selectedVariant.stock_count : product.stock_count;
   const needsVariantSelection = hasVariants && !selectedVariant;
+
+  // Get variant-specific images for mobile
+  const variantImages = selectedVariant?.image_urls?.length 
+    ? selectedVariant.image_urls 
+    : images;
+
+  const sellerName = sellerProfile?.shop_name || sellerProfile?.legal_name || "FANZON Seller";
 
   const handleVariantSelect = (variantName: string, variant: ProductVariant) => {
     setSelectedVariants(prev => ({ ...prev, [variantName]: variant }));
@@ -178,7 +221,7 @@ const ProductDetail = () => {
         {seoTags}
         <MobileProductDetail
           product={product}
-          images={images}
+          images={variantImages}
           displayPrice={displayPrice}
           discount={discount}
           availableStock={availableStock}
@@ -196,6 +239,7 @@ const ProductDetail = () => {
           onVariantSelect={handleVariantSelect}
           selectedVariant={selectedVariant}
           reviewStats={reviewStats}
+          sellerName={sellerName}
         />
       </>
     );
@@ -245,7 +289,7 @@ const ProductDetail = () => {
                   </>
                 )}
               </div>
-              {additionalPrice > 0 && <p className="text-xs text-muted-foreground mt-1">Includes +Rs. {additionalPrice.toLocaleString()} for selected variant</p>}
+              {hasVariants && selectedVariant && variantPrice > 0 && <p className="text-xs text-muted-foreground mt-1">Price for selected variant: {selectedVariant.variant_value}</p>}
             </div>
 
             {hasVariants && (
@@ -318,11 +362,19 @@ const ProductDetail = () => {
             </div>
             <div className="bg-card border border-border rounded-lg p-4">
               <h3 className="font-semibold mb-4">Sold by</h3>
-              <div className="flex items-center gap-3 mb-4">
+              <Link to={`/store/${product.seller_id}`} className="flex items-center gap-3 mb-4 hover:opacity-80 transition-opacity">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center"><Store size={24} className="text-primary" /></div>
-                <div><p className="font-medium">FANZON Seller</p><div className="flex items-center gap-1 text-sm text-muted-foreground"><Star size={12} className="fill-fanzon-star text-fanzon-star" />4.8</div></div>
+                <div>
+                  <p className="font-medium text-primary hover:underline">{sellerName}</p>
+                  {sellerProfile?.city && <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={10} />{sellerProfile.city}</p>}
+                </div>
+              </Link>
+              <div className="flex gap-2 mb-3">
+                <Link to={`/store/${product.seller_id}`}>
+                  <Button variant="outline" size="sm" className="text-xs">Visit Store</Button>
+                </Link>
               </div>
-              <ChatWithSellerButton sellerId={product.seller_id} productId={product.id} productTitle={product.title} sellerName="FANZON Seller" />
+              <ChatWithSellerButton sellerId={product.seller_id} productId={product.id} productTitle={product.title} sellerName={sellerName} />
             </div>
           </div>
         </div>

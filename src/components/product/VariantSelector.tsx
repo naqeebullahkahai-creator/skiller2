@@ -129,7 +129,7 @@ const VariantSelector = ({
                   : {selectedVariant.variant_value}
                   {selectedVariant.additional_price_pkr > 0 && (
                     <span className="text-primary ml-1">
-                      (+Rs. {selectedVariant.additional_price_pkr.toLocaleString()})
+                      (Rs. {selectedVariant.additional_price_pkr.toLocaleString()})
                     </span>
                   )}
                 </span>
@@ -151,7 +151,7 @@ const VariantSelector = ({
                       key={variant.id}
                       onClick={() => !isDisabled && onVariantSelect(variantName, variant)}
                       disabled={isDisabled}
-                      title={`${variant.variant_value}${isOutOfStock ? " (Out of Stock)" : isUnavailable ? " (Unavailable)" : ""}${variant.additional_price_pkr > 0 ? ` (+Rs. ${variant.additional_price_pkr.toLocaleString()})` : ""}`}
+                      title={`${variant.variant_value}${isOutOfStock ? " (Out of Stock)" : isUnavailable ? " (Unavailable)" : ""}${variant.additional_price_pkr > 0 ? ` (Rs. ${variant.additional_price_pkr.toLocaleString()})` : ""}`}
                       className={cn(
                         "w-10 h-10 rounded-full transition-all relative",
                         colorClass,
@@ -185,7 +185,7 @@ const VariantSelector = ({
                     {variant.variant_value}
                     {variant.additional_price_pkr > 0 && (
                       <span className="ml-1 text-xs">
-                        +Rs. {variant.additional_price_pkr.toLocaleString()}
+                        Rs. {variant.additional_price_pkr.toLocaleString()}
                       </span>
                     )}
                     {isOutOfStock && (

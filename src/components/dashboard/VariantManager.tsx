@@ -201,7 +201,7 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs">Additional Price (PKR)</Label>
+            <Label className="text-xs">Variant Price (PKR)</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">
                 Rs.
@@ -216,6 +216,7 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
                 }
               />
             </div>
+            <p className="text-[10px] text-muted-foreground">This will be the price when this variant is selected</p>
           </div>
 
           <div className="space-y-2">
@@ -257,7 +258,7 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
                 <Label className="text-sm font-medium text-muted-foreground">
                   {variantName} ({variantList.length})
                 </Label>
-                {isColorVariant(variantName) && productImages.length > 0 && (
+                {productImages.length > 0 && (
                   <span className="text-xs text-muted-foreground">
                     Tag images to show specific photos for each variant
                   </span>
@@ -276,11 +277,11 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
                           <p className="font-medium text-sm">{variant.variant_value}</p>
                         </div>
                         <div>
-                          <span className="text-xs text-muted-foreground">Additional Price</span>
+                          <span className="text-xs text-muted-foreground">Variant Price</span>
                           <p className="font-medium text-sm">
                             {variant.additional_price_pkr > 0
-                              ? `+Rs. ${variant.additional_price_pkr.toLocaleString()}`
-                              : "—"}
+                              ? `Rs. ${variant.additional_price_pkr.toLocaleString()}`
+                              : "Base price"}
                           </p>
                         </div>
                         <div>
@@ -297,7 +298,7 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
                       </div>
                       <div className="flex items-center gap-2">
                         {/* Image Tag Button */}
-                        {isColorVariant(variantName) && productImages.length > 0 && (
+                        {productImages.length > 0 && (
                           <Button
                             type="button"
                             variant="outline"

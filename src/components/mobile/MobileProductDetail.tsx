@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Star, Heart, Minus, Plus, ShoppingCart, Truck, Shield,
   RotateCcw, Store, Package, ChevronLeft, Share2, ChevronDown, ChevronUp,
@@ -36,6 +36,7 @@ interface MobileProductDetailProps {
   onVariantSelect: (name: string, variant: ProductVariant) => void;
   selectedVariant: ProductVariant | null;
   reviewStats: { averageRating: number; totalReviews: number };
+  sellerName?: string;
 }
 
 const MobileProductDetail = ({
@@ -58,6 +59,7 @@ const MobileProductDetail = ({
   onVariantSelect,
   selectedVariant,
   reviewStats,
+  sellerName = "FANZON Seller",
 }: MobileProductDetailProps) => {
   const navigate = useNavigate();
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -98,37 +100,47 @@ const MobileProductDetail = ({
 
       {/* Image Gallery Swiper */}
       <div className="relative bg-card">
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex">
-            {images.map((img, i) => (
-              <div key={i} className="flex-[0_0_100%] min-w-0">
-                <div className="aspect-square bg-muted">
-                  <img src={img} alt={product.title} className="w-full h-full object-contain" />
+        {(() => {
+          // Use variant images if available
+          const displayImages = selectedVariant?.image_urls?.length 
+            ? selectedVariant.image_urls 
+            : images;
+          return (
+            <>
+              <div className="overflow-hidden" ref={emblaRef}>
+                <div className="flex">
+                  {displayImages.map((img, i) => (
+                    <div key={i} className="flex-[0_0_100%] min-w-0">
+                      <div className="aspect-square bg-muted">
+                        <img src={img} alt={product.title} className="w-full h-full object-contain" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Dots */}
-        {images.length > 1 && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {images.map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "h-[6px] rounded-full transition-all duration-300",
-                  i === selectedIndex ? "w-5 bg-primary" : "w-[6px] bg-muted-foreground/30"
-                )}
-              />
-            ))}
-          </div>
-        )}
+              {/* Dots */}
+              {displayImages.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {displayImages.map((_, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        "h-[6px] rounded-full transition-all duration-300",
+                        i === selectedIndex ? "w-5 bg-primary" : "w-[6px] bg-muted-foreground/30"
+                      )}
+                    />
+                  ))}
+                </div>
+              )}
 
-        {/* Image counter */}
-        <div className="absolute top-3 right-3 bg-foreground/60 text-background text-[10px] font-medium px-2 py-1 rounded-full">
-          {selectedIndex + 1}/{images.length}
-        </div>
+              {/* Image counter */}
+              <div className="absolute top-3 right-3 bg-foreground/60 text-background text-[10px] font-medium px-2 py-1 rounded-full">
+                {selectedIndex + 1}/{displayImages.length}
+              </div>
+            </>
+          );
+        })()}
 
         {/* Discount badge */}
         {discount > 0 && (
@@ -222,23 +234,20 @@ const MobileProductDetail = ({
       {/* Seller */}
       <div className="bg-card px-4 py-3 mt-1">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link to={`/store/${product.seller_id}`} className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
               <Store size={20} className="text-primary" />
             </div>
             <div>
-              <p className="text-[13px] font-medium text-foreground">FANZON Seller</p>
-              <div className="flex items-center gap-1">
-                <Star size={10} className="fill-fanzon-star text-fanzon-star" />
-                <span className="text-[11px] text-muted-foreground">4.8</span>
-              </div>
+              <p className="text-[13px] font-medium text-primary">{sellerName}</p>
+              <p className="text-[11px] text-muted-foreground">Visit Store →</p>
             </div>
-          </div>
+          </Link>
           <ChatWithSellerButton
             sellerId={product.seller_id}
             productId={product.id}
             productTitle={product.title}
-            sellerName="FANZON Seller"
+            sellerName={sellerName}
           />
         </div>
       </div>
