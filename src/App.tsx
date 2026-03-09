@@ -250,7 +250,14 @@ const App = () => (
                           <MobileFloatingBackButton />
                           <VisualEditToggle />
                           <Routes>
-                          <Route path="/" element={<Index />} />
+                          {/* Domain-based root redirect for subdomains */}
+                          {domainRole !== 'main' ? (
+                            <Route path="/" element={<Navigate to={getDefaultPathForRole(domainRole)} replace />} />
+                          ) : (
+                            <Route path="/" element={<Index />} />
+                          )}
+                          
+                          {/* Auth routes - available on all domains */}
                           <Route path="/auth" element={<Auth />} />
                           
                           {/* Customer Auth Routes - /auth/* */}
