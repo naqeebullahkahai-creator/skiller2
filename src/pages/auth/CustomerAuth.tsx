@@ -60,19 +60,24 @@ const CustomerAuth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      if (isSuperAdmin || role === "admin") {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (role === "seller") {
+      // Check for cross-domain redirect first (production domains)
+      const crossDomainUrl = getCrossDomainRedirectUrl(role);
+      if (crossDomainUrl) {
+        window.location.href = crossDomainUrl;
+        return;
+      }
+      
+      // In-app redirect (localhost, preview, or already on correct domain)
+      const redirectPath = getInAppRedirectPath(role);
+      if (role === "seller") {
         toast({
           title: "Redirecting to Seller Portal",
           description: "You have a seller account. Redirecting to your dashboard.",
         });
-        navigate("/seller/dashboard", { replace: true });
-      } else {
-        navigate("/", { replace: true });
       }
+      navigate(redirectPath, { replace: true });
     }
-  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate, toast]);
+  }, [isAuthenticated, role, isLoading, navigate, toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
