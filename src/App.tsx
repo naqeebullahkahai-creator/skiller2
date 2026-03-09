@@ -394,35 +394,39 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Seller Routes - Nested under sidebar layout */}
-                          <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
-                            <Route path="dashboard" element={<SellerDashboardHome />} />
-                            <Route path="kyc" element={<SellerKyc />} />
-                            <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
-                            <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
-                            <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
-                            <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
-                            <Route path="reviews" element={<SellerReviewsPage />} />
-                            <Route path="qa" element={<VerifiedSellerGuard><SellerQAPage /></VerifiedSellerGuard>} />
-                            <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
-                            <Route path="flash-sale" element={<SellerFlashSalePage />} />
-                            <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
-                            <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
-                            <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
-                            <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
-                            <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
-                            <Route path="settings" element={<SellerSettingsPage />} />
-                            <Route path="fee-guide" element={<SellerFeeGuidePage />} />
-                          </Route>
+                          {/* Seller Routes - main & seller domains */}
+                          {(domainRole === 'main' || domainRole === 'seller') && (
+                            <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
+                              <Route path="dashboard" element={<SellerDashboardHome />} />
+                              <Route path="kyc" element={<SellerKyc />} />
+                              <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
+                              <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
+                              <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
+                              <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
+                              <Route path="reviews" element={<SellerReviewsPage />} />
+                              <Route path="qa" element={<VerifiedSellerGuard><SellerQAPage /></VerifiedSellerGuard>} />
+                              <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
+                              <Route path="flash-sale" element={<SellerFlashSalePage />} />
+                              <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
+                              <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
+                              <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
+                              <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
+                              <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
+                              <Route path="settings" element={<SellerSettingsPage />} />
+                              <Route path="fee-guide" element={<SellerFeeGuidePage />} />
+                            </Route>
+                          )}
 
-                          {/* Support Agent Routes - Nested under layout */}
-                          <Route path="/agent" element={<AgentDashboardLayout />}>
-                            <Route path="dashboard" element={<AgentDashboardHome />} />
-                            <Route path="chats" element={<AgentChatsPage />} />
-                            <Route path="earnings" element={<AgentEarningsPage />} />
-                            <Route path="performance" element={<AgentPerformancePage />} />
-                            <Route path="settings" element={<AgentSettingsPage />} />
-                          </Route>
+                          {/* Support Agent Routes - main & agent domains */}
+                          {(domainRole === 'main' || domainRole === 'agent') && (
+                            <Route path="/agent" element={<AgentDashboardLayout />}>
+                              <Route path="dashboard" element={<AgentDashboardHome />} />
+                              <Route path="chats" element={<AgentChatsPage />} />
+                              <Route path="earnings" element={<AgentEarningsPage />} />
+                              <Route path="performance" element={<AgentPerformancePage />} />
+                              <Route path="settings" element={<AgentSettingsPage />} />
+                            </Route>
+                          )}
 
                           {/* === PWA Mobile Apps === */}
                           {/* Customer App - /app */}
