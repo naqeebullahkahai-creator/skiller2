@@ -31,6 +31,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MapPin, Plus, Trash2, Star, Loader2, Phone, Home, Pencil, Building2, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import EmptyState from "@/components/ui/empty-state";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const addressSchema = z.object({
   full_name: z.string().min(3, "Full name must be at least 3 characters").max(100),
@@ -67,6 +68,7 @@ const AddressesPage = () => {
     deleteAddress,
     setDefaultAddress,
   } = useUserAddresses();
+  const isMobile = useIsMobile();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState("");
@@ -168,22 +170,141 @@ const AddressesPage = () => {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin size={20} />
-            Saved Addresses
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        </CardContent>
-      </Card>
+      <div className={cn(isMobile ? "py-8" : "")}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin size={20} />
+              Saved Addresses
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <div className="space-y-3">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-sm text-muted-foreground">
+            {addresses.length} saved address{addresses.length !== 1 ? "es" : ""}
+          </p>
+          <Button size="sm" onClick={openAddModal} className="h-9">
+            <Plus size={14} className="mr-1.5" />
+            Add New
+          </Button>
+        </div>
+
+        {addresses.length === 0 ? (
+          <div className="py-8">
+            <EmptyState
+              type="default"
+              title="No addresses saved"
+              description="Add a delivery address to make checkout faster."
+              actionLabel="Add Your First Address"
+              onAction={openAddModal}
+              icon={<MapPin size={48} strokeWidth={1.5} />}
+            />
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {addresses.map((address) => {
+              const LabelIcon = getLabelIcon(address.label || "Home");
+              return (
+                <div
+                  key={address.id}
+                  className={cn(
+                    "bg-card border rounded-xl p-4",
+                    address.is_default ? "border-primary ring-1 ring-primary/20" : "border-border"
+                  )}
+                >
+                  {/* Label + Default */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={cn(
+                      "p-1 rounded",
+                      address.is_default ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                    )}>
+                      <LabelIcon size={14} />
+                    </div>
+                    <span className="text-xs font-medium uppercase text-muted-foreground">
+                      {address.label || "Home"}
+                    </span>
+                    {address.is_default && (
+                      <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full flex items-center gap-0.5 ml-auto">
+                        <Star size={8} />
+                        Default
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <p className="font-semibold text-sm">{address.full_name}</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <Phone size={10} />
+                    {address.phone}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2">
+                    {address.full_address}
+                    {address.area && `, ${address.area}`}, {address.city}, {address.province}
+                  </p>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+                    {!address.is_default && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs flex-1"
+                        onClick={() => handleSetDefault(address.id)}
+                      >
+                        <Star size={12} className="mr-1" />
+                        Set Default
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs"
+                      onClick={() => openEditModal(address)}
+                    >
+                      <Pencil size={12} className="mr-1" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => handleDelete(address.id)}
+                      disabled={deletingId === address.id}
+                    >
+                      {deletingId === address.id ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={12} />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Modal */}
+        {renderAddressModal()}
+      </div>
+    );
+  }
+
+  // Desktop Layout
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -223,7 +344,6 @@ const AddressesPage = () => {
                     address.is_default ? "border-primary ring-1 ring-primary/20" : "border-border"
                   )}
                 >
-                  {/* Header with Label and Default Badge */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <div className={cn(
@@ -242,7 +362,6 @@ const AddressesPage = () => {
                     )}
                   </div>
 
-                  {/* Address Details */}
                   <div className="space-y-1">
                     <p className="font-semibold">{address.full_name}</p>
                     <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -258,7 +377,6 @@ const AddressesPage = () => {
                     </p>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
                     {!address.is_default && (
                       <Button
@@ -299,7 +417,12 @@ const AddressesPage = () => {
         )}
       </CardContent>
 
-      {/* Add/Edit Address Modal */}
+      {renderAddressModal()}
+    </Card>
+  );
+
+  function renderAddressModal() {
+    return (
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -311,7 +434,6 @@ const AddressesPage = () => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-              {/* Address Label */}
               <FormField
                 control={form.control}
                 name="label"
@@ -348,7 +470,7 @@ const AddressesPage = () => {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter recipient's full name" {...field} />
+                      <Input placeholder="Enter recipient's full name" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -362,7 +484,7 @@ const AddressesPage = () => {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="0300-1234567" {...field} />
+                      <Input placeholder="0300-1234567" inputMode="tel" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -384,7 +506,7 @@ const AddressesPage = () => {
                       value={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12">
                           <SelectValue placeholder="Select province" />
                         </SelectTrigger>
                       </FormControl>
@@ -413,7 +535,7 @@ const AddressesPage = () => {
                       disabled={!selectedProvince}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-12">
                           <SelectValue placeholder="Select city" />
                         </SelectTrigger>
                       </FormControl>
@@ -437,7 +559,7 @@ const AddressesPage = () => {
                   <FormItem>
                     <FormLabel>Area / Sector (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., DHA Phase 5, Gulberg" {...field} />
+                      <Input placeholder="e.g., DHA Phase 5, Gulberg" className="h-12 text-base" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -453,6 +575,7 @@ const AddressesPage = () => {
                     <FormControl>
                       <Input
                         placeholder="House/Flat No., Street, Landmark"
+                        className="h-12 text-base"
                         {...field}
                       />
                     </FormControl>
@@ -484,11 +607,11 @@ const AddressesPage = () => {
                   type="button"
                   variant="outline"
                   onClick={() => setShowModal(false)}
-                  className="flex-1"
+                  className="flex-1 h-12"
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1 h-12">
                   {editingAddress ? "Update Address" : "Save Address"}
                 </Button>
               </div>
@@ -496,8 +619,8 @@ const AddressesPage = () => {
           </Form>
         </DialogContent>
       </Dialog>
-    </Card>
-  );
+    );
+  }
 };
 
 export default AddressesPage;
