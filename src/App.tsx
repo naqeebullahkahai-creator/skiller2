@@ -12,6 +12,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { VisualEditProvider } from "@/contexts/VisualEditContext";
 import AuthModal from "@/components/auth/AuthModal";
 import CrossDomainAuthRedirector from "@/components/auth/CrossDomainAuthRedirector";
+import CrossDomainSessionReceiver from "@/components/auth/CrossDomainSessionReceiver";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import MaintenanceGuard from "@/components/MaintenanceGuard"; // force rebuild
 import ErrorBoundary from "@/components/ErrorBoundary";
