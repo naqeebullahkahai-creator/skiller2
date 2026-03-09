@@ -12,6 +12,7 @@ import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainRouting";
+import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
