@@ -331,10 +331,10 @@ const App = () => (
                             </>
                           )}
                           
-                          {/* Admin Routes - main & admin domains */}
-                          {(domainRole === 'main' || domainRole === 'admin') && (
-                            <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboardLayout /></ProtectedRoute>}>
-                              <Route path="dashboard" element={<AdminDashboardHome />} />
+                           {/* Admin Routes - admin domain (and dev/preview) */}
+                           {((domainRole === 'admin') || devAllowsAll) && (
+                             <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboardLayout /></ProtectedRoute>}>
+                               <Route path="dashboard" element={<AdminDashboardHome />} />
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
