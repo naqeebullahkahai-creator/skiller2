@@ -396,10 +396,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Seller Routes - main & seller domains */}
-                          {(domainRole === 'main' || domainRole === 'seller') && (
-                            <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
-                              <Route path="dashboard" element={<SellerDashboardHome />} />
+                           {/* Seller Routes - seller domain (and dev/preview) */}
+                           {((domainRole === 'seller') || devAllowsAll) && (
+                             <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
+                               <Route path="dashboard" element={<SellerDashboardHome />} />
                               <Route path="kyc" element={<SellerKyc />} />
                               <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
                               <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
