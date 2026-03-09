@@ -85,13 +85,19 @@ const Auth = () => {
         if (result.success) {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            if (user.email === "alxteam001@gmail.com") {
-              toast({ title: "Welcome Admin!", description: "Redirecting to Admin Dashboard..." });
-              navigate("/admin/dashboard", { replace: true }); return;
-            }
             const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", user.id).maybeSingle();
-            if (roleData?.role === "admin") { toast({ title: "Welcome Admin!" }); navigate("/admin/dashboard", { replace: true }); return; }
-            if (roleData?.role === "seller") { toast({ title: "Seller Portal" }); navigate("/seller/dashboard", { replace: true }); return; }
+            const detectedRole = roleData?.role || 'customer';
+            
+            // Cross-domain redirect if on production
+            const crossDomainUrl = getCrossDomainRedirectUrl(detectedRole);
+            if (crossDomainUrl) {
+              toast({ title: "Redirecting...", description: `Taking you to your ${detectedRole} dashboard.` });
+              window.location.href = crossDomainUrl;
+              return;
+            }
+            
+            if (detectedRole === "admin") { toast({ title: "Welcome Admin!" }); navigate("/admin/dashboard", { replace: true }); return; }
+            if (detectedRole === "seller") { toast({ title: "Seller Portal" }); navigate("/seller/dashboard", { replace: true }); return; }
           }
           toast({ title: "Welcome back!", description: "You have successfully logged in." });
           navigate("/", { replace: true });
