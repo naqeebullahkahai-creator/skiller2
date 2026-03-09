@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
+import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainRouting";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -67,14 +68,16 @@ const SellerAuth = () => {
   // Role-based redirection
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      if (isSuperAdmin || role === "admin") {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (role === "seller") {
-        navigate("/seller/dashboard", { replace: true });
+      if (role === "customer") return; // handled by warning modal
+      
+      const crossDomainUrl = getCrossDomainRedirectUrl(role);
+      if (crossDomainUrl) {
+        window.location.href = crossDomainUrl;
+        return;
       }
-      // Customer case is handled by the warning modal
+      navigate(getInAppRedirectPath(role), { replace: true });
     }
-  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
+  }, [isAuthenticated, role, isLoading, navigate]);
 
   const handleLogoutAndContinue = async () => {
     await supabase.auth.signOut();

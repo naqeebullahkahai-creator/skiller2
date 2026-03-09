@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
+import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainRouting";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -42,10 +43,14 @@ const Auth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      if (isSuperAdmin || role === "admin") navigate("/admin/dashboard", { replace: true });
-      else if (role === "seller") navigate("/seller/dashboard", { replace: true });
+      const crossDomainUrl = getCrossDomainRedirectUrl(role);
+      if (crossDomainUrl) {
+        window.location.href = crossDomainUrl;
+        return;
+      }
+      navigate(getInAppRedirectPath(role), { replace: true });
     }
-  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
+  }, [isAuthenticated, role, isLoading, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -80,13 +85,19 @@ const Auth = () => {
         if (result.success) {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            if (user.email === "alxteam001@gmail.com") {
-              toast({ title: "Welcome Admin!", description: "Redirecting to Admin Dashboard..." });
-              navigate("/admin/dashboard", { replace: true }); return;
-            }
             const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", user.id).maybeSingle();
-            if (roleData?.role === "admin") { toast({ title: "Welcome Admin!" }); navigate("/admin/dashboard", { replace: true }); return; }
-            if (roleData?.role === "seller") { toast({ title: "Seller Portal" }); navigate("/seller/dashboard", { replace: true }); return; }
+            const detectedRole = roleData?.role || 'customer';
+            
+            // Cross-domain redirect if on production
+            const crossDomainUrl = getCrossDomainRedirectUrl(detectedRole);
+            if (crossDomainUrl) {
+              toast({ title: "Redirecting...", description: `Taking you to your ${detectedRole} dashboard.` });
+              window.location.href = crossDomainUrl;
+              return;
+            }
+            
+            if (detectedRole === "admin") { toast({ title: "Welcome Admin!" }); navigate("/admin/dashboard", { replace: true }); return; }
+            if (detectedRole === "seller") { toast({ title: "Seller Portal" }); navigate("/seller/dashboard", { replace: true }); return; }
           }
           toast({ title: "Welcome back!", description: "You have successfully logged in." });
           navigate("/", { replace: true });

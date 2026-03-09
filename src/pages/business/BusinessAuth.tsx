@@ -12,6 +12,7 @@ import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import { checkEmailRoleConflict } from "@/utils/roleValidation";
+import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainRouting";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RealTimeFieldValidator from "@/components/auth/RealTimeFieldValidator";
 
@@ -66,13 +67,20 @@ const BusinessAuth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      if (isSuperAdmin || role === "admin") {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (role === "seller") {
-        navigate("/seller/dashboard", { replace: true });
+      if (role === "customer") return; // handled by warning state above
+      
+      // Check for cross-domain redirect first (production domains)
+      const crossDomainUrl = getCrossDomainRedirectUrl(role);
+      if (crossDomainUrl) {
+        window.location.href = crossDomainUrl;
+        return;
       }
+      
+      // In-app redirect
+      const redirectPath = getInAppRedirectPath(role);
+      navigate(redirectPath, { replace: true });
     }
-  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
+  }, [isAuthenticated, role, isLoading, navigate]);
 
   const handleLogoutAndContinue = async () => {
     await supabase.auth.signOut();
