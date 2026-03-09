@@ -6,32 +6,52 @@
 export type DomainRole = 'main' | 'admin' | 'seller' | 'customer' | 'agent';
 
 type RoleSlug = 'admin' | 'seller' | 'customer' | 'agent' | 'main';
+type DomainStyle = 'hyphen' | 'dot';
 
 function normalizeHostname(hostname: string): string {
   return hostname.trim().toLowerCase();
 }
 
+interface Parsed2bdDomain {
+  baseLabel: string;
+  roleSlug: RoleSlug;
+  style: DomainStyle;
+}
+
 /**
- * We support both brand spellings that may exist in DNS:
- * - fanzon.2bd.net
- * - fanzoon.2bd.net
- * and their role-prefixed subdomains.
+ * Supported patterns:
+ * - Main: fanzon.2bd.net
+ * - Role (hyphen): admin-fanzon.2bd.net
+ * - Role (dot): admin.fanzon.2bd.net
  */
-function parse2bdDomain(hostname: string): { baseLabel: string; roleSlug: RoleSlug } | null {
+function parse2bdDomain(hostname: string): Parsed2bdDomain | null {
   const host = normalizeHostname(hostname);
 
-  // role subdomains first
-  const roleMatch = host.match(/^(admin|seller|customer|agent)-([a-z0-9-]+)\.2bd\.net$/i);
-  if (roleMatch) {
-    const roleSlug = roleMatch[1].toLowerCase() as RoleSlug;
-    const baseLabel = roleMatch[2].toLowerCase();
-    return { baseLabel, roleSlug };
+  const hyphenRoleMatch = host.match(/^(admin|seller|customer|agent)-([a-z0-9-]+)\.2bd\.net$/i);
+  if (hyphenRoleMatch) {
+    return {
+      roleSlug: hyphenRoleMatch[1].toLowerCase() as RoleSlug,
+      baseLabel: hyphenRoleMatch[2].toLowerCase(),
+      style: 'hyphen',
+    };
   }
 
-  // main domain
+  const dotRoleMatch = host.match(/^(admin|seller|customer|agent)\.([a-z0-9-]+)\.2bd\.net$/i);
+  if (dotRoleMatch) {
+    return {
+      roleSlug: dotRoleMatch[1].toLowerCase() as RoleSlug,
+      baseLabel: dotRoleMatch[2].toLowerCase(),
+      style: 'dot',
+    };
+  }
+
   const mainMatch = host.match(/^([a-z0-9-]+)\.2bd\.net$/i);
   if (mainMatch) {
-    return { baseLabel: mainMatch[1].toLowerCase(), roleSlug: 'main' };
+    return {
+      baseLabel: mainMatch[1].toLowerCase(),
+      roleSlug: 'main',
+      style: 'hyphen',
+    };
   }
 
   return null;
@@ -53,10 +73,10 @@ function roleSlugToDomainRole(roleSlug: RoleSlug): DomainRole {
   }
 }
 
-function build2bdDomainForRole(baseLabel: string, role: DomainRole): string {
+function build2bdDomainForRole(baseLabel: string, role: DomainRole, style: DomainStyle): string {
   const cleanBase = baseLabel.toLowerCase();
   if (role === 'main') return `${cleanBase}.2bd.net`;
-  return `${role}-${cleanBase}.2bd.net`;
+  return style === 'dot' ? `${role}.${cleanBase}.2bd.net` : `${role}-${cleanBase}.2bd.net`;
 }
 
 /**
@@ -113,7 +133,6 @@ export function getCrossDomainRedirectUrl(userRole: string): string | null {
   const parsed = parse2bdDomain(hostname);
   if (!parsed) return null;
 
-  // Map app roles to domain roles
   const roleToDomainRole: Record<string, DomainRole> = {
     admin: 'admin',
     seller: 'seller',
@@ -124,15 +143,14 @@ export function getCrossDomainRedirectUrl(userRole: string): string | null {
   const targetDomainRole = roleToDomainRole[userRole];
   if (!targetDomainRole) return null;
 
-  const currentDomainRole = getDomainRole();
+  const currentDomainRole = roleSlugToDomainRole(parsed.roleSlug);
 
-  // Already on the correct domain
   if (currentDomainRole === targetDomainRole) return null;
 
   // Customer on main domain is fine
   if (userRole === 'customer' && currentDomainRole === 'main') return null;
 
-  const targetHost = build2bdDomainForRole(parsed.baseLabel, targetDomainRole);
+  const targetHost = build2bdDomainForRole(parsed.baseLabel, targetDomainRole, parsed.style);
   const defaultPath = getDefaultPathForRole(targetDomainRole);
 
   return `https://${targetHost}${defaultPath}`;
@@ -154,3 +172,4 @@ export function getInAppRedirectPath(userRole: string): string {
       return '/';
   }
 }
+
