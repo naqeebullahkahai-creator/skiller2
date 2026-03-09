@@ -129,7 +129,7 @@ const VariantSelector = ({
                   : {selectedVariant.variant_value}
                   {selectedVariant.additional_price_pkr > 0 && (
                     <span className="text-primary ml-1">
-                      (+Rs. {selectedVariant.additional_price_pkr.toLocaleString()})
+                      (Rs. {selectedVariant.additional_price_pkr.toLocaleString()})
                     </span>
                   )}
                 </span>
