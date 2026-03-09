@@ -196,12 +196,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    // Cross-domain logout: signs out locally + sends logout signal to all sibling domains
+    await crossDomainLogout();
     setUser(null);
     setSession(null);
     setProfile(null);
     setRole(null);
-    // Import dynamically to avoid circular deps – toast is a standalone function
     const { toast } = await import("sonner");
     toast.success("Logged out. See you soon!");
   };
