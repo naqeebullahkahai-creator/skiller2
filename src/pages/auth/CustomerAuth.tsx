@@ -61,10 +61,11 @@ const CustomerAuth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      // Check for cross-domain redirect first (production domains)
       const crossDomainUrl = getCrossDomainRedirectUrl(role);
       if (crossDomainUrl) {
-        window.location.href = crossDomainUrl;
+        buildCrossDomainUrl(crossDomainUrl).then((url) => {
+          window.location.href = url;
+        });
         return;
       }
       

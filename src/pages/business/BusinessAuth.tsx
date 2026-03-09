@@ -68,12 +68,12 @@ const BusinessAuth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      if (role === "customer") return; // handled by warning state above
-      
-      // Check for cross-domain redirect first (production domains)
+      if (role === "customer") return;
       const crossDomainUrl = getCrossDomainRedirectUrl(role);
       if (crossDomainUrl) {
-        window.location.href = crossDomainUrl;
+        buildCrossDomainUrl(crossDomainUrl).then((url) => {
+          window.location.href = url;
+        });
         return;
       }
       

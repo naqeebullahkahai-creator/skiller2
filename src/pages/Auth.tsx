@@ -95,7 +95,9 @@ const Auth = () => {
             const crossDomainUrl = getCrossDomainRedirectUrl(detectedRole);
             if (crossDomainUrl) {
               toast({ title: "Redirecting...", description: `Taking you to your ${detectedRole} dashboard.` });
-              window.location.href = crossDomainUrl;
+              buildCrossDomainUrl(crossDomainUrl).then((url) => {
+                window.location.href = url;
+              });
               return;
             }
             

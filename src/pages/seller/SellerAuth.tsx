@@ -66,14 +66,14 @@ const SellerAuth = () => {
     }
   }, [isAuthenticated, role, isLoading]);
 
-  // Role-based redirection
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      if (role === "customer") return; // handled by warning modal
-      
+      if (role === "customer") return;
       const crossDomainUrl = getCrossDomainRedirectUrl(role);
       if (crossDomainUrl) {
-        window.location.href = crossDomainUrl;
+        buildCrossDomainUrl(crossDomainUrl).then((url) => {
+          window.location.href = url;
+        });
         return;
       }
       navigate(getInAppRedirectPath(role), { replace: true });
