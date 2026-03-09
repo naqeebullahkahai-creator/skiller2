@@ -288,7 +288,7 @@ const ProductDetail = () => {
                   </>
                 )}
               </div>
-              {additionalPrice > 0 && <p className="text-xs text-muted-foreground mt-1">Includes +Rs. {additionalPrice.toLocaleString()} for selected variant</p>}
+              {hasVariants && selectedVariant && variantPrice > 0 && <p className="text-xs text-muted-foreground mt-1">Price for selected variant: {selectedVariant.variant_value}</p>}
             </div>
 
             {hasVariants && (
