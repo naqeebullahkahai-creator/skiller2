@@ -46,7 +46,9 @@ const Auth = () => {
     if (!isLoading && isAuthenticated && role) {
       const crossDomainUrl = getCrossDomainRedirectUrl(role);
       if (crossDomainUrl) {
-        window.location.href = crossDomainUrl;
+        buildCrossDomainUrl(crossDomainUrl).then((url) => {
+          window.location.href = url;
+        });
         return;
       }
       navigate(getInAppRedirectPath(role), { replace: true });
