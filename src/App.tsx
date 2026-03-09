@@ -447,10 +447,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Seller App - /seller-app - main & seller domains */}
-                          {(domainRole === 'main' || domainRole === 'seller') && (
-                            <Route path="/seller-app" element={<SellerAppShell />}>
-                              <Route index element={<SellerDashboardHome />} />
+                           {/* Seller App - /seller-app - seller domain (and dev/preview) */}
+                           {((domainRole === 'seller') || devAllowsAll) && (
+                             <Route path="/seller-app" element={<SellerAppShell />}>
+                               <Route index element={<SellerDashboardHome />} />
                               <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
                               <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
                               <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
