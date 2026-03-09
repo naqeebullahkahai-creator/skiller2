@@ -142,15 +142,16 @@ const AdminCustomersManagement = () => {
             </Button>
           </div>
 
-          <Card>
+          {/* Desktop Table */}
+          <Card className="hidden md:block">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
                     <TableHead>Customer</TableHead>
-                    <TableHead className="hidden md:table-cell">Orders</TableHead>
-                    <TableHead className="hidden md:table-cell">Spent</TableHead>
+                    <TableHead>Orders</TableHead>
+                    <TableHead>Spent</TableHead>
                     <TableHead className="hidden lg:table-cell">Wallet</TableHead>
                     <TableHead className="hidden lg:table-cell">Joined</TableHead>
                     <TableHead>Actions</TableHead>
@@ -187,8 +188,8 @@ const AdminCustomersManagement = () => {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">{user.orders_count}</TableCell>
-                        <TableCell className="hidden md:table-cell">{formatPKR(user.total_spent)}</TableCell>
+                        <TableCell>{user.orders_count}</TableCell>
+                        <TableCell>{formatPKR(user.total_spent)}</TableCell>
                         <TableCell className="hidden lg:table-cell">{formatPKR(user.wallet_balance)}</TableCell>
                         <TableCell className="hidden lg:table-cell">{format(new Date(user.created_at), "MMM dd, yyyy")}</TableCell>
                         <TableCell>
@@ -203,6 +204,55 @@ const AdminCustomersManagement = () => {
               </Table>
             </CardContent>
           </Card>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {isLoading ? (
+              [...Array(4)].map((_, i) => (
+                <Card key={i} className="border-0 shadow-sm">
+                  <CardContent className="p-4 space-y-3">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : customers.length === 0 ? (
+              <Card><CardContent className="p-6 text-center text-muted-foreground">No customers found</CardContent></Card>
+            ) : (
+              customers.map((user) => (
+                <Card key={user.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => setSelectedUserId(user.id)}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Avatar className="h-10 w-10 shrink-0">
+                        {user.avatar_url && <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover aspect-square" />}
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">{user.full_name.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{user.full_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                      <Eye size={16} className="text-muted-foreground shrink-0" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Orders</p>
+                        <p className="text-sm font-bold">{user.orders_count}</p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Spent</p>
+                        <p className="text-sm font-bold truncate">{formatPKR(user.total_spent)}</p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Wallet</p>
+                        <p className="text-sm font-bold truncate">{formatPKR(user.wallet_balance)}</p>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-2 font-mono">{user.display_id || `FZN-USR-${user.id.slice(0, 6).toUpperCase()}`}</p>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         </TabsContent>
       </Tabs>
 

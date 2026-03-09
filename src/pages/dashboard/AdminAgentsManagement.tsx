@@ -203,15 +203,16 @@ const AdminAgentsManagement = () => {
             <Input placeholder="Search agents..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
           </div>
 
-          <Card>
+          {/* Desktop Table */}
+          <Card className="hidden md:block">
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Agent</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">Sessions</TableHead>
-                    <TableHead className="hidden md:table-cell">Resolved</TableHead>
+                    <TableHead>Sessions</TableHead>
+                    <TableHead>Resolved</TableHead>
                     <TableHead className="hidden lg:table-cell">Avg Rating</TableHead>
                     <TableHead className="hidden lg:table-cell">Last Seen</TableHead>
                   </TableRow>
@@ -250,8 +251,8 @@ const AdminAgentsManagement = () => {
                             {agent.is_online ? <><CheckCircle size={10} /> Online</> : <><XCircle size={10} /> Offline</>}
                           </Badge>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell">{agent.total_sessions}</TableCell>
-                        <TableCell className="hidden md:table-cell">{agent.resolved_sessions}</TableCell>
+                        <TableCell>{agent.total_sessions}</TableCell>
+                        <TableCell>{agent.resolved_sessions}</TableCell>
                         <TableCell className="hidden lg:table-cell">
                           <div className="flex items-center gap-1">
                             <Star className="h-3 w-3 text-yellow-500" />
@@ -268,6 +269,63 @@ const AdminAgentsManagement = () => {
               </Table>
             </CardContent>
           </Card>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-3">
+            {isLoading ? (
+              [...Array(3)].map((_, i) => (
+                <Card key={i} className="border-0 shadow-sm">
+                  <CardContent className="p-4 space-y-3">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : agents.length === 0 ? (
+              <Card><CardContent className="p-6 text-center text-muted-foreground">No agents found. Assign the "support_agent" role via Roles & Permissions.</CardContent></Card>
+            ) : (
+              agents.map((agent) => (
+                <Card key={agent.id} className="border-0 shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Avatar className="h-10 w-10 shrink-0">
+                        <AvatarFallback className="bg-indigo-100 text-indigo-600 text-sm">{agent.full_name.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{agent.full_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{agent.email}</p>
+                      </div>
+                      <Badge variant={agent.is_online ? "default" : "secondary"} className={cn("gap-1 shrink-0", agent.is_online && "bg-green-500")}>
+                        {agent.is_online ? <><CheckCircle size={10} /> Online</> : <><XCircle size={10} /> Offline</>}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Sessions</p>
+                        <p className="text-sm font-bold">{agent.total_sessions}</p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Resolved</p>
+                        <p className="text-sm font-bold">{agent.resolved_sessions}</p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Rating</p>
+                        <p className="text-sm font-bold flex items-center justify-center gap-0.5">
+                          <Star className="h-3 w-3 text-yellow-500" />
+                          {agent.avg_rating > 0 ? agent.avg_rating.toFixed(1) : "—"}
+                        </p>
+                      </div>
+                    </div>
+                    {agent.last_seen_at && (
+                      <p className="text-[10px] text-muted-foreground mt-2 flex items-center gap-1">
+                        <Clock size={10} /> Last seen: {format(new Date(agent.last_seen_at), "MMM dd, HH:mm")}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>
