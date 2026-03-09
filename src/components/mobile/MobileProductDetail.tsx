@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Star, Heart, Minus, Plus, ShoppingCart, Truck, Shield,
   RotateCcw, Store, Package, ChevronLeft, Share2, ChevronDown, ChevronUp,
