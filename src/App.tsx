@@ -303,27 +303,31 @@ const App = () => (
                             </>
                           )}
                           
-                          {/* Customer Account Routes */}
-                          <Route 
-                            path="/account" 
-                            element={
-                              <ProtectedRoute>
-                                <AccountLayout />
-                              </ProtectedRoute>
-                            }
-                          >
-                            <Route index element={<AccountIndexRedirect />} />
-                            <Route path="profile" element={<ProfilePage />} />
-                            <Route path="orders" element={<OrdersPage />} />
-                            <Route path="orders/:orderId" element={<OrderDetailPage />} />
-                            <Route path="wishlist" element={<WishlistPage />} />
-                            <Route path="addresses" element={<AddressesPage />} />
-                            <Route path="messages" element={<CustomerMessagesPage />} />
-                            <Route path="notifications" element={<NotificationsPage />} />
-                          <Route path="wallet" element={<WalletPage />} />
-                          <Route path="referrals" element={<ReferralPage />} />
-                          </Route>
-                          <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
+                          {/* Customer Account Routes - main & customer domains */}
+                          {(domainRole === 'main' || domainRole === 'customer') && (
+                            <>
+                              <Route 
+                                path="/account" 
+                                element={
+                                  <ProtectedRoute>
+                                    <AccountLayout />
+                                  </ProtectedRoute>
+                                }
+                              >
+                                <Route index element={<AccountIndexRedirect />} />
+                                <Route path="profile" element={<ProfilePage />} />
+                                <Route path="orders" element={<OrdersPage />} />
+                                <Route path="orders/:orderId" element={<OrderDetailPage />} />
+                                <Route path="wishlist" element={<WishlistPage />} />
+                                <Route path="addresses" element={<AddressesPage />} />
+                                <Route path="messages" element={<CustomerMessagesPage />} />
+                                <Route path="notifications" element={<NotificationsPage />} />
+                                <Route path="wallet" element={<WalletPage />} />
+                                <Route path="referrals" element={<ReferralPage />} />
+                              </Route>
+                              <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
+                            </>
+                          )}
                           
                           {/* Admin Routes - Nested under sidebar layout */}
                           <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboardLayout /></ProtectedRoute>}>
