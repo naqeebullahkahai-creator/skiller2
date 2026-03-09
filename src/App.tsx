@@ -164,6 +164,9 @@ import AgentAppShell from "./components/pwa/AgentAppShell";
 import CustomerAppHome from "./pages/pwa/CustomerAppHome";
 
 import ScrollToTop from "./components/ScrollToTop";
+import { getDomainRole, getDefaultPathForRole, type DomainRole } from "./utils/domainRouting";
+
+const domainRole = getDomainRole();
 
 const queryClient = new QueryClient({
   defaultOptions: {
