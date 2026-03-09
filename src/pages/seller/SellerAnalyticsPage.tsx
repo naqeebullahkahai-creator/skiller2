@@ -102,20 +102,20 @@ const SellerAnalyticsPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Sales Analytics</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl md:text-2xl font-bold">Sales Analytics</h1>
+          <p className="text-sm text-muted-foreground">
             Track your performance and customer insights
           </p>
         </div>
         
         {/* Export Section */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[160px] sm:w-[180px]">
               <Calendar className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Select month" />
             </SelectTrigger>
@@ -127,77 +127,77 @@ const SellerAnalyticsPage = () => {
               ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={handleExportPDF} disabled={exportLoading}>
-            {exportLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+          <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={exportLoading}>
+            {exportLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Download className="w-4 h-4 mr-1.5" />}
             PDF
           </Button>
-          <Button variant="outline" onClick={handleExportCSV} disabled={exportLoading}>
-            <FileText className="w-4 h-4 mr-2" />
+          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={exportLoading}>
+            <FileText className="w-4 h-4 mr-1.5" />
             CSV
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Earnings</p>
-                <p className="text-2xl font-bold text-fanzon-success">
+                <p className="text-xs text-muted-foreground">Total Earnings</p>
+                <p className="text-lg md:text-2xl font-bold text-fanzon-success">
                   {formatPKR(totalStats.totalEarnings)}
                 </p>
               </div>
-              <div className="p-3 bg-fanzon-success/10 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-fanzon-success" />
+              <div className="p-2 md:p-3 bg-fanzon-success/10 rounded-lg hidden sm:block">
+                <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-fanzon-success" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Orders</p>
-                <p className="text-2xl font-bold">{totalStats.totalOrders}</p>
+                <p className="text-xs text-muted-foreground">Total Orders</p>
+                <p className="text-lg md:text-2xl font-bold">{totalStats.totalOrders}</p>
               </div>
-              <div className="p-3 bg-blue-500/10 rounded-lg">
-                <ShoppingCart className="w-6 h-6 text-blue-500" />
+              <div className="p-2 md:p-3 bg-blue-500/10 rounded-lg hidden sm:block">
+                <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Avg Order Value</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs text-muted-foreground">Avg Order Value</p>
+                <p className="text-lg md:text-2xl font-bold">
                   {formatPKR(totalStats.avgOrderValue)}
                 </p>
               </div>
-              <div className="p-3 bg-purple-500/10 rounded-lg">
-                <Package className="w-6 h-6 text-purple-500" />
+              <div className="p-2 md:p-3 bg-purple-500/10 rounded-lg hidden sm:block">
+                <Package className="w-5 h-5 md:w-6 md:h-6 text-purple-500" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Repeat Customers</p>
-                <p className="text-2xl font-bold">{repeatCustomerStats.percentage}%</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {repeatCustomerStats.repeat} of {repeatCustomerStats.total} customers
+                <p className="text-xs text-muted-foreground">Repeat Customers</p>
+                <p className="text-lg md:text-2xl font-bold">{repeatCustomerStats.percentage}%</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {repeatCustomerStats.repeat} of {repeatCustomerStats.total}
                 </p>
               </div>
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Users className="w-6 h-6 text-primary" />
+              <div className="p-2 md:p-3 bg-primary/10 rounded-lg hidden sm:block">
+                <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
               </div>
             </div>
           </CardContent>
@@ -321,32 +321,50 @@ const SellerAnalyticsPage = () => {
           </CardHeader>
           <CardContent>
             {topProducts.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>#</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead className="text-right">Units</TableHead>
-                    <TableHead className="text-right">Revenue</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Desktop Table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>#</TableHead>
+                        <TableHead>Product</TableHead>
+                        <TableHead className="text-right">Units</TableHead>
+                        <TableHead className="text-right">Revenue</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {topProducts.map((product, index) => (
+                        <TableRow key={product.id}>
+                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell className="max-w-[150px] truncate">
+                            {product.title}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {product.total_sold}
+                          </TableCell>
+                          <TableCell className="text-right font-medium text-fanzon-success">
+                            {formatPKR(product.total_revenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-2">
                   {topProducts.map((product, index) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell className="max-w-[150px] truncate">
-                        {product.title}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {product.total_sold}
-                      </TableCell>
-                      <TableCell className="text-right font-medium text-fanzon-success">
-                        {formatPKR(product.total_revenue)}
-                      </TableCell>
-                    </TableRow>
+                    <div key={product.id} className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
+                      <span className="text-sm font-bold text-muted-foreground w-5 shrink-0">#{index + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{product.title}</p>
+                        <p className="text-xs text-muted-foreground">{product.total_sold} units sold</p>
+                      </div>
+                      <span className="text-sm font-semibold text-fanzon-success shrink-0">{formatPKR(product.total_revenue)}</span>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              </>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 No sales data yet
