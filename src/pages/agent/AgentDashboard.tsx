@@ -56,7 +56,6 @@ const AgentDashboard = () => {
       return data || [];
     },
     enabled: !!user,
-    refetchInterval: 10000,
   });
 
   const { data: waitingSessions = [] } = useQuery({
@@ -66,8 +65,23 @@ const AgentDashboard = () => {
       return data || [];
     },
     enabled: !!user && isOnline,
-    refetchInterval: 5000,
   });
+
+  // Realtime subscription for sessions
+  useEffect(() => {
+    const channel = supabase
+      .channel("agent-dashboard-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "support_chat_sessions" }, (payload) => {
+        if (payload.eventType === "INSERT" && (payload.new as any).status === "waiting") {
+          toast.info("🆘 New support request!", { duration: 4000 });
+        }
+        queryClient.invalidateQueries({ queryKey: ["agent-sessions"] });
+        queryClient.invalidateQueries({ queryKey: ["waiting-sessions"] });
+        queryClient.invalidateQueries({ queryKey: ["agent-today-stats"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
 
   const { data: todayStats } = useQuery({
     queryKey: ["agent-today-stats", user?.id],
