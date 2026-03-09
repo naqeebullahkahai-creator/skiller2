@@ -9,6 +9,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const TOKEN_HASH_PREFIX = "#sso_";
+const LOGOUT_HASH = "#sso_logout";
 
 /**
  * Build a cross-domain URL that includes the current session tokens
@@ -40,6 +41,14 @@ export async function receiveSessionFromUrl(): Promise<boolean> {
   if (typeof window === "undefined") return false;
 
   const hash = window.location.hash;
+
+  // Handle logout signal
+  if (hash === LOGOUT_HASH) {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    await supabase.auth.signOut();
+    return false;
+  }
+
   if (!hash.startsWith(TOKEN_HASH_PREFIX)) return false;
 
   const paramString = hash.slice(TOKEN_HASH_PREFIX.length);
@@ -68,4 +77,76 @@ export async function receiveSessionFromUrl(): Promise<boolean> {
     console.error("Cross-domain session restore error:", e);
     return false;
   }
+}
+
+/**
+ * Get the base label from the current hostname (e.g. "fanzon" from "admin-fanzon.2bd.net").
+ */
+function getBaseLabel(): string | null {
+  if (typeof window === "undefined") return null;
+  const host = window.location.hostname.toLowerCase();
+  
+  // role-prefix hyphen style
+  const hyphen = host.match(/^(?:admin|seller|customer|agent)-([a-z0-9-]+)\.2bd\.net$/);
+  if (hyphen) return hyphen[1];
+  
+  // role-prefix dot style
+  const dot = host.match(/^(?:admin|seller|customer|agent)\.([a-z0-9-]+)\.2bd\.net$/);
+  if (dot) return dot[1];
+  
+  // main domain
+  const main = host.match(/^([a-z0-9-]+)\.2bd\.net$/);
+  if (main) return main[1];
+  
+  return null;
+}
+
+/**
+ * Get all sibling domain origins for cross-domain logout.
+ * Returns the other subdomain origins (not the current one).
+ */
+export function getSiblingDomainOrigins(): string[] {
+  const base = getBaseLabel();
+  if (!base) return [];
+
+  const currentHost = window.location.hostname.toLowerCase();
+  const allHosts = [
+    `${base}.2bd.net`,           // main
+    `admin-${base}.2bd.net`,     // admin
+    `seller-${base}.2bd.net`,    // seller
+    `customer-${base}.2bd.net`,  // customer  
+    `agent-${base}.2bd.net`,     // agent
+  ];
+
+  return allHosts
+    .filter((h) => h !== currentHost)
+    .map((h) => `https://${h}`);
+}
+
+/**
+ * Perform cross-domain logout by:
+ * 1. Signing out locally
+ * 2. Loading hidden iframes on sibling domains with logout signal
+ */
+export async function crossDomainLogout(): Promise<void> {
+  const siblings = getSiblingDomainOrigins();
+
+  // Sign out locally first
+  await supabase.auth.signOut();
+
+  // Fire-and-forget iframe logout on sibling domains
+  siblings.forEach((origin) => {
+    try {
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = `${origin}/${LOGOUT_HASH}`;
+      document.body.appendChild(iframe);
+      // Clean up after 5 seconds
+      setTimeout(() => {
+        try { document.body.removeChild(iframe); } catch (_) {}
+      }, 5000);
+    } catch (_) {
+      // Silently ignore if iframe fails
+    }
+  });
 }

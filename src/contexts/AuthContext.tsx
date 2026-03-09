@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { crossDomainLogout } from "@/utils/crossDomainAuth";
 import { User, Session } from "@supabase/supabase-js";
 
 export type UserRole = "admin" | "seller" | "customer" | "support_agent";
@@ -195,12 +196,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    // Cross-domain logout: signs out locally + sends logout signal to all sibling domains
+    await crossDomainLogout();
     setUser(null);
     setSession(null);
     setProfile(null);
     setRole(null);
-    // Import dynamically to avoid circular deps – toast is a standalone function
     const { toast } = await import("sonner");
     toast.success("Logged out. See you soon!");
   };
