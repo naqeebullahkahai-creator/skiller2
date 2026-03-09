@@ -429,103 +429,110 @@ const App = () => (
                           )}
 
                           {/* === PWA Mobile Apps === */}
-                          {/* Customer App - /app */}
-                          <Route path="/app" element={<CustomerAppShell />}>
-                            <Route index element={<CustomerAppHome />} />
-                            <Route path="orders" element={<OrdersPage />} />
-                            <Route path="orders/:orderId" element={<OrderDetailPage />} />
-                            <Route path="wishlist" element={<WishlistPage />} />
-                            <Route path="messages" element={<CustomerMessagesPage />} />
-                            <Route path="wallet" element={<WalletPage />} />
-                            <Route path="profile" element={<ProfilePage />} />
-                            <Route path="addresses" element={<AddressesPage />} />
-                            <Route path="notifications" element={<NotificationsPage />} />
-                            <Route path="referrals" element={<ReferralPage />} />
-                          </Route>
+                          {/* Customer App - /app - main & customer domains */}
+                          {(domainRole === 'main' || domainRole === 'customer') && (
+                            <Route path="/app" element={<CustomerAppShell />}>
+                              <Route index element={<CustomerAppHome />} />
+                              <Route path="orders" element={<OrdersPage />} />
+                              <Route path="orders/:orderId" element={<OrderDetailPage />} />
+                              <Route path="wishlist" element={<WishlistPage />} />
+                              <Route path="messages" element={<CustomerMessagesPage />} />
+                              <Route path="wallet" element={<WalletPage />} />
+                              <Route path="profile" element={<ProfilePage />} />
+                              <Route path="addresses" element={<AddressesPage />} />
+                              <Route path="notifications" element={<NotificationsPage />} />
+                              <Route path="referrals" element={<ReferralPage />} />
+                            </Route>
+                          )}
 
-                          {/* Seller App - /seller-app */}
-                          <Route path="/seller-app" element={<SellerAppShell />}>
-                            <Route index element={<SellerDashboardHome />} />
-                            <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
-                            <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
-                            <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
-                            <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
-                            <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
-                            <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
-                            <Route path="reviews" element={<SellerReviewsPage />} />
-                            <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
-                            <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
-                            <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
-                            <Route path="flash-sale" element={<SellerFlashSalePage />} />
-                            <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
-                            <Route path="settings" element={<SellerSettingsPage />} />
-                            <Route path="fee-guide" element={<SellerFeeGuidePage />} />
-                            <Route path="kyc" element={<SellerKyc />} />
-                          </Route>
+                          {/* Seller App - /seller-app - main & seller domains */}
+                          {(domainRole === 'main' || domainRole === 'seller') && (
+                            <Route path="/seller-app" element={<SellerAppShell />}>
+                              <Route index element={<SellerDashboardHome />} />
+                              <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
+                              <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
+                              <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
+                              <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
+                              <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
+                              <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
+                              <Route path="reviews" element={<SellerReviewsPage />} />
+                              <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
+                              <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
+                              <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
+                              <Route path="flash-sale" element={<SellerFlashSalePage />} />
+                              <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
+                              <Route path="settings" element={<SellerSettingsPage />} />
+                              <Route path="fee-guide" element={<SellerFeeGuidePage />} />
+                              <Route path="kyc" element={<SellerKyc />} />
+                            </Route>
+                          )}
 
-                          {/* Admin App - /admin-app */}
-                          <Route path="/admin-app" element={<AdminAppShell />}>
-                            <Route index element={<AdminDashboardHome />} />
-                            <Route path="sellers-management" element={<AdminSellersManagement />} />
-                            <Route path="customers-management" element={<AdminCustomersManagement />} />
-                            <Route path="agents-management" element={<AdminAgentsManagement />} />
-                            <Route path="orders-management" element={<AdminOrdersManagement />} />
-                            <Route path="products-management" element={<AdminProductsManagement />} />
-                            <Route path="finance-management" element={<AdminFinanceManagement />} />
-                            <Route path="marketing-management" element={<AdminMarketingManagement />} />
-                            <Route path="content-management" element={<AdminContentManagement />} />
-                            <Route path="security-management" element={<AdminSecurityManagement />} />
-                            <Route path="agents-management" element={<AdminAgentsManagement />} />
-                            <Route path="orders" element={<AdminOrderManagement />} />
-                            <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
-                            <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />
-                            <Route path="users" element={<AdminUserDirectory />} />
-                            <Route path="sellers" element={<AdminSellersDirectory />} />
-                            <Route path="sellers/:sellerId" element={<AdminSellerDetailPage />} />
-                            <Route path="products" element={<AdminProductCatalog />} />
-                            <Route path="categories" element={<AdminCategoryManager />} />
-                            <Route path="approvals" element={<AdminProductApprovals />} />
-                            <Route path="seller-kyc" element={<AdminSellerKyc />} />
-                            <Route path="seller-kyc/:sellerId" element={<AdminSellerDetail />} />
-                            <Route path="returns" element={<AdminReturnsPage />} />
-                            <Route path="cancellations" element={<AdminCancellationsPage />} />
-                            <Route path="cancelled" element={<AdminCancelledOrdersPage />} />
-                            <Route path="analytics" element={<AdminAnalyticsPage />} />
-                            <Route path="reviews" element={<AdminReviewsPage />} />
-                            <Route path="qa" element={<AdminQAModerationPage />} />
-                            <Route path="flash-sales" element={<FlashSaleManager />} />
-                            <Route path="flash-nominations" element={<AdminFlashNominations />} />
-                            <Route path="vouchers" element={<VoucherManager />} />
-                            <Route path="banners" element={<BannerManager />} />
-                            <Route path="subscriptions" element={<AdminSubscriptionPage />} />
-                            <Route path="balance-adjustments" element={<AdminBalanceAdjustmentsPage />} />
-                            <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
-                            <Route path="payment-settings" element={<AdminPaymentSettingsPage />} />
-                            <Route path="deposits/sellers" element={<AdminSellerDepositsPage />} />
-                            <Route path="deposits/users" element={<AdminUserDepositsPage />} />
-                            <Route path="deposits/settings" element={<AdminDepositSettings />} />
-                            <Route path="payouts" element={<AdminPayoutManagement />} />
-                            <Route path="roles" element={<AdminRolesPage />} />
-                            <Route path="notifications" element={<AdminNotificationsPage />} />
-                            <Route path="wallet" element={<AdminWalletPage />} />
-                            <Route path="settings" element={<AdminAllSettingsPage />} />
-                            <Route path="site-settings" element={<SocialSettingsPage />} />
-                            <Route path="brand-assets" element={<AdminBrandAssetsPage />} />
-                            <Route path="content-manager" element={<AdminSiteContentPage />} />
-                            <Route path="chat-shortcuts" element={<AdminChatShortcutsPage />} />
-                            <Route path="commission-management" element={<AdminCommissionManagementPage />} />
-                            <Route path="security" element={<AdminSecurityPage />} />
-                            <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
-                          </Route>
+                          {/* Admin App - /admin-app - main & admin domains */}
+                          {(domainRole === 'main' || domainRole === 'admin') && (
+                            <Route path="/admin-app" element={<AdminAppShell />}>
+                              <Route index element={<AdminDashboardHome />} />
+                              <Route path="sellers-management" element={<AdminSellersManagement />} />
+                              <Route path="customers-management" element={<AdminCustomersManagement />} />
+                              <Route path="agents-management" element={<AdminAgentsManagement />} />
+                              <Route path="orders-management" element={<AdminOrdersManagement />} />
+                              <Route path="products-management" element={<AdminProductsManagement />} />
+                              <Route path="finance-management" element={<AdminFinanceManagement />} />
+                              <Route path="marketing-management" element={<AdminMarketingManagement />} />
+                              <Route path="content-management" element={<AdminContentManagement />} />
+                              <Route path="security-management" element={<AdminSecurityManagement />} />
+                              <Route path="orders" element={<AdminOrderManagement />} />
+                              <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
+                              <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />
+                              <Route path="users" element={<AdminUserDirectory />} />
+                              <Route path="sellers" element={<AdminSellersDirectory />} />
+                              <Route path="sellers/:sellerId" element={<AdminSellerDetailPage />} />
+                              <Route path="products" element={<AdminProductCatalog />} />
+                              <Route path="categories" element={<AdminCategoryManager />} />
+                              <Route path="approvals" element={<AdminProductApprovals />} />
+                              <Route path="seller-kyc" element={<AdminSellerKyc />} />
+                              <Route path="seller-kyc/:sellerId" element={<AdminSellerDetail />} />
+                              <Route path="returns" element={<AdminReturnsPage />} />
+                              <Route path="cancellations" element={<AdminCancellationsPage />} />
+                              <Route path="cancelled" element={<AdminCancelledOrdersPage />} />
+                              <Route path="analytics" element={<AdminAnalyticsPage />} />
+                              <Route path="reviews" element={<AdminReviewsPage />} />
+                              <Route path="qa" element={<AdminQAModerationPage />} />
+                              <Route path="flash-sales" element={<FlashSaleManager />} />
+                              <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                              <Route path="vouchers" element={<VoucherManager />} />
+                              <Route path="banners" element={<BannerManager />} />
+                              <Route path="subscriptions" element={<AdminSubscriptionPage />} />
+                              <Route path="balance-adjustments" element={<AdminBalanceAdjustmentsPage />} />
+                              <Route path="payment-methods" element={<AdminPaymentMethodsPage />} />
+                              <Route path="payment-settings" element={<AdminPaymentSettingsPage />} />
+                              <Route path="deposits/sellers" element={<AdminSellerDepositsPage />} />
+                              <Route path="deposits/users" element={<AdminUserDepositsPage />} />
+                              <Route path="deposits/settings" element={<AdminDepositSettings />} />
+                              <Route path="payouts" element={<AdminPayoutManagement />} />
+                              <Route path="roles" element={<AdminRolesPage />} />
+                              <Route path="notifications" element={<AdminNotificationsPage />} />
+                              <Route path="wallet" element={<AdminWalletPage />} />
+                              <Route path="settings" element={<AdminAllSettingsPage />} />
+                              <Route path="site-settings" element={<SocialSettingsPage />} />
+                              <Route path="brand-assets" element={<AdminBrandAssetsPage />} />
+                              <Route path="content-manager" element={<AdminSiteContentPage />} />
+                              <Route path="chat-shortcuts" element={<AdminChatShortcutsPage />} />
+                              <Route path="commission-management" element={<AdminCommissionManagementPage />} />
+                              <Route path="security" element={<AdminSecurityPage />} />
+                              <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
+                            </Route>
+                          )}
 
-                          {/* Agent App - /agent-app */}
-                          <Route path="/agent-app" element={<AgentAppShell />}>
-                            <Route index element={<AgentDashboardHome />} />
-                            <Route path="chats" element={<AgentChatsPage />} />
-                            <Route path="earnings" element={<AgentEarningsPage />} />
-                            <Route path="performance" element={<AgentPerformancePage />} />
-                            <Route path="settings" element={<AgentSettingsPage />} />
-                          </Route>
+                          {/* Agent App - /agent-app - main & agent domains */}
+                          {(domainRole === 'main' || domainRole === 'agent') && (
+                            <Route path="/agent-app" element={<AgentAppShell />}>
+                              <Route index element={<AgentDashboardHome />} />
+                              <Route path="chats" element={<AgentChatsPage />} />
+                              <Route path="earnings" element={<AgentEarningsPage />} />
+                              <Route path="performance" element={<AgentPerformancePage />} />
+                              <Route path="settings" element={<AgentSettingsPage />} />
+                            </Route>
+                          )}
 
                           {/* Legacy route redirects */}
                           <Route path="/admin-dashboard" element={<Navigate to="/admin/dashboard" replace />} />
