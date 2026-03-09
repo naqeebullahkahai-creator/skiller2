@@ -239,6 +239,7 @@ const ProductDetail = () => {
           onVariantSelect={handleVariantSelect}
           selectedVariant={selectedVariant}
           reviewStats={reviewStats}
+          sellerName={sellerName}
         />
       </>
     );
