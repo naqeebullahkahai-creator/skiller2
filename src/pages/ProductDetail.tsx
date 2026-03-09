@@ -221,7 +221,7 @@ const ProductDetail = () => {
         {seoTags}
         <MobileProductDetail
           product={product}
-          images={images}
+          images={variantImages}
           displayPrice={displayPrice}
           discount={discount}
           availableStock={availableStock}
