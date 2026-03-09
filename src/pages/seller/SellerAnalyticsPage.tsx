@@ -139,65 +139,65 @@ const SellerAnalyticsPage = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Earnings</p>
-                <p className="text-2xl font-bold text-fanzon-success">
+                <p className="text-xs text-muted-foreground">Total Earnings</p>
+                <p className="text-lg md:text-2xl font-bold text-fanzon-success">
                   {formatPKR(totalStats.totalEarnings)}
                 </p>
               </div>
-              <div className="p-3 bg-fanzon-success/10 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-fanzon-success" />
+              <div className="p-2 md:p-3 bg-fanzon-success/10 rounded-lg hidden sm:block">
+                <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-fanzon-success" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Orders</p>
-                <p className="text-2xl font-bold">{totalStats.totalOrders}</p>
+                <p className="text-xs text-muted-foreground">Total Orders</p>
+                <p className="text-lg md:text-2xl font-bold">{totalStats.totalOrders}</p>
               </div>
-              <div className="p-3 bg-blue-500/10 rounded-lg">
-                <ShoppingCart className="w-6 h-6 text-blue-500" />
+              <div className="p-2 md:p-3 bg-blue-500/10 rounded-lg hidden sm:block">
+                <ShoppingCart className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Avg Order Value</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs text-muted-foreground">Avg Order Value</p>
+                <p className="text-lg md:text-2xl font-bold">
                   {formatPKR(totalStats.avgOrderValue)}
                 </p>
               </div>
-              <div className="p-3 bg-purple-500/10 rounded-lg">
-                <Package className="w-6 h-6 text-purple-500" />
+              <div className="p-2 md:p-3 bg-purple-500/10 rounded-lg hidden sm:block">
+                <Package className="w-5 h-5 md:w-6 md:h-6 text-purple-500" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Repeat Customers</p>
-                <p className="text-2xl font-bold">{repeatCustomerStats.percentage}%</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {repeatCustomerStats.repeat} of {repeatCustomerStats.total} customers
+                <p className="text-xs text-muted-foreground">Repeat Customers</p>
+                <p className="text-lg md:text-2xl font-bold">{repeatCustomerStats.percentage}%</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {repeatCustomerStats.repeat} of {repeatCustomerStats.total}
                 </p>
               </div>
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Users className="w-6 h-6 text-primary" />
+              <div className="p-2 md:p-3 bg-primary/10 rounded-lg hidden sm:block">
+                <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
               </div>
             </div>
           </CardContent>
