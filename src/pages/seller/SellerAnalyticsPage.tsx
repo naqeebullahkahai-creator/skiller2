@@ -321,32 +321,50 @@ const SellerAnalyticsPage = () => {
           </CardHeader>
           <CardContent>
             {topProducts.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>#</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead className="text-right">Units</TableHead>
-                    <TableHead className="text-right">Revenue</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Desktop Table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>#</TableHead>
+                        <TableHead>Product</TableHead>
+                        <TableHead className="text-right">Units</TableHead>
+                        <TableHead className="text-right">Revenue</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {topProducts.map((product, index) => (
+                        <TableRow key={product.id}>
+                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell className="max-w-[150px] truncate">
+                            {product.title}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {product.total_sold}
+                          </TableCell>
+                          <TableCell className="text-right font-medium text-fanzon-success">
+                            {formatPKR(product.total_revenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-2">
                   {topProducts.map((product, index) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">{index + 1}</TableCell>
-                      <TableCell className="max-w-[150px] truncate">
-                        {product.title}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {product.total_sold}
-                      </TableCell>
-                      <TableCell className="text-right font-medium text-fanzon-success">
-                        {formatPKR(product.total_revenue)}
-                      </TableCell>
-                    </TableRow>
+                    <div key={product.id} className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
+                      <span className="text-sm font-bold text-muted-foreground w-5 shrink-0">#{index + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{product.title}</p>
+                        <p className="text-xs text-muted-foreground">{product.total_sold} units sold</p>
+                      </div>
+                      <span className="text-sm font-semibold text-fanzon-success shrink-0">{formatPKR(product.total_revenue)}</span>
+                    </div>
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              </>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 No sales data yet
