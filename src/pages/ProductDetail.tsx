@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Star, Heart, Minus, Plus, ShoppingCart, Truck, Shield,
   RotateCcw, Store, Package, MapPin, Clock, CreditCard, Loader2,
