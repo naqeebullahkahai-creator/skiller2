@@ -297,7 +297,7 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
                       </div>
                       <div className="flex items-center gap-2">
                         {/* Image Tag Button */}
-                        {isColorVariant(variantName) && productImages.length > 0 && (
+                        {productImages.length > 0 && (
                           <Button
                             type="button"
                             variant="outline"
