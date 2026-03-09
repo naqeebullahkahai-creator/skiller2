@@ -257,7 +257,7 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
                 <Label className="text-sm font-medium text-muted-foreground">
                   {variantName} ({variantList.length})
                 </Label>
-                {isColorVariant(variantName) && productImages.length > 0 && (
+                {productImages.length > 0 && (
                   <span className="text-xs text-muted-foreground">
                     Tag images to show specific photos for each variant
                   </span>
