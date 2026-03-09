@@ -151,7 +151,7 @@ const VariantSelector = ({
                       key={variant.id}
                       onClick={() => !isDisabled && onVariantSelect(variantName, variant)}
                       disabled={isDisabled}
-                      title={`${variant.variant_value}${isOutOfStock ? " (Out of Stock)" : isUnavailable ? " (Unavailable)" : ""}${variant.additional_price_pkr > 0 ? ` (+Rs. ${variant.additional_price_pkr.toLocaleString()})` : ""}`}
+                      title={`${variant.variant_value}${isOutOfStock ? " (Out of Stock)" : isUnavailable ? " (Unavailable)" : ""}${variant.additional_price_pkr > 0 ? ` (Rs. ${variant.additional_price_pkr.toLocaleString()})` : ""}`}
                       className={cn(
                         "w-10 h-10 rounded-full transition-all relative",
                         colorClass,
