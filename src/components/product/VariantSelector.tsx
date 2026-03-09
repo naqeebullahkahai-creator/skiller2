@@ -185,7 +185,7 @@ const VariantSelector = ({
                     {variant.variant_value}
                     {variant.additional_price_pkr > 0 && (
                       <span className="ml-1 text-xs">
-                        +Rs. {variant.additional_price_pkr.toLocaleString()}
+                        Rs. {variant.additional_price_pkr.toLocaleString()}
                       </span>
                     )}
                     {isOutOfStock && (
