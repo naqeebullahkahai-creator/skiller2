@@ -277,26 +277,31 @@ const App = () => (
                           {/* Password Reset Route */}
                           <Route path="/reset-password" element={<ResetPassword />} />
                           
-                          <Route path="/products" element={<ProductListing />} />
-                          <Route path="/category/:slug" element={<CategoryPage />} />
-                          <Route path="/search" element={<ProductListing />} />
-                          <Route path="/product/:id" element={<ProductDetail />} />
-                          <Route path="/compare" element={<ComparePage />} />
-                          <Route path="/help" element={<HelpCenter />} />
-                          <Route path="/contact" element={<ContactUs />} />
-                          <Route path="/track-order" element={<TrackOrder />} />
-                          <Route path="/store/:sellerId" element={<SellerStorefront />} />
-                          
-                          {/* Checkout Routes */}
-                          <Route 
-                            path="/checkout" 
-                            element={
-                              <ProtectedRoute>
-                                <Checkout />
-                              </ProtectedRoute>
-                            }
-                          />
-                          <Route path="/order-success/:orderNumber" element={<OrderSuccess />} />
+                          {/* Public storefront routes - main & customer domains */}
+                          {(domainRole === 'main' || domainRole === 'customer') && (
+                            <>
+                              <Route path="/products" element={<ProductListing />} />
+                              <Route path="/category/:slug" element={<CategoryPage />} />
+                              <Route path="/search" element={<ProductListing />} />
+                              <Route path="/product/:id" element={<ProductDetail />} />
+                              <Route path="/compare" element={<ComparePage />} />
+                              <Route path="/help" element={<HelpCenter />} />
+                              <Route path="/contact" element={<ContactUs />} />
+                              <Route path="/track-order" element={<TrackOrder />} />
+                              <Route path="/store/:sellerId" element={<SellerStorefront />} />
+                              
+                              {/* Checkout Routes */}
+                              <Route 
+                                path="/checkout" 
+                                element={
+                                  <ProtectedRoute>
+                                    <Checkout />
+                                  </ProtectedRoute>
+                                }
+                              />
+                              <Route path="/order-success/:orderNumber" element={<OrderSuccess />} />
+                            </>
+                          )}
                           
                           {/* Customer Account Routes */}
                           <Route 
