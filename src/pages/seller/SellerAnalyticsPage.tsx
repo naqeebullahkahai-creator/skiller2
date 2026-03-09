@@ -102,20 +102,20 @@ const SellerAnalyticsPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Sales Analytics</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl md:text-2xl font-bold">Sales Analytics</h1>
+          <p className="text-sm text-muted-foreground">
             Track your performance and customer insights
           </p>
         </div>
         
         {/* Export Section */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[160px] sm:w-[180px]">
               <Calendar className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Select month" />
             </SelectTrigger>
@@ -127,12 +127,12 @@ const SellerAnalyticsPage = () => {
               ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={handleExportPDF} disabled={exportLoading}>
-            {exportLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+          <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={exportLoading}>
+            {exportLoading ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Download className="w-4 h-4 mr-1.5" />}
             PDF
           </Button>
-          <Button variant="outline" onClick={handleExportCSV} disabled={exportLoading}>
-            <FileText className="w-4 h-4 mr-2" />
+          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={exportLoading}>
+            <FileText className="w-4 h-4 mr-1.5" />
             CSV
           </Button>
         </div>
