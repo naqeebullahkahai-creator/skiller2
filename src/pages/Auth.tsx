@@ -43,10 +43,14 @@ const Auth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      if (isSuperAdmin || role === "admin") navigate("/admin/dashboard", { replace: true });
-      else if (role === "seller") navigate("/seller/dashboard", { replace: true });
+      const crossDomainUrl = getCrossDomainRedirectUrl(role);
+      if (crossDomainUrl) {
+        window.location.href = crossDomainUrl;
+        return;
+      }
+      navigate(getInAppRedirectPath(role), { replace: true });
     }
-  }, [isAuthenticated, role, isLoading, isSuperAdmin, navigate]);
+  }, [isAuthenticated, role, isLoading, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
