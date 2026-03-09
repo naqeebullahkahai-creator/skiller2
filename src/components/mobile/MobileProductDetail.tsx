@@ -36,6 +36,7 @@ interface MobileProductDetailProps {
   onVariantSelect: (name: string, variant: ProductVariant) => void;
   selectedVariant: ProductVariant | null;
   reviewStats: { averageRating: number; totalReviews: number };
+  sellerName?: string;
 }
 
 const MobileProductDetail = ({
