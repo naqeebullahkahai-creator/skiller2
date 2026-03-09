@@ -245,6 +245,7 @@ const App = () => (
                           <AdminInactivityGuard />
                           <LoginTracker />
                           <AuthModal />
+                          <CrossDomainAuthRedirector />
                           <SupportChatWidget />
                           <WhatsAppFloatingButton />
                           <ComparisonBar />
