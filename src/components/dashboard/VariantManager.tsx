@@ -277,11 +277,11 @@ const VariantManager = ({ variants, onChange, productImages = [] }: VariantManag
                           <p className="font-medium text-sm">{variant.variant_value}</p>
                         </div>
                         <div>
-                          <span className="text-xs text-muted-foreground">Additional Price</span>
+                          <span className="text-xs text-muted-foreground">Variant Price</span>
                           <p className="font-medium text-sm">
                             {variant.additional_price_pkr > 0
-                              ? `+Rs. ${variant.additional_price_pkr.toLocaleString()}`
-                              : "—"}
+                              ? `Rs. ${variant.additional_price_pkr.toLocaleString()}`
+                              : "Base price"}
                           </p>
                         </div>
                         <div>

@@ -361,11 +361,19 @@ const ProductDetail = () => {
             </div>
             <div className="bg-card border border-border rounded-lg p-4">
               <h3 className="font-semibold mb-4">Sold by</h3>
-              <div className="flex items-center gap-3 mb-4">
+              <Link to={`/store/${product.seller_id}`} className="flex items-center gap-3 mb-4 hover:opacity-80 transition-opacity">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center"><Store size={24} className="text-primary" /></div>
-                <div><p className="font-medium">FANZON Seller</p><div className="flex items-center gap-1 text-sm text-muted-foreground"><Star size={12} className="fill-fanzon-star text-fanzon-star" />4.8</div></div>
+                <div>
+                  <p className="font-medium text-primary hover:underline">{sellerName}</p>
+                  {sellerProfile?.city && <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={10} />{sellerProfile.city}</p>}
+                </div>
+              </Link>
+              <div className="flex gap-2 mb-3">
+                <Link to={`/store/${product.seller_id}`}>
+                  <Button variant="outline" size="sm" className="text-xs">Visit Store</Button>
+                </Link>
               </div>
-              <ChatWithSellerButton sellerId={product.seller_id} productId={product.id} productTitle={product.title} sellerName="FANZON Seller" />
+              <ChatWithSellerButton sellerId={product.seller_id} productId={product.id} productTitle={product.title} sellerName={sellerName} />
             </div>
           </div>
         </div>
