@@ -469,10 +469,10 @@ const App = () => (
                             </Route>
                           )}
 
-                          {/* Admin App - /admin-app - main & admin domains */}
-                          {(domainRole === 'main' || domainRole === 'admin') && (
-                            <Route path="/admin-app" element={<AdminAppShell />}>
-                              <Route index element={<AdminDashboardHome />} />
+                           {/* Admin App - /admin-app - admin domain (and dev/preview) */}
+                           {((domainRole === 'admin') || devAllowsAll) && (
+                             <Route path="/admin-app" element={<AdminAppShell />}>
+                               <Route index element={<AdminDashboardHome />} />
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
