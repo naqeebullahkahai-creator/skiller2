@@ -245,28 +245,51 @@ const DepositFundsSection = ({ requesterType, formatCurrency }: DepositFundsSect
             <CardTitle className="text-lg">Deposit History</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Payment Method</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Reference</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {depositRequests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell>{new Date(request.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{request.payment_methods?.method_name || 'Unknown'}</TableCell>
-                    <TableCell className="font-medium">{formatCurrency(request.amount)}</TableCell>
-                    <TableCell className="text-muted-foreground">{request.transaction_reference || '-'}</TableCell>
-                    <TableCell>{getStatusBadge(request.status)}</TableCell>
+            {/* Desktop Table */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Payment Method</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Reference</TableHead>
+                    <TableHead>Status</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {depositRequests.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell>{new Date(request.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>{request.payment_methods?.method_name || 'Unknown'}</TableCell>
+                      <TableCell className="font-medium">{formatCurrency(request.amount)}</TableCell>
+                      <TableCell className="text-muted-foreground">{request.transaction_reference || '-'}</TableCell>
+                      <TableCell>{getStatusBadge(request.status)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-3">
+              {depositRequests.map((request) => (
+                <div key={request.id} className="border border-border rounded-xl p-3.5 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(request.created_at).toLocaleDateString("en-PK", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                    {getStatusBadge(request.status)}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">{request.payment_methods?.method_name || 'Unknown'}</span>
+                    <span className="font-semibold text-sm">{formatCurrency(request.amount)}</span>
+                  </div>
+                  {request.transaction_reference && (
+                    <p className="text-xs text-muted-foreground">Ref: {request.transaction_reference}</p>
+                  )}
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}

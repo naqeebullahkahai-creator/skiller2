@@ -32,10 +32,10 @@ const OrderSuccess = () => {
           {/* Success Animation */}
           <div className={cn("mb-6", isMobile && "mb-5")}>
             <div className={cn(
-              "mx-auto bg-green-500/10 rounded-full flex items-center justify-center animate-pulse",
+              "mx-auto bg-primary/10 rounded-full flex items-center justify-center animate-pulse",
               isMobile ? "w-20 h-20" : "w-24 h-24"
             )}>
-              <CheckCircle size={isMobile ? 40 : 48} className="text-green-500" />
+              <CheckCircle size={isMobile ? 40 : 48} className="text-primary" />
             </div>
           </div>
 
