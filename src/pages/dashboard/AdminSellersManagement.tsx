@@ -198,7 +198,7 @@ const AdminSellersManagement = () => {
                         <TableCell className="hidden lg:table-cell">{seller.city || "-"}</TableCell>
                         <TableCell className="hidden lg:table-cell">{format(new Date(seller.created_at), "MMM dd, yyyy")}</TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/sellers/${seller.id}`)}>
+                          <Button variant="ghost" size="sm" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
                             <Eye size={16} className="mr-1" /> View
                           </Button>
                         </TableCell>
