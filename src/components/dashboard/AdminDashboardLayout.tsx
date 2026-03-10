@@ -112,7 +112,7 @@ const AdminDashboardLayout = () => {
               </Sheet>
               {isSubPage && (
                 <button 
-                  onClick={() => navigate(-1)} 
+                  onClick={() => navigate("/admin/dashboard")} 
                   className="text-white/90 p-1.5 active:scale-95 transition-transform"
                 >
                   <ArrowLeft size={22} />
