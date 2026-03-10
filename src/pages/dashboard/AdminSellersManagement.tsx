@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Store, Search, Eye, ShieldCheck, XCircle, CheckCircle, AlertCircle,
   TrendingUp, Package, Wallet, Users, FileCheck, Zap, CreditCard,
