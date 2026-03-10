@@ -75,6 +75,8 @@ import AdminOrderManagement from "./pages/dashboard/OrderManagement";
 import AdminProductCatalog from "./pages/dashboard/ProductCatalog";
 import AdminCategoryManager from "./pages/dashboard/AdminCategoryManager";
 import AdminProductApprovals from "./pages/dashboard/AdminProductApprovals";
+import AdminPendingCommissionsPage from "./pages/dashboard/AdminPendingCommissionsPage";
+import AdminTrackingSearchPage from "./pages/dashboard/AdminTrackingSearchPage";
 import SellerApprovals from "./pages/dashboard/SellerApprovals";
 import AdminSettings from "./pages/dashboard/DashboardSettings";
 import AdminSellerKyc from "./pages/dashboard/AdminSellerKyc";
@@ -412,6 +414,8 @@ const App = () => (
                               <Route path="store/products/new" element={<AdminStoreAddProductPage />} />
                               <Route path="store/wallet" element={<AdminStoreWalletPage />} />
                               <Route path="store/orders" element={<AdminStoreOrdersPage />} />
+                              <Route path="pending-commissions" element={<AdminPendingCommissionsPage />} />
+                              <Route path="tracking-search" element={<AdminTrackingSearchPage />} />
                             </Route>
                           )}
 
@@ -541,6 +545,8 @@ const App = () => (
                               <Route path="commission-management" element={<AdminCommissionManagementPage />} />
                               <Route path="security" element={<AdminSecurityPage />} />
                               <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
+                              <Route path="pending-commissions" element={<AdminPendingCommissionsPage />} />
+                              <Route path="tracking-search" element={<AdminTrackingSearchPage />} />
                             </Route>
                           )}
 

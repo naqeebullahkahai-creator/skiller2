@@ -5,7 +5,7 @@ import {
   UserCircle, Store, DollarSign, Headphones, Shield, Megaphone,
   ChevronDown, ChevronRight, Users, Receipt, CreditCard, Scale,
   PiggyBank, Percent, Zap, BarChart3, FileText, Star, Tag,
-  Image, Bell, Wrench, Lock, KeyRound, Activity
+  Image, Bell, Wrench, Lock, KeyRound, Activity, Clock, Search, Truck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -64,6 +64,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "Vendor Orders", href: "/admin/orders/vendor", icon: Package },
         { name: "Cancellations", href: "/admin/cancellations", icon: ShoppingCart },
         { name: "Returns", href: "/admin/returns", icon: ShoppingCart },
+        { name: "Track Orders", href: "/admin/tracking-search", icon: Search },
       ]
     },
     {
@@ -104,7 +105,9 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Commission & Fees", icon: Percent, feature: 'payouts',
       children: [
+        { name: "Pending Commissions", href: "/admin/pending-commissions", icon: Clock },
         { name: "Commission Settings", href: "/admin/commission-management", icon: Percent },
+        { name: "Commission Wallet", href: "/admin/commission-wallet", icon: Wallet },
         { name: "Subscriptions", href: "/admin/subscriptions", icon: Receipt },
         { name: "Payment Methods", href: "/admin/payment-methods", icon: CreditCard },
         { name: "Payment Settings", href: "/admin/payment-settings", icon: Settings },
