@@ -32,11 +32,7 @@ const Footer = () => {
   };
 
   const paymentMethods = [
-    { name: "Visa", type: "icon" as const, icon: <CreditCard size={14} /> },
-    { name: "Mastercard", type: "icon" as const, icon: <CreditCard size={14} /> },
-    { name: "JazzCash", type: "image" as const, logo: jazzcashLogo },
-    { name: "Easypaisa", type: "image" as const, logo: easypaisaLogo },
-    { name: "COD", type: "icon" as const, icon: <Banknote size={14} /> },
+    { name: "Cash on Delivery", icon: <Banknote size={14} /> },
   ];
   
   return (
