@@ -121,6 +121,10 @@ import AdminWalletManagementPage from "./pages/dashboard/AdminWalletManagementPa
 import AdminSellersManagement from "./pages/dashboard/AdminSellersManagement";
 import AdminCustomersManagement from "./pages/dashboard/AdminCustomersManagement";
 import AdminAgentsManagement from "./pages/dashboard/AdminAgentsManagement";
+import AdminAgentOnlineMonitor from "./pages/dashboard/AdminAgentOnlineMonitor";
+import AdminAgentSalaryPage from "./pages/dashboard/AdminAgentSalaryPage";
+import AdminAgentPayoutsPage from "./pages/dashboard/AdminAgentPayoutsPage";
+import AdminAgentRolePage from "./pages/dashboard/AdminAgentRolePage";
 import AdminStorePage from "./pages/dashboard/AdminStorePage";
 import AdminStoreProductsPage from "./pages/dashboard/AdminStoreProductsPage";
 import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
