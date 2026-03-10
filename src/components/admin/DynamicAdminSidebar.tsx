@@ -102,7 +102,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Content", icon: Settings, feature: 'settings',
       children: [
-        { name: "Overview", href: "/admin/content-management", icon: Settings },
         { name: "Reviews", href: "/admin/reviews", icon: Star },
         { name: "Q&A Moderation", href: "/admin/qa", icon: FileText },
         { name: "Site Content", href: "/admin/content-manager", icon: FileText },
