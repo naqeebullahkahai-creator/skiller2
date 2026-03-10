@@ -75,6 +75,8 @@ import AdminOrderManagement from "./pages/dashboard/OrderManagement";
 import AdminProductCatalog from "./pages/dashboard/ProductCatalog";
 import AdminCategoryManager from "./pages/dashboard/AdminCategoryManager";
 import AdminProductApprovals from "./pages/dashboard/AdminProductApprovals";
+import AdminPendingCommissionsPage from "./pages/dashboard/AdminPendingCommissionsPage";
+import AdminTrackingSearchPage from "./pages/dashboard/AdminTrackingSearchPage";
 import SellerApprovals from "./pages/dashboard/SellerApprovals";
 import AdminSettings from "./pages/dashboard/DashboardSettings";
 import AdminSellerKyc from "./pages/dashboard/AdminSellerKyc";
