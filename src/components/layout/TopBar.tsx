@@ -1,6 +1,5 @@
-import { Download, HelpCircle, Store, LayoutDashboard, Shield } from "lucide-react";
+import { HelpCircle, Store, LayoutDashboard, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
-import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -41,18 +40,9 @@ const TopBar = () => {
                 Become a Partner
               </Link>
             )}
-            
-            <Link 
-              to="/app" 
-              className="flex items-center gap-1.5 hover:text-primary transition-colors"
-            >
-              <Download size={12} />
-              Download App
-            </Link>
           </div>
           
           <div className="flex items-center gap-4">
-            <LanguageSwitcher variant="compact" />
             <Link 
               to="/help" 
               className="flex items-center gap-1.5 hover:text-primary transition-colors"

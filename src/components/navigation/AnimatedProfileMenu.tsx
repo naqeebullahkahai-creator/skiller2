@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Package, Settings, LogOut, ChevronDown } from "lucide-react";
+import { User, Package, Settings, LogOut, ChevronDown, UserPlus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const AnimatedProfileMenu = () => {
@@ -34,11 +35,6 @@ const AnimatedProfileMenu = () => {
     navigate("/");
   };
 
-  const openLoginModal = () => {
-    setAuthModalMode("login");
-    setShowAuthModal(true);
-  };
-
   const getInitials = () => {
     if (profile?.full_name) {
       return profile.full_name
@@ -56,25 +52,29 @@ const AnimatedProfileMenu = () => {
   if (!isAuthenticated) {
     return (
       <div className="flex items-center gap-2">
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => {
             setAuthModalMode("login");
             setShowAuthModal(true);
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-muted rounded-lg transition-all duration-200"
+          className="h-9 px-4 text-sm font-semibold border-primary/30 text-primary hover:bg-primary/10 hover:text-primary rounded-xl gap-1.5"
         >
-          <User size={16} />
-          <span>Login</span>
-        </button>
-        <button
+          <User size={15} />
+          Login
+        </Button>
+        <Button
+          size="sm"
           onClick={() => {
             setAuthModalMode("signup");
             setShowAuthModal(true);
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-all duration-200"
+          className="h-9 px-4 text-sm font-semibold rounded-xl gap-1.5"
         >
-          <span>Sign Up</span>
-        </button>
+          <UserPlus size={15} />
+          Sign Up
+        </Button>
       </div>
     );
   }
@@ -85,25 +85,25 @@ const AnimatedProfileMenu = () => {
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300",
-          "text-primary-foreground hover:bg-primary/80",
-          isOpen && "bg-primary/80"
+          "flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300",
+          "text-foreground hover:bg-muted",
+          isOpen && "bg-muted"
         )}
       >
-        <Avatar className="h-8 w-8 border-2 border-primary-foreground/30">
+        <Avatar className="h-8 w-8 border-2 border-primary/20">
           <AvatarImage 
             src={profile?.avatar_url || undefined} 
             className="object-cover"
           />
-          <AvatarFallback className="bg-primary-foreground/20 text-primary-foreground text-xs font-semibold">
+          <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
             {getInitials()}
           </AvatarFallback>
         </Avatar>
-        <span className="text-sm font-medium max-w-[100px] truncate">{displayName}</span>
+        <span className="text-sm font-medium max-w-[100px] truncate hidden lg:inline">{displayName}</span>
         <ChevronDown 
           size={14} 
           className={cn(
-            "transition-transform duration-300",
+            "transition-transform duration-300 hidden lg:block",
             isOpen && "rotate-180"
           )}
         />
@@ -113,7 +113,7 @@ const AnimatedProfileMenu = () => {
       <div
         ref={menuRef}
         className={cn(
-          "absolute top-full right-0 mt-2 w-56 bg-card rounded-xl shadow-xl border border-border overflow-hidden",
+          "absolute top-full right-0 mt-2 w-56 bg-card rounded-xl shadow-xl border border-border overflow-hidden z-50",
           "transform origin-top-right transition-all duration-300 ease-out",
           isOpen
             ? "opacity-100 scale-100 translate-y-0"
