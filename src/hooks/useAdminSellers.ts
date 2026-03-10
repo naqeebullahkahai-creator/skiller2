@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SUPER_ADMIN_EMAIL } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 export type VerificationStatus = "pending" | "verified" | "rejected";
 
@@ -21,10 +22,11 @@ export interface SellerWithDetails {
 }
 
 export const useAdminSellers = (searchQuery?: string) => {
+  const queryClient = useQueryClient();
+
   const { data: sellers = [], isLoading, error } = useQuery({
     queryKey: ["admin-sellers", searchQuery],
     queryFn: async () => {
-      // Get all seller profiles with user details
       let query = supabase
         .from("seller_profiles")
         .select("*")
@@ -33,38 +35,22 @@ export const useAdminSellers = (searchQuery?: string) => {
       const { data: sellerProfiles, error: sellersError } = await query;
       if (sellersError) throw sellersError;
 
-      if (!sellerProfiles || sellerProfiles.length === 0) {
-        return [];
-      }
+      if (!sellerProfiles || sellerProfiles.length === 0) return [];
 
-      // Get user IDs
       const userIds = sellerProfiles.map(s => s.user_id);
 
-      // Get profiles for these users - exclude super admin
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url, email")
-        .in("id", userIds)
-        .neq("email", SUPER_ADMIN_EMAIL); // Exclude super admin from sellers list
+      const [profilesRes, productsRes, walletsRes, ordersRes] = await Promise.all([
+        supabase.from("profiles").select("id, full_name, avatar_url, email").in("id", userIds).neq("email", SUPER_ADMIN_EMAIL),
+        supabase.from("products").select("seller_id").in("seller_id", userIds),
+        supabase.from("seller_wallets").select("seller_id, current_balance, total_earnings").in("seller_id", userIds),
+        supabase.from("orders").select("items"),
+      ]);
 
-      // Get products count per seller
-      const { data: products } = await supabase
-        .from("products")
-        .select("seller_id")
-        .in("seller_id", userIds);
+      const profiles = profilesRes.data;
+      const products = productsRes.data;
+      const wallets = walletsRes.data;
+      const orders = ordersRes.data;
 
-      // Get seller wallets
-      const { data: wallets } = await supabase
-        .from("seller_wallets")
-        .select("seller_id, current_balance, total_earnings")
-        .in("seller_id", userIds);
-
-      // Get orders count per seller
-      const { data: orders } = await supabase
-        .from("orders")
-        .select("items");
-
-      // Count orders per seller from order items
       const orderCountBySeller: Record<string, number> = {};
       orders?.forEach(order => {
         const items = order.items as any[];
@@ -76,12 +62,9 @@ export const useAdminSellers = (searchQuery?: string) => {
         });
       });
 
-      // Combine data - filter out sellers that don't have matching profiles (e.g., super admin)
       const sellersWithDetails: SellerWithDetails[] = sellerProfiles
         .map((seller) => {
           const profile = profiles?.find((p) => p.id === seller.user_id);
-          
-          // Skip if no matching profile (likely super admin or filtered out)
           if (!profile) return null;
 
           const productCount = products?.filter((p) => p.seller_id === seller.user_id).length || 0;
@@ -105,7 +88,6 @@ export const useAdminSellers = (searchQuery?: string) => {
         })
         .filter((seller): seller is NonNullable<typeof seller> => seller !== null) as SellerWithDetails[];
 
-      // Apply search filter - include display_id (FZN-SEL-XXXXXX)
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
         return sellersWithDetails.filter(
@@ -121,7 +103,24 @@ export const useAdminSellers = (searchQuery?: string) => {
     },
   });
 
-  // Calculate stats
+  // Realtime: refresh on seller_profiles, seller_wallets, products changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-sellers-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'seller_profiles' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-sellers'] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'seller_wallets' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-sellers'] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-sellers'] });
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
+
   const stats = {
     totalSellers: sellers.length,
     verifiedSellers: sellers.filter((s) => s.verification_status === "verified").length,
@@ -133,76 +132,56 @@ export const useAdminSellers = (searchQuery?: string) => {
 };
 
 export const useSellerDetails = (sellerId: string) => {
+  const queryClient = useQueryClient();
+
   const { data: seller, isLoading } = useQuery({
     queryKey: ["admin-seller-details", sellerId],
     queryFn: async () => {
-      // Get seller profile
       const { data: sellerProfile, error: sellerError } = await supabase
-        .from("seller_profiles")
-        .select("*")
-        .eq("id", sellerId)
-        .single();
-
+        .from("seller_profiles").select("*").eq("id", sellerId).single();
       if (sellerError) throw sellerError;
 
-      // Get user profile - check it's not the super admin
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", sellerProfile.user_id)
-        .neq("email", SUPER_ADMIN_EMAIL)
-        .maybeSingle();
+      const [profileRes, walletRes, productsRes, transactionsRes, ordersRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", sellerProfile.user_id).neq("email", SUPER_ADMIN_EMAIL).maybeSingle(),
+        supabase.from("seller_wallets").select("*").eq("seller_id", sellerProfile.user_id).maybeSingle(),
+        supabase.from("products").select("*").eq("seller_id", sellerProfile.user_id).order("created_at", { ascending: false }).limit(10),
+        supabase.from("wallet_transactions").select("*").eq("seller_id", sellerProfile.user_id).order("created_at", { ascending: false }).limit(20),
+        supabase.from("orders").select("*").order("created_at", { ascending: false }),
+      ]);
 
-      if (!profile) {
-        throw new Error("Seller not found or access denied");
-      }
+      if (!profileRes.data) throw new Error("Seller not found or access denied");
 
-      // Get wallet
-      const { data: wallet } = await supabase
-        .from("seller_wallets")
-        .select("*")
-        .eq("seller_id", sellerProfile.user_id)
-        .maybeSingle();
-
-      // Get products
-      const { data: products } = await supabase
-        .from("products")
-        .select("*")
-        .eq("seller_id", sellerProfile.user_id)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      // Get wallet transactions
-      const { data: transactions } = await supabase
-        .from("wallet_transactions")
-        .select("*")
-        .eq("seller_id", sellerProfile.user_id)
-        .order("created_at", { ascending: false })
-        .limit(20);
-
-      // Get orders for this seller
-      const { data: allOrders } = await supabase
-        .from("orders")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      // Filter orders containing this seller's products
-      const sellerOrders = allOrders?.filter(order => {
+      const sellerOrders = ordersRes.data?.filter(order => {
         const items = order.items as any[];
         return items?.some(item => item.seller_id === sellerProfile.user_id);
       }).slice(0, 20) || [];
 
       return {
         ...sellerProfile,
-        profile,
-        wallet,
-        products: products || [],
-        transactions: transactions || [],
+        profile: profileRes.data,
+        wallet: walletRes.data,
+        products: productsRes.data || [],
+        transactions: transactionsRes.data || [],
         orders: sellerOrders,
       };
     },
     enabled: !!sellerId,
   });
+
+  // Realtime for seller detail
+  useEffect(() => {
+    if (!sellerId) return;
+    const channel = supabase
+      .channel(`seller-detail-${sellerId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'seller_profiles' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-seller-details', sellerId] });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'seller_wallets' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-seller-details', sellerId] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [sellerId, queryClient]);
 
   return { seller, isLoading };
 };

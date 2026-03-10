@@ -196,9 +196,12 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     );
   }
 
-  const isLinkActive = (href: string) =>
-    location.pathname === href ||
-    (href !== "/admin/dashboard" && location.pathname.startsWith(href));
+  const isLinkActive = (href: string) => {
+    if (location.pathname === href) return true;
+    if (href === "/admin/dashboard") return false;
+    // Only match if the path continues with a "/" after the href (not a different word)
+    return location.pathname.startsWith(href + "/");
+  };
 
   const isGroupActive = (group: NavGroup) => {
     if (group.href) return isLinkActive(group.href);
