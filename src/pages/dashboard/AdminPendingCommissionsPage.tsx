@@ -235,7 +235,7 @@ const AdminPendingCommissionsPage = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => { bulkSettle.mutate(selectedIds); setBulkDialogOpen(false); setSelectedIds([]); }}
+              onClick={() => { bulkSettle.mutate(selectedPendingIds); setBulkDialogOpen(false); setSelectedIds([]); }}
               disabled={bulkSettle.isPending}
               className="bg-green-600 hover:bg-green-700"
             >
