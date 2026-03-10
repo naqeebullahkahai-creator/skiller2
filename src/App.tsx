@@ -101,6 +101,7 @@ import AdminSellerDepositsPage from "./pages/dashboard/AdminSellerDepositsPage";
 import AdminUserDepositsPage from "./pages/dashboard/AdminUserDepositsPage";
 import AdminBalanceAdjustmentsPage from "./pages/dashboard/AdminBalanceAdjustmentsPage";
 import AdminPaymentMethodsPage from "./pages/dashboard/AdminPaymentMethodsPage";
+import AdminWithdrawalMethodsPage from "./pages/dashboard/AdminWithdrawalMethodsPage";
 import AdminPaymentSettingsPage from "./pages/dashboard/AdminPaymentSettingsPage";
 import AdminAllSettingsPage from "./pages/dashboard/AdminAllSettingsPage";
 import AdminDirectOrdersPage from "./pages/dashboard/AdminDirectOrdersPage";
