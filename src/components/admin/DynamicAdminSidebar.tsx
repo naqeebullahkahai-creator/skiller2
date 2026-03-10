@@ -76,25 +76,50 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
       ]
     },
     {
-      name: "Finance", icon: DollarSign, feature: 'payouts',
+      name: "Wallets", icon: Wallet, feature: 'payouts',
       children: [
-        { name: "Wallet Management", href: "/admin/wallet-management", icon: Wallet },
-        { name: "Payouts", href: "/admin/payouts", icon: DollarSign },
-        { name: "Commissions", href: "/admin/commission-management", icon: Percent },
-        { name: "Subscriptions", href: "/admin/subscriptions", icon: Receipt },
-        { name: "Balance Adjustments", href: "/admin/balance-adjustments", icon: Scale },
+        { name: "Wallet Hub", href: "/admin/wallet-management", icon: Wallet },
+        { name: "Admin Wallet", href: "/admin/wallet", icon: Wallet },
+        { name: "Commission Wallet", href: "/admin/commission-wallet", icon: Percent },
+        { name: "Subscription Wallet", href: "/admin/subscription-wallet", icon: Receipt },
+        { name: "Store Wallet", href: "/admin/store/wallet", icon: Store },
+      ]
+    },
+    {
+      name: "Deposits", icon: PiggyBank, feature: 'payouts',
+      children: [
         { name: "Seller Deposits", href: "/admin/deposits/sellers", icon: PiggyBank },
         { name: "Customer Deposits", href: "/admin/deposits/users", icon: PiggyBank },
+        { name: "Deposit Settings", href: "/admin/deposits/settings", icon: Settings },
+      ]
+    },
+    {
+      name: "Withdrawals", icon: DollarSign, feature: 'payouts',
+      children: [
+        { name: "Payout Requests", href: "/admin/payouts", icon: DollarSign },
+        { name: "Withdrawal Methods", href: "/admin/withdrawal-methods", icon: CreditCard },
+        { name: "Balance Adjustments", href: "/admin/balance-adjustments", icon: Scale },
+      ]
+    },
+    {
+      name: "Commission & Fees", icon: Percent, feature: 'payouts',
+      children: [
+        { name: "Commission Settings", href: "/admin/commission-management", icon: Percent },
+        { name: "Subscriptions", href: "/admin/subscriptions", icon: Receipt },
         { name: "Payment Methods", href: "/admin/payment-methods", icon: CreditCard },
         { name: "Payment Settings", href: "/admin/payment-settings", icon: Settings },
-        { name: "Withdrawal Methods", href: "/admin/withdrawal-methods", icon: Wallet },
+      ]
+    },
+    {
+      name: "Flash Sales", icon: Zap, feature: 'flash_sales',
+      children: [
+        { name: "Manage Sales", href: "/admin/flash-sales", icon: Zap },
+        { name: "Nominations", href: "/admin/flash-nominations", icon: Star },
       ]
     },
     {
       name: "Marketing", icon: Megaphone, feature: 'flash_sales',
       children: [
-        { name: "Flash Sales", href: "/admin/flash-sales", icon: Zap },
-        { name: "Flash Nominations", href: "/admin/flash-nominations", icon: Star },
         { name: "Vouchers", href: "/admin/vouchers", icon: Tag },
         { name: "Banners", href: "/admin/banners", icon: Image },
       ]
