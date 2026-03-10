@@ -1,55 +1,45 @@
-import { HelpCircle, Store, LayoutDashboard, Shield } from "lucide-react";
+import { Store, LayoutDashboard, Shield, Headphones, Truck } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 
 const TopBar = () => {
-  const { t } = useLanguage();
   const { isAuthenticated, role, isSuperAdmin } = useAuth();
-  
+
   return (
-    <div className="hidden md:block bg-secondary border-b border-border">
+    <div className="hidden md:block bg-foreground text-background/70">
       <div className="container mx-auto">
-        <div className="flex items-center justify-between h-8 text-[11px] text-muted-foreground">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between h-8 text-[11px]">
+          <div className="flex items-center gap-5">
             {isAuthenticated && isSuperAdmin && (
-              <Link 
-                to="/admin/dashboard" 
-                className="flex items-center gap-1.5 text-primary font-semibold hover:text-primary/80 transition-colors"
-              >
-                <Shield size={12} />
+              <Link to="/admin/dashboard" className="flex items-center gap-1 text-primary font-semibold hover:text-primary/80 transition-colors">
+                <Shield size={11} />
                 Admin Panel
               </Link>
             )}
             {isAuthenticated && role === "seller" && (
-              <Link 
-                to="/seller/dashboard" 
-                className="flex items-center gap-1.5 text-primary font-semibold hover:text-primary/80 transition-colors"
-              >
-                <LayoutDashboard size={12} />
+              <Link to="/seller/dashboard" className="flex items-center gap-1 text-primary font-semibold hover:text-primary/80 transition-colors">
+                <LayoutDashboard size={11} />
                 Seller Dashboard
               </Link>
             )}
-            
             {(!isAuthenticated || role === "customer") && (
-              <Link 
-                to="/business/signup" 
-                className="flex items-center gap-1.5 hover:text-primary transition-colors font-medium"
-              >
-                <Store size={12} />
-                Become a Partner
+              <Link to="/business/signup" className="flex items-center gap-1 hover:text-primary transition-colors font-medium">
+                <Store size={11} />
+                Sell on FANZOON
               </Link>
             )}
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Link 
-              to="/help" 
-              className="flex items-center gap-1.5 hover:text-primary transition-colors"
-            >
-              <HelpCircle size={12} />
-              {t("nav.help")}
+            <span className="flex items-center gap-1">
+              <Truck size={11} />
+              Free shipping over Rs.999
+            </span>
+            <Link to="/help" className="flex items-center gap-1 hover:text-primary transition-colors">
+              <Headphones size={11} />
+              Customer Support
             </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher variant="header" />
           </div>
         </div>
       </div>
