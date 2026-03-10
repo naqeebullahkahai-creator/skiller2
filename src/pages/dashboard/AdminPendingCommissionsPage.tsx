@@ -163,10 +163,11 @@ const AdminPendingCommissionsPage = () => {
 
         <TabsContent value="pending">
           {/* Bulk Actions */}
-          {selectedIds.length > 0 && (
+          {selectedPendingIds.length > 0 && (
             <div className="flex items-center gap-3 p-3 bg-muted rounded-lg mb-4">
-              <span className="text-sm font-medium">{selectedIds.length} selected</span>
+              <span className="text-sm font-medium">{selectedPendingIds.length} selected</span>
               <Button size="sm" onClick={() => setBulkDialogOpen(true)}>
+
                 <Check size={14} className="mr-1" /> Settle All Selected
               </Button>
               <Button size="sm" variant="outline" onClick={() => setSelectedIds([])}>Clear</Button>
