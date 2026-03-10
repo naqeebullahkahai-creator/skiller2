@@ -22,9 +22,9 @@ const SectionSkeleton = () => (
 );
 
 const GridSkeleton = () => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-    {Array.from({ length: 10 }).map((_, i) => (
-      <div key={i} className="bg-card rounded-xl overflow-hidden elevation-1">
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+    {Array.from({ length: 12 }).map((_, i) => (
+      <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border">
         <Skeleton className="aspect-square w-full" />
         <div className="p-3 space-y-2">
           <Skeleton className="h-3 w-full" />
@@ -74,12 +74,12 @@ const Index = () => {
             </SectionErrorBoundary>
 
             {/* Just For You */}
-            <section className="py-8">
+            <section className="py-10">
               <div className="container mx-auto">
-                <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-3.5 px-5 rounded-t-2xl">
-                  <h2 className="text-base md:text-lg font-bold text-center tracking-wide">Just For You</h2>
+                <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-4 px-6 rounded-t-2xl">
+                  <h2 className="text-lg font-bold text-center tracking-wide">Just For You</h2>
                 </div>
-                <div className="bg-card rounded-b-2xl p-4 border border-t-0 border-border/50">
+                <div className="bg-card rounded-b-2xl p-5 border border-t-0 border-border/50">
                   <SectionErrorBoundary fallbackMessage="Products couldn't load">
                     <Suspense fallback={<GridSkeleton />}>
                       <InfiniteProductGrid />
