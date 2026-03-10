@@ -21,32 +21,42 @@ const defaultCounts: SidebarCounts = {
   pendingNominations: 0, cancelledOrders: 0,
 };
 
+async function fetchCount(table: string, filters: Record<string, any> = {}, inFilters: Record<string, any[]> = {}): Promise<number> {
+  let query = supabase.from(table as any).select('id', { count: 'exact', head: true });
+  for (const [key, value] of Object.entries(filters)) {
+    query = query.eq(key, value) as any;
+  }
+  for (const [key, values] of Object.entries(inFilters)) {
+    query = query.in(key, values) as any;
+  }
+  const { count } = await query;
+  return count ?? 0;
+}
+
 export const useAdminSidebarCounts = () => {
   const { data: counts, refetch } = useQuery({
     queryKey: ['admin-sidebar-counts'],
     queryFn: async (): Promise<SidebarCounts> => {
-      const results = await Promise.all([
-        supabase.from('orders').select('id', { count: 'exact', head: true }).in('order_status', ['pending', 'processing'] as any[]),
-        supabase.from('seller_profiles').select('id', { count: 'exact', head: true }).eq('verification_status', 'pending' as any),
-        supabase.from('products').select('id', { count: 'exact', head: true }).eq('approval_status', 'pending' as any),
-        supabase.from('deposit_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending' as any).eq('requester_type', 'seller' as any),
-        supabase.from('deposit_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending' as any).eq('requester_type', 'customer' as any),
-        supabase.from('order_settlements').select('id', { count: 'exact', head: true }).eq('status', 'pending' as any),
-        supabase.from('return_requests').select('id', { count: 'exact', head: true }).in('status', ['return_requested', 'approved'] as any[]),
-        supabase.from('flash_sale_nominations').select('id', { count: 'exact', head: true }).eq('status', 'pending' as any),
-        supabase.from('orders').select('id', { count: 'exact', head: true }).eq('order_status', 'cancelled' as any),
+      const [
+        pendingOrders, pendingKyc, pendingApprovals,
+        pendingSellerDeposits, pendingCustomerDeposits,
+        pendingCommissions, pendingReturns, pendingNominations, cancelledOrders,
+      ] = await Promise.all([
+        fetchCount('orders', {}, { order_status: ['pending', 'processing'] }),
+        fetchCount('seller_profiles', { verification_status: 'pending' }),
+        fetchCount('products', { approval_status: 'pending' }),
+        fetchCount('deposit_requests', { status: 'pending', requester_type: 'seller' }),
+        fetchCount('deposit_requests', { status: 'pending', requester_type: 'customer' }),
+        fetchCount('order_settlements', { status: 'pending' }),
+        fetchCount('return_requests', {}, { status: ['return_requested', 'approved'] }),
+        fetchCount('flash_sale_nominations', { status: 'pending' }),
+        fetchCount('orders', { order_status: 'cancelled' }),
       ]);
 
       return {
-        pendingOrders: results[0].count ?? 0,
-        pendingKyc: results[1].count ?? 0,
-        pendingApprovals: results[2].count ?? 0,
-        pendingSellerDeposits: results[3].count ?? 0,
-        pendingCustomerDeposits: results[4].count ?? 0,
-        pendingCommissions: results[5].count ?? 0,
-        pendingReturns: results[6].count ?? 0,
-        pendingNominations: results[7].count ?? 0,
-        cancelledOrders: results[8].count ?? 0,
+        pendingOrders, pendingKyc, pendingApprovals,
+        pendingSellerDeposits, pendingCustomerDeposits,
+        pendingCommissions, pendingReturns, pendingNominations, cancelledOrders,
       };
     },
     refetchInterval: 30000,
