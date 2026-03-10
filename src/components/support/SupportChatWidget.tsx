@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { useSupportSession, useChatShortcuts } from "@/hooks/useSupportChat";
 import { useChatbotFAQs, findBotAnswer } from "@/hooks/useChatbot";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 
 interface LocalMessage {
   id: string;
