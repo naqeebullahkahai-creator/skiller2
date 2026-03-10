@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Package, Settings, LogOut, ChevronDown, Heart, Wallet, MapPin } from "lucide-react";
+import { User, Package, Settings, LogOut, ChevronDown, Heart, Wallet, MapPin, UserPlus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -44,27 +44,36 @@ const AnimatedProfileMenu = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center gap-1.5">
         <button
           onClick={() => {
             setAuthModalMode("login");
             setShowAuthModal(true);
           }}
-          className="flex flex-col items-center px-3 py-1 hover:bg-primary/10 rounded-lg transition-colors group cursor-pointer"
+          className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-semibold text-foreground hover:text-primary hover:bg-muted rounded-xl transition-all cursor-pointer"
         >
-          <User size={22} className="text-foreground group-hover:text-primary transition-colors" />
-          <span className="text-[11px] font-medium text-muted-foreground group-hover:text-primary transition-colors">Login</span>
+          <User size={18} />
+          <span>Login</span>
         </button>
-        <div className="w-px h-6 bg-border" />
         <button
           onClick={() => {
             setAuthModalMode("signup");
             setShowAuthModal(true);
           }}
-          className="flex flex-col items-center px-3 py-1 hover:bg-primary/10 rounded-lg transition-colors group cursor-pointer"
+          className="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl transition-all cursor-pointer shadow-sm"
         >
-          <User size={22} className="text-foreground group-hover:text-primary transition-colors" />
-          <span className="text-[11px] font-medium text-muted-foreground group-hover:text-primary transition-colors">Sign Up</span>
+          <UserPlus size={16} />
+          <span>Sign Up</span>
+        </button>
+        {/* Mobile: compact icons */}
+        <button
+          onClick={() => {
+            setAuthModalMode("login");
+            setShowAuthModal(true);
+          }}
+          className="md:hidden flex items-center gap-1.5 px-2 py-1.5 text-foreground hover:bg-muted rounded-lg transition-colors"
+        >
+          <User size={20} />
         </button>
       </div>
     );
@@ -75,37 +84,37 @@ const AnimatedProfileMenu = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex flex-col items-center px-3 py-1 rounded-lg transition-all duration-200 cursor-pointer",
-          "hover:bg-primary/10",
-          isOpen && "bg-primary/10"
+          "flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer",
+          "hover:bg-muted",
+          isOpen && "bg-muted"
         )}
       >
-        <Avatar className="h-6 w-6 border border-primary/30">
+        <Avatar className="h-7 w-7 ring-2 ring-primary/20">
           <AvatarImage src={profile?.avatar_url || undefined} className="object-cover" />
-          <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">
+          <AvatarFallback className="bg-primary text-primary-foreground text-[10px] font-bold">
             {getInitials()}
           </AvatarFallback>
         </Avatar>
-        <div className="flex items-center gap-0.5">
-          <span className="text-[11px] font-medium text-muted-foreground max-w-[60px] truncate">{displayName}</span>
-          <ChevronDown size={10} className={cn("text-muted-foreground transition-transform duration-200", isOpen && "rotate-180")} />
+        <div className="hidden lg:flex items-center gap-1">
+          <span className="text-xs font-medium text-foreground max-w-[80px] truncate">{displayName}</span>
+          <ChevronDown size={12} className={cn("text-muted-foreground transition-transform duration-200", isOpen && "rotate-180")} />
         </div>
       </button>
 
       <div
         ref={menuRef}
         className={cn(
-          "absolute top-full right-0 mt-1.5 w-52 bg-card rounded-lg shadow-xl border border-border overflow-hidden z-50",
-          "transform origin-top-right transition-all duration-200 ease-out",
-          isOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-1 pointer-events-none"
+          "absolute top-full right-0 mt-2 w-56 bg-card rounded-2xl shadow-xl border border-border/60 overflow-hidden z-50",
+          "transform origin-top-right transition-all duration-250 ease-out",
+          isOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
         )}
       >
-        <div className="px-3 py-2.5 bg-muted/50 border-b border-border">
-          <p className="font-semibold text-sm text-foreground truncate">{displayName}</p>
+        <div className="px-4 py-3 bg-gradient-to-br from-primary/5 to-transparent border-b border-border/50">
+          <p className="font-bold text-sm text-foreground truncate">{displayName}</p>
           <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
         </div>
 
-        <nav className="py-1">
+        <nav className="py-1.5 px-1.5">
           {[
             { to: "/account/orders", icon: Package, label: "My Orders" },
             { to: "/account/wishlist", icon: Heart, label: "Wishlist" },
@@ -117,16 +126,16 @@ const AnimatedProfileMenu = () => {
               key={to}
               to={to}
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors"
+              className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-xl transition-colors"
             >
               <Icon size={16} className="text-muted-foreground" />
               {label}
             </Link>
           ))}
-          <div className="my-1 border-t border-border" />
+          <div className="my-1.5 border-t border-border/50 mx-2" />
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-destructive hover:bg-destructive/5 rounded-xl transition-colors"
           >
             <LogOut size={16} />
             Logout
