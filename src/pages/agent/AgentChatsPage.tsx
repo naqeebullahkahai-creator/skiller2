@@ -126,13 +126,23 @@ const AgentChatsPage = () => {
   const toggleOnline = useMutation({
     mutationFn: async (online: boolean) => {
       if (!user) throw new Error("Not authenticated");
-      await supabase.from("support_agent_profiles").update({ is_online: online, updated_at: new Date().toISOString() }).eq("user_id", user.id);
-      await supabase.from("agent_online_status").upsert({ user_id: user.id, is_online: online, last_seen_at: new Date().toISOString() });
+      // Update both tables for consistency
+      await supabase.from("agent_online_status").upsert(
+        { user_id: user.id, is_online: online, last_seen_at: new Date().toISOString() },
+        { onConflict: "user_id" }
+      );
+      // Also update support_agent_profiles if it exists
+      await supabase.from("support_agent_profiles")
+        .update({ is_online: online, updated_at: new Date().toISOString() })
+        .eq("user_id", user.id);
     },
     onSuccess: (_, online) => {
       setIsOnline(online);
-      toast.success(online ? "You are now online" : "You are now offline");
-      queryClient.invalidateQueries({ queryKey: ["agent-profile"] });
+      toast.success(online ? "You are now online — ready for chats!" : "You are now offline");
+      queryClient.invalidateQueries({ queryKey: ["agent-online-status"] });
+      if (online) {
+        queryClient.invalidateQueries({ queryKey: ["waiting-sessions"] });
+      }
     },
   });
 
