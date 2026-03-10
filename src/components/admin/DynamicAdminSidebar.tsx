@@ -78,7 +78,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Finance", icon: DollarSign, feature: 'payouts',
       children: [
-        { name: "Overview", href: "/admin/finance-management", icon: DollarSign },
         { name: "Wallet Management", href: "/admin/wallet-management", icon: Wallet },
         { name: "Payouts", href: "/admin/payouts", icon: DollarSign },
         { name: "Commissions", href: "/admin/commission-management", icon: Percent },
