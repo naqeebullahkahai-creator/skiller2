@@ -4323,6 +4323,7 @@ export type Database = {
           has_conflict: boolean
         }[]
       }
+      cleanup_old_waiting_sessions: { Args: never; Returns: undefined }
       decrease_product_stock: {
         Args: { p_product_id: string; p_quantity: number }
         Returns: boolean
