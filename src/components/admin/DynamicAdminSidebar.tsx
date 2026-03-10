@@ -64,6 +64,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "Vendor Orders", href: "/admin/orders/vendor", icon: Package },
         { name: "Cancellations", href: "/admin/cancellations", icon: ShoppingCart },
         { name: "Returns", href: "/admin/returns", icon: ShoppingCart },
+        { name: "Track Orders", href: "/admin/tracking-search", icon: Search },
       ]
     },
     {
