@@ -19,17 +19,45 @@ const SellerStorefront = () => {
   const queryClient = useQueryClient();
   const { followerCount, isFollowing, toggleFollow, isLoading: followLoading } = useSellerFollow(sellerId);
 
+  // Fetch seller profile (try seller_profiles, fallback to profiles)
   const { data: seller, isLoading: sellerLoading } = useQuery({
     queryKey: ["seller-storefront", sellerId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First try seller_profiles
+      const { data: sp } = await supabase
         .from("seller_profiles")
         .select("*")
         .eq("user_id", sellerId!)
-        .eq("verification_status", "verified")
         .maybeSingle();
-      if (error) throw error;
-      return data;
+      
+      // Always get basic profile
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, email, avatar_url")
+        .eq("id", sellerId!)
+        .maybeSingle();
+      
+      if (sp) {
+        return { ...sp, profile_name: profile?.full_name, avatar_url: profile?.avatar_url };
+      }
+      
+      // If no seller_profile, create a minimal object from profiles
+      if (profile) {
+        return {
+          user_id: sellerId,
+          shop_name: null,
+          legal_name: null,
+          profile_name: profile.full_name,
+          avatar_url: profile.avatar_url,
+          city: null,
+          store_logo_url: null,
+          store_banner_url: null,
+          verification_status: null,
+          created_at: new Date().toISOString(),
+        };
+      }
+      
+      return null;
     },
     enabled: !!sellerId,
   });
@@ -121,7 +149,7 @@ const SellerStorefront = () => {
     );
   }
 
-  const storeName = seller.shop_name || seller.legal_name;
+  const storeName = seller.shop_name || seller.legal_name || seller.profile_name || "Store";
   const storeInitials = storeName?.slice(0, 2)?.toUpperCase() || "ST";
 
   return (

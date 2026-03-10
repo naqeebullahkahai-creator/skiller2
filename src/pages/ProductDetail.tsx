@@ -118,12 +118,28 @@ const ProductDetail = () => {
   const { data: sellerProfile } = useQuery({
     queryKey: ["seller-profile-mini", product?.seller_id],
     queryFn: async () => {
-      const { data } = await supabase
+      // Try seller_profiles first
+      const { data: sp } = await supabase
         .from("seller_profiles")
-        .select("shop_name, legal_name, city, verification_status")
+        .select("shop_name, legal_name, city, verification_status, store_logo_url")
         .eq("user_id", product!.seller_id)
         .maybeSingle();
-      return data;
+      
+      // Also get profile name as fallback
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", product!.seller_id)
+        .maybeSingle();
+      
+      return {
+        shop_name: sp?.shop_name || null,
+        legal_name: sp?.legal_name || null,
+        city: sp?.city || null,
+        verification_status: sp?.verification_status || null,
+        store_logo_url: sp?.store_logo_url || null,
+        profile_name: profile?.full_name || null,
+      };
     },
     enabled: !!product?.seller_id,
   });
@@ -169,7 +185,7 @@ const ProductDetail = () => {
     ? selectedVariant.image_urls 
     : images;
 
-  const sellerName = sellerProfile?.shop_name || sellerProfile?.legal_name || "FANZON Seller";
+  const sellerName = sellerProfile?.shop_name || sellerProfile?.legal_name || sellerProfile?.profile_name || "Seller";
 
   const handleVariantSelect = (variantName: string, variant: ProductVariant) => {
     setSelectedVariants(prev => ({ ...prev, [variantName]: variant }));
