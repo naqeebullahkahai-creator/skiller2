@@ -173,7 +173,7 @@ const SellerStorefront = () => {
                 {/* Stats Row */}
                 <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-2 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5">
-                    <Star size={15} className="fill-yellow-400 text-yellow-400" />
+                    <Star size={15} className="fill-accent text-accent" />
                     <span className="font-semibold text-foreground">{reviewStats?.avg || 0}</span>
                     <span>({reviewStats?.count || 0} reviews)</span>
                   </span>
