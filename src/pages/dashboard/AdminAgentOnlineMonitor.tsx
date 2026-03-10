@@ -89,7 +89,7 @@ const AdminAgentOnlineMonitor = () => {
       // Get message counts per session
       const sessionIds = sessions.map((s: any) => s.id);
       const { data: messages } = await supabase
-        .from("support_chat_messages")
+        .from("support_messages")
         .select("session_id")
         .in("session_id", sessionIds);
 
