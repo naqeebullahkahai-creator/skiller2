@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Store, Search, Eye, ShieldCheck, XCircle, CheckCircle, AlertCircle,
   TrendingUp, Package, Wallet, Users, FileCheck, Zap, CreditCard,
@@ -67,10 +67,13 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
 
 const AdminSellersManagement = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const adminBasePath = location.pathname.startsWith("/admin-app") ? "/admin-app" : "/admin";
+  const toAdminPath = (path: string) => path.replace(/^\/admin/, adminBasePath);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const { sellers, isLoading, stats } = useAdminSellers(searchQuery);
-  const { pendingCount: pendingKyc, verifiedCount, rejectedCount } = useAdminSellerProfiles();
+  const { pendingCount: pendingKyc } = useAdminSellerProfiles();
   const { pendingCount: pendingDeposits } = useAdminDepositRequests("seller");
 
   const statCards = [
@@ -97,7 +100,7 @@ const AdminSellersManagement = () => {
     <div className="space-y-6 overflow-x-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl p-5 text-white">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/dashboard")} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
+        <Button variant="ghost" size="sm" onClick={() => navigate(toAdminPath("/admin/dashboard"))} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
           <ArrowLeft className="h-4 w-4" /> Return to Admin Panel
         </Button>
         <h1 className="text-xl font-bold flex items-center gap-2">
@@ -131,7 +134,7 @@ const AdminSellersManagement = () => {
         {/* Quick Actions Tab */}
         <TabsContent value="overview" className="mt-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {quickActions.map((action, i) => <QuickAction key={i} {...action} />)}
+            {quickActions.map((action, i) => <QuickAction key={i} {...action} href={toAdminPath(action.href)} />)}
           </div>
         </TabsContent>
 
@@ -195,7 +198,7 @@ const AdminSellersManagement = () => {
                         <TableCell className="hidden lg:table-cell">{seller.city || "-"}</TableCell>
                         <TableCell className="hidden lg:table-cell">{format(new Date(seller.created_at), "MMM dd, yyyy")}</TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="sm" onClick={() => navigate(`/admin/sellers/${seller.id}`)}>
+                          <Button variant="ghost" size="sm" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
                             <Eye size={16} className="mr-1" /> View
                           </Button>
                         </TableCell>
@@ -222,7 +225,7 @@ const AdminSellersManagement = () => {
               <Card><CardContent className="p-6 text-center text-muted-foreground">No sellers found</CardContent></Card>
             ) : (
               sellers.map((seller) => (
-                <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => navigate(`/admin/sellers/${seller.id}`)}>
+                <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3 mb-3">
                       <Avatar className="h-10 w-10 shrink-0">

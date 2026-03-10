@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { 
   Store, Mail, Phone, Calendar, Package, Wallet, 
   ShieldCheck, FileText, TrendingUp, CheckCircle, 
@@ -55,6 +55,9 @@ const getVerificationBadge = (status: string) => {
 const AdminSellerDetailPage = () => {
   const { sellerId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const adminBasePath = location.pathname.startsWith("/admin-app") ? "/admin-app" : "/admin";
+  const toAdminPath = (path: string) => path.replace(/^\/admin/, adminBasePath);
   const { seller, isLoading } = useSellerDetails(sellerId || "");
   const [viewingDocument, setViewingDocument] = useState<{ url: string; label: string } | null>(null);
 
@@ -76,7 +79,7 @@ const AdminSellerDetailPage = () => {
         <Store className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h2 className="text-xl font-semibold">Seller not found</h2>
         <p className="text-muted-foreground mt-2">This seller does not exist or you don't have access.</p>
-        <Button onClick={() => navigate("/admin/sellers")} className="mt-4">
+        <Button onClick={() => navigate(toAdminPath("/admin/sellers"))} className="mt-4">
           <ArrowLeft size={16} className="mr-2" />
           Back to Sellers
         </Button>
@@ -129,7 +132,7 @@ const AdminSellerDetailPage = () => {
 
             <Button 
               variant="outline"
-              onClick={() => navigate(`/admin/seller-kyc/${seller.id}`)}
+              onClick={() => navigate(toAdminPath(`/admin/seller-kyc/${seller.id}`))}
             >
               <ShieldCheck size={16} className="mr-2" />
               View KYC Details

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Search, Store, Eye, Package, Wallet, ShieldCheck, XCircle, CheckCircle, AlertCircle, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,9 @@ const getVerificationBadge = (status: string | undefined) => {
 
 const AdminSellersDirectory = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const adminBasePath = location.pathname.startsWith("/admin-app") ? "/admin-app" : "/admin";
+  const toAdminPath = (path: string) => path.replace(/^\/admin/, adminBasePath);
   const [searchQuery, setSearchQuery] = useState("");
   const { sellers, isLoading, stats } = useAdminSellers(searchQuery);
 
@@ -197,7 +200,7 @@ const AdminSellersDirectory = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate(`/admin/sellers/${seller.id}`)}
+                        onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}
                       >
                         <Eye size={16} className="mr-1" />
                         View

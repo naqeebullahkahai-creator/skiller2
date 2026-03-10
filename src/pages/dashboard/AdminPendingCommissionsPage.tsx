@@ -45,11 +45,13 @@ const AdminPendingCommissionsPage = () => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
+  const selectedPendingIds = selectedIds.filter((id) => filteredPending.some((s) => s.id === id));
+
   const selectAll = () => {
-    if (selectedIds.length === filteredPending.length) {
-      setSelectedIds([]);
+    if (selectedPendingIds.length === filteredPending.length && filteredPending.length > 0) {
+      setSelectedIds((prev) => prev.filter((id) => !filteredPending.some((s) => s.id === id)));
     } else {
-      setSelectedIds(filteredPending.map(s => s.id));
+      setSelectedIds((prev) => [...new Set([...prev, ...filteredPending.map((s) => s.id)])]);
     }
   };
 
@@ -161,10 +163,11 @@ const AdminPendingCommissionsPage = () => {
 
         <TabsContent value="pending">
           {/* Bulk Actions */}
-          {selectedIds.length > 0 && (
+          {selectedPendingIds.length > 0 && (
             <div className="flex items-center gap-3 p-3 bg-muted rounded-lg mb-4">
-              <span className="text-sm font-medium">{selectedIds.length} selected</span>
+              <span className="text-sm font-medium">{selectedPendingIds.length} selected</span>
               <Button size="sm" onClick={() => setBulkDialogOpen(true)}>
+
                 <Check size={14} className="mr-1" /> Settle All Selected
               </Button>
               <Button size="sm" variant="outline" onClick={() => setSelectedIds([])}>Clear</Button>
@@ -174,7 +177,7 @@ const AdminPendingCommissionsPage = () => {
           <SettlementTable
             items={filteredPending}
             isPending
-            selectedIds={selectedIds}
+            selectedIds={selectedPendingIds}
             onToggleSelect={toggleSelect}
             onSelectAll={selectAll}
             onSettle={(id) => setSettleDialogId(id)}
@@ -225,7 +228,7 @@ const AdminPendingCommissionsPage = () => {
       <AlertDialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Settle {selectedIds.length} Commissions?</AlertDialogTitle>
+            <AlertDialogTitle>Settle {selectedPendingIds.length} Commissions?</AlertDialogTitle>
             <AlertDialogDescription>
               All selected orders will be settled. Commission will be deducted and sellers will receive their payouts.
             </AlertDialogDescription>
@@ -233,7 +236,7 @@ const AdminPendingCommissionsPage = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => { bulkSettle.mutate(selectedIds); setBulkDialogOpen(false); setSelectedIds([]); }}
+              onClick={() => { bulkSettle.mutate(selectedPendingIds); setBulkDialogOpen(false); setSelectedIds([]); }}
               disabled={bulkSettle.isPending}
               className="bg-green-600 hover:bg-green-700"
             >
@@ -284,7 +287,7 @@ const SettlementTable = ({ items, isPending, selectedIds = [], onToggleSelect, o
                 {isPending && onSelectAll && (
                   <TableHead className="w-10">
                     <Checkbox
-                      checked={selectedIds.length === items.length && items.length > 0}
+                      checked={selectedIds.length > 0 && selectedIds.length === items.length}
                       onCheckedChange={onSelectAll}
                     />
                   </TableHead>
