@@ -414,6 +414,8 @@ const App = () => (
                               <Route path="store/products/new" element={<AdminStoreAddProductPage />} />
                               <Route path="store/wallet" element={<AdminStoreWalletPage />} />
                               <Route path="store/orders" element={<AdminStoreOrdersPage />} />
+                              <Route path="pending-commissions" element={<AdminPendingCommissionsPage />} />
+                              <Route path="tracking-search" element={<AdminTrackingSearchPage />} />
                             </Route>
                           )}
 
