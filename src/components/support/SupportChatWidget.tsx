@@ -98,6 +98,27 @@ const SupportChatWidget = () => {
     await createSession("Transferred from chatbot");
   };
 
+  // Get agent name when session is active
+  const { data: agentInfo } = useQuery({
+    queryKey: ["agent-info", session?.agent_id],
+    queryFn: async () => {
+      if (!session?.agent_id) return null;
+      const { data } = await supabase.from("profiles").select("full_name").eq("id", session.agent_id).single();
+      return data;
+    },
+    enabled: !!session?.agent_id,
+  });
+
+  // Auto-cancel session when user closes widget without agent connection
+  const handleClose = async () => {
+    if (mode === "agent" && session && session.status === "waiting") {
+      await supabase.from("support_chat_sessions").update({ status: "ended", ended_at: new Date().toISOString() }).eq("id", session.id);
+      setMode("bot");
+      setLocalMessages([]);
+    }
+    setIsOpen(false);
+  };
+
   const handleSendAgent = async (text?: string) => {
     const messageText = text || input.trim();
     if (!messageText) return;
