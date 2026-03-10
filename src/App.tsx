@@ -115,6 +115,7 @@ import AdminCommissionManagementPage from "./pages/dashboard/AdminCommissionMana
 import AdminWalletPage from "./pages/dashboard/AdminWalletPage";
 import AdminCommissionWalletPage from "./pages/dashboard/AdminCommissionWalletPage";
 import AdminSubscriptionWalletPage from "./pages/dashboard/AdminSubscriptionWalletPage";
+import AdminWalletManagementPage from "./pages/dashboard/AdminWalletManagementPage";
 import AdminSellersManagement from "./pages/dashboard/AdminSellersManagement";
 import AdminCustomersManagement from "./pages/dashboard/AdminCustomersManagement";
 import AdminAgentsManagement from "./pages/dashboard/AdminAgentsManagement";
