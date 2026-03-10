@@ -149,7 +149,7 @@ const SellerStorefront = () => {
     );
   }
 
-  const storeName = seller.shop_name || seller.legal_name;
+  const storeName = seller.shop_name || seller.legal_name || seller.profile_name || "Store";
   const storeInitials = storeName?.slice(0, 2)?.toUpperCase() || "ST";
 
   return (

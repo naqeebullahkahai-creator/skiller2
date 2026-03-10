@@ -80,7 +80,7 @@ const AnimatedProfileMenu = () => {
   }
 
   return (
-    <div className="relative hidden md:block">
+    <div className="relative">
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}

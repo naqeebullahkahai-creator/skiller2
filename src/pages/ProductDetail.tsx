@@ -185,7 +185,7 @@ const ProductDetail = () => {
     ? selectedVariant.image_urls 
     : images;
 
-  const sellerName = sellerProfile?.shop_name || sellerProfile?.legal_name || "FANZON Seller";
+  const sellerName = sellerProfile?.shop_name || sellerProfile?.legal_name || sellerProfile?.profile_name || "Seller";
 
   const handleVariantSelect = (variantName: string, variant: ProductVariant) => {
     setSelectedVariants(prev => ({ ...prev, [variantName]: variant }));
