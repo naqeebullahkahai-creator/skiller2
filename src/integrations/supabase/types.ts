@@ -289,6 +289,45 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_payouts: {
+        Row: {
+          admin_notes: string | null
+          agent_id: string
+          amount: number
+          created_at: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          status: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          agent_id: string
+          amount: number
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          agent_id?: string
+          amount?: number
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       agent_performance: {
         Row: {
           agent_id: string
@@ -326,6 +365,105 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      agent_salaries: {
+        Row: {
+          agent_id: string
+          amount: number
+          created_at: string
+          frequency: string
+          id: string
+          is_active: boolean
+          last_paid_at: string | null
+          next_payment_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          amount?: number
+          created_at?: string
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          last_paid_at?: string | null
+          next_payment_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          created_at?: string
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          last_paid_at?: string | null
+          next_payment_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      agent_saved_wallets: {
+        Row: {
+          account_name: string
+          account_number: string
+          agent_id: string
+          created_at: string
+          id: string
+          is_default: boolean
+          updated_at: string
+          wallet_type: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          agent_id: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          updated_at?: string
+          wallet_type: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          agent_id?: string
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          updated_at?: string
+          wallet_type?: string
+        }
+        Relationships: []
+      }
+      agent_wallets: {
+        Row: {
+          agent_id: string
+          balance: number
+          created_at: string
+          id: string
+          total_earned: number
+          total_withdrawn: number
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          balance?: number
+          created_at?: string
+          id?: string
+          total_earned?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          balance?: number
+          created_at?: string
+          id?: string
+          total_earned?: number
+          total_withdrawn?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       blocked_ips: {
         Row: {
