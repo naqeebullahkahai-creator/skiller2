@@ -270,6 +270,7 @@ const App = () => (
                           {/* Customer Auth Routes - /auth/* */}
                           <Route path="/auth/login" element={<CustomerAuth />} />
                           <Route path="/auth/signup" element={<CustomerAuth />} />
+                          <Route path="/auth/verify-email" element={<CustomerEmailVerification />} />
                           
                           {/* Business Partner Auth Routes - /business/* */}
                           <Route path="/business/login" element={<BusinessAuth />} />

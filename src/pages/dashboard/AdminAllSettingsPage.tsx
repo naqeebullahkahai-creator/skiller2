@@ -107,6 +107,14 @@ const settingsPages = [
     bgColor: "bg-teal-500/10",
   },
   {
+    title: "Withdrawal Methods",
+    description: "Manage seller payout methods and fields",
+    icon: Banknote,
+    href: "/admin/withdrawal-methods",
+    color: "text-cyan-600",
+    bgColor: "bg-cyan-600/10",
+  },
+  {
     title: "Balance Adjustments",
     description: "Add or subtract funds from any wallet",
     icon: Wallet,
