@@ -73,6 +73,8 @@ const AdminSellersManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const { sellers, isLoading, stats } = useAdminSellers(searchQuery);
+  const { pendingCount: pendingKyc } = useAdminSellerProfiles();
+  const { pendingCount: pendingDeposits } = useAdminDepositRequests("seller");
 
   const statCards = [
     { label: "Total Sellers", value: stats.totalSellers, icon: <Store className="h-5 w-5 text-white" />, color: "bg-blue-500" },
