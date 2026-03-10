@@ -2114,6 +2114,7 @@ export type Database = {
           processed_at: string | null
           processed_by: string | null
           receipt_url: string | null
+          saved_wallet_id: string | null
           seller_id: string
           status: Database["public"]["Enums"]["payout_status"]
           transaction_reference: string | null
@@ -2131,6 +2132,7 @@ export type Database = {
           processed_at?: string | null
           processed_by?: string | null
           receipt_url?: string | null
+          saved_wallet_id?: string | null
           seller_id: string
           status?: Database["public"]["Enums"]["payout_status"]
           transaction_reference?: string | null
@@ -2148,6 +2150,7 @@ export type Database = {
           processed_at?: string | null
           processed_by?: string | null
           receipt_url?: string | null
+          saved_wallet_id?: string | null
           seller_id?: string
           status?: Database["public"]["Enums"]["payout_status"]
           transaction_reference?: string | null
@@ -2155,6 +2158,13 @@ export type Database = {
           wallet_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "payout_requests_saved_wallet_id_fkey"
+            columns: ["saved_wallet_id"]
+            isOneToOne: false
+            referencedRelation: "seller_saved_wallets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payout_requests_wallet_id_fkey"
             columns: ["wallet_id"]
@@ -3012,6 +3022,47 @@ export type Database = {
           verified_at?: string | null
         }
         Relationships: []
+      }
+      seller_saved_wallets: {
+        Row: {
+          created_at: string
+          field_values: Json
+          id: string
+          is_default: boolean
+          label: string
+          method_id: string
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          field_values?: Json
+          id?: string
+          is_default?: boolean
+          label?: string
+          method_id: string
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          field_values?: Json
+          id?: string
+          is_default?: boolean
+          label?: string
+          method_id?: string
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_saved_wallets_method_id_fkey"
+            columns: ["method_id"]
+            isOneToOne: false
+            referencedRelation: "withdrawal_methods"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       seller_subscriptions: {
         Row: {
@@ -3967,6 +4018,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      withdrawal_methods: {
+        Row: {
+          created_at: string
+          display_order: number
+          fields: Json
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          fields?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          fields?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

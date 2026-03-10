@@ -160,11 +160,9 @@ const CustomerAuth = () => {
         const result = await signup(formData.name, formData.email, formData.password, false);
         
         if (result.success) {
-          toast({
-            title: "Account created!",
-            description: "Welcome to FANZON! Start shopping now.",
-          });
-          setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+          // Redirect to email verification page
+          navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
+          return;
         } else {
           toast({
             title: "Error",

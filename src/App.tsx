@@ -28,6 +28,7 @@ import BusinessAuth from "./pages/business/BusinessAuth";
 import EmailVerificationPending from "./pages/business/EmailVerificationPending";
 import EmailVerificationSuccess from "./pages/business/EmailVerificationSuccess";
 import CustomerAuth from "./pages/auth/CustomerAuth";
+import CustomerEmailVerification from "./pages/auth/CustomerEmailVerification";
 import ResetPassword from "./pages/ResetPassword";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
@@ -101,6 +102,7 @@ import AdminSellerDepositsPage from "./pages/dashboard/AdminSellerDepositsPage";
 import AdminUserDepositsPage from "./pages/dashboard/AdminUserDepositsPage";
 import AdminBalanceAdjustmentsPage from "./pages/dashboard/AdminBalanceAdjustmentsPage";
 import AdminPaymentMethodsPage from "./pages/dashboard/AdminPaymentMethodsPage";
+import AdminWithdrawalMethodsPage from "./pages/dashboard/AdminWithdrawalMethodsPage";
 import AdminPaymentSettingsPage from "./pages/dashboard/AdminPaymentSettingsPage";
 import AdminAllSettingsPage from "./pages/dashboard/AdminAllSettingsPage";
 import AdminDirectOrdersPage from "./pages/dashboard/AdminDirectOrdersPage";
@@ -268,6 +270,7 @@ const App = () => (
                           {/* Customer Auth Routes - /auth/* */}
                           <Route path="/auth/login" element={<CustomerAuth />} />
                           <Route path="/auth/signup" element={<CustomerAuth />} />
+                          <Route path="/auth/verify-email" element={<CustomerEmailVerification />} />
                           
                           {/* Business Partner Auth Routes - /business/* */}
                           <Route path="/business/login" element={<BusinessAuth />} />
@@ -390,6 +393,7 @@ const App = () => (
                               <Route path="commission-wallet" element={<AdminCommissionWalletPage />} />
                               <Route path="subscription-wallet" element={<AdminSubscriptionWalletPage />} />
                               <Route path="wallet" element={<AdminWalletPage />} />
+                              <Route path="withdrawal-methods" element={<AdminWithdrawalMethodsPage />} />
                               <Route path="security" element={<AdminSecurityPage />} />
                               <Route path="store" element={<AdminStorePage />} />
                               <Route path="store/products" element={<AdminStoreProductsPage />} />
