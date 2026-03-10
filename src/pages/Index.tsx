@@ -22,11 +22,11 @@ const SectionSkeleton = () => (
 );
 
 const GridSkeleton = () => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
     {Array.from({ length: 12 }).map((_, i) => (
-      <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border">
+      <div key={i} className="bg-card rounded-lg overflow-hidden border border-border">
         <Skeleton className="aspect-square w-full" />
-        <div className="p-3 space-y-2">
+        <div className="p-2.5 space-y-1.5">
           <Skeleton className="h-3 w-full" />
           <Skeleton className="h-4 w-1/2" />
         </div>
@@ -50,7 +50,7 @@ const Index = () => {
       {isMobile ? (
         <MobileHomeLayout />
       ) : (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="min-h-screen bg-secondary/50 flex flex-col">
           <Header />
           <main className="flex-1">
             <SectionErrorBoundary fallbackMessage="Banner couldn't load">
@@ -74,12 +74,13 @@ const Index = () => {
             </SectionErrorBoundary>
 
             {/* Just For You */}
-            <section className="py-8">
+            <section className="py-4">
               <div className="container mx-auto">
-                <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-3.5 px-6 rounded-t-2xl">
-                  <h2 className="text-base font-bold text-center tracking-wide">Just For You</h2>
+                <div className="bg-primary text-primary-foreground py-2.5 px-5 flex items-center justify-between">
+                  <h2 className="text-sm font-bold tracking-wide uppercase">Just For You</h2>
+                  <span className="text-xs text-primary-foreground/70">Recommended products</span>
                 </div>
-                <div className="bg-card rounded-b-2xl p-4 border border-t-0 border-border/50">
+                <div className="bg-card p-3 border border-t-0 border-border">
                   <SectionErrorBoundary fallbackMessage="Products couldn't load">
                     <Suspense fallback={<GridSkeleton />}>
                       <InfiniteProductGrid />
