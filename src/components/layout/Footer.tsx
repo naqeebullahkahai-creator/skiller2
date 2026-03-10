@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom";
 import { 
   Facebook, Twitter, Instagram, Youtube,
-  Music2, MessageCircle, CreditCard, Banknote,
+  Music2, MessageCircle, Banknote,
   ArrowRight
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import easypaisaLogo from "@/assets/easypaisa-logo.png";
-import jazzcashLogo from "@/assets/jazzcash-logo.png";
 
 const socialIconMap: Record<string, React.ReactNode> = {
   social_facebook: <Facebook size={16} />,
