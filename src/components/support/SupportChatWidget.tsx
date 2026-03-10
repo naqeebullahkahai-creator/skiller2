@@ -173,14 +173,14 @@ const SupportChatWidget = () => {
               </div>
               <div>
                 <h3 className="font-semibold text-sm">
-                  {mode === "bot" ? "FANZON Assistant" : "FANZON Support"}
+                  {mode === "bot" ? "FANZON Assistant" : session?.status === "active" && agentInfo?.full_name ? agentInfo.full_name : "FANZON Support"}
                 </h3>
                 <p className="text-xs text-primary-foreground/80">
                   {mode === "bot" 
                     ? "🤖 AI Assistant" 
                     : session?.status === "active" 
-                      ? "🟢 Connected to agent" 
-                      : "⏳ Waiting for agent..."}
+                      ? "🟢 Support Agent" 
+                      : "⏳ Connecting to agent..."}
                 </p>
               </div>
             </div>
