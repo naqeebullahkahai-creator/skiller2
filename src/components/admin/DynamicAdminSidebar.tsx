@@ -5,7 +5,7 @@ import {
   UserCircle, Store, DollarSign, Headphones, Shield, Megaphone,
   ChevronDown, ChevronRight, Users, Receipt, CreditCard, Scale,
   PiggyBank, Percent, Zap, BarChart3, FileText, Star, Tag,
-  Image, Bell, Wrench, Lock, KeyRound, Activity
+  Image, Bell, Wrench, Lock, KeyRound, Activity, Clock, Search, Truck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
