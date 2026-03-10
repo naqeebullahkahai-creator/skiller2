@@ -176,7 +176,7 @@ const AdminPendingCommissionsPage = () => {
           <SettlementTable
             items={filteredPending}
             isPending
-            selectedIds={selectedIds}
+            selectedIds={selectedPendingIds}
             onToggleSelect={toggleSelect}
             onSelectAll={selectAll}
             onSettle={(id) => setSettleDialogId(id)}
