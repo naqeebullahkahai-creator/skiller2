@@ -165,7 +165,7 @@ const SellerStorefront = () => {
               <div className="flex-1 min-w-0 pt-2 md:pb-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">{storeName}</h1>
-                  <Badge className="bg-green-500/10 text-green-600 border-green-500/30 text-xs">
+                  <Badge variant="secondary" className="text-xs">
                     ✓ Verified
                   </Badge>
                 </div>
