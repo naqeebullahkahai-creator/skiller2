@@ -361,6 +361,10 @@ const App = () => (
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
+                              <Route path="agents/roles" element={<AdminAgentRolePage />} />
+                              <Route path="agents/monitor" element={<AdminAgentOnlineMonitor />} />
+                              <Route path="agents/salaries" element={<AdminAgentSalaryPage />} />
+                              <Route path="agents/payouts" element={<AdminAgentPayoutsPage />} />
                               <Route path="orders-management" element={<Navigate to="/admin/orders" replace />} />
                               <Route path="products-management" element={<Navigate to="/admin/products" replace />} />
                               <Route path="finance-management" element={<Navigate to="/admin/wallet-management" replace />} />
