@@ -1970,6 +1970,81 @@ export type Database = {
           },
         ]
       }
+      order_settlements: {
+        Row: {
+          commission_amount: number
+          commission_type: string
+          commission_value: number
+          courier_name: string | null
+          created_at: string
+          id: string
+          order_amount: number
+          order_id: string
+          product_id: string | null
+          product_title: string | null
+          seller_id: string
+          seller_payout: number
+          settled_at: string | null
+          settled_by: string | null
+          status: string
+          tracking_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          commission_amount?: number
+          commission_type?: string
+          commission_value?: number
+          courier_name?: string | null
+          created_at?: string
+          id?: string
+          order_amount?: number
+          order_id: string
+          product_id?: string | null
+          product_title?: string | null
+          seller_id: string
+          seller_payout?: number
+          settled_at?: string | null
+          settled_by?: string | null
+          status?: string
+          tracking_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commission_amount?: number
+          commission_type?: string
+          commission_value?: number
+          courier_name?: string | null
+          created_at?: string
+          id?: string
+          order_amount?: number
+          order_id?: string
+          product_id?: string | null
+          product_title?: string | null
+          seller_id?: string
+          seller_payout?: number
+          settled_at?: string | null
+          settled_by?: string | null
+          status?: string
+          tracking_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_settlements_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_settlements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           address_id: string | null
@@ -4239,6 +4314,10 @@ export type Database = {
       restock_order_items: { Args: { p_order_id: string }; Returns: boolean }
       set_admin_wallet_pin: {
         Args: { p_admin_id: string; p_pin: string }
+        Returns: Json
+      }
+      settle_order_commission: {
+        Args: { p_admin_id: string; p_settlement_id: string }
         Returns: Json
       }
       validate_voucher: {
