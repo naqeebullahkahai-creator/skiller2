@@ -119,15 +119,6 @@ const SupportChatWidget = () => {
     await createSession("Transferred from chatbot");
   };
 
-  // Auto-cancel session when user closes widget without agent connection
-  const handleClose = async () => {
-    if (mode === "agent" && session && session.status === "waiting") {
-      await supabase.from("support_chat_sessions").update({ status: "ended", ended_at: new Date().toISOString() }).eq("id", session.id);
-      setMode("bot");
-      setLocalMessages([]);
-    }
-    setIsOpen(false);
-  };
 
   const handleSendAgent = async (text?: string) => {
     const messageText = text || input.trim();
