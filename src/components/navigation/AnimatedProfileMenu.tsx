@@ -55,13 +55,27 @@ const AnimatedProfileMenu = () => {
 
   if (!isAuthenticated) {
     return (
-      <button
-        onClick={openLoginModal}
-        className="hidden md:flex items-center gap-2 px-4 py-2 text-primary-foreground hover:bg-primary/80 rounded-lg transition-all duration-300"
-      >
-        <User size={18} />
-        <span className="text-sm font-medium">Login / Signup</span>
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => {
+            setAuthModalMode("login");
+            setShowAuthModal(true);
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-muted rounded-lg transition-all duration-200"
+        >
+          <User size={16} />
+          <span>Login</span>
+        </button>
+        <button
+          onClick={() => {
+            setAuthModalMode("signup");
+            setShowAuthModal(true);
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-all duration-200"
+        >
+          <span>Sign Up</span>
+        </button>
+      </div>
     );
   }
 
