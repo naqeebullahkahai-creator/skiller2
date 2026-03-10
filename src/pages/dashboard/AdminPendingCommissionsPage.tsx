@@ -227,7 +227,7 @@ const AdminPendingCommissionsPage = () => {
       <AlertDialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Settle {selectedIds.length} Commissions?</AlertDialogTitle>
+            <AlertDialogTitle>Settle {selectedPendingIds.length} Commissions?</AlertDialogTitle>
             <AlertDialogDescription>
               All selected orders will be settled. Commission will be deducted and sellers will receive their payouts.
             </AlertDialogDescription>
