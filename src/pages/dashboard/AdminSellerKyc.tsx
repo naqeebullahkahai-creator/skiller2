@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,7 @@ import { SellerProfile, isCnicExpired } from "@/hooks/useSellerKyc";
 
 const AdminSellerKyc = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -51,6 +52,17 @@ const AdminSellerKyc = () => {
       return data as SellerProfile[];
     },
   });
+
+  // Realtime
+  useEffect(() => {
+    const channel = supabase
+      .channel('kyc-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'seller_profiles' }, () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-seller-profiles'] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
 
   const filteredSellers = sellers?.filter((seller) => {
     const matchesSearch =
