@@ -119,12 +119,6 @@ import AdminWalletManagementPage from "./pages/dashboard/AdminWalletManagementPa
 import AdminSellersManagement from "./pages/dashboard/AdminSellersManagement";
 import AdminCustomersManagement from "./pages/dashboard/AdminCustomersManagement";
 import AdminAgentsManagement from "./pages/dashboard/AdminAgentsManagement";
-import AdminOrdersManagement from "./pages/dashboard/AdminOrdersManagement";
-import AdminProductsManagement from "./pages/dashboard/AdminProductsManagement";
-import AdminFinanceManagement from "./pages/dashboard/AdminFinanceManagement";
-import AdminMarketingManagement from "./pages/dashboard/AdminMarketingManagement";
-import AdminContentManagement from "./pages/dashboard/AdminContentManagement";
-import AdminSecurityManagement from "./pages/dashboard/AdminSecurityManagement";
 import AdminStorePage from "./pages/dashboard/AdminStorePage";
 import AdminStoreProductsPage from "./pages/dashboard/AdminStoreProductsPage";
 import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
@@ -361,12 +355,12 @@ const App = () => (
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
-                              <Route path="orders-management" element={<AdminOrdersManagement />} />
-                              <Route path="products-management" element={<AdminProductsManagement />} />
-                              <Route path="finance-management" element={<AdminFinanceManagement />} />
-                              <Route path="marketing-management" element={<AdminMarketingManagement />} />
-                              <Route path="content-management" element={<AdminContentManagement />} />
-                              <Route path="security-management" element={<AdminSecurityManagement />} />
+                              <Route path="orders-management" element={<Navigate to="/admin/orders" replace />} />
+                              <Route path="products-management" element={<Navigate to="/admin/products" replace />} />
+                              <Route path="finance-management" element={<Navigate to="/admin/wallet-management" replace />} />
+                              <Route path="marketing-management" element={<Navigate to="/admin/flash-sales" replace />} />
+                              <Route path="content-management" element={<Navigate to="/admin/reviews" replace />} />
+                              <Route path="security-management" element={<Navigate to="/admin/roles" replace />} />
                               <Route path="users" element={<AdminUserDirectory />} />
                               <Route path="sellers" element={<AdminSellersDirectory />} />
                               <Route path="sellers/:sellerId" element={<AdminSellerDetailPage />} />
@@ -501,12 +495,12 @@ const App = () => (
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
-                              <Route path="orders-management" element={<AdminOrdersManagement />} />
-                              <Route path="products-management" element={<AdminProductsManagement />} />
-                              <Route path="finance-management" element={<AdminFinanceManagement />} />
-                              <Route path="marketing-management" element={<AdminMarketingManagement />} />
-                              <Route path="content-management" element={<AdminContentManagement />} />
-                              <Route path="security-management" element={<AdminSecurityManagement />} />
+                              <Route path="orders-management" element={<Navigate to="/admin-app/orders" replace />} />
+                              <Route path="products-management" element={<Navigate to="/admin-app/products" replace />} />
+                              <Route path="finance-management" element={<Navigate to="/admin-app/wallet-management" replace />} />
+                              <Route path="marketing-management" element={<Navigate to="/admin-app/flash-sales" replace />} />
+                              <Route path="content-management" element={<Navigate to="/admin-app/reviews" replace />} />
+                              <Route path="security-management" element={<Navigate to="/admin-app/roles" replace />} />
                               <Route path="orders" element={<AdminOrderManagement />} />
                               <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
                               <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />

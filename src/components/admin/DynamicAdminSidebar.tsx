@@ -78,7 +78,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Finance", icon: DollarSign, feature: 'payouts',
       children: [
-        { name: "Overview", href: "/admin/finance-management", icon: DollarSign },
         { name: "Wallet Management", href: "/admin/wallet-management", icon: Wallet },
         { name: "Payouts", href: "/admin/payouts", icon: DollarSign },
         { name: "Commissions", href: "/admin/commission-management", icon: Percent },
@@ -94,7 +93,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Marketing", icon: Megaphone, feature: 'flash_sales',
       children: [
-        { name: "Overview", href: "/admin/marketing-management", icon: Megaphone },
         { name: "Flash Sales", href: "/admin/flash-sales", icon: Zap },
         { name: "Flash Nominations", href: "/admin/flash-nominations", icon: Star },
         { name: "Vouchers", href: "/admin/vouchers", icon: Tag },
@@ -104,7 +102,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Content", icon: Settings, feature: 'settings',
       children: [
-        { name: "Overview", href: "/admin/content-management", icon: Settings },
         { name: "Reviews", href: "/admin/reviews", icon: Star },
         { name: "Q&A Moderation", href: "/admin/qa", icon: FileText },
         { name: "Site Content", href: "/admin/content-manager", icon: FileText },
@@ -126,7 +123,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Security", icon: Shield, requireSuperAdmin: true,
       children: [
-        { name: "Overview", href: "/admin/security-management", icon: Shield },
         { name: "Roles & Permissions", href: "/admin/roles", icon: KeyRound },
         { name: "Security Settings", href: "/admin/security", icon: Lock },
         { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },

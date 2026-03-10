@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom";
 import { 
   Facebook, Twitter, Instagram, Youtube,
-  Music2, MessageCircle, CreditCard, Banknote,
+  Music2, MessageCircle, Banknote,
   ArrowRight
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import easypaisaLogo from "@/assets/easypaisa-logo.png";
-import jazzcashLogo from "@/assets/jazzcash-logo.png";
 
 const socialIconMap: Record<string, React.ReactNode> = {
   social_facebook: <Facebook size={16} />,
@@ -34,11 +32,7 @@ const Footer = () => {
   };
 
   const paymentMethods = [
-    { name: "Visa", type: "icon" as const, icon: <CreditCard size={14} /> },
-    { name: "Mastercard", type: "icon" as const, icon: <CreditCard size={14} /> },
-    { name: "JazzCash", type: "image" as const, logo: jazzcashLogo },
-    { name: "Easypaisa", type: "image" as const, logo: easypaisaLogo },
-    { name: "COD", type: "icon" as const, icon: <Banknote size={14} /> },
+    { name: "Cash on Delivery", icon: <Banknote size={14} /> },
   ];
   
   return (
@@ -102,11 +96,7 @@ const Footer = () => {
             <div className="flex flex-wrap gap-2">
               {paymentMethods.map((method) => (
                 <div key={method.name} className="bg-primary-foreground/5 border border-primary-foreground/10 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
-                  {method.type === "image" ? (
-                    <img src={method.logo} alt={method.name} className="h-4 w-4 object-contain rounded-sm" />
-                  ) : (
-                    <span className="text-primary-foreground/40">{method.icon}</span>
-                  )}
+                  <span className="text-primary-foreground/40">{method.icon}</span>
                   <span className="text-[11px] font-medium text-primary-foreground/60">{method.name}</span>
                 </div>
               ))}
