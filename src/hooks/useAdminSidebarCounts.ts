@@ -35,7 +35,7 @@ export const useAdminSidebarCounts = () => {
         supabase.from('deposit_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending').eq('requester_type', 'seller'),
         supabase.from('deposit_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending').eq('requester_type', 'customer'),
         supabase.from('order_settlements').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('return_requests').select('id', { count: 'exact', head: true }).in('status', ['pending', 'approved']),
+        supabase.from('return_requests').select('id', { count: 'exact', head: true }).in('status', ['return_requested', 'approved'] as any),
         supabase.from('flash_sale_nominations').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
         supabase.from('orders').select('id', { count: 'exact', head: true }).eq('order_status', 'cancelled'),
       ]);
