@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { useSupportSession, useChatShortcuts } from "@/hooks/useSupportChat";
 import { useChatbotFAQs, findBotAnswer } from "@/hooks/useChatbot";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 
 interface LocalMessage {
   id: string;
@@ -49,8 +52,29 @@ const SupportChatWidget = () => {
     }, 800);
   }, []);
 
+  // Get agent name when session is active (must be before early return)
+  const { data: agentInfo } = useQuery({
+    queryKey: ["agent-info", session?.agent_id],
+    queryFn: async () => {
+      if (!session?.agent_id) return null;
+      const { data } = await supabase.from("profiles").select("full_name").eq("id", session.agent_id).single();
+      return data;
+    },
+    enabled: !!session?.agent_id,
+  });
+
   // Only show for customers
   if (!user || role === "admin" || role === "seller" || role === "support_agent") return null;
+
+  // Auto-cancel session when user closes widget without agent connection
+  const handleClose = async () => {
+    if (mode === "agent" && session && session.status === "waiting") {
+      await supabase.from("support_chat_sessions").update({ status: "ended", ended_at: new Date().toISOString() }).eq("id", session.id);
+      setMode("bot");
+      setLocalMessages([]);
+    }
+    setIsOpen(false);
+  };
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -94,6 +118,7 @@ const SupportChatWidget = () => {
     setMode("agent");
     await createSession("Transferred from chatbot");
   };
+
 
   const handleSendAgent = async (text?: string) => {
     const messageText = text || input.trim();
@@ -149,14 +174,14 @@ const SupportChatWidget = () => {
               </div>
               <div>
                 <h3 className="font-semibold text-sm">
-                  {mode === "bot" ? "FANZON Assistant" : "FANZON Support"}
+                  {mode === "bot" ? "FANZON Assistant" : session?.status === "active" && agentInfo?.full_name ? agentInfo.full_name : "FANZON Support"}
                 </h3>
                 <p className="text-xs text-primary-foreground/80">
                   {mode === "bot" 
                     ? "🤖 AI Assistant" 
                     : session?.status === "active" 
-                      ? "🟢 Connected to agent" 
-                      : "⏳ Waiting for agent..."}
+                      ? "🟢 Support Agent" 
+                      : "⏳ Connecting to agent..."}
                 </p>
               </div>
             </div>
@@ -167,7 +192,7 @@ const SupportChatWidget = () => {
                   <PhoneOff size={18} />
                 </Button>
               )}
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}
+              <Button variant="ghost" size="icon" onClick={handleClose}
                 className="text-primary-foreground hover:bg-primary-foreground/20">
                 <X size={20} />
               </Button>
@@ -244,11 +269,18 @@ const SupportChatWidget = () => {
                       )}
                       {agentMessages.map(msg => {
                         const isOwn = msg.sender_id === user?.id;
+                        const isAgent = !isOwn && msg.sender_id === session?.agent_id;
                         return (
                           <div key={msg.id} className={cn("flex", isOwn ? "justify-end" : "justify-start")}>
                             <div className={cn("max-w-[85%] rounded-xl px-3 py-2 text-sm",
                               isOwn ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
                             )}>
+                              {isAgent && agentInfo?.full_name && (
+                                <div className="flex items-center gap-1 mb-1">
+                                  <span className="text-[10px] font-semibold text-primary">{agentInfo.full_name}</span>
+                                  <Badge variant="secondary" className="text-[8px] h-3.5 px-1">Agent</Badge>
+                                </div>
+                              )}
                               <p className="break-words">{msg.content}</p>
                               <p className={cn("text-[10px] mt-1", isOwn ? "text-primary-foreground/70" : "text-muted-foreground")}>
                                 {format(new Date(msg.created_at), "HH:mm")}

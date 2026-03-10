@@ -67,26 +67,29 @@ const AgentChatsPage = () => {
     enabled: !!user,
   });
 
-  // Waiting sessions - always load when user exists (so agent sees queue even while loading)
+  // Waiting sessions - filter out requests older than 24 hours
   const { data: waitingSessions = [] } = useQuery({
     queryKey: ["waiting-sessions", isOnline],
     queryFn: async () => {
-      const { data } = await supabase.from("support_chat_sessions").select("*").eq("status", "waiting").is("agent_id", null).order("created_at", { ascending: true });
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data } = await supabase.from("support_chat_sessions").select("*").eq("status", "waiting").is("agent_id", null).gte("created_at", oneDayAgo).order("created_at", { ascending: true });
       return data || [];
     },
     enabled: !!user && isOnline,
     refetchInterval: 5000,
   });
 
-  // User names
+  // User names and roles
   const { data: sessionUsers = {} } = useQuery({
     queryKey: ["session-users", activeSessions.map((s: any) => s.user_id).concat(waitingSessions.map((s: any) => s.user_id))],
     queryFn: async () => {
       const userIds = [...new Set([...activeSessions.map((s: any) => s.user_id), ...waitingSessions.map((s: any) => s.user_id)])];
       if (userIds.length === 0) return {};
-      const { data } = await supabase.from("profiles").select("id, full_name").in("id", userIds);
-      const map: Record<string, string> = {};
-      data?.forEach(p => { map[p.id] = p.full_name || "User"; });
+      const { data: profiles } = await supabase.from("profiles").select("id, full_name").in("id", userIds);
+      const { data: roles } = await supabase.from("user_roles").select("user_id, role").in("user_id", userIds);
+      const map: Record<string, { name: string; role: string }> = {};
+      profiles?.forEach(p => { map[p.id] = { name: p.full_name || "User", role: "customer" }; });
+      roles?.forEach(r => { if (map[r.user_id]) map[r.user_id].role = r.role; });
       return map;
     },
     enabled: activeSessions.length > 0 || waitingSessions.length > 0,
@@ -207,15 +210,25 @@ const AgentChatsPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-3 pb-3 space-y-2">
-                {waitingSessions.map((session: any) => (
+                {waitingSessions.map((session: any) => {
+                  const userInfo = (sessionUsers as any)[session.user_id];
+                  const userName = userInfo?.name || userInfo || "User";
+                  const userRole = userInfo?.role || "customer";
+                  return (
                   <div key={session.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{(sessionUsers as any)[session.user_id] || "User"}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium truncate">{userName}</p>
+                        <Badge variant="secondary" className="text-[9px] h-4 px-1.5 shrink-0">
+                          {userRole === "seller" ? "Seller" : "Customer"}
+                        </Badge>
+                      </div>
                       <p className="text-[10px] text-muted-foreground truncate">{session.subject || "General"}</p>
                     </div>
                     <Button size="sm" className="h-7 text-xs shrink-0 ml-2" onClick={() => claimSession.mutate(session.id)} disabled={claimSession.isPending}>Accept</Button>
                   </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           )}
@@ -232,7 +245,11 @@ const AgentChatsPage = () => {
                   {isOnline ? "No active sessions." : "Go online to receive chats."}
                 </p>
               ) : (
-                activeSessions.map((session: any) => (
+                activeSessions.map((session: any) => {
+                  const userInfo = (sessionUsers as any)[session.user_id];
+                  const userName = userInfo?.name || userInfo || "User";
+                  const userRole = userInfo?.role || "customer";
+                  return (
                   <button key={session.id}
                     className={cn("flex items-center justify-between p-2 rounded-lg w-full text-left transition-colors",
                       activeChat === session.id ? "bg-primary/10 border border-primary/30" : "bg-muted hover:bg-accent"
@@ -242,17 +259,23 @@ const AgentChatsPage = () => {
                     <div className="flex items-center gap-2 min-w-0">
                       <Avatar className="h-7 w-7 shrink-0">
                         <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                          {((sessionUsers as any)[session.user_id] || "U").charAt(0)}
+                          {userName.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{(sessionUsers as any)[session.user_id] || "User"}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-sm font-medium truncate">{userName}</p>
+                          <Badge variant="secondary" className="text-[9px] h-4 px-1.5 shrink-0">
+                            {userRole === "seller" ? "Seller" : "Customer"}
+                          </Badge>
+                        </div>
                         <p className="text-[10px] text-muted-foreground truncate">{session.subject || "General"}</p>
                       </div>
                     </div>
                     <Badge variant="default" className="text-[10px] shrink-0">Active</Badge>
                   </button>
-                ))
+                  );
+                })
               )}
             </CardContent>
           </Card>
@@ -264,8 +287,11 @@ const AgentChatsPage = () => {
             {activeChat ? (
               <>
                 <CardHeader className="pb-2 border-b flex-row items-center justify-between px-3 pt-3">
-                  <CardTitle className="text-sm truncate">
-                    Chat with {(sessionUsers as any)[activeSessions.find((s: any) => s.id === activeChat)?.user_id] || "User"}
+                  <CardTitle className="text-sm truncate flex items-center gap-1.5">
+                    Chat with {(() => { const info = (sessionUsers as any)[activeSessions.find((s: any) => s.id === activeChat)?.user_id]; return info?.name || info || "User"; })()}
+                    <Badge variant="secondary" className="text-[9px] h-4 px-1.5">
+                      {(() => { const info = (sessionUsers as any)[activeSessions.find((s: any) => s.id === activeChat)?.user_id]; return (info?.role === "seller" ? "Seller" : "Customer"); })()}
+                    </Badge>
                   </CardTitle>
                   <Button variant="ghost" size="sm" className="text-destructive h-7 text-xs shrink-0" onClick={() => endChat.mutate(activeChat)}>
                     <PhoneOff className="w-3 h-3 mr-1" /> End
