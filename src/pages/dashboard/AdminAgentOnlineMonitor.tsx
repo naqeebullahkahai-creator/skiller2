@@ -288,22 +288,25 @@ const AdminAgentOnlineMonitor = () => {
               <p className="text-center text-muted-foreground py-8">No messages</p>
             ) : (
               <div className="space-y-2 p-1">
-                {sessionMessages.map((msg: any) => (
-                  <div
-                    key={msg.id}
-                    className={cn(
-                      "p-2 rounded-lg text-sm max-w-[85%]",
-                      msg.sender_type === "agent"
-                        ? "bg-primary/10 ml-auto text-right"
-                        : "bg-muted"
-                    )}
-                  >
-                    <p className="text-[10px] font-medium text-muted-foreground mb-0.5">
-                      {msg.sender_type === "agent" ? "Agent" : "User"} · {format(new Date(msg.created_at), "HH:mm")}
-                    </p>
-                    <p>{msg.content}</p>
-                  </div>
-                ))}
+                {sessionMessages.map((msg: any) => {
+                  const isAgent = historyDialog && chatHistory.find((s: any) => s.id === viewSessionId)?.agent_id === msg.sender_id;
+                  return (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        "p-2 rounded-lg text-sm max-w-[85%]",
+                        isAgent
+                          ? "bg-primary/10 ml-auto text-right"
+                          : "bg-muted"
+                      )}
+                    >
+                      <p className="text-[10px] font-medium text-muted-foreground mb-0.5">
+                        {isAgent ? "Agent" : "User"} · {format(new Date(msg.created_at), "HH:mm")}
+                      </p>
+                      <p>{msg.content}</p>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </ScrollArea>
