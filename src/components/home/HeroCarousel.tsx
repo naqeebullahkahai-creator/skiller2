@@ -48,10 +48,10 @@ const HeroCarousel = memo(() => {
       <section className="py-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-            <Skeleton className="lg:col-span-3 h-[200px] md:h-[320px] rounded-2xl" />
+            <Skeleton className="lg:col-span-3 h-[200px] md:h-[360px] rounded-2xl" />
             <div className="hidden lg:flex flex-col gap-3">
-              <Skeleton className="h-[155px] rounded-2xl" />
-              <Skeleton className="h-[155px] rounded-2xl" />
+              <Skeleton className="h-[174px] rounded-2xl" />
+              <Skeleton className="h-[174px] rounded-2xl" />
             </div>
           </div>
         </div>
@@ -63,12 +63,33 @@ const HeroCarousel = memo(() => {
     return (
       <section className="py-4">
         <div className="container mx-auto">
-          <div className="bg-gradient-to-br from-primary via-primary/90 to-accent rounded-2xl text-primary-foreground p-10 md:p-16 text-center shadow-elevated">
-            <h1 className="text-3xl md:text-5xl font-display font-bold mb-4">Welcome to FANZOON</h1>
-            <p className="text-primary-foreground/85 text-lg mb-8 max-w-md mx-auto">Pakistan's Best Online Marketplace</p>
-            <Button asChild className="bg-card text-primary hover:bg-card/90 font-bold px-8 py-3 rounded-xl shadow-lg">
-              <Link to="/products">Shop Now</Link>
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div className="md:col-span-3 bg-gradient-to-br from-primary via-primary/90 to-accent rounded-2xl text-primary-foreground p-10 md:p-16 text-center shadow-elevated">
+              <h1 className="text-3xl md:text-5xl font-display font-bold mb-4">Welcome to FANZOON</h1>
+              <p className="text-primary-foreground/85 text-lg mb-8 max-w-md mx-auto">Pakistan's Best Online Marketplace</p>
+              <Button asChild className="bg-card text-primary hover:bg-card/90 font-bold px-8 py-3 rounded-xl shadow-lg">
+                <Link to="/products">Shop Now</Link>
+              </Button>
+            </div>
+            {/* Side Cards - Always visible on md+ */}
+            <div className="hidden md:flex flex-col gap-3">
+              <Link to="/flash-sale" className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-5 flex-1 hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300">
+                <div className="absolute top-3 right-3"><Zap size={40} className="text-primary-foreground/15" /></div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-2"><Zap size={18} className="text-fanzon-star" /><span className="text-sm font-semibold">Flash Sale</span></div>
+                  <p className="text-xl font-display font-bold">Up to 70% OFF</p>
+                  <p className="text-xs text-primary-foreground/70 mt-1">Limited Time Only</p>
+                </div>
+              </Link>
+              <Link to="/vouchers" className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-fanzon-emerald to-fanzon-success text-primary-foreground p-5 flex-1 hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300">
+                <div className="absolute top-3 right-3"><Tag size={40} className="text-primary-foreground/15" /></div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-2"><Tag size={18} className="text-fanzon-star" /><span className="text-sm font-semibold">Collect Vouchers</span></div>
+                  <p className="text-xl font-display font-bold">Extra Savings</p>
+                  <p className="text-xs text-primary-foreground/70 mt-1">Free Shipping & More</p>
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -78,9 +99,9 @@ const HeroCarousel = memo(() => {
   return (
     <section className="py-4">
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {/* Main Carousel */}
-          <div className="lg:col-span-3 relative rounded-2xl overflow-hidden bg-card shadow-card">
+          <div className="md:col-span-3 relative rounded-2xl overflow-hidden bg-card shadow-card">
             <div 
               className="flex transition-transform duration-500 ease-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -102,7 +123,7 @@ const HeroCarousel = memo(() => {
                       <div className="absolute inset-0" style={{ background: getGradientCSS(banner) }} />
                       
                       <div className={cn(
-                        "absolute inset-0 flex flex-col justify-end p-6",
+                        "absolute inset-0 flex flex-col justify-end p-6 md:p-8",
                         getAlignmentClass(banner.text_alignment),
                       )}>
                         <div className={cn(isActive ? getAnimationClass(banner.animation_type, true) : "")}>
@@ -132,7 +153,7 @@ const HeroCarousel = memo(() => {
                           )}
                           {banner.button_text && (
                             <span
-                              className="inline-block mt-4 px-6 py-2.5 rounded-xl font-semibold text-sm shadow-lg"
+                              className="inline-block mt-4 px-7 py-3 rounded-xl font-semibold text-sm shadow-lg"
                               style={{ backgroundColor: banner.button_color || "hsl(252, 60%, 52%)", color: banner.button_text_color || "#FFFFFF" }}
                             >
                               {banner.button_text}
@@ -149,11 +170,11 @@ const HeroCarousel = memo(() => {
             {/* Navigation Arrows */}
             {banners.length > 1 && (
               <>
-                <button onClick={goToPrev} className="absolute left-3 top-1/2 -translate-y-1/2 bg-card/90 backdrop-blur-sm hover:bg-card rounded-xl p-2 shadow-md transition-all">
-                  <ChevronLeft size={20} className="text-foreground" />
+                <button onClick={goToPrev} className="absolute left-3 top-1/2 -translate-y-1/2 bg-card/90 backdrop-blur-sm hover:bg-card rounded-xl p-2.5 shadow-md transition-all">
+                  <ChevronLeft size={22} className="text-foreground" />
                 </button>
-                <button onClick={goToNext} className="absolute right-3 top-1/2 -translate-y-1/2 bg-card/90 backdrop-blur-sm hover:bg-card rounded-xl p-2 shadow-md transition-all">
-                  <ChevronRight size={20} className="text-foreground" />
+                <button onClick={goToNext} className="absolute right-3 top-1/2 -translate-y-1/2 bg-card/90 backdrop-blur-sm hover:bg-card rounded-xl p-2.5 shadow-md transition-all">
+                  <ChevronRight size={22} className="text-foreground" />
                 </button>
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                   {banners.map((_, index) => (
@@ -171,9 +192,9 @@ const HeroCarousel = memo(() => {
             )}
           </div>
 
-          {/* Side Cards */}
-          <div className="hidden lg:flex flex-col gap-3">
-            <Link to="/flash-sale" className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-5 h-[155px] hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300">
+          {/* Side Cards - Always visible on md+ screens */}
+          <div className="hidden md:flex flex-col gap-3">
+            <Link to="/flash-sale" className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-5 flex-1 hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300">
               <div className="absolute top-3 right-3"><Zap size={40} className="text-primary-foreground/15" /></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2"><Zap size={18} className="text-fanzon-star" /><span className="text-sm font-semibold">Flash Sale</span></div>
@@ -181,7 +202,7 @@ const HeroCarousel = memo(() => {
                 <p className="text-xs text-primary-foreground/70 mt-1">Limited Time Only</p>
               </div>
             </Link>
-            <Link to="/vouchers" className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-fanzon-emerald to-fanzon-success text-primary-foreground p-5 h-[155px] hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300">
+            <Link to="/vouchers" className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-fanzon-emerald to-fanzon-success text-primary-foreground p-5 flex-1 hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-300">
               <div className="absolute top-3 right-3"><Tag size={40} className="text-primary-foreground/15" /></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2"><Tag size={18} className="text-fanzon-star" /><span className="text-sm font-semibold">Collect Vouchers</span></div>
