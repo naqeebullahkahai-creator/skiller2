@@ -200,7 +200,7 @@ const AdminSellersDirectory = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => navigate(`/admin/sellers/${seller.id}`)}
+                        onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}
                       >
                         <Eye size={16} className="mr-1" />
                         View

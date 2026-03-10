@@ -132,7 +132,7 @@ const AdminSellerDetailPage = () => {
 
             <Button 
               variant="outline"
-              onClick={() => navigate(`/admin/seller-kyc/${seller.id}`)}
+              onClick={() => navigate(toAdminPath(`/admin/seller-kyc/${seller.id}`))}
             >
               <ShieldCheck size={16} className="mr-2" />
               View KYC Details
