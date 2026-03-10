@@ -115,7 +115,7 @@ const AdminAgentOnlineMonitor = () => {
     queryFn: async () => {
       if (!viewSessionId) return [];
       const { data } = await supabase
-        .from("support_chat_messages")
+        .from("support_messages")
         .select("*")
         .eq("session_id", viewSessionId)
         .order("created_at", { ascending: true });
