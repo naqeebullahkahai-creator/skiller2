@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Headphones, Search, Users, CheckCircle, XCircle, Star,
-  MessageSquare, ChevronRight, Shield, Clock, BarChart3, ArrowLeft
+  MessageSquare, ChevronRight, Shield, Clock, BarChart3, ArrowLeft, DollarSign
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
