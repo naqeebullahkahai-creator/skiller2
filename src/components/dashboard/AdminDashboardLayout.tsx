@@ -191,7 +191,7 @@ const AdminDashboardLayout = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate("/admin/dashboard")}
                   className="h-9 w-9 text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft size={20} />
