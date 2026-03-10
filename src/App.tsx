@@ -28,6 +28,7 @@ import BusinessAuth from "./pages/business/BusinessAuth";
 import EmailVerificationPending from "./pages/business/EmailVerificationPending";
 import EmailVerificationSuccess from "./pages/business/EmailVerificationSuccess";
 import CustomerAuth from "./pages/auth/CustomerAuth";
+import CustomerEmailVerification from "./pages/auth/CustomerEmailVerification";
 import ResetPassword from "./pages/ResetPassword";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
