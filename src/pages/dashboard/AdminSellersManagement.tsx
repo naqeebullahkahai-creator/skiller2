@@ -225,7 +225,7 @@ const AdminSellersManagement = () => {
               <Card><CardContent className="p-6 text-center text-muted-foreground">No sellers found</CardContent></Card>
             ) : (
               sellers.map((seller) => (
-                <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => navigate(`/admin/sellers/${seller.id}`)}>
+                <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3 mb-3">
                       <Avatar className="h-10 w-10 shrink-0">
