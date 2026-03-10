@@ -9,9 +9,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
 const ProductSkeleton = () => (
-  <div className="bg-card rounded-xl overflow-hidden" style={{ boxShadow: 'var(--shadow-1)' }}>
+  <div className="bg-card rounded-2xl overflow-hidden border border-border/40">
     <Skeleton className="aspect-square w-full" />
-    <div className="p-2 space-y-2">
+    <div className="p-3 space-y-2">
       <Skeleton className="h-3 w-full" />
       <Skeleton className="h-3 w-3/4" />
       <Skeleton className="h-4 w-1/2" />
@@ -62,8 +62,8 @@ const InfiniteProductGrid = memo(() => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-2">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <div className={isMobile ? "grid grid-cols-2 gap-2" : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"}>
+        {Array.from({ length: isMobile ? 6 : 12 }).map((_, i) => (
           <ProductSkeleton key={i} />
         ))}
       </div>
@@ -72,11 +72,13 @@ const InfiniteProductGrid = memo(() => {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <PackageOpen className="w-10 h-10 text-muted-foreground mb-3" />
-        <p className="text-[14px] font-medium text-foreground">Failed to load products</p>
-        <p className="text-[12px] text-muted-foreground mb-3">Please check your connection</p>
-        <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
+          <PackageOpen className="w-8 h-8 text-muted-foreground" />
+        </div>
+        <p className="text-sm font-semibold text-foreground">Failed to load products</p>
+        <p className="text-xs text-muted-foreground mb-4">Please check your connection</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2 rounded-xl">
           <RefreshCw size={14} />
           Try Again
         </Button>
@@ -86,10 +88,12 @@ const InfiniteProductGrid = memo(() => {
 
   if (allProducts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <PackageOpen className="w-12 h-12 text-primary mb-3" />
-        <p className="text-[16px] font-semibold text-foreground">No products yet</p>
-        <p className="text-[12px] text-muted-foreground">Check back soon!</p>
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+          <PackageOpen className="w-8 h-8 text-primary" />
+        </div>
+        <p className="text-base font-bold text-foreground">No products yet</p>
+        <p className="text-xs text-muted-foreground">Check back soon!</p>
       </div>
     );
   }
@@ -110,7 +114,7 @@ const InfiniteProductGrid = memo(() => {
       <div ref={loadMoreRef} className="flex items-center justify-center py-8">
         {isFetchingNextPage && <FanzonSpinner size="md" />}
         {!hasNextPage && allProducts.length > 0 && (
-          <p className="text-[12px] text-muted-foreground">You've seen all products</p>
+          <p className="text-xs text-muted-foreground bg-muted px-4 py-2 rounded-full">You've seen all products</p>
         )}
       </div>
     </>

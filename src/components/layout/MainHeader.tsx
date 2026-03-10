@@ -44,13 +44,13 @@ const MainHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-lg border-b border-border/50">
       <div className="container mx-auto">
         {/* Main Row */}
-        <div className="flex items-center h-[60px] gap-3">
+        <div className="flex items-center h-16 gap-4">
           {/* Mobile Menu */}
           <button
-            className="md:hidden text-foreground p-2 hover:bg-muted rounded-lg transition-colors"
+            className="md:hidden text-foreground p-2 hover:bg-muted rounded-xl transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -61,12 +61,12 @@ const MainHeader = () => {
             <FanzonLogo size="md" />
           </Link>
 
-          {/* Search Bar */}
+          {/* Search Bar — Floating pill style */}
           <div className="hidden md:flex flex-1 max-w-2xl relative">
             <form onSubmit={handleSearch} className="flex w-full">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1 px-3 h-10 text-xs text-muted-foreground bg-secondary border border-border border-r-0 rounded-l-lg whitespace-nowrap hover:bg-muted transition-colors">
+                  <button className="flex items-center gap-1 px-4 h-11 text-xs font-medium text-muted-foreground bg-muted/60 border border-border/60 border-r-0 rounded-l-full whitespace-nowrap hover:bg-muted transition-colors">
                     {selectedCategory}
                     <ChevronDown size={12} />
                   </button>
@@ -82,15 +82,17 @@ const MainHeader = () => {
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Input
-                ref={searchInputRef}
-                type="text"
-                placeholder={t("search.placeholder")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setShowSuggestions(true)}
-                className="flex-1 h-10 border border-border border-x-0 bg-secondary rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
-              />
+              <div className="flex-1 relative">
+                <Input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder={t("search.placeholder")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setShowSuggestions(true)}
+                  className="w-full h-11 border border-border/60 border-x-0 bg-muted/60 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm placeholder:text-muted-foreground/60"
+                />
+              </div>
               <VoiceSearchButton
                 onResult={(text) => {
                   setSearchQuery(text);
@@ -98,7 +100,7 @@ const MainHeader = () => {
                 }}
                 size={16}
               />
-              <Button type="submit" className="h-10 rounded-none rounded-r-lg px-5">
+              <Button type="submit" className="h-11 rounded-none rounded-r-full px-6 bg-primary hover:bg-primary/90">
                 <Search size={18} />
               </Button>
             </form>
@@ -114,16 +116,21 @@ const MainHeader = () => {
             />
           </div>
 
-          {/* Right Actions — Daraz-style icon columns */}
-          <div className="flex items-center gap-0.5 ml-auto">
+          {/* Right Actions */}
+          <div className="flex items-center gap-1 ml-auto">
             {/* Wallet */}
             {isAuthenticated && role === "customer" && (
               <Link
                 to="/account/wallet"
-                className="hidden md:flex flex-col items-center px-3 py-1 hover:bg-primary/10 rounded-lg transition-colors group"
+                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-xl transition-colors group"
               >
-                <Wallet size={20} className="text-foreground group-hover:text-primary" />
-                <span className="text-[11px] font-semibold text-primary">{formatPKR(wallet?.balance || 0)}</span>
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Wallet size={16} className="text-primary" />
+                </div>
+                <div className="hidden lg:block">
+                  <p className="text-[10px] text-muted-foreground leading-none">Balance</p>
+                  <p className="text-xs font-bold text-primary leading-tight">{formatPKR(wallet?.balance || 0)}</p>
+                </div>
               </Link>
             )}
 
@@ -131,15 +138,16 @@ const MainHeader = () => {
             {isAuthenticated && (
               <Link
                 to="/account/messages"
-                className="hidden md:flex flex-col items-center px-3 py-1 hover:bg-primary/10 rounded-lg transition-colors group relative"
+                className="hidden md:flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-xl transition-colors group relative"
               >
-                <MessageCircle size={20} className="text-foreground group-hover:text-primary" />
-                <span className="text-[11px] text-muted-foreground group-hover:text-primary">Messages</span>
-                {unreadCount > 0 && (
-                  <span className="absolute top-0 right-1 min-w-[16px] h-4 flex items-center justify-center bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full px-1">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center relative">
+                  <MessageCircle size={16} className="text-foreground group-hover:text-primary transition-colors" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 flex items-center justify-center bg-accent text-accent-foreground text-[9px] font-bold rounded-full px-1">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </div>
               </Link>
             )}
 
@@ -156,7 +164,7 @@ const MainHeader = () => {
 
         {/* Mobile Search */}
         <div className="md:hidden pb-3 px-1">
-          <form onSubmit={handleSearch} className="flex w-full bg-secondary rounded-lg overflow-hidden border border-border">
+          <form onSubmit={handleSearch} className="flex w-full bg-muted/60 rounded-full overflow-hidden border border-border/50">
             <Input
               type="text"
               placeholder={t("search.placeholder")}
@@ -164,7 +172,7 @@ const MainHeader = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <Button type="submit" className="rounded-none px-4">
+            <Button type="submit" className="rounded-none rounded-r-full px-4">
               <Search size={18} />
             </Button>
           </form>

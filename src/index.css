@@ -1,5 +1,5 @@
-/* FANZON Marketplace — Professional Teal Theme */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+/* FANZOON — Premium Editorial Marketplace */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -32,85 +32,87 @@
 }
 
 /* ═══════════════════════════════════════════
-   FANZON PROFESSIONAL TEAL THEME
-   Clean, high-contrast, everything visible
-   Primary: Deep Teal on bright white
+   FANZOON EDITORIAL MARKETPLACE THEME
+   Unique • Bold • World-Class
    ═══════════════════════════════════════════ */
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 12%;
+    --background: 40 20% 97%;
+    --foreground: 220 30% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 12%;
+    --card-foreground: 220 30% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 12%;
+    --popover-foreground: 220 30% 10%;
 
-    /* Primary: Deep Teal */
+    /* Primary: Deep Teal — refined */
     --primary: 173 78% 26%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 95%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 40 15% 94%;
+    --secondary-foreground: 220 25% 15%;
 
-    --muted: 210 12% 93%;
-    --muted-foreground: 215 10% 46%;
+    --muted: 40 10% 92%;
+    --muted-foreground: 220 10% 46%;
 
-    /* Accent: Warm Amber for CTAs and highlights */
+    /* Accent: Rich Amber */
     --accent: 32 95% 52%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 15% 89%;
-    --input: 214 15% 89%;
+    --border: 40 10% 88%;
+    --input: 40 10% 88%;
     --ring: 173 78% 26%;
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
-    /* Fanzon design tokens */
+    /* FANZOON unique tokens */
     --fanzon-gold: 32 95% 52%;
     --fanzon-gold-light: 32 80% 72%;
     --fanzon-gold-muted: 32 30% 94%;
-    --fanzon-onyx: 215 25% 12%;
-    --fanzon-charcoal: 215 20% 18%;
-    --fanzon-graphite: 215 15% 30%;
-    --fanzon-ivory: 210 20% 98%;
-    --fanzon-cream: 210 15% 96%;
-    --fanzon-warm-gray: 215 10% 50%;
-    --fanzon-success: 152 60% 38%;
+    --fanzon-onyx: 220 30% 10%;
+    --fanzon-charcoal: 220 25% 16%;
+    --fanzon-graphite: 220 18% 28%;
+    --fanzon-ivory: 40 20% 97%;
+    --fanzon-cream: 40 18% 95%;
+    --fanzon-warm-gray: 220 8% 52%;
+    --fanzon-success: 160 64% 38%;
     --fanzon-warning: 38 92% 50%;
     --fanzon-star: 45 93% 47%;
     --fanzon-emerald: 160 60% 36%;
     --fanzon-teal: 173 78% 26%;
-    --fanzon-teal-light: 173 60% 40%;
-    --fanzon-teal-muted: 173 30% 92%;
+    --fanzon-teal-light: 173 55% 42%;
+    --fanzon-teal-muted: 173 25% 93%;
+    --fanzon-coral: 12 80% 58%;
+    --fanzon-violet: 262 60% 55%;
 
-    /* Shadows — clean, sharp */
-    --shadow-1: 0 1px 2px rgba(0,0,0,0.05);
-    --shadow-2: 0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-3: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-    --shadow-4: 0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
-    --shadow-gold: 0 2px 12px rgba(15,118,110,0.08);
+    /* Shadows — layered depth */
+    --shadow-1: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+    --shadow-2: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03);
+    --shadow-3: 0 6px 20px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.03);
+    --shadow-4: 0 12px 40px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+    --shadow-gold: 0 4px 16px rgba(15,118,110,0.1);
+    --shadow-hover: 0 8px 30px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.05);
 
     /* Dashboard */
-    --dashboard-sidebar: 215 28% 11%;
-    --dashboard-sidebar-hover: 215 24% 16%;
+    --dashboard-sidebar: 220 28% 11%;
+    --dashboard-sidebar-hover: 220 24% 16%;
     --dashboard-sidebar-active: 173 78% 26%;
-    --dashboard-sidebar-border: 215 20% 18%;
-    --dashboard-sidebar-text: 215 10% 60%;
+    --dashboard-sidebar-border: 220 20% 18%;
+    --dashboard-sidebar-text: 220 10% 60%;
     --dashboard-sidebar-text-active: 173 78% 40%;
 
-    --sidebar-background: 215 28% 11%;
-    --sidebar-foreground: 215 10% 75%;
+    --sidebar-background: 220 28% 11%;
+    --sidebar-foreground: 220 10% 75%;
     --sidebar-primary: 173 78% 26%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 24% 16%;
-    --sidebar-accent-foreground: 215 10% 80%;
-    --sidebar-border: 215 20% 18%;
+    --sidebar-accent: 220 24% 16%;
+    --sidebar-accent-foreground: 220 10% 80%;
+    --sidebar-border: 220 20% 18%;
     --sidebar-ring: 173 78% 26%;
   }
 }
@@ -123,23 +125,23 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     font-size: 14px;
     line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 
   .font-body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
   }
 
   .font-display {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
   }
 
   .font-urdu {
@@ -175,19 +177,18 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-  /* Clean thin scrollbar */
   * {
     scrollbar-width: thin;
-    scrollbar-color: hsl(215 10% 80%) transparent;
+    scrollbar-color: hsl(220 10% 82%) transparent;
   }
-  *::-webkit-scrollbar { width: 5px; height: 5px; }
+  *::-webkit-scrollbar { width: 4px; height: 4px; }
   *::-webkit-scrollbar-track { background: transparent; }
   *::-webkit-scrollbar-thumb {
-    background: hsl(215 10% 80%);
+    background: hsl(220 10% 82%);
     border-radius: 10px;
   }
   *::-webkit-scrollbar-thumb:hover {
-    background: hsl(215 10% 65%);
+    background: hsl(220 10% 65%);
   }
 
   .touch-target { min-height: 44px; min-width: 44px; }
@@ -240,16 +241,16 @@
   .elevation-gold { box-shadow: var(--shadow-gold); }
 
   .card-luxury {
-    @apply bg-card rounded-lg border border-border;
-    box-shadow: var(--shadow-2);
+    @apply bg-card rounded-xl border border-border;
+    box-shadow: var(--shadow-1);
   }
   .card-luxury-elevated {
-    @apply bg-card rounded-lg border border-border;
+    @apply bg-card rounded-xl border border-border;
     box-shadow: var(--shadow-3);
   }
   .card-luxury-gold {
-    @apply bg-card rounded-lg;
-    border: 1px solid hsl(var(--primary) / 0.15);
+    @apply bg-card rounded-xl;
+    border: 1px solid hsl(var(--primary) / 0.12);
     box-shadow: var(--shadow-gold);
   }
 
@@ -261,7 +262,7 @@
 
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(173 78% 26%), hsl(173 60% 38%));
+    background-image: linear-gradient(135deg, hsl(173 78% 26%), hsl(173 55% 40%));
   }
 
   .text-gradient-gold {
@@ -270,20 +271,21 @@
   }
 
   .border-gold-glow {
-    border: 1px solid hsl(var(--primary) / 0.2);
-    box-shadow: 0 0 8px hsl(var(--primary) / 0.05);
+    border: 1px solid hsl(var(--primary) / 0.15);
+    box-shadow: 0 0 12px hsl(var(--primary) / 0.05);
   }
 
   .btn-gold {
-    background: linear-gradient(135deg, hsl(173 78% 26%), hsl(173 65% 32%));
+    background: linear-gradient(135deg, hsl(173 78% 26%), hsl(173 60% 34%));
     color: white;
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(15,118,110,0.2);
+    box-shadow: 0 2px 10px rgba(15,118,110,0.2);
     transition: all 0.2s;
   }
   .btn-gold:hover {
-    background: linear-gradient(135deg, hsl(173 78% 22%), hsl(173 65% 28%));
-    box-shadow: 0 4px 16px rgba(15,118,110,0.25);
+    background: linear-gradient(135deg, hsl(173 78% 22%), hsl(173 60% 30%));
+    box-shadow: 0 4px 20px rgba(15,118,110,0.3);
+    transform: translateY(-1px);
   }
 
   .page-enter {
@@ -309,6 +311,18 @@
   }
   .animate-confetti-fall { animation: confetti-fall 3s ease-out forwards; }
 
+  @keyframes fadeInUp {
+    from { transform: translateY(16px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .animate-scale-in { animation: scaleIn 0.3s ease-out forwards; }
+
   [data-radix-avatar-image], .avatar-image, img[class*="avatar"],
   [class*="Avatar"] img, .product-image, .gallery-image, .kyc-image {
     object-fit: cover !important;
@@ -317,4 +331,19 @@
   .glass { @apply bg-white/90 backdrop-blur-xl border border-border; box-shadow: var(--shadow-2); }
   .glass-dark { @apply bg-black/40 backdrop-blur-xl border border-white/10; }
   .glass-gold { @apply bg-white/95 backdrop-blur-xl; border: 1px solid hsl(var(--primary) / 0.1); box-shadow: var(--shadow-gold); }
+
+  /* Unique marketplace section divider */
+  .section-divider {
+    position: relative;
+  }
+  .section-divider::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 48px;
+    height: 3px;
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+    border-radius: 2px;
+  }
 }
