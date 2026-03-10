@@ -71,7 +71,16 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "User Directory", href: "/admin/users", icon: Users },
       ]
     },
-    { name: "Agents", href: "/admin/agents-management", icon: Headphones, feature: 'users' },
+    {
+      name: "Agents", icon: Headphones, feature: 'users',
+      children: [
+        { name: "Overview", href: "/admin/agents-management", icon: Headphones },
+        { name: "Assign Role", href: "/admin/agents/roles", icon: Shield },
+        { name: "Live Monitor", href: "/admin/agents/monitor", icon: Users },
+        { name: "Salaries", href: "/admin/agents/salaries", icon: DollarSign },
+        { name: "Payouts", href: "/admin/agents/payouts", icon: Wallet },
+      ]
+    },
     {
       name: "Orders", icon: ShoppingCart, feature: 'orders',
       badge: counts.pendingOrders + counts.pendingReturns + counts.cancelledOrders,
