@@ -74,12 +74,12 @@ const Index = () => {
             </SectionErrorBoundary>
 
             {/* Just For You */}
-            <section className="py-10">
+            <section className="py-8">
               <div className="container mx-auto">
-                <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-4 px-6 rounded-t-2xl">
-                  <h2 className="text-lg font-bold text-center tracking-wide">Just For You</h2>
+                <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-3.5 px-6 rounded-t-2xl">
+                  <h2 className="text-base font-bold text-center tracking-wide">Just For You</h2>
                 </div>
-                <div className="bg-card rounded-b-2xl p-5 border border-t-0 border-border/50">
+                <div className="bg-card rounded-b-2xl p-4 border border-t-0 border-border/50">
                   <SectionErrorBoundary fallbackMessage="Products couldn't load">
                     <Suspense fallback={<GridSkeleton />}>
                       <InfiniteProductGrid />
