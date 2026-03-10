@@ -67,11 +67,12 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
 
 const AdminSellersManagement = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const adminBasePath = location.pathname.startsWith("/admin-app") ? "/admin-app" : "/admin";
+  const toAdminPath = (path: string) => path.replace(/^\/admin/, adminBasePath);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const { sellers, isLoading, stats } = useAdminSellers(searchQuery);
-  const { pendingCount: pendingKyc, verifiedCount, rejectedCount } = useAdminSellerProfiles();
-  const { pendingCount: pendingDeposits } = useAdminDepositRequests("seller");
 
   const statCards = [
     { label: "Total Sellers", value: stats.totalSellers, icon: <Store className="h-5 w-5 text-white" />, color: "bg-blue-500" },

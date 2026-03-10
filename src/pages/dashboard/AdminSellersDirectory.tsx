@@ -42,6 +42,9 @@ const getVerificationBadge = (status: string | undefined) => {
 
 const AdminSellersDirectory = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const adminBasePath = location.pathname.startsWith("/admin-app") ? "/admin-app" : "/admin";
+  const toAdminPath = (path: string) => path.replace(/^\/admin/, adminBasePath);
   const [searchQuery, setSearchQuery] = useState("");
   const { sellers, isLoading, stats } = useAdminSellers(searchQuery);
 

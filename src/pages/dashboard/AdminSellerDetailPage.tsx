@@ -55,6 +55,9 @@ const getVerificationBadge = (status: string) => {
 const AdminSellerDetailPage = () => {
   const { sellerId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const adminBasePath = location.pathname.startsWith("/admin-app") ? "/admin-app" : "/admin";
+  const toAdminPath = (path: string) => path.replace(/^\/admin/, adminBasePath);
   const { seller, isLoading } = useSellerDetails(sellerId || "");
   const [viewingDocument, setViewingDocument] = useState<{ url: string; label: string } | null>(null);
 
