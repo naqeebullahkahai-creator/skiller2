@@ -38,20 +38,23 @@ const AgentChatsPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  // Agent profile for online status
-  const { data: agentProfile } = useQuery({
-    queryKey: ["agent-profile", user?.id],
+  // Load online status from agent_online_status (persists across refresh)
+  const { data: onlineStatusData } = useQuery({
+    queryKey: ["agent-online-status", user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data } = await supabase.from("support_agent_profiles").select("*").eq("user_id", user.id).maybeSingle();
+      const { data } = await supabase.from("agent_online_status").select("*").eq("user_id", user.id).maybeSingle();
       return data;
     },
     enabled: !!user,
   });
 
+  // Sync local state from DB on load
   useEffect(() => {
-    if (agentProfile) setIsOnline((agentProfile as any).is_online);
-  }, [agentProfile]);
+    if (onlineStatusData) {
+      setIsOnline(onlineStatusData.is_online);
+    }
+  }, [onlineStatusData]);
 
   // Active sessions
   const { data: activeSessions = [] } = useQuery({
@@ -64,14 +67,15 @@ const AgentChatsPage = () => {
     enabled: !!user,
   });
 
-  // Waiting sessions
+  // Waiting sessions - always load when user exists (so agent sees queue even while loading)
   const { data: waitingSessions = [] } = useQuery({
-    queryKey: ["waiting-sessions"],
+    queryKey: ["waiting-sessions", isOnline],
     queryFn: async () => {
       const { data } = await supabase.from("support_chat_sessions").select("*").eq("status", "waiting").is("agent_id", null).order("created_at", { ascending: true });
       return data || [];
     },
     enabled: !!user && isOnline,
+    refetchInterval: 5000,
   });
 
   // User names
