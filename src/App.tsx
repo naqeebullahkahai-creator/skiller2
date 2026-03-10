@@ -545,6 +545,8 @@ const App = () => (
                               <Route path="commission-management" element={<AdminCommissionManagementPage />} />
                               <Route path="security" element={<AdminSecurityPage />} />
                               <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
+                              <Route path="pending-commissions" element={<AdminPendingCommissionsPage />} />
+                              <Route path="tracking-search" element={<AdminTrackingSearchPage />} />
                             </Route>
                           )}
 

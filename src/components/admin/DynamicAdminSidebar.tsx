@@ -105,7 +105,9 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Commission & Fees", icon: Percent, feature: 'payouts',
       children: [
+        { name: "Pending Commissions", href: "/admin/pending-commissions", icon: Clock },
         { name: "Commission Settings", href: "/admin/commission-management", icon: Percent },
+        { name: "Commission Wallet", href: "/admin/commission-wallet", icon: Wallet },
         { name: "Subscriptions", href: "/admin/subscriptions", icon: Receipt },
         { name: "Payment Methods", href: "/admin/payment-methods", icon: CreditCard },
         { name: "Payment Settings", href: "/admin/payment-settings", icon: Settings },
