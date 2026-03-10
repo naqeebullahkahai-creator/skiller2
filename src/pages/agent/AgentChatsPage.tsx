@@ -79,15 +79,17 @@ const AgentChatsPage = () => {
     refetchInterval: 5000,
   });
 
-  // User names
+  // User names and roles
   const { data: sessionUsers = {} } = useQuery({
     queryKey: ["session-users", activeSessions.map((s: any) => s.user_id).concat(waitingSessions.map((s: any) => s.user_id))],
     queryFn: async () => {
       const userIds = [...new Set([...activeSessions.map((s: any) => s.user_id), ...waitingSessions.map((s: any) => s.user_id)])];
       if (userIds.length === 0) return {};
-      const { data } = await supabase.from("profiles").select("id, full_name").in("id", userIds);
-      const map: Record<string, string> = {};
-      data?.forEach(p => { map[p.id] = p.full_name || "User"; });
+      const { data: profiles } = await supabase.from("profiles").select("id, full_name").in("id", userIds);
+      const { data: roles } = await supabase.from("user_roles").select("user_id, role").in("user_id", userIds);
+      const map: Record<string, { name: string; role: string }> = {};
+      profiles?.forEach(p => { map[p.id] = { name: p.full_name || "User", role: "customer" }; });
+      roles?.forEach(r => { if (map[r.user_id]) map[r.user_id].role = r.role; });
       return map;
     },
     enabled: activeSessions.length > 0 || waitingSessions.length > 0,
