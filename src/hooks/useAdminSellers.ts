@@ -24,20 +24,18 @@ export interface SellerWithDetails {
 export const useAdminSellers = (searchQuery?: string) => {
   const queryClient = useQueryClient();
 
-  const { data: sellers = [], isLoading, error } = useQuery({
-    queryKey: ["admin-sellers", searchQuery],
+  const { data: allSellers = [], isLoading, error } = useQuery({
+    queryKey: ["admin-sellers"],
     queryFn: async () => {
-      let query = supabase
+      const { data: sellerProfiles, error: sellersError } = await supabase
         .from("seller_profiles")
         .select("*")
         .order("created_at", { ascending: false });
 
-      const { data: sellerProfiles, error: sellersError } = await query;
       if (sellersError) throw sellersError;
-
       if (!sellerProfiles || sellerProfiles.length === 0) return [];
 
-      const userIds = sellerProfiles.map(s => s.user_id);
+      const userIds = sellerProfiles.map((s) => s.user_id);
 
       const [profilesRes, productsRes, walletsRes, ordersRes] = await Promise.all([
         supabase.from("profiles").select("id, full_name, avatar_url, email").in("id", userIds).neq("email", SUPER_ADMIN_EMAIL),
@@ -52,9 +50,9 @@ export const useAdminSellers = (searchQuery?: string) => {
       const orders = ordersRes.data;
 
       const orderCountBySeller: Record<string, number> = {};
-      orders?.forEach(order => {
+      orders?.forEach((order) => {
         const items = order.items as any[];
-        items?.forEach(item => {
+        items?.forEach((item) => {
           const sellerId = item.seller_id;
           if (sellerId && userIds.includes(sellerId)) {
             orderCountBySeller[sellerId] = (orderCountBySeller[sellerId] || 0) + 1;
@@ -62,7 +60,7 @@ export const useAdminSellers = (searchQuery?: string) => {
         });
       });
 
-      const sellersWithDetails: SellerWithDetails[] = sellerProfiles
+      return sellerProfiles
         .map((seller) => {
           const profile = profiles?.find((p) => p.id === seller.user_id);
           if (!profile) return null;
@@ -87,21 +85,21 @@ export const useAdminSellers = (searchQuery?: string) => {
           };
         })
         .filter((seller): seller is NonNullable<typeof seller> => seller !== null) as SellerWithDetails[];
-
-      if (searchQuery) {
-        const searchLower = searchQuery.toLowerCase();
-        return sellersWithDetails.filter(
-          (seller) =>
-            seller.shop_name?.toLowerCase().includes(searchLower) ||
-            seller.full_name?.toLowerCase().includes(searchLower) ||
-            seller.city?.toLowerCase().includes(searchLower) ||
-            seller.display_id?.toLowerCase().includes(searchLower)
-        );
-      }
-
-      return sellersWithDetails;
     },
   });
+
+  const sellers = useMemo(() => {
+    if (!searchQuery) return allSellers;
+
+    const searchLower = searchQuery.toLowerCase();
+    return allSellers.filter(
+      (seller) =>
+        seller.shop_name?.toLowerCase().includes(searchLower) ||
+        seller.full_name?.toLowerCase().includes(searchLower) ||
+        seller.city?.toLowerCase().includes(searchLower) ||
+        seller.display_id?.toLowerCase().includes(searchLower)
+    );
+  }, [allSellers, searchQuery]);
 
   // Realtime: refresh on seller_profiles, seller_wallets, products changes
   useEffect(() => {

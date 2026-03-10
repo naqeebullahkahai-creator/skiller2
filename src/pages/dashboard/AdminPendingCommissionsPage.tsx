@@ -45,11 +45,13 @@ const AdminPendingCommissionsPage = () => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
+  const selectedPendingIds = selectedIds.filter((id) => filteredPending.some((s) => s.id === id));
+
   const selectAll = () => {
-    if (selectedIds.length === filteredPending.length) {
-      setSelectedIds([]);
+    if (selectedPendingIds.length === filteredPending.length && filteredPending.length > 0) {
+      setSelectedIds((prev) => prev.filter((id) => !filteredPending.some((s) => s.id === id)));
     } else {
-      setSelectedIds(filteredPending.map(s => s.id));
+      setSelectedIds((prev) => [...new Set([...prev, ...filteredPending.map((s) => s.id)])]);
     }
   };
 
