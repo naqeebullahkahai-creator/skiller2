@@ -286,7 +286,7 @@ const SettlementTable = ({ items, isPending, selectedIds = [], onToggleSelect, o
                 {isPending && onSelectAll && (
                   <TableHead className="w-10">
                     <Checkbox
-                      checked={selectedIds.length === items.length && items.length > 0}
+                      checked={selectedIds.length > 0 && selectedIds.length === items.length}
                       onCheckedChange={onSelectAll}
                     />
                   </TableHead>

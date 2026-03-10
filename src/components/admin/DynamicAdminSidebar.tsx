@@ -196,11 +196,15 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     );
   }
 
+  const normalizeAdminPath = (path: string) => path.replace(/^\/admin-app/, "/admin");
+
   const isLinkActive = (href: string) => {
-    if (location.pathname === href) return true;
-    if (href === "/admin/dashboard") return false;
-    // Only match if the path continues with a "/" after the href (not a different word)
-    return location.pathname.startsWith(href + "/");
+    const currentPath = normalizeAdminPath(location.pathname);
+    const targetPath = normalizeAdminPath(href);
+
+    if (currentPath === targetPath) return true;
+    if (targetPath === "/admin/dashboard") return false;
+    return currentPath.startsWith(targetPath + "/");
   };
 
   const isGroupActive = (group: NavGroup) => {

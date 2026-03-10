@@ -101,22 +101,30 @@ export const useAdminSellers = (searchQuery?: string) => {
     );
   }, [allSellers, searchQuery]);
 
-  // Realtime: refresh on seller_profiles, seller_wallets, products changes
+  // Realtime: refresh on seller related changes
   useEffect(() => {
     const channel = supabase
-      .channel('admin-sellers-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'seller_profiles' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['admin-sellers'] });
+      .channel("admin-sellers-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "seller_profiles" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-sellers"] });
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'seller_wallets' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['admin-sellers'] });
+      .on("postgres_changes", { event: "*", schema: "public", table: "seller_wallets" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-sellers"] });
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-        queryClient.invalidateQueries({ queryKey: ['admin-sellers'] });
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-sellers"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-sellers"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-sellers"] });
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [queryClient]);
 
   const stats = {
