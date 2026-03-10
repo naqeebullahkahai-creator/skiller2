@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   Store, Search, Eye, ShieldCheck, XCircle, CheckCircle, AlertCircle,
   TrendingUp, Package, Wallet, Users, FileCheck, Zap, CreditCard,
-  BarChart3, Percent, PiggyBank, Settings, ChevronRight, Scale, UserCheck, ArrowLeft
+  BarChart3, Percent, PiggyBank, Settings, ChevronRight, Scale, UserCheck, ArrowLeft, RotateCcw
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,10 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAdminSellers } from "@/hooks/useAdminSellers";
 import { useAdminSellerProfiles } from "@/hooks/useAdminSellerProfiles";
 import { useAdminDepositRequests } from "@/hooks/useDeposits";
@@ -65,6 +69,159 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
   );
 };
 
+const SellerTable = ({ 
+  sellers, isLoading, navigate, toAdminPath, searchQuery, showUnreject, onUnreject 
+}: {
+  sellers: any[];
+  isLoading: boolean;
+  navigate: any;
+  toAdminPath: (p: string) => string;
+  searchQuery: string;
+  showUnreject?: boolean;
+  onUnreject?: (seller: any) => void;
+}) => {
+  const filtered = searchQuery
+    ? sellers.filter(s =>
+        s.shop_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.display_id?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : sellers;
+
+  return (
+    <>
+      {/* Desktop Table */}
+      <Card className="hidden md:block">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Seller / Shop</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Products</TableHead>
+                <TableHead>Wallet</TableHead>
+                <TableHead className="hidden lg:table-cell">City</TableHead>
+                <TableHead className="hidden lg:table-cell">Joined</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <TableRow key={i}>
+                    {[...Array(8)].map((_, j) => (
+                      <TableCell key={j}><Skeleton className="h-6 w-20" /></TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : filtered.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">No sellers found</TableCell>
+                </TableRow>
+              ) : (
+                filtered.map((seller) => (
+                  <TableRow key={seller.id}>
+                    <TableCell className="font-mono text-xs text-primary">
+                      {seller.display_id || `FZN-SEL-${seller.id.slice(0, 5).toUpperCase()}`}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9 shrink-0">
+                          {seller.avatar_url && <AvatarImage src={seller.avatar_url} alt={seller.shop_name} className="object-cover aspect-square" />}
+                          <AvatarFallback className="bg-primary/10 text-primary text-xs">{seller.shop_name?.charAt(0).toUpperCase() || "S"}</AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm truncate">{seller.shop_name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{seller.full_name}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{getVerificationBadge(seller.verification_status)}</TableCell>
+                    <TableCell>{seller.products_count}</TableCell>
+                    <TableCell>{formatPKR(seller.wallet_balance)}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{seller.city || "-"}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{format(new Date(seller.created_at), "MMM dd, yyyy")}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="sm" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
+                          <Eye size={16} className="mr-1" /> View
+                        </Button>
+                        {showUnreject && seller.verification_status === "rejected" && onUnreject && (
+                          <Button variant="outline" size="sm" className="text-green-600 border-green-300 hover:bg-green-50" onClick={(e) => { e.stopPropagation(); onUnreject(seller); }}>
+                            <RotateCcw size={14} className="mr-1" /> Unreject
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          [...Array(4)].map((_, i) => (
+            <Card key={i} className="border-0 shadow-sm">
+              <CardContent className="p-4 space-y-3">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-4 w-24" />
+              </CardContent>
+            </Card>
+          ))
+        ) : filtered.length === 0 ? (
+          <Card><CardContent className="p-6 text-center text-muted-foreground">No sellers found</CardContent></Card>
+        ) : (
+          filtered.map((seller) => (
+            <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <Avatar className="h-10 w-10 shrink-0">
+                    {seller.avatar_url && <AvatarImage src={seller.avatar_url} alt={seller.shop_name} className="object-cover aspect-square" />}
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm">{seller.shop_name?.charAt(0).toUpperCase() || "S"}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate">{seller.shop_name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{seller.full_name}</p>
+                  </div>
+                  {getVerificationBadge(seller.verification_status)}
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-muted/50 rounded-lg p-2">
+                    <p className="text-xs text-muted-foreground">Products</p>
+                    <p className="text-sm font-bold">{seller.products_count}</p>
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-2">
+                    <p className="text-xs text-muted-foreground">Wallet</p>
+                    <p className="text-sm font-bold truncate">{formatPKR(seller.wallet_balance)}</p>
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-2">
+                    <p className="text-xs text-muted-foreground">City</p>
+                    <p className="text-sm font-bold truncate">{seller.city || "—"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-[10px] text-muted-foreground font-mono">{seller.display_id || `FZN-SEL-${seller.id.slice(0, 5).toUpperCase()}`}</p>
+                  {showUnreject && seller.verification_status === "rejected" && onUnreject && (
+                    <Button variant="outline" size="sm" className="text-green-600 border-green-300 hover:bg-green-50 h-7 text-xs" onClick={(e) => { e.stopPropagation(); onUnreject(seller); }}>
+                      <RotateCcw size={12} className="mr-1" /> Unreject
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+    </>
+  );
+};
+
 const AdminSellersManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -72,15 +229,29 @@ const AdminSellersManagement = () => {
   const toAdminPath = (path: string) => path.replace(/^\/admin/, adminBasePath);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
-  const { sellers, isLoading, stats } = useAdminSellers(searchQuery);
-  const { pendingCount: pendingKyc } = useAdminSellerProfiles();
+  const { sellers, isLoading, stats } = useAdminSellers();
+  const { pendingCount: pendingKyc, updateStatus } = useAdminSellerProfiles();
   const { pendingCount: pendingDeposits } = useAdminDepositRequests("seller");
+  const [unrejectSeller, setUnrejectSeller] = useState<any>(null);
+
+  const verifiedSellers = sellers.filter(s => s.verification_status === "verified");
+  const unverifiedSellers = sellers.filter(s => s.verification_status !== "verified");
+  const rejectedSellers = sellers.filter(s => s.verification_status === "rejected");
+
+  const handleUnreject = () => {
+    if (!unrejectSeller) return;
+    // Find the seller_profile id from useAdminSellerProfiles or use the seller.id (which is seller_profile.id)
+    updateStatus.mutate(
+      { id: unrejectSeller.id, status: "verified" },
+      { onSettled: () => setUnrejectSeller(null) }
+    );
+  };
 
   const statCards = [
     { label: "Total Sellers", value: stats.totalSellers, icon: <Store className="h-5 w-5 text-white" />, color: "bg-blue-500" },
     { label: "Verified", value: stats.verifiedSellers, icon: <ShieldCheck className="h-5 w-5 text-white" />, color: "bg-green-500" },
-    { label: "Pending KYC", value: pendingKyc, icon: <FileCheck className="h-5 w-5 text-white" />, color: "bg-yellow-500" },
-    { label: "Total Earnings", value: formatPKR(stats.totalEarnings), icon: <TrendingUp className="h-5 w-5 text-white" />, color: "bg-emerald-500" },
+    { label: "Unverified", value: stats.totalSellers - stats.verifiedSellers, icon: <AlertCircle className="h-5 w-5 text-white" />, color: "bg-yellow-500" },
+    { label: "Rejected", value: rejectedSellers.length, icon: <XCircle className="h-5 w-5 text-white" />, color: "bg-red-500" },
   ];
 
   const quickActions: QuickActionProps[] = [
@@ -126,140 +297,67 @@ const AdminSellersManagement = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-2 w-full max-w-md">
-          <TabsTrigger value="overview">Quick Actions</TabsTrigger>
-          <TabsTrigger value="directory">Seller Directory</TabsTrigger>
+        <TabsList className="grid grid-cols-4 w-full max-w-lg">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="verified" className="gap-1">
+            Verified
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">{verifiedSellers.length}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="unverified" className="gap-1">
+            Unverified
+            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4">{unverifiedSellers.length}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
         </TabsList>
 
-        {/* Quick Actions Tab */}
+        {/* Search (shared) */}
+        {activeTab !== "overview" && (
+          <div className="relative w-full sm:w-80 mt-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search by ID, shop, name (FZN-SEL-...)" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
+          </div>
+        )}
+
+        {/* Overview Tab */}
         <TabsContent value="overview" className="mt-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {quickActions.map((action, i) => <QuickAction key={i} {...action} href={toAdminPath(action.href)} />)}
           </div>
         </TabsContent>
 
-        {/* Directory Tab */}
-        <TabsContent value="directory" className="mt-4 space-y-4">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search by ID, shop, name (FZN-SEL-...)" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
-          </div>
+        {/* Verified Tab */}
+        <TabsContent value="verified" className="mt-4">
+          <SellerTable sellers={verifiedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} />
+        </TabsContent>
 
-          {/* Desktop Table */}
-          <Card className="hidden md:block">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Seller / Shop</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Products</TableHead>
-                    <TableHead>Wallet</TableHead>
-                    <TableHead className="hidden lg:table-cell">City</TableHead>
-                    <TableHead className="hidden lg:table-cell">Joined</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    [...Array(5)].map((_, i) => (
-                      <TableRow key={i}>
-                        {[...Array(8)].map((_, j) => (
-                          <TableCell key={j}><Skeleton className="h-6 w-20" /></TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : sellers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">No sellers found</TableCell>
-                    </TableRow>
-                  ) : (
-                    sellers.map((seller) => (
-                      <TableRow key={seller.id}>
-                        <TableCell className="font-mono text-xs text-primary">
-                          {seller.display_id || `FZN-SEL-${seller.id.slice(0, 5).toUpperCase()}`}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-9 w-9 shrink-0">
-                              {seller.avatar_url && <AvatarImage src={seller.avatar_url} alt={seller.shop_name} className="object-cover aspect-square" />}
-                              <AvatarFallback className="bg-primary/10 text-primary text-xs">{seller.shop_name?.charAt(0).toUpperCase() || "S"}</AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0">
-                              <p className="font-medium text-sm truncate">{seller.shop_name}</p>
-                              <p className="text-xs text-muted-foreground truncate">{seller.full_name}</p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{getVerificationBadge(seller.verification_status)}</TableCell>
-                        <TableCell>{seller.products_count}</TableCell>
-                        <TableCell>{formatPKR(seller.wallet_balance)}</TableCell>
-                        <TableCell className="hidden lg:table-cell">{seller.city || "-"}</TableCell>
-                        <TableCell className="hidden lg:table-cell">{format(new Date(seller.created_at), "MMM dd, yyyy")}</TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="sm" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
-                            <Eye size={16} className="mr-1" /> View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+        {/* Unverified Tab (pending + rejected) */}
+        <TabsContent value="unverified" className="mt-4">
+          <SellerTable sellers={unverifiedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
+        </TabsContent>
 
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-3">
-            {isLoading ? (
-              [...Array(4)].map((_, i) => (
-                <Card key={i} className="border-0 shadow-sm">
-                  <CardContent className="p-4 space-y-3">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-4 w-24" />
-                  </CardContent>
-                </Card>
-              ))
-            ) : sellers.length === 0 ? (
-              <Card><CardContent className="p-6 text-center text-muted-foreground">No sellers found</CardContent></Card>
-            ) : (
-              sellers.map((seller) => (
-                <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <Avatar className="h-10 w-10 shrink-0">
-                        {seller.avatar_url && <AvatarImage src={seller.avatar_url} alt={seller.shop_name} className="object-cover aspect-square" />}
-                        <AvatarFallback className="bg-primary/10 text-primary text-sm">{seller.shop_name?.charAt(0).toUpperCase() || "S"}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{seller.shop_name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{seller.full_name}</p>
-                      </div>
-                      {getVerificationBadge(seller.verification_status)}
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-muted/50 rounded-lg p-2">
-                        <p className="text-xs text-muted-foreground">Products</p>
-                        <p className="text-sm font-bold">{seller.products_count}</p>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-2">
-                        <p className="text-xs text-muted-foreground">Wallet</p>
-                        <p className="text-sm font-bold truncate">{formatPKR(seller.wallet_balance)}</p>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-2">
-                        <p className="text-xs text-muted-foreground">City</p>
-                        <p className="text-sm font-bold truncate">{seller.city || "—"}</p>
-                      </div>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground mt-2 font-mono">{seller.display_id || `FZN-SEL-${seller.id.slice(0, 5).toUpperCase()}`}</p>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+        {/* All Tab */}
+        <TabsContent value="all" className="mt-4">
+          <SellerTable sellers={sellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
         </TabsContent>
       </Tabs>
+
+      {/* Unreject Confirmation Dialog */}
+      <AlertDialog open={!!unrejectSeller} onOpenChange={(open) => !open && setUnrejectSeller(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unreject & Verify Seller</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to unreject <strong>{unrejectSeller?.shop_name}</strong> and change their status to <strong>Verified</strong>? This will allow the seller to operate on the platform.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUnreject} className="bg-green-600 hover:bg-green-700">
+              <ShieldCheck size={16} className="mr-1" /> Verify Seller
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

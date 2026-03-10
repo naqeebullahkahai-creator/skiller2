@@ -53,6 +53,7 @@ export const useAdminSellerProfiles = () => {
     onSuccess: (_, variables) => {
       toast.success(`Seller ${variables.status === 'verified' ? 'approved' : 'rejected'} successfully`);
       queryClient.invalidateQueries({ queryKey: ['admin-seller-profiles'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-sellers'] });
     },
     onError: (error: Error) => {
       toast.error(`Failed to update status: ${error.message}`);
