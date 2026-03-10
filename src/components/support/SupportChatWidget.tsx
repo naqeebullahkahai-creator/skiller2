@@ -191,7 +191,7 @@ const SupportChatWidget = () => {
                   <PhoneOff size={18} />
                 </Button>
               )}
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}
+              <Button variant="ghost" size="icon" onClick={handleClose}
                 className="text-primary-foreground hover:bg-primary-foreground/20">
                 <X size={20} />
               </Button>
