@@ -79,7 +79,7 @@ const AdminSellerDetailPage = () => {
         <Store className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
         <h2 className="text-xl font-semibold">Seller not found</h2>
         <p className="text-muted-foreground mt-2">This seller does not exist or you don't have access.</p>
-        <Button onClick={() => navigate("/admin/sellers")} className="mt-4">
+        <Button onClick={() => navigate(toAdminPath("/admin/sellers"))} className="mt-4">
           <ArrowLeft size={16} className="mr-2" />
           Back to Sellers
         </Button>
