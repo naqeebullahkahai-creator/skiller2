@@ -67,11 +67,12 @@ const AgentChatsPage = () => {
     enabled: !!user,
   });
 
-  // Waiting sessions - always load when user exists (so agent sees queue even while loading)
+  // Waiting sessions - filter out requests older than 24 hours
   const { data: waitingSessions = [] } = useQuery({
     queryKey: ["waiting-sessions", isOnline],
     queryFn: async () => {
-      const { data } = await supabase.from("support_chat_sessions").select("*").eq("status", "waiting").is("agent_id", null).order("created_at", { ascending: true });
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data } = await supabase.from("support_chat_sessions").select("*").eq("status", "waiting").is("agent_id", null).gte("created_at", oneDayAgo).order("created_at", { ascending: true });
       return data || [];
     },
     enabled: !!user && isOnline,
