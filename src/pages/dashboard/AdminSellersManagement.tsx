@@ -100,7 +100,7 @@ const AdminSellersManagement = () => {
     <div className="space-y-6 overflow-x-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl p-5 text-white">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/admin/dashboard")} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
+        <Button variant="ghost" size="sm" onClick={() => navigate(toAdminPath("/admin/dashboard"))} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
           <ArrowLeft className="h-4 w-4" /> Return to Admin Panel
         </Button>
         <h1 className="text-xl font-bold flex items-center gap-2">
