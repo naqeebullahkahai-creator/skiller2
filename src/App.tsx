@@ -121,6 +121,10 @@ import AdminWalletManagementPage from "./pages/dashboard/AdminWalletManagementPa
 import AdminSellersManagement from "./pages/dashboard/AdminSellersManagement";
 import AdminCustomersManagement from "./pages/dashboard/AdminCustomersManagement";
 import AdminAgentsManagement from "./pages/dashboard/AdminAgentsManagement";
+import AdminAgentOnlineMonitor from "./pages/dashboard/AdminAgentOnlineMonitor";
+import AdminAgentSalaryPage from "./pages/dashboard/AdminAgentSalaryPage";
+import AdminAgentPayoutsPage from "./pages/dashboard/AdminAgentPayoutsPage";
+import AdminAgentRolePage from "./pages/dashboard/AdminAgentRolePage";
 import AdminStorePage from "./pages/dashboard/AdminStorePage";
 import AdminStoreProductsPage from "./pages/dashboard/AdminStoreProductsPage";
 import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
@@ -357,6 +361,10 @@ const App = () => (
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
+                              <Route path="agents/roles" element={<AdminAgentRolePage />} />
+                              <Route path="agents/monitor" element={<AdminAgentOnlineMonitor />} />
+                              <Route path="agents/salaries" element={<AdminAgentSalaryPage />} />
+                              <Route path="agents/payouts" element={<AdminAgentPayoutsPage />} />
                               <Route path="orders-management" element={<Navigate to="/admin/orders" replace />} />
                               <Route path="products-management" element={<Navigate to="/admin/products" replace />} />
                               <Route path="finance-management" element={<Navigate to="/admin/wallet-management" replace />} />
@@ -499,6 +507,10 @@ const App = () => (
                               <Route path="sellers-management" element={<AdminSellersManagement />} />
                               <Route path="customers-management" element={<AdminCustomersManagement />} />
                               <Route path="agents-management" element={<AdminAgentsManagement />} />
+                              <Route path="agents/roles" element={<AdminAgentRolePage />} />
+                              <Route path="agents/monitor" element={<AdminAgentOnlineMonitor />} />
+                              <Route path="agents/salaries" element={<AdminAgentSalaryPage />} />
+                              <Route path="agents/payouts" element={<AdminAgentPayoutsPage />} />
                               <Route path="orders-management" element={<Navigate to="/admin-app/orders" replace />} />
                               <Route path="products-management" element={<Navigate to="/admin-app/products" replace />} />
                               <Route path="finance-management" element={<Navigate to="/admin-app/wallet-management" replace />} />

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Headphones, Search, Users, CheckCircle, XCircle, Star,
-  MessageSquare, ChevronRight, Shield, Clock, BarChart3, ArrowLeft
+  MessageSquare, ChevronRight, Shield, Clock, BarChart3, ArrowLeft, DollarSign
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -151,7 +151,10 @@ const AdminAgentsManagement = () => {
   ];
 
   const quickActions: QuickActionProps[] = [
-    { icon: <Shield className="w-5 h-5 text-white" />, title: "Roles & Permissions", description: "Assign support_agent role", href: "/admin/roles", color: "bg-slate-700" },
+    { icon: <Shield className="w-5 h-5 text-white" />, title: "Assign Agent Role", description: "Add/remove support_agent role", href: "/admin/agents/roles", color: "bg-slate-700" },
+    { icon: <Users className="w-5 h-5 text-white" />, title: "Live Monitor", description: "See who's online & chatting", href: "/admin/agents/monitor", color: "bg-green-600" },
+    { icon: <Clock className="w-5 h-5 text-white" />, title: "Agent Salaries", description: "Scheduled salary payments", href: "/admin/agents/salaries", color: "bg-violet-500" },
+    { icon: <DollarSign className="w-5 h-5 text-white" />, title: "Payouts", description: "Withdrawal requests", href: "/admin/agents/payouts", color: "bg-amber-500" },
     { icon: <MessageSquare className="w-5 h-5 text-white" />, title: "Chat Shortcuts", description: "Manage quick replies", href: "/admin/chat-shortcuts", color: "bg-primary" },
     { icon: <BarChart3 className="w-5 h-5 text-white" />, title: "Analytics", description: "Support performance data", href: "/admin/analytics", color: "bg-purple-500" },
   ];
