@@ -210,10 +210,19 @@ const AgentChatsPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-3 pb-3 space-y-2">
-                {waitingSessions.map((session: any) => (
+                {waitingSessions.map((session: any) => {
+                  const userInfo = (sessionUsers as any)[session.user_id];
+                  const userName = userInfo?.name || userInfo || "User";
+                  const userRole = userInfo?.role || "customer";
+                  return (
                   <div key={session.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{(sessionUsers as any)[session.user_id] || "User"}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium truncate">{userName}</p>
+                        <Badge variant="secondary" className="text-[9px] h-4 px-1.5 shrink-0">
+                          {userRole === "seller" ? "Seller" : "Customer"}
+                        </Badge>
+                      </div>
                       <p className="text-[10px] text-muted-foreground truncate">{session.subject || "General"}</p>
                     </div>
                     <Button size="sm" className="h-7 text-xs shrink-0 ml-2" onClick={() => claimSession.mutate(session.id)} disabled={claimSession.isPending}>Accept</Button>
