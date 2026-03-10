@@ -134,7 +134,7 @@ const AdminSellersManagement = () => {
         {/* Quick Actions Tab */}
         <TabsContent value="overview" className="mt-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {quickActions.map((action, i) => <QuickAction key={i} {...action} />)}
+            {quickActions.map((action, i) => <QuickAction key={i} {...action} href={toAdminPath(action.href)} />)}
           </div>
         </TabsContent>
 
