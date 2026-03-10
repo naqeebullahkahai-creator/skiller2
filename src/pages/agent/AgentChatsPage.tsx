@@ -245,7 +245,11 @@ const AgentChatsPage = () => {
                   {isOnline ? "No active sessions." : "Go online to receive chats."}
                 </p>
               ) : (
-                activeSessions.map((session: any) => (
+                activeSessions.map((session: any) => {
+                  const userInfo = (sessionUsers as any)[session.user_id];
+                  const userName = userInfo?.name || userInfo || "User";
+                  const userRole = userInfo?.role || "customer";
+                  return (
                   <button key={session.id}
                     className={cn("flex items-center justify-between p-2 rounded-lg w-full text-left transition-colors",
                       activeChat === session.id ? "bg-primary/10 border border-primary/30" : "bg-muted hover:bg-accent"
@@ -255,17 +259,23 @@ const AgentChatsPage = () => {
                     <div className="flex items-center gap-2 min-w-0">
                       <Avatar className="h-7 w-7 shrink-0">
                         <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                          {((sessionUsers as any)[session.user_id] || "U").charAt(0)}
+                          {userName.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{(sessionUsers as any)[session.user_id] || "User"}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-sm font-medium truncate">{userName}</p>
+                          <Badge variant="secondary" className="text-[9px] h-4 px-1.5 shrink-0">
+                            {userRole === "seller" ? "Seller" : "Customer"}
+                          </Badge>
+                        </div>
                         <p className="text-[10px] text-muted-foreground truncate">{session.subject || "General"}</p>
                       </div>
                     </div>
                     <Badge variant="default" className="text-[10px] shrink-0">Active</Badge>
                   </button>
-                ))
+                  );
+                })
               )}
             </CardContent>
           </Card>
