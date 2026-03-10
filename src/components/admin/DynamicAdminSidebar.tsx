@@ -123,7 +123,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Security", icon: Shield, requireSuperAdmin: true,
       children: [
-        { name: "Overview", href: "/admin/security-management", icon: Shield },
         { name: "Roles & Permissions", href: "/admin/roles", icon: KeyRound },
         { name: "Security Settings", href: "/admin/security", icon: Lock },
         { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
