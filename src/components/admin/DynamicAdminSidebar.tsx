@@ -12,11 +12,13 @@ import { usePermissions } from "@/contexts/PermissionsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PermissionFeature } from "@/hooks/useRoleManagement";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useAdminSidebarCounts } from "@/hooks/useAdminSidebarCounts";
 
 interface NavChild {
   name: string;
   href: string;
   icon: any;
+  badge?: number;
 }
 
 interface NavGroup {
@@ -24,8 +26,9 @@ interface NavGroup {
   icon: any;
   feature?: PermissionFeature;
   requireSuperAdmin?: boolean;
-  href?: string; // direct link (no children)
+  href?: string;
   children?: NavChild[];
+  badge?: number;
 }
 
 interface DynamicAdminSidebarProps {
@@ -33,18 +36,31 @@ interface DynamicAdminSidebarProps {
   onNavigate?: () => void;
 }
 
+const CountBadge = ({ count }: { count: number }) => {
+  if (!count) return null;
+  return (
+    <span className="ml-auto min-w-[20px] h-5 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 shrink-0">
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+};
+
 const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarProps) => {
   const location = useLocation();
   const { canView, isLoading } = usePermissions();
   const { isSuperAdmin } = useAuth();
+  const counts = useAdminSidebarCounts();
+
+  const totalDeposits = counts.pendingSellerDeposits + counts.pendingCustomerDeposits;
 
   const navGroups: NavGroup[] = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     {
       name: "Sellers", icon: Store, feature: 'users',
+      badge: counts.pendingKyc,
       children: [
         { name: "All Sellers", href: "/admin/sellers-management", icon: Store },
-        { name: "Seller KYC", href: "/admin/seller-kyc", icon: FileText },
+        { name: "Seller KYC", href: "/admin/seller-kyc", icon: FileText, badge: counts.pendingKyc },
         { name: "Seller Directory", href: "/admin/sellers", icon: Users },
       ]
     },
@@ -58,21 +74,23 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     { name: "Agents", href: "/admin/agents-management", icon: Headphones, feature: 'users' },
     {
       name: "Orders", icon: ShoppingCart, feature: 'orders',
+      badge: counts.pendingOrders + counts.pendingReturns + counts.cancelledOrders,
       children: [
-        { name: "All Orders", href: "/admin/orders-management", icon: ShoppingCart },
+        { name: "All Orders", href: "/admin/orders-management", icon: ShoppingCart, badge: counts.pendingOrders },
         { name: "Direct Orders", href: "/admin/orders/direct", icon: Store },
         { name: "Vendor Orders", href: "/admin/orders/vendor", icon: Package },
-        { name: "Cancellations", href: "/admin/cancellations", icon: ShoppingCart },
-        { name: "Returns", href: "/admin/returns", icon: ShoppingCart },
+        { name: "Cancellations", href: "/admin/cancellations", icon: ShoppingCart, badge: counts.cancelledOrders },
+        { name: "Returns", href: "/admin/returns", icon: ShoppingCart, badge: counts.pendingReturns },
         { name: "Track Orders", href: "/admin/tracking-search", icon: Search },
       ]
     },
     {
       name: "Products", icon: Package, feature: 'products',
+      badge: counts.pendingApprovals,
       children: [
         { name: "All Products", href: "/admin/products-management", icon: Package },
         { name: "Categories", href: "/admin/categories", icon: Tag },
-        { name: "Approvals", href: "/admin/approvals", icon: FileText },
+        { name: "Approvals", href: "/admin/approvals", icon: FileText, badge: counts.pendingApprovals },
         { name: "Bulk Uploads", href: "/admin/bulk-uploads", icon: Package },
       ]
     },
@@ -88,9 +106,10 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     },
     {
       name: "Deposits", icon: PiggyBank, feature: 'payouts',
+      badge: totalDeposits,
       children: [
-        { name: "Seller Deposits", href: "/admin/deposits/sellers", icon: PiggyBank },
-        { name: "Customer Deposits", href: "/admin/deposits/users", icon: PiggyBank },
+        { name: "Seller Deposits", href: "/admin/deposits/sellers", icon: PiggyBank, badge: counts.pendingSellerDeposits },
+        { name: "Customer Deposits", href: "/admin/deposits/users", icon: PiggyBank, badge: counts.pendingCustomerDeposits },
         { name: "Deposit Settings", href: "/admin/deposits/settings", icon: Settings },
       ]
     },
@@ -104,8 +123,9 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     },
     {
       name: "Commission & Fees", icon: Percent, feature: 'payouts',
+      badge: counts.pendingCommissions,
       children: [
-        { name: "Pending Commissions", href: "/admin/pending-commissions", icon: Clock },
+        { name: "Pending Commissions", href: "/admin/pending-commissions", icon: Clock, badge: counts.pendingCommissions },
         { name: "Commission Settings", href: "/admin/commission-management", icon: Percent },
         { name: "Commission Wallet", href: "/admin/commission-wallet", icon: Wallet },
         { name: "Subscriptions", href: "/admin/subscriptions", icon: Receipt },
@@ -115,9 +135,10 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     },
     {
       name: "Flash Sales", icon: Zap, feature: 'flash_sales',
+      badge: counts.pendingNominations,
       children: [
         { name: "Manage Sales", href: "/admin/flash-sales", icon: Zap },
-        { name: "Nominations", href: "/admin/flash-nominations", icon: Star },
+        { name: "Nominations", href: "/admin/flash-nominations", icon: Star, badge: counts.pendingNominations },
       ]
     },
     {
@@ -202,7 +223,15 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
               )}
             >
               <group.icon size={sidebarOpen ? 18 : 24} className="shrink-0" />
-              {sidebarOpen && <span className="text-sm">{group.name}</span>}
+              {sidebarOpen && (
+                <>
+                  <span className="text-sm flex-1">{group.name}</span>
+                  {group.badge ? <CountBadge count={group.badge} /> : null}
+                </>
+              )}
+              {!sidebarOpen && group.badge ? (
+                <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-destructive" />
+              ) : null}
             </Link>
           );
         }
@@ -222,6 +251,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
               {sidebarOpen && (
                 <>
                   <span className="text-sm flex-1">{group.name}</span>
+                  {group.badge ? <CountBadge count={group.badge} /> : null}
                   <ChevronDown className="w-4 h-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </>
               )}
@@ -241,7 +271,8 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
                     )}
                   >
                     <child.icon size={15} className="shrink-0" />
-                    <span>{child.name}</span>
+                    <span className="flex-1">{child.name}</span>
+                    {child.badge ? <CountBadge count={child.badge} /> : null}
                   </Link>
                 ))}
               </CollapsibleContent>
