@@ -227,7 +227,8 @@ const AgentChatsPage = () => {
                     </div>
                     <Button size="sm" className="h-7 text-xs shrink-0 ml-2" onClick={() => claimSession.mutate(session.id)} disabled={claimSession.isPending}>Accept</Button>
                   </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           )}
