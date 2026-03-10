@@ -1,4 +1,4 @@
-import { Search, ChevronDown, Menu, X, MessageCircle, Wallet } from "lucide-react";
+import { Search, ChevronDown, Menu, X, MessageCircle, Wallet, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NotificationBell from "@/components/notifications/NotificationBell";
-import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 import SearchSuggestions from "@/components/search/SearchSuggestions";
 import AnimatedProfileMenu from "@/components/navigation/AnimatedProfileMenu";
 import CategoryAccordion from "@/components/navigation/CategoryAccordion";
 import FanzonLogo from "@/components/brand/FanzonLogo";
 import VoiceSearchButton from "@/components/shared/VoiceSearchButton";
-import QRCodeScanner from "@/components/shared/QRCodeScanner";
 import { useUnreadCount } from "@/hooks/useMessaging";
 import { useCustomerWallet } from "@/hooks/useReturns";
 import { formatPKR } from "@/hooks/useProducts";
@@ -46,12 +44,13 @@ const MainHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-card/98 backdrop-blur-2xl border-b border-border shadow-sm">
+    <header className="sticky top-0 z-50 bg-card border-b border-border shadow-sm">
       <div className="container mx-auto">
-        <div className="flex items-center justify-between h-16 gap-4">
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-foreground p-2 hover:bg-secondary rounded-xl transition-colors"
+        {/* Main Row */}
+        <div className="flex items-center h-[60px] gap-3">
+          {/* Mobile Menu */}
+          <button
+            className="md:hidden text-foreground p-2 hover:bg-muted rounded-lg transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -62,14 +61,14 @@ const MainHeader = () => {
             <FanzonLogo size="md" />
           </Link>
 
-          {/* Search Bar - Desktop */}
+          {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-2xl relative">
-            <form onSubmit={handleSearch} className="flex w-full bg-secondary rounded-xl overflow-hidden border border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+            <form onSubmit={handleSearch} className="flex w-full">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:bg-muted border-r border-border whitespace-nowrap transition-colors duration-200">
+                  <button className="flex items-center gap-1 px-3 h-10 text-xs text-muted-foreground bg-secondary border border-border border-r-0 rounded-l-lg whitespace-nowrap hover:bg-muted transition-colors">
                     {selectedCategory}
-                    <ChevronDown size={14} />
+                    <ChevronDown size={12} />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align={isRTL ? "end" : "start"} className="w-48">
@@ -77,10 +76,7 @@ const MainHeader = () => {
                     {t("nav.all_categories")}
                   </DropdownMenuItem>
                   {categories?.map((category) => (
-                    <DropdownMenuItem 
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.name)}
-                    >
+                    <DropdownMenuItem key={category.id} onClick={() => setSelectedCategory(category.name)}>
                       {category.name}
                     </DropdownMenuItem>
                   ))}
@@ -93,25 +89,19 @@ const MainHeader = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
-                className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
+                className="flex-1 h-10 border border-border border-x-0 bg-secondary rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
               />
               <VoiceSearchButton
                 onResult={(text) => {
                   setSearchQuery(text);
                   navigate(`/search?q=${encodeURIComponent(text)}`);
                 }}
-                size={18}
+                size={16}
               />
-              <Button 
-                 type="submit"
-                 className="rounded-none px-6 bg-primary hover:bg-primary/90 transition-colors"
-               >
-                 <Search size={18} />
+              <Button type="submit" className="h-10 rounded-none rounded-r-lg px-5">
+                <Search size={18} />
               </Button>
             </form>
-            <div className="flex items-center ml-2">
-              <QRCodeScanner className="text-muted-foreground hover:text-primary hover:bg-muted rounded-xl" />
-            </div>
             <SearchSuggestions
               query={searchQuery}
               isOpen={showSuggestions}
@@ -124,45 +114,39 @@ const MainHeader = () => {
             />
           </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-1.5 md:gap-3">
-            {/* Wallet Balance - Desktop */}
+          {/* Right Actions — Daraz-style icon columns */}
+          <div className="flex items-center gap-0.5 ml-auto">
+            {/* Wallet */}
             {isAuthenticated && role === "customer" && (
               <Link
                 to="/account/wallet"
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-xl text-primary font-semibold transition-colors"
-                title="Wallet"
+                className="hidden md:flex flex-col items-center px-3 py-1 hover:bg-primary/10 rounded-lg transition-colors group"
               >
-                <Wallet size={16} />
-                <span className="text-sm">{formatPKR(wallet?.balance || 0)}</span>
+                <Wallet size={20} className="text-foreground group-hover:text-primary" />
+                <span className="text-[11px] font-semibold text-primary">{formatPKR(wallet?.balance || 0)}</span>
               </Link>
             )}
 
-            {/* Language Switcher - Desktop */}
-            <div className="hidden md:block">
-              <LanguageSwitcher variant="header" />
-            </div>
-            
-            {/* Messages Icon - Desktop */}
+            {/* Messages */}
             {isAuthenticated && (
-              <Link 
-                to="/account/messages" 
-                className="hidden md:flex relative p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-xl transition-colors"
-                title="Messages"
+              <Link
+                to="/account/messages"
+                className="hidden md:flex flex-col items-center px-3 py-1 hover:bg-primary/10 rounded-lg transition-colors group relative"
               >
-                <MessageCircle size={20} />
+                <MessageCircle size={20} className="text-foreground group-hover:text-primary" />
+                <span className="text-[11px] text-muted-foreground group-hover:text-primary">Messages</span>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-primary text-primary-foreground text-[10px] font-bold rounded-full px-1">
+                  <span className="absolute top-0 right-1 min-w-[16px] h-4 flex items-center justify-center bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full px-1">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
               </Link>
             )}
-            
-            {/* Notification Bell */}
+
+            {/* Notifications */}
             {isAuthenticated && <NotificationBell />}
-            
-            {/* Animated Profile Menu - Desktop */}
+
+            {/* Profile / Login-SignUp */}
             <AnimatedProfileMenu />
 
             {/* Cart */}
@@ -170,9 +154,9 @@ const MainHeader = () => {
           </div>
         </div>
 
-        {/* Mobile Search Bar */}
+        {/* Mobile Search */}
         <div className="md:hidden pb-3 px-1">
-          <form onSubmit={handleSearch} className="flex w-full bg-secondary rounded-xl overflow-hidden border border-border">
+          <form onSubmit={handleSearch} className="flex w-full bg-secondary rounded-lg overflow-hidden border border-border">
             <Input
               type="text"
               placeholder={t("search.placeholder")}
@@ -180,19 +164,15 @@ const MainHeader = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <Button type="submit" className="rounded-none px-4 hover:bg-primary/90 transition-colors duration-200">
+            <Button type="submit" className="rounded-none px-4">
               <Search size={18} />
             </Button>
           </form>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      <div
-        className={`md:hidden bg-card border-t border-border overflow-hidden transition-all duration-300 ease-out ${
-          isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
+      {/* Mobile Menu */}
+      <div className={`md:hidden bg-card border-t border-border overflow-hidden transition-all duration-300 ease-out ${isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"}`}>
         <div className="container mx-auto py-4 max-h-[70vh] overflow-y-auto">
           <CategoryAccordion onCategoryClick={() => setIsMobileMenuOpen(false)} />
         </div>
