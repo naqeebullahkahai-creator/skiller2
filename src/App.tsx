@@ -119,10 +119,6 @@ import AdminWalletManagementPage from "./pages/dashboard/AdminWalletManagementPa
 import AdminSellersManagement from "./pages/dashboard/AdminSellersManagement";
 import AdminCustomersManagement from "./pages/dashboard/AdminCustomersManagement";
 import AdminAgentsManagement from "./pages/dashboard/AdminAgentsManagement";
-import AdminFinanceManagement from "./pages/dashboard/AdminFinanceManagement";
-import AdminMarketingManagement from "./pages/dashboard/AdminMarketingManagement";
-import AdminContentManagement from "./pages/dashboard/AdminContentManagement";
-import AdminSecurityManagement from "./pages/dashboard/AdminSecurityManagement";
 import AdminStorePage from "./pages/dashboard/AdminStorePage";
 import AdminStoreProductsPage from "./pages/dashboard/AdminStoreProductsPage";
 import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
