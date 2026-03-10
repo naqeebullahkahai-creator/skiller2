@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 import { 
   Facebook, Twitter, Instagram, Youtube,
-  CreditCard, Truck, Shield, Headphones,
   Music2, MessageCircle
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import FanzonLogo from "@/components/brand/FanzonLogo";
+import easypaisaLogo from "@/assets/easypaisa-logo.png";
+import jazzcashLogo from "@/assets/jazzcash-logo.png";
 
 const socialIconMap: Record<string, React.ReactNode> = {
   social_facebook: <Facebook size={18} />,
@@ -31,33 +31,17 @@ const Footer = () => {
     }
     return setting.setting_value || '#';
   };
+
+  const paymentMethods = [
+    { name: "Visa", type: "text" as const },
+    { name: "Mastercard", type: "text" as const },
+    { name: "JazzCash", type: "image" as const, logo: jazzcashLogo },
+    { name: "Easypaisa", type: "image" as const, logo: easypaisaLogo },
+    { name: "COD", type: "text" as const },
+  ];
   
   return (
     <footer className="hidden md:block bg-foreground text-background mt-10">
-      {/* Features Bar */}
-      <div className="border-b border-background/10">
-        <div className="container mx-auto py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { icon: Truck, title: t("footer.free_delivery"), desc: t("footer.free_delivery_desc") },
-              { icon: Shield, title: t("footer.secure_payment"), desc: t("footer.secure_payment_desc") },
-              { icon: CreditCard, title: t("footer.easy_returns"), desc: t("footer.easy_returns_desc") },
-              { icon: Headphones, title: t("footer.support_24_7"), desc: t("footer.support_desc") },
-            ].map((feature) => (
-              <div key={feature.title} className="flex items-center gap-4">
-                <div className="p-3 bg-primary/15 rounded-2xl">
-                  <feature.icon className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">{feature.title}</p>
-                  <p className="text-xs text-background/50">{feature.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer */}
       <div className="container mx-auto py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
@@ -94,9 +78,12 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-sm mb-4 text-primary">{t("footer.payment")}</h4>
             <div className="flex flex-wrap gap-2">
-              {["Visa", "Mastercard", "JazzCash", "Easypaisa", "COD"].map((method) => (
-                <div key={method} className="bg-background/5 border border-background/15 px-2.5 py-1 rounded-lg text-xs">
-                  {method}
+              {paymentMethods.map((method) => (
+                <div key={method.name} className="bg-background/10 border border-background/15 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
+                  {method.type === "image" ? (
+                    <img src={method.logo} alt={method.name} className="h-5 w-5 object-contain rounded-sm" />
+                  ) : null}
+                  <span className="text-xs font-medium">{method.name}</span>
                 </div>
               ))}
             </div>

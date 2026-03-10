@@ -152,6 +152,14 @@ import TrackOrder from "./pages/TrackOrder";
 import SystemAnnouncementBanner from "./components/admin/SystemAnnouncementBanner";
 import SellerStorefront from "./pages/SellerStorefront";
 import ReferralPage from "./pages/account/ReferralPage";
+import AboutPage from "./pages/AboutPage";
+import CareersPage from "./pages/CareersPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import HowToBuyPage from "./pages/HowToBuyPage";
+import ReturnsPage from "./pages/ReturnsPage";
+import AffiliatePage from "./pages/AffiliatePage";
+import VendorSupportPage from "./pages/VendorSupportPage";
 import AgentDashboard from "./pages/agent/AgentDashboard";
 import AgentDashboardHome from "./pages/agent/AgentDashboardHome";
 import AgentChatsPage from "./pages/agent/AgentChatsPage";
@@ -298,6 +306,14 @@ const App = () => (
                               <Route path="/contact" element={<ContactUs />} />
                               <Route path="/track-order" element={<TrackOrder />} />
                               <Route path="/store/:sellerId" element={<SellerStorefront />} />
+                              <Route path="/about" element={<AboutPage />} />
+                              <Route path="/careers" element={<CareersPage />} />
+                              <Route path="/terms" element={<TermsPage />} />
+                              <Route path="/privacy" element={<PrivacyPage />} />
+                              <Route path="/how-to-buy" element={<HowToBuyPage />} />
+                              <Route path="/returns" element={<ReturnsPage />} />
+                              <Route path="/affiliate" element={<AffiliatePage />} />
+                              <Route path="/vendor-support" element={<VendorSupportPage />} />
                               
                               {/* Checkout Routes */}
                               <Route 
