@@ -287,8 +287,11 @@ const AgentChatsPage = () => {
             {activeChat ? (
               <>
                 <CardHeader className="pb-2 border-b flex-row items-center justify-between px-3 pt-3">
-                  <CardTitle className="text-sm truncate">
-                    Chat with {(sessionUsers as any)[activeSessions.find((s: any) => s.id === activeChat)?.user_id] || "User"}
+                  <CardTitle className="text-sm truncate flex items-center gap-1.5">
+                    Chat with {(() => { const info = (sessionUsers as any)[activeSessions.find((s: any) => s.id === activeChat)?.user_id]; return info?.name || info || "User"; })()}
+                    <Badge variant="secondary" className="text-[9px] h-4 px-1.5">
+                      {(() => { const info = (sessionUsers as any)[activeSessions.find((s: any) => s.id === activeChat)?.user_id]; return (info?.role === "seller" ? "Seller" : "Customer"); })()}
+                    </Badge>
                   </CardTitle>
                   <Button variant="ghost" size="sm" className="text-destructive h-7 text-xs shrink-0" onClick={() => endChat.mutate(activeChat)}>
                     <PhoneOff className="w-3 h-3 mr-1" /> End

@@ -268,11 +268,18 @@ const SupportChatWidget = () => {
                       )}
                       {agentMessages.map(msg => {
                         const isOwn = msg.sender_id === user?.id;
+                        const isAgent = !isOwn && msg.sender_id === session?.agent_id;
                         return (
                           <div key={msg.id} className={cn("flex", isOwn ? "justify-end" : "justify-start")}>
                             <div className={cn("max-w-[85%] rounded-xl px-3 py-2 text-sm",
                               isOwn ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
                             )}>
+                              {isAgent && agentInfo?.full_name && (
+                                <div className="flex items-center gap-1 mb-1">
+                                  <span className="text-[10px] font-semibold text-primary">{agentInfo.full_name}</span>
+                                  <Badge variant="secondary" className="text-[8px] h-3.5 px-1">Agent</Badge>
+                                </div>
+                              )}
                               <p className="break-words">{msg.content}</p>
                               <p className={cn("text-[10px] mt-1", isOwn ? "text-primary-foreground/70" : "text-muted-foreground")}>
                                 {format(new Date(msg.created_at), "HH:mm")}
