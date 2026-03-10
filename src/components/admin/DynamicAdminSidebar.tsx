@@ -93,7 +93,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     {
       name: "Marketing", icon: Megaphone, feature: 'flash_sales',
       children: [
-        { name: "Overview", href: "/admin/marketing-management", icon: Megaphone },
         { name: "Flash Sales", href: "/admin/flash-sales", icon: Zap },
         { name: "Flash Nominations", href: "/admin/flash-nominations", icon: Star },
         { name: "Vouchers", href: "/admin/vouchers", icon: Tag },
