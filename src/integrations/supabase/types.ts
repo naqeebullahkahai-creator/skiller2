@@ -2839,6 +2839,27 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_followers: {
+        Row: {
+          created_at: string
+          follower_id: string
+          id: string
+          seller_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          id?: string
+          seller_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          id?: string
+          seller_id?: string
+        }
+        Relationships: []
+      }
       seller_plan_change_requests: {
         Row: {
           admin_notes: string | null
@@ -2908,6 +2929,8 @@ export type Database = {
           rejection_reason: string | null
           selfie_url: string | null
           shop_name: string
+          store_banner_url: string | null
+          store_logo_url: string | null
           submitted_at: string
           updated_at: string
           user_id: string
@@ -2943,6 +2966,8 @@ export type Database = {
           rejection_reason?: string | null
           selfie_url?: string | null
           shop_name: string
+          store_banner_url?: string | null
+          store_logo_url?: string | null
           submitted_at?: string
           updated_at?: string
           user_id: string
@@ -2978,6 +3003,8 @@ export type Database = {
           rejection_reason?: string | null
           selfie_url?: string | null
           shop_name?: string
+          store_banner_url?: string | null
+          store_logo_url?: string | null
           submitted_at?: string
           updated_at?: string
           user_id?: string
