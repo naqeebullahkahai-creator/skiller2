@@ -46,7 +46,7 @@ const AdminOrdersManagement = () => {
 
   const quickActions: QuickActionProps[] = [
     { icon: <ClipboardList className="w-5 h-5 text-white" />, title: "All Orders", description: "View & manage all platform orders", href: "/admin/orders", color: "bg-blue-500" },
-    { icon: <Store className="w-5 h-5 text-white" />, title: "Direct Store Orders", description: "Admin's own product sales", href: "/admin/orders/direct", color: "bg-emerald-500" },
+    { icon: <Store className="w-5 h-5 text-white" />, title: "Direct Store Orders", description: "Admin's own product sales", href: "/admin/store/orders", color: "bg-emerald-500" },
     { icon: <Users className="w-5 h-5 text-white" />, title: "Vendor Marketplace Orders", description: "Seller marketplace orders", href: "/admin/orders/vendor", color: "bg-amber-500" },
     { icon: <XCircle className="w-5 h-5 text-white" />, title: "Cancellations", description: "Cancelled orders & refunds", href: "/admin/cancellations", color: "bg-red-500" },
     { icon: <RotateCcw className="w-5 h-5 text-white" />, title: "Returns", description: "Handle return requests", href: "/admin/returns", color: "bg-orange-500" },

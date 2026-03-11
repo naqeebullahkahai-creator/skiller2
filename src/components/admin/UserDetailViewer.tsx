@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { 
   User, Mail, Phone, Calendar, Package, Wallet, 
-  FileText, Activity, ShieldCheck, LogIn, X, Eye,
+  FileText, Activity, ShieldCheck, LogIn, X,
   CheckCircle, XCircle, AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,8 @@ const getRoleBadge = (role: string) => {
       return <Badge className="bg-red-500 text-white">Admin</Badge>;
     case "seller":
       return <Badge className="bg-blue-500 text-white">Seller</Badge>;
+    case "support_agent":
+      return <Badge className="bg-purple-500 text-white">Support Agent</Badge>;
     default:
       return <Badge variant="secondary">Customer</Badge>;
   }
@@ -253,18 +255,11 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
                   </div>
                 </div>
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0 gap-1.5"
-                  onClick={() => {
-                    // Open impersonation in new tab via AdminViewAsPage
-                    window.open(`/admin/view-as/${userId}`, '_blank');
-                  }}
-                >
-                  <Eye size={14} />
-                  View as User
-                </Button>
+                {user.display_id && (
+                  <Badge variant="outline" className="shrink-0 text-xs font-mono">
+                    {user.display_id}
+                  </Badge>
+                )}
               </div>
               
               <Tabs defaultValue="overview" className="w-full">
