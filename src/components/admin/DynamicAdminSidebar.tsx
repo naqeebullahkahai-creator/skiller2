@@ -126,8 +126,9 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     },
     {
       name: "Withdrawals", icon: DollarSign, feature: 'payouts',
+      badge: totalWithdrawals,
       children: [
-        { name: "Payout Requests", href: "/admin/payouts", icon: DollarSign },
+        { name: "Payout Requests", href: "/admin/payouts", icon: DollarSign, badge: counts.pendingWithdrawals },
         { name: "Withdrawal Methods", href: "/admin/withdrawal-methods", icon: CreditCard },
         { name: "Balance Adjustments", href: "/admin/balance-adjustments", icon: Scale },
       ]
