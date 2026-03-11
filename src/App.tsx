@@ -425,6 +425,7 @@ const App = () => (
                               <Route path="store/orders" element={<AdminStoreOrdersPage />} />
                               <Route path="pending-commissions" element={<AdminPendingCommissionsPage />} />
                               <Route path="tracking-search" element={<AdminTrackingSearchPage />} />
+                              <Route path="view-as/:userId" element={<AdminViewAsPage />} />
                             </Route>
                           )}
 
