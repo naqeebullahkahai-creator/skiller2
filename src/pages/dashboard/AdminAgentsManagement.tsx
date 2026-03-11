@@ -69,12 +69,19 @@ const useAdminAgents = (searchQuery?: string) => {
         .select("agent_id, status, rating")
         .in("agent_id", agentIds);
 
+      // Get agent wallets
+      const { data: wallets } = await supabase
+        .from("agent_wallets")
+        .select("agent_id, balance, total_earned, total_withdrawn")
+        .in("agent_id", agentIds);
+
       const agents: AgentData[] = (profiles || []).map(p => {
         const online = onlineStatus?.find(o => o.user_id === p.id);
         const agentSessions = sessions?.filter(s => s.agent_id === p.id) || [];
         const resolved = agentSessions.filter(s => s.status === "ended");
         const rated = resolved.filter(s => s.rating);
         const avgRating = rated.length > 0 ? rated.reduce((sum, s) => sum + (s.rating || 0), 0) / rated.length : 0;
+        const wallet = wallets?.find((w: any) => w.agent_id === p.id);
 
         return {
           id: p.id,
@@ -87,6 +94,9 @@ const useAdminAgents = (searchQuery?: string) => {
           avg_rating: avgRating,
           last_seen_at: online?.last_seen_at || null,
           created_at: p.created_at,
+          wallet_balance: (wallet as any)?.balance || 0,
+          total_earned: (wallet as any)?.total_earned || 0,
+          total_withdrawn: (wallet as any)?.total_withdrawn || 0,
         };
       });
 
