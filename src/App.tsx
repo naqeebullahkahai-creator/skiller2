@@ -597,6 +597,7 @@ const App = () => (
                 </ComparisonProvider>
               </CartProvider>
             </VisualEditProvider>
+            </ImpersonationProvider>
         </AuthProvider>
         </ThemeProvider>
       </LanguageProvider>
