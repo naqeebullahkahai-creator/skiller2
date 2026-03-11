@@ -4,6 +4,8 @@ import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { canAccessAccountPage, getRoleRedirectPath } from "@/utils/roleValidation";
+import { isDomainAllowedForRole, getCrossDomainRedirectUrl, isProductionDomain } from "@/utils/domainRouting";
+import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -16,50 +18,42 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
   const location = useLocation();
   const { toast } = useToast();
   const hasShownToast = useRef(false);
+  const hasTriedDomainRedirect = useRef(false);
 
-  // Show permission denied toast when user tries to access unauthorized route
+  // If user is on wrong domain, redirect them to the correct one instead of showing "Access Denied"
+  useEffect(() => {
+    if (isLoading || !isAuthenticated || !role || hasTriedDomainRedirect.current) return;
+    
+    if (!isDomainAllowedForRole(role) && isProductionDomain()) {
+      hasTriedDomainRedirect.current = true;
+      const targetUrl = getCrossDomainRedirectUrl(role);
+      if (targetUrl) {
+        buildCrossDomainUrl(targetUrl).then((ssoUrl) => {
+          window.location.replace(ssoUrl);
+        });
+      }
+    }
+  }, [isLoading, isAuthenticated, role]);
+
+  // Show permission denied toast
   useEffect(() => {
     if (!isLoading && isAuthenticated && !hasShownToast.current) {
-      // Check for admin route access by non-super-admin
       if (location.pathname.startsWith("/admin") && !isSuperAdmin) {
         hasShownToast.current = true;
-        toast({
-          title: "Access Denied",
-          description: "You don't have permission to access the Admin Dashboard.",
-          variant: "destructive",
-        });
-      }
-      // Check for seller route access by customer
-      else if (location.pathname.startsWith("/seller") && role === "customer") {
+        toast({ title: "Access Denied", description: "You don't have permission to access the Admin Dashboard.", variant: "destructive" });
+      } else if (location.pathname.startsWith("/seller") && role === "customer") {
         hasShownToast.current = true;
-        toast({
-          title: "Access Denied",
-          description: "This section is for sellers only. Please use the customer area.",
-          variant: "destructive",
-        });
-      }
-      // Check for account page access by admin
-      else if (role === "admin" && location.pathname.startsWith("/account")) {
+        toast({ title: "Access Denied", description: "This section is for sellers only.", variant: "destructive" });
+      } else if (role === "admin" && location.pathname.startsWith("/account")) {
         hasShownToast.current = true;
-        toast({
-          title: "Access Denied",
-          description: "Admins cannot access customer account pages. Use the Admin Panel.",
-          variant: "destructive",
-        });
-      }
-      // Check for customer account pages access by seller
-      else if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
+        toast({ title: "Access Denied", description: "Admins cannot access customer account pages.", variant: "destructive" });
+      } else if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
         hasShownToast.current = true;
-        toast({
-          title: "Permission Denied",
-          description: "This section is for customers only. Please use your Seller Dashboard.",
-          variant: "destructive",
-        });
+        toast({ title: "Permission Denied", description: "This section is for customers only.", variant: "destructive" });
       }
     }
   }, [isLoading, isAuthenticated, location.pathname, isSuperAdmin, role, toast]);
 
-  // Reset toast flag when location changes
   useEffect(() => {
     hasShownToast.current = false;
   }, [location.pathname]);
@@ -75,21 +69,29 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
   }
 
   if (!isAuthenticated) {
-    // Redirect to auth page with return URL
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Check for super admin requirement (for admin routes)
+  // If on wrong production domain, show loading while redirect happens
+  if (isProductionDomain() && role && !isDomainAllowedForRole(role)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+        <div className="text-2xl font-bold text-primary tracking-tight mb-4">FANZON</div>
+        <FanzonSpinner size="lg" />
+        <p className="text-sm text-muted-foreground mt-4 animate-pulse">Redirecting to your dashboard...</p>
+      </div>
+    );
+  }
+
+  // Super admin check for admin routes
   if (requireSuperAdmin || (allowedRoles?.includes("admin") && location.pathname.startsWith("/admin"))) {
     if (!isSuperAdmin) {
-      // Log unauthorized access attempt
       console.warn(`Unauthorized admin access attempt by: ${user?.email} to ${location.pathname}`);
       return <Navigate to="/forbidden" replace />;
     }
   }
 
-  // Check role-based session locking - strict isolation
-  // Sellers, admins, and agents cannot access customer account pages
+  // Role-based session locking
   if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
     return <Navigate to="/seller/dashboard" replace />;
   }
@@ -100,15 +102,12 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
     return <Navigate to="/agent/dashboard" replace />;
   }
 
-  // If specific roles are required, check if user has one of them
+  // Role requirement check
   if (allowedRoles && allowedRoles.length > 0) {
-    // For admin role, must also be super admin
     if (allowedRoles.includes("admin") && !isSuperAdmin) {
       return <Navigate to="/forbidden" replace />;
     }
-    
     if (!role || !allowedRoles.includes(role)) {
-      // User doesn't have required role - redirect based on their actual role
       const redirectPath = getRoleRedirectPath(role);
       return <Navigate to={redirectPath} replace />;
     }
