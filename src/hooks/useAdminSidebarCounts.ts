@@ -11,24 +11,15 @@ export interface SidebarCounts {
   pendingCommissions: number;
   pendingReturns: number;
   pendingNominations: number;
-  cancelledOrders: number;
-  totalSellers: number;
-  totalCustomers: number;
-  totalAgents: number;
-  confirmedOrders: number;
-  shippedOrders: number;
-  deliveredOrders: number;
   pendingPayouts: number;
+  pendingWithdrawals: number;
 }
 
 const defaultCounts: SidebarCounts = {
   pendingOrders: 0, pendingKyc: 0, pendingApprovals: 0,
   pendingSellerDeposits: 0, pendingCustomerDeposits: 0,
   pendingCommissions: 0, pendingReturns: 0,
-  pendingNominations: 0, cancelledOrders: 0,
-  totalSellers: 0, totalCustomers: 0, totalAgents: 0,
-  confirmedOrders: 0, shippedOrders: 0, deliveredOrders: 0,
-  pendingPayouts: 0,
+  pendingNominations: 0, pendingPayouts: 0, pendingWithdrawals: 0,
 };
 
 async function fetchCount(table: string, filters: Record<string, any> = {}, inFilters: Record<string, any[]> = {}): Promise<number> {
@@ -50,9 +41,8 @@ export const useAdminSidebarCounts = () => {
       const [
         pendingOrders, pendingKyc, pendingApprovals,
         pendingSellerDeposits, pendingCustomerDeposits,
-        pendingCommissions, pendingReturns, pendingNominations, cancelledOrders,
-        totalSellers, totalCustomers, totalAgents,
-        confirmedOrders, shippedOrders, deliveredOrders, pendingPayouts,
+        pendingCommissions, pendingReturns, pendingNominations,
+        pendingPayouts, pendingWithdrawals,
       ] = await Promise.all([
         fetchCount('orders', {}, { order_status: ['pending', 'processing'] }),
         fetchCount('seller_profiles', { verification_status: 'pending' }),
@@ -62,22 +52,15 @@ export const useAdminSidebarCounts = () => {
         fetchCount('order_settlements', { status: 'pending' }),
         fetchCount('return_requests', {}, { status: ['return_requested', 'approved'] }),
         fetchCount('flash_sale_nominations', { status: 'pending' }),
-        fetchCount('orders', { order_status: 'cancelled' }),
-        fetchCount('user_roles', { role: 'seller' }),
-        fetchCount('user_roles', { role: 'customer' }),
-        fetchCount('user_roles', { role: 'support_agent' }),
-        fetchCount('orders', { order_status: 'confirmed' }),
-        fetchCount('orders', { order_status: 'shipped' }),
-        fetchCount('orders', { order_status: 'delivered' }),
         fetchCount('agent_payouts', { status: 'pending' }),
+        fetchCount('payout_requests', { status: 'pending' }),
       ]);
 
       return {
         pendingOrders, pendingKyc, pendingApprovals,
         pendingSellerDeposits, pendingCustomerDeposits,
-        pendingCommissions, pendingReturns, pendingNominations, cancelledOrders,
-        totalSellers, totalCustomers, totalAgents,
-        confirmedOrders, shippedOrders, deliveredOrders, pendingPayouts,
+        pendingCommissions, pendingReturns, pendingNominations,
+        pendingPayouts, pendingWithdrawals,
       };
     },
     refetchInterval: 30000,
@@ -93,8 +76,8 @@ export const useAdminSidebarCounts = () => {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'order_settlements' }, () => refetch())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'return_requests' }, () => refetch())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'flash_sale_nominations' }, () => refetch())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_roles' }, () => refetch())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'agent_payouts' }, () => refetch())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'payout_requests' }, () => refetch())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [refetch]);
