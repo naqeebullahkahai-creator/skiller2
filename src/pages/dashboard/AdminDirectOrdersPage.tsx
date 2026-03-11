@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck, XCircle, Store, Tag } from "lucide-react";
+import { MoreHorizontal, Search, RefreshCw, Eye, Truck, XCircle, Store } from "lucide-react";
 import DateRangeFilter, { DateRange } from "@/components/admin/DateRangeFilter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
