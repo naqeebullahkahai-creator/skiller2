@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
 import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { canAccessAccountPage, getRoleRedirectPath } from "@/utils/roleValidation";
@@ -14,7 +15,11 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: ProtectedRouteProps) => {
-  const { isAuthenticated, isLoading, role, user, isSuperAdmin } = useAuth();
+  const { isAuthenticated, isLoading, role: actualRole, user, isSuperAdmin } = useAuth();
+  const { isImpersonating, impersonatedUser } = useImpersonation();
+  
+  // When impersonating, use the impersonated user's role for access checks
+  const role = isImpersonating ? impersonatedUser?.role || actualRole : actualRole;
   const location = useLocation();
   const { toast } = useToast();
   const hasShownToast = useRef(false);
