@@ -142,6 +142,12 @@ const SellerKyc = () => {
     );
   }
 
+  // Verified sellers don't need this page - redirect to dashboard
+  if (isVerified) {
+    navigate("/seller/dashboard", { replace: true });
+    return null;
+  }
+
   // Show pending state if KYC already submitted
   if (hasSubmittedKyc && sellerProfile) {
     return <VerificationPending sellerProfile={sellerProfile} />;

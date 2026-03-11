@@ -96,7 +96,7 @@ const SellerDashboard = () => {
   ];
 
   const quickActions = [
-    { icon: <Shield size={20} className="text-purple-600" />, title: "KYC Verification", description: isVerified ? "Verified ✓" : isPending ? "Under Review" : "Complete Now", href: "/seller/kyc", color: "bg-purple-100", badge: !isVerified ? "Required" : undefined, badgeVariant: "destructive" as const },
+    ...(!isVerified ? [{ icon: <Shield size={20} className="text-purple-600" />, title: "KYC Verification", description: isPending ? "Under Review" : "Complete Now", href: "/seller/kyc", color: "bg-purple-100", badge: "Required", badgeVariant: "destructive" as const }] : []),
     { icon: <Plus size={20} className="text-green-600" />, title: "Add Product", description: "List new product", href: "/seller/products/new", color: "bg-green-100", disabled: !isVerified },
     { icon: <Package size={20} className="text-blue-600" />, title: "My Products", description: "Manage inventory", href: "/seller/products", color: "bg-blue-100", disabled: !isVerified },
     { icon: <ShoppingBag size={20} className="text-primary" />, title: "Orders", description: "View & manage orders", badge: pendingOrders > 0 ? pendingOrders.toString() : undefined, badgeVariant: "destructive" as const, href: "/seller/orders", color: "bg-primary/10", disabled: !isVerified },

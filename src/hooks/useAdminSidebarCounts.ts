@@ -46,7 +46,7 @@ export const useAdminSidebarCounts = () => {
       ] = await Promise.all([
         fetchCount('orders', {}, { order_status: ['pending', 'processing'] }),
         fetchCount('seller_profiles', { verification_status: 'pending' }),
-        fetchCount('products', { approval_status: 'pending' }),
+        fetchCount('products', { status: 'pending' }),
         fetchCount('deposit_requests', { status: 'pending', requester_type: 'seller' }),
         fetchCount('deposit_requests', { status: 'pending', requester_type: 'customer' }),
         fetchCount('order_settlements', { status: 'pending' }),

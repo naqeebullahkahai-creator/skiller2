@@ -60,10 +60,18 @@ export async function receiveSessionFromUrl(): Promise<boolean> {
   window.history.replaceState(null, "", window.location.pathname + window.location.search);
 
   try {
-    const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+    // First try setSession with existing tokens
+    const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
     if (error) {
-      console.error("[SSO] Session restore failed:", error.message);
-      return false;
+      console.warn("[SSO] setSession failed, trying refreshSession:", error.message);
+      // If access_token expired, try refresh
+      const { error: refreshError } = await supabase.auth.refreshSession({ refresh_token });
+      if (refreshError) {
+        console.error("[SSO] refreshSession also failed:", refreshError.message);
+        return false;
+      }
+      console.log("[SSO] Session restored via refresh");
+      return true;
     }
     console.log("[SSO] Session restored successfully");
     return true;
