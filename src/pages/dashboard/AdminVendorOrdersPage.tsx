@@ -201,12 +201,6 @@ const AdminVendorOrdersPage = () => {
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal size={16} /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild><Link to={`/account/orders/${order.id}`}><Eye className="h-4 w-4 mr-2" />View Details</Link></DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => generateOrderInvoice({ id: order.id, order_number: order.order_number, customer_name: order.customer_name, customer_phone: order.customer_phone, shipping_address: order.shipping_address, payment_method: order.payment_method, total_amount_pkr: order.total_amount_pkr, order_status: order.order_status, items: order.items, created_at: order.created_at, tracking_id: order.tracking_id, courier_name: order.courier_name })}>
-                              <Printer className="h-4 w-4 mr-2" />Print Invoice
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => generateShippingLabel({ id: order.id, order_number: order.order_number, customer_name: order.customer_name, customer_phone: order.customer_phone, shipping_address: order.shipping_address, payment_method: order.payment_method, total_amount_pkr: order.total_amount_pkr, order_status: order.order_status, items: order.items, created_at: order.created_at, tracking_id: order.tracking_id, courier_name: order.courier_name })}>
-                              <Tag className="h-4 w-4 mr-2" />Print Shipping Label
-                            </DropdownMenuItem>
                             {order.order_status === "processing" && (<><DropdownMenuSeparator /><DropdownMenuItem onClick={() => { setSelectedOrderForShipping(order); setShippingDialogOpen(true); }}><Truck className="h-4 w-4 mr-2" />Ship Order</DropdownMenuItem></>)}
                             {canCancelOrder(order.order_status).canCancel && (<><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => { setSelectedOrderForCancel(order); setCancelDialogOpen(true); }}><XCircle className="h-4 w-4 mr-2" />Cancel Order</DropdownMenuItem></>)}
                           </DropdownMenuContent>
