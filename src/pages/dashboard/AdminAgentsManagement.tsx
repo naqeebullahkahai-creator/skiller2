@@ -239,7 +239,7 @@ const AdminAgentsManagement = () => {
                   {isLoading ? (
                     [...Array(3)].map((_, i) => (
                       <TableRow key={i}>
-                        {[...Array(6)].map((_, j) => (
+                        {[...Array(8)].map((_, j) => (
                           <TableCell key={j}><Skeleton className="h-6 w-20" /></TableCell>
                         ))}
                       </TableRow>
