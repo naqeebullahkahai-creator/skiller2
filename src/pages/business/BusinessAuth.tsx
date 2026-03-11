@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2, TrendingUp, ShieldCheck, Wallet, Package, AlertCircle, Briefcase } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2, TrendingUp, ShieldCheck, Wallet, Package, AlertCircle, Briefcase, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
