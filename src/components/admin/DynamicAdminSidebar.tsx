@@ -52,6 +52,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
   const counts = useAdminSidebarCounts();
 
   const totalDeposits = counts.pendingSellerDeposits + counts.pendingCustomerDeposits;
+  const totalWithdrawals = counts.pendingWithdrawals + counts.pendingPayouts;
 
   const navGroups: NavGroup[] = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
