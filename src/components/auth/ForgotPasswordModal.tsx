@@ -33,7 +33,6 @@ const ForgotPasswordModal = ({ open, onOpenChange, userType }: ForgotPasswordMod
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate email
     try {
       emailSchema.parse(email);
       setError("");
@@ -46,10 +45,9 @@ const ForgotPasswordModal = ({ open, onOpenChange, userType }: ForgotPasswordMod
 
     setIsSubmitting(true);
     try {
-      // Get the reset URL based on user type
       const redirectUrl = `${window.location.origin}/reset-password`;
 
-      // Use Supabase's built-in password reset
+      // Use Supabase's built-in password reset (Lovable handles email delivery)
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
       });
@@ -62,20 +60,6 @@ const ForgotPasswordModal = ({ open, onOpenChange, userType }: ForgotPasswordMod
         });
       } else {
         setIsSuccess(true);
-        
-        // Also send our custom styled email via edge function
-        try {
-          await supabase.functions.invoke("send-password-reset", {
-            body: {
-              email,
-              resetUrl: redirectUrl,
-              userType,
-            },
-          });
-        } catch (emailError) {
-          // Silently fail the custom email - Supabase's built-in email is the backup
-          console.log("Custom email failed, but Supabase email was sent");
-        }
       }
     } catch (error) {
       toast({
@@ -132,7 +116,7 @@ const ForgotPasswordModal = ({ open, onOpenChange, userType }: ForgotPasswordMod
             <form onSubmit={handleSubmit} className="space-y-4 mt-2">
               <div className="space-y-1.5">
                 <Label htmlFor="reset-email" className="text-sm font-medium">
-                  {userType === "seller" ? "Business Email" : "Email Address"}
+                  Email Address
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -141,7 +125,7 @@ const ForgotPasswordModal = ({ open, onOpenChange, userType }: ForgotPasswordMod
                     type="email"
                     inputMode="email"
                     autoComplete="email"
-                    placeholder={userType === "seller" ? "seller@business.com" : "you@example.com"}
+                    placeholder="yourname@gmail.com"
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);

@@ -56,7 +56,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserData = async (userId: string, setLoadingFalse = false) => {
     try {
-      // Fetch profile and role in parallel
       const [profileResult, roleResult] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", userId).maybeSingle(),
@@ -87,14 +86,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let initialLoad = true;
 
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Defer to avoid deadlock, but keep loading until role is fetched
           setTimeout(() => {
             fetchUserData(session.user.id, true);
           }, 0);
@@ -106,7 +103,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!initialLoad) return;
       initialLoad = false;
@@ -115,7 +111,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        // Wait for role before setting isLoading=false
         fetchUserData(session.user.id, true);
       } else {
         setIsLoading(false);
@@ -150,7 +145,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isSeller: boolean = false
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      // For sellers, redirect to verification success page; for customers, redirect to home
       const redirectUrl = isSeller 
         ? `${window.location.origin}/business/verify-email-success`
         : `${window.location.origin}/`;
@@ -174,20 +168,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { success: false, error: error.message };
       }
 
-      // Send welcome email via edge function (fire & forget)
-      try {
-        supabase.functions.invoke("send-order-emails", {
-          body: {
-            type: "welcome",
-            customerEmail: email,
-            customerName: name,
-            isSeller: isSeller,
-          },
-        });
-      } catch (e) {
-        console.error("Welcome email failed:", e);
-      }
-
       setShowAuthModal(false);
       return { success: true };
     } catch (error: any) {
@@ -196,7 +176,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    // Cross-domain logout: signs out locally + sends logout signal to all sibling domains
     await crossDomainLogout();
     setUser(null);
     setSession(null);
@@ -206,7 +185,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     toast.success("Logged out. See you soon!");
   };
 
-  // Check if current user is super admin
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
 
   return (

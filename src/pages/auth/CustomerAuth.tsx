@@ -4,6 +4,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowRight, ShoppingBag, TrendingUp, Shi
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -52,11 +53,13 @@ const CustomerAuth = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   useEffect(() => {
     setMode(location.pathname === "/auth/login" ? "login" : "signup");
     setErrors({});
     setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+    setAgreedToTerms(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -69,7 +72,6 @@ const CustomerAuth = () => {
         return;
       }
       
-      // In-app redirect (localhost, preview, or already on correct domain)
       const redirectPath = getInAppRedirectPath(role);
       if (role === "seller") {
         toast({
@@ -116,16 +118,39 @@ const CustomerAuth = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    if (mode === "signup" && !agreedToTerms) {
+      toast({
+        title: "Terms Required",
+        description: "Please agree to the Terms of Service and Privacy Policy.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       if (mode === "login") {
         const result = await login(formData.email, formData.password);
         
         if (result.success) {
+          // Check if email is verified
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && !user.email_confirmed_at) {
+            await supabase.auth.signOut();
+            navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
+            toast({
+              title: "Email Not Verified",
+              description: "Please verify your email before logging in.",
+              variant: "destructive",
+            });
+            setIsSubmitting(false);
+            return;
+          }
+
           const { data: roleData } = await supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+            .eq("user_id", user?.id)
             .maybeSingle();
           
           if (roleData?.role === "seller") {
@@ -144,7 +169,6 @@ const CustomerAuth = () => {
           });
         }
       } else {
-        // Check for role conflict before signup
         const roleConflict = await checkEmailRoleConflict(formData.email, "customer");
         
         if (roleConflict.hasConflict) {
@@ -160,7 +184,6 @@ const CustomerAuth = () => {
         const result = await signup(formData.name, formData.email, formData.password, false);
         
         if (result.success) {
-          // Redirect to email verification page
           navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
           return;
         } else {
@@ -265,10 +288,6 @@ const CustomerAuth = () => {
           {/* Auth Card */}
           <div className="bg-card rounded-2xl shadow-2xl p-6 sm:p-8">
             <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-semibold mb-3">
-                <ShoppingBag className="h-3 w-3" />
-                Customer Portal
-              </div>
               <h2 className="text-xl font-semibold text-foreground">
                 {mode === "login" ? "Welcome Back" : "Create Account"}
               </h2>
@@ -313,7 +332,7 @@ const CustomerAuth = () => {
                     type="email"
                     inputMode="email"
                     autoComplete="email"
-                    placeholder="you@example.com"
+                    placeholder="yourname@gmail.com"
                     value={formData.email}
                     onChange={handleInputChange}
                     className={cn(
@@ -386,6 +405,23 @@ const CustomerAuth = () => {
                 </div>
               )}
 
+              {mode === "signup" && (
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="terms"
+                    checked={agreedToTerms}
+                    onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+                    className="mt-1"
+                  />
+                  <Label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    I agree to FANZON's{" "}
+                    <Link to="/terms" className="text-primary hover:underline" target="_blank">Terms of Service</Link>
+                    {" "}and{" "}
+                    <Link to="/privacy" className="text-primary hover:underline" target="_blank">Privacy Policy</Link>
+                  </Label>
+                </div>
+              )}
+
               {mode === "login" && (
                 <div className="flex justify-end">
                   <button 
@@ -451,10 +487,6 @@ const CustomerAuth = () => {
               <ArrowRight size={14} />
             </Link>
           </div>
-
-          <p className="text-center text-xs text-muted-foreground mt-4">
-            By continuing, you agree to FANZON's Terms of Service and Privacy Policy
-          </p>
         </div>
       </div>
 
