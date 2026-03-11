@@ -253,7 +253,17 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
                   </div>
                 </div>
                 
-                {/* Impersonation removed for security - use "View as Customer" instead */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 gap-1.5"
+                  onClick={() => {
+                    window.open(`/admin/view-as/${userId}`, '_blank');
+                  }}
+                >
+                  <Eye size={14} />
+                  View as User
+                </Button>
               </div>
               
               <Tabs defaultValue="overview" className="w-full">
