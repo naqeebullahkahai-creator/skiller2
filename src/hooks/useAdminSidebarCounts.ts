@@ -11,24 +11,15 @@ export interface SidebarCounts {
   pendingCommissions: number;
   pendingReturns: number;
   pendingNominations: number;
-  cancelledOrders: number;
-  totalSellers: number;
-  totalCustomers: number;
-  totalAgents: number;
-  confirmedOrders: number;
-  shippedOrders: number;
-  deliveredOrders: number;
   pendingPayouts: number;
+  pendingWithdrawals: number;
 }
 
 const defaultCounts: SidebarCounts = {
   pendingOrders: 0, pendingKyc: 0, pendingApprovals: 0,
   pendingSellerDeposits: 0, pendingCustomerDeposits: 0,
   pendingCommissions: 0, pendingReturns: 0,
-  pendingNominations: 0, cancelledOrders: 0,
-  totalSellers: 0, totalCustomers: 0, totalAgents: 0,
-  confirmedOrders: 0, shippedOrders: 0, deliveredOrders: 0,
-  pendingPayouts: 0,
+  pendingNominations: 0, pendingPayouts: 0, pendingWithdrawals: 0,
 };
 
 async function fetchCount(table: string, filters: Record<string, any> = {}, inFilters: Record<string, any[]> = {}): Promise<number> {
