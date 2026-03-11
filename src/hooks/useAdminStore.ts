@@ -142,5 +142,6 @@ export const useAdminStore = () => {
     updateSettings,
     isLoading: settingsLoading || walletLoading || txnLoading || productsLoading,
     ordersLoading,
+    refetchOrders,
   };
 };
