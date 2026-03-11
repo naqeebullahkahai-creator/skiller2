@@ -242,6 +242,7 @@ const App = () => (
         <LanguageProvider>
            <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false}>
            <AuthProvider>
+             <ImpersonationProvider>
               <VisualEditProvider>
                 <CartProvider>
                   <ComparisonProvider>
