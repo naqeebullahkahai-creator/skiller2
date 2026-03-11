@@ -168,6 +168,7 @@ import AgentSettingsPage from "./pages/agent/AgentSettingsPage";
 import AgentPerformancePage from "./pages/agent/AgentPerformancePage";
 import AgentDashboardLayout from "./components/dashboard/AgentDashboardLayout";
 import AdminSecurityPage from "./pages/dashboard/AdminSecurityPage";
+import AdminViewAsPage from "./pages/dashboard/AdminViewAsPage";
 
 // PWA App Shells
 import CustomerAppShell from "./components/pwa/CustomerAppShell";
