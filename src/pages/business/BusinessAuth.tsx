@@ -202,7 +202,7 @@ const BusinessAuth = () => {
           return;
         }
         
-        const result = await signup(formData.name, formData.email, formData.password, true);
+        const result = await signup(formData.name, formData.email, formData.password, true, formData.phone);
         
         if (result.success) {
           toast({
