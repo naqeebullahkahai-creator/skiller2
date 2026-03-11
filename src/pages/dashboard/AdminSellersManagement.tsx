@@ -235,7 +235,7 @@ const AdminSellersManagement = () => {
   const [unrejectSeller, setUnrejectSeller] = useState<any>(null);
 
   const verifiedSellers = sellers.filter(s => s.verification_status === "verified");
-  const unverifiedSellers = sellers.filter(s => s.verification_status !== "verified");
+  const pendingSellers = sellers.filter(s => s.verification_status === "pending");
   const rejectedSellers = sellers.filter(s => s.verification_status === "rejected");
 
   const handleUnreject = () => {
