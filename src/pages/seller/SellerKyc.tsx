@@ -60,7 +60,8 @@ const steps = [
 
 const SellerKyc = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const { sellerProfile, isLoading, hasSubmittedKyc, submitKyc } = useSellerKyc();
+  const { sellerProfile, isLoading, hasSubmittedKyc, isVerified, submitKyc } = useSellerKyc();
+  const navigate = useNavigate();
 
   const form = useForm<KycFormData>({
     resolver: zodResolver(fullSchema),
