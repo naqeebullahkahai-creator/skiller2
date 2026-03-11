@@ -24,7 +24,7 @@ import ComparisonBar from "./components/comparison/ComparisonBar";
 import VisualEditToggle from "./components/admin/VisualEditToggle";
 // BackToDashboardBar removed - strict role isolation
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
+
 import SellerAuth from "./pages/seller/SellerAuth";
 import BusinessAuth from "./pages/business/BusinessAuth";
 import EmailVerificationPending from "./pages/business/EmailVerificationPending";
