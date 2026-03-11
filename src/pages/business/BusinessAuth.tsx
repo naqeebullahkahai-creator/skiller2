@@ -4,6 +4,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2, TrendingUp, Shiel
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -53,11 +54,13 @@ const BusinessAuth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showLoggedInWarning, setShowLoggedInWarning] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   useEffect(() => {
     setMode(location.pathname === "/business/login" ? "login" : "signup");
     setErrors({});
     setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+    setAgreedToTerms(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -77,7 +80,6 @@ const BusinessAuth = () => {
         return;
       }
       
-      // In-app redirect
       const redirectPath = getInAppRedirectPath(role);
       navigate(redirectPath, { replace: true });
     }
@@ -127,16 +129,39 @@ const BusinessAuth = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    if (mode === "signup" && !agreedToTerms) {
+      toast({
+        title: "Terms Required",
+        description: "Please agree to the Terms of Service and Privacy Policy.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       if (mode === "login") {
         const result = await login(formData.email, formData.password);
         
         if (result.success) {
+          // Check if email is verified
+          const { data: { user: authUser } } = await supabase.auth.getUser();
+          if (authUser && !authUser.email_confirmed_at) {
+            await supabase.auth.signOut();
+            navigate(`/business/verify-email-pending?email=${encodeURIComponent(formData.email)}`);
+            toast({
+              title: "Email Not Verified",
+              description: "Please verify your email before logging in.",
+              variant: "destructive",
+            });
+            setIsSubmitting(false);
+            return;
+          }
+
           const { data: roleData } = await supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+            .eq("user_id", authUser?.id)
             .maybeSingle();
           
           if (roleData?.role !== "seller" && roleData?.role !== "admin") {
@@ -162,7 +187,6 @@ const BusinessAuth = () => {
           });
         }
       } else {
-        // Check for role conflict before signup
         const roleConflict = await checkEmailRoleConflict(formData.email, "seller");
         
         if (roleConflict.hasConflict) {
@@ -182,7 +206,6 @@ const BusinessAuth = () => {
             title: "Partner Account Created! 🎉",
             description: "Please check your email to verify your account.",
           });
-          // Redirect to email verification pending page
           navigate(`/business/verify-email-pending?email=${encodeURIComponent(formData.email)}`);
           setFormData({ name: "", email: "", password: "", confirmPassword: "" });
         } else {
@@ -315,16 +338,12 @@ const BusinessAuth = () => {
               <Briefcase className="h-8 w-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold text-white tracking-tight">FANZON</h1>
-            <p className="text-primary mt-1 text-sm font-medium">Business Partner Portal</p>
+            <p className="text-primary mt-1 text-sm font-medium">Sell on FANZON</p>
           </div>
 
           {/* Auth Card */}
           <div className="bg-card rounded-2xl shadow-2xl p-6 sm:p-8">
             <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-xs font-semibold mb-3">
-                <Building2 className="h-3 w-3" />
-                Business Partner Portal
-              </div>
               <h2 className="text-xl font-semibold text-foreground">
                 {mode === "login" ? "Partner Login" : "Become a Partner"}
               </h2>
@@ -360,7 +379,7 @@ const BusinessAuth = () => {
               )}
 
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-sm font-medium">Business Email</Label>
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -369,7 +388,7 @@ const BusinessAuth = () => {
                     type="email"
                     inputMode="email"
                     autoComplete="email"
-                    placeholder="partner@business.com"
+                    placeholder="yourname@gmail.com"
                     value={formData.email}
                     onChange={handleInputChange}
                     className={cn(
@@ -442,6 +461,23 @@ const BusinessAuth = () => {
                 </div>
               )}
 
+              {mode === "signup" && (
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="terms"
+                    checked={agreedToTerms}
+                    onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+                    className="mt-1"
+                  />
+                  <Label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    I agree to FANZON's{" "}
+                    <Link to="/terms" className="text-primary hover:underline" target="_blank">Terms of Service</Link>
+                    {" "}and{" "}
+                    <Link to="/privacy" className="text-primary hover:underline" target="_blank">Privacy Policy</Link>
+                  </Label>
+                </div>
+              )}
+
               {mode === "login" && (
                 <div className="flex justify-end">
                   <button 
@@ -506,10 +542,6 @@ const BusinessAuth = () => {
               <ArrowRight size={14} />
             </Link>
           </div>
-
-          <p className="text-center text-xs text-muted-foreground mt-4">
-            By continuing, you agree to FANZON's Terms of Service and Privacy Policy
-          </p>
         </div>
       </div>
 
