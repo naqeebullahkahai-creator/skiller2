@@ -97,7 +97,7 @@ const CustomerAuth = () => {
       if (mode === "login") {
         loginSchema.parse({ email: formData.email, password: formData.password });
       } else {
-        signupSchema.parse(formData);
+        signupSchema.parse({ ...formData });
       }
       setErrors({});
       return true;
