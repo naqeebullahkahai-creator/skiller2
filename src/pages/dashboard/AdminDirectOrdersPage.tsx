@@ -18,7 +18,6 @@ import {
 import { useAdminOrderClassification } from "@/hooks/useAdminOrderClassification";
 import { useOrderCancellation } from "@/hooks/useOrderCancellation";
 import { formatPKR } from "@/hooks/useProducts";
-import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
 import { generateShippingLabel } from "@/utils/generateShippingLabel";
 import ShippingDialog from "@/components/orders/ShippingDialog";
 import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
