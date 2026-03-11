@@ -278,10 +278,8 @@ const App = () => (
                             <Route path="/" element={<Index />} />
                           )}
                           
-                          {/* Auth routes - available on all domains */}
-                          <Route path="/auth" element={<Auth />} />
-                          
                           {/* Customer Auth Routes - /auth/* */}
+                          <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
                           <Route path="/auth/login" element={<CustomerAuth />} />
                           <Route path="/auth/signup" element={<CustomerAuth />} />
                           <Route path="/auth/verify-email" element={<CustomerEmailVerification />} />

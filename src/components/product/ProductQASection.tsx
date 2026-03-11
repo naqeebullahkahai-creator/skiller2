@@ -124,7 +124,7 @@ const ProductQASection = ({ productId, sellerId, productTitle }: ProductQASectio
               <CardContent className="p-4 text-center">
                 <MessageSquare className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  <a href="/auth" className="text-primary font-medium hover:underline">Login</a> to ask a question about this product
+                  <a href="/auth/login" className="text-primary font-medium hover:underline">Login</a> to ask a question about this product
                 </p>
               </CardContent>
             </Card>

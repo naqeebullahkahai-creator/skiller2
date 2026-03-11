@@ -112,7 +112,7 @@ const ResetPassword = () => {
         // Sign out and redirect to login after 2 seconds
         setTimeout(async () => {
           await supabase.auth.signOut();
-          navigate("/auth");
+          navigate("/auth/login");
         }, 2000);
       }
     } catch (error) {
