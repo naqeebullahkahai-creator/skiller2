@@ -246,7 +246,7 @@ const AdminAgentsManagement = () => {
                     ))
                   ) : agents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                         No agents found. Assign the "support_agent" role via Roles & Permissions.
                       </TableCell>
                     </TableRow>
