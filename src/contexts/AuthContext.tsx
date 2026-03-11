@@ -26,7 +26,7 @@ interface AuthContextType {
   isLoading: boolean;
   isSuperAdmin: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (name: string, email: string, password: string, isSeller?: boolean) => Promise<{ success: boolean; error?: string }>;
+  signup: (name: string, email: string, password: string, isSeller?: boolean, phoneNumber?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;

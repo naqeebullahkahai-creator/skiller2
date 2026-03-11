@@ -61,7 +61,7 @@ const CustomerAuth = () => {
   useEffect(() => {
     setMode(location.pathname === "/auth/login" ? "login" : "signup");
     setErrors({});
-    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+    setFormData({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
     setAgreedToTerms(false);
   }, [location.pathname]);
 
