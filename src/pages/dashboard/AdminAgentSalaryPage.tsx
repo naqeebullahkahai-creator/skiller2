@@ -4,30 +4,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DollarSign, Plus, Edit, Trash2, Users } from "lucide-react";
+import { DollarSign, Users } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
 const formatPKR = (amount: number) =>
   new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", minimumFractionDigits: 0 }).format(amount);
 
 const AdminAgentSalaryPage = () => {
   const queryClient = useQueryClient();
-  const [showDialog, setShowDialog] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [formAgentId, setFormAgentId] = useState("");
-  const [formAmount, setFormAmount] = useState("");
-  const [formFrequency, setFormFrequency] = useState("monthly");
-  const [formDate, setFormDate] = useState("");
-  const [formTime, setFormTime] = useState("09:00");
+  const [showPayDialog, setShowPayDialog] = useState(false);
+  const [payAgentId, setPayAgentId] = useState("");
+  const [payAmount, setPayAmount] = useState("");
 
   const { data: agents = [] } = useQuery({
     queryKey: ["agent-list-for-salary"],
@@ -39,124 +32,87 @@ const AdminAgentSalaryPage = () => {
     },
   });
 
-  const { data: salaries = [], isLoading } = useQuery({
-    queryKey: ["agent-salaries"],
+  // Get agent wallets for balance display
+  const { data: agentWallets = [] } = useQuery({
+    queryKey: ["agent-wallets-salary"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("agent_salaries").select("*").order("created_at", { ascending: false });
+      const { data } = await supabase.from("agent_wallets").select("*");
+      return data || [];
+    },
+  });
+
+  // Payment history from agent_wallet_transactions where type is salary
+  const { data: paymentHistory = [], isLoading } = useQuery({
+    queryKey: ["agent-salary-history"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("agent_wallet_transactions")
+        .select("*")
+        .eq("transaction_type", "salary")
+        .order("created_at", { ascending: false })
+        .limit(50);
       if (error) throw error;
       return data || [];
     },
   });
 
-  // Stats
-  const totalMonthly = salaries.filter((s: any) => s.is_active).reduce((sum: number, s: any) => {
-    const amt = s.amount || 0;
-    if (s.frequency === "weekly") return sum + amt * 4;
-    if (s.frequency === "biweekly") return sum + amt * 2;
-    return sum + amt;
-  }, 0);
-  const activeCount = salaries.filter((s: any) => s.is_active).length;
-  const totalAgents = salaries.length;
-
-  const saveSalary = useMutation({
-    mutationFn: async () => {
-      if (!formAgentId || !formAmount) throw new Error("Fill all fields");
-      const nextPayment = formDate
-        ? new Date(`${formDate}T${formTime || "09:00"}`).toISOString()
-        : getNextPaymentDate(formFrequency);
-      const payload = {
-        agent_id: formAgentId,
-        amount: parseFloat(formAmount),
-        frequency: formFrequency,
-        next_payment_at: nextPayment,
-        is_active: true,
-      };
-      if (editId) {
-        const { error } = await supabase.from("agent_salaries").update(payload).eq("id", editId);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("agent_salaries").insert(payload);
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      toast.success(editId ? "Salary updated" : "Salary scheduled");
-      queryClient.invalidateQueries({ queryKey: ["agent-salaries"] });
-      resetForm();
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
-  // Pay salary now (credit agent wallet)
   const paySalary = useMutation({
-    mutationFn: async (salaryId: string) => {
-      const { data, error } = await supabase.rpc("process_agent_salary", { p_salary_id: salaryId });
-      if (error) throw error;
-      const result = data as any;
-      if (!result?.success) throw new Error(result?.message || "Failed");
-      return result;
-    },
-    onSuccess: (data) => {
-      toast.success(`Rs. ${data.amount} credited to agent wallet!`);
-      queryClient.invalidateQueries({ queryKey: ["agent-salaries"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+    mutationFn: async () => {
+      if (!payAgentId || !payAmount) throw new Error("Select agent and enter amount");
+      const amount = parseFloat(payAmount);
+      if (isNaN(amount) || amount <= 0) throw new Error("Enter a valid amount");
 
-  const toggleActive = useMutation({
-    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
-      const { error } = await supabase.from("agent_salaries").update({ is_active: active }).eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: (_, { active }) => {
-      toast.success(active ? "Salary activated" : "Salary paused");
-      queryClient.invalidateQueries({ queryKey: ["agent-salaries"] });
-    },
-  });
+      // First check/create wallet
+      const { data: existingWallet } = await supabase
+        .from("agent_wallets")
+        .select("id, balance")
+        .eq("agent_id", payAgentId)
+        .maybeSingle();
 
-  const removeSalary = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("agent_salaries").delete().eq("id", id);
+      if (existingWallet) {
+        await supabase
+          .from("agent_wallets")
+          .update({
+            balance: existingWallet.balance + amount,
+            total_earned: (existingWallet as any).total_earned + amount,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("agent_id", payAgentId);
+      } else {
+        await supabase.from("agent_wallets").insert({
+          agent_id: payAgentId,
+          balance: amount,
+          total_earned: amount,
+        });
+      }
+
+      // Log transaction
+      const { error } = await supabase.from("agent_wallet_transactions").insert({
+        agent_id: payAgentId,
+        amount,
+        transaction_type: "salary",
+        description: `Salary payment of ${formatPKR(amount)}`,
+      });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Salary removed");
-      queryClient.invalidateQueries({ queryKey: ["agent-salaries"] });
+      toast.success(`Salary paid successfully!`);
+      queryClient.invalidateQueries({ queryKey: ["agent-salary-history"] });
+      queryClient.invalidateQueries({ queryKey: ["agent-wallets-salary"] });
+      setShowPayDialog(false);
+      setPayAgentId("");
+      setPayAmount("");
     },
+    onError: (e: Error) => toast.error(e.message),
   });
-
-  const getNextPaymentDate = (freq: string) => {
-    const now = new Date();
-    if (freq === "weekly") now.setDate(now.getDate() + 7);
-    else if (freq === "biweekly") now.setDate(now.getDate() + 14);
-    else now.setMonth(now.getMonth() + 1);
-    return now.toISOString();
-  };
-
-  const resetForm = () => {
-    setShowDialog(false);
-    setEditId(null);
-    setFormAgentId("");
-    setFormAmount("");
-    setFormFrequency("monthly");
-    setFormDate("");
-    setFormTime("09:00");
-  };
-
-  const handleEdit = (salary: any) => {
-    setEditId(salary.id);
-    setFormAgentId(salary.agent_id);
-    setFormAmount(salary.amount.toString());
-    setFormFrequency(salary.frequency);
-    if (salary.next_payment_at) {
-      const d = new Date(salary.next_payment_at);
-      setFormDate(format(d, "yyyy-MM-dd"));
-      setFormTime(format(d, "HH:mm"));
-    }
-    setShowDialog(true);
-  };
 
   const getAgentName = (id: string) => agents.find((a: any) => a.id === id)?.full_name || id.slice(0, 8);
+  const getAgentBalance = (id: string) => {
+    const w = agentWallets.find((w: any) => w.agent_id === id);
+    return w ? (w as any).balance : 0;
+  };
+
+  const totalPaid = paymentHistory.reduce((sum: number, t: any) => sum + t.amount, 0);
 
   return (
     <div className="space-y-6 overflow-x-hidden">
@@ -165,92 +121,54 @@ const AdminAgentSalaryPage = () => {
           <h1 className="text-xl font-bold flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-primary" /> Agent Salaries
           </h1>
-          <p className="text-sm text-muted-foreground">Schedule & manage agent salary payments</p>
+          <p className="text-sm text-muted-foreground">Pay agents manually</p>
         </div>
-        <Button size="sm" onClick={() => setShowDialog(true)}>
-          <Plus className="h-4 w-4 mr-1" /> Add Salary
+        <Button size="sm" onClick={() => setShowPayDialog(true)}>
+          <DollarSign className="h-4 w-4 mr-1" /> Pay Salary
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <Card><CardContent className="p-4 text-center">
-          <p className="text-2xl font-bold text-primary">{totalAgents}</p>
-          <p className="text-xs text-muted-foreground flex items-center justify-center gap-1"><Users size={12}/> Total Scheduled</p>
+          <p className="text-2xl font-bold text-primary">{agents.length}</p>
+          <p className="text-xs text-muted-foreground flex items-center justify-center gap-1"><Users size={12}/> Total Agents</p>
         </CardContent></Card>
         <Card><CardContent className="p-4 text-center">
-          <p className="text-2xl font-bold text-green-600">{activeCount}</p>
-          <p className="text-xs text-muted-foreground">Active</p>
-        </CardContent></Card>
-        <Card><CardContent className="p-4 text-center">
-          <p className="text-2xl font-bold text-primary">{formatPKR(totalMonthly)}</p>
-          <p className="text-xs text-muted-foreground">Est. Monthly Total</p>
+          <p className="text-2xl font-bold text-primary">{formatPKR(totalPaid)}</p>
+          <p className="text-xs text-muted-foreground">Total Paid</p>
         </CardContent></Card>
       </div>
 
+      {/* Payment History */}
       <Card>
         <CardContent className="p-0">
+          <div className="p-4 border-b">
+            <h3 className="font-semibold text-sm">Payment History</h3>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Agent</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead>Frequency</TableHead>
-                <TableHead className="hidden md:table-cell">Next Payment</TableHead>
-                <TableHead className="hidden md:table-cell">Last Paid</TableHead>
-                <TableHead>On/Off</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead className="hidden md:table-cell">Description</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 [...Array(3)].map((_, i) => (
-                  <TableRow key={i}>{[...Array(7)].map((_, j) => <TableCell key={j}><Skeleton className="h-6 w-16" /></TableCell>)}</TableRow>
+                  <TableRow key={i}>{[...Array(4)].map((_, j) => <TableCell key={j}><Skeleton className="h-6 w-16" /></TableCell>)}</TableRow>
                 ))
-              ) : salaries.length === 0 ? (
-                <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No salaries scheduled</TableCell></TableRow>
+              ) : paymentHistory.length === 0 ? (
+                <TableRow><TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No payments yet</TableCell></TableRow>
               ) : (
-                salaries.map((salary: any) => (
-                  <TableRow key={salary.id} className={cn(!salary.is_active && "opacity-60")}>
-                    <TableCell className="font-medium text-sm">{getAgentName(salary.agent_id)}</TableCell>
-                    <TableCell className="font-bold text-primary">{formatPKR(salary.amount)}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize text-xs">{salary.frequency}</Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-xs">
-                      {salary.next_payment_at ? format(new Date(salary.next_payment_at), "MMM dd, yyyy HH:mm") : "—"}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-xs">
-                      {salary.last_paid_at ? format(new Date(salary.last_paid_at), "MMM dd, yyyy") : "Never"}
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        checked={salary.is_active}
-                        onCheckedChange={(checked) => toggleActive.mutate({ id: salary.id, active: checked })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700 text-xs h-7"
-                          disabled={!salary.is_active || paySalary.isPending}
-                          onClick={() => { if (confirm(`Pay ${formatPKR(salary.amount)} to ${getAgentName(salary.agent_id)} now?`)) paySalary.mutate(salary.id); }}>
-                          <DollarSign size={12} className="mr-0.5" /> Pay Now
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(salary)}>
-                          <Edit size={14} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => {
-                            if (confirm("Remove this salary schedule?")) removeSalary.mutate(salary.id);
-                          }}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </TableCell>
+                paymentHistory.map((txn: any) => (
+                  <TableRow key={txn.id}>
+                    <TableCell className="font-medium text-sm">{getAgentName(txn.agent_id)}</TableCell>
+                    <TableCell className="font-bold text-primary">{formatPKR(txn.amount)}</TableCell>
+                    <TableCell className="text-xs">{format(new Date(txn.created_at), "MMM dd, yyyy HH:mm")}</TableCell>
+                    <TableCell className="hidden md:table-cell text-xs text-muted-foreground">{txn.description || "—"}</TableCell>
                   </TableRow>
                 ))
               )}
@@ -259,53 +177,43 @@ const AdminAgentSalaryPage = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={showDialog} onOpenChange={(o) => { if (!o) resetForm(); else setShowDialog(true); }}>
+      {/* Pay Dialog */}
+      <Dialog open={showPayDialog} onOpenChange={(o) => { if (!o) { setShowPayDialog(false); setPayAgentId(""); setPayAmount(""); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editId ? "Edit Salary" : "Schedule Agent Salary"}</DialogTitle>
+            <DialogTitle>Pay Agent Salary</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <Label>Agent</Label>
-              <Select value={formAgentId} onValueChange={setFormAgentId}>
+              <Select value={payAgentId} onValueChange={setPayAgentId}>
                 <SelectTrigger><SelectValue placeholder="Select agent" /></SelectTrigger>
                 <SelectContent>
                   {agents.map((a: any) => (
-                    <SelectItem key={a.id} value={a.id}>{a.full_name} ({a.email})</SelectItem>
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.full_name} ({a.email}) — Balance: {formatPKR(getAgentBalance(a.id))}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>Amount (PKR)</Label>
-              <Input type="number" value={formAmount} onChange={(e) => setFormAmount(e.target.value)} placeholder="e.g. 25000" />
-            </div>
-            <div>
-              <Label>Frequency</Label>
-              <Select value={formFrequency} onValueChange={setFormFrequency}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="biweekly">Bi-Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Payment Date</Label>
-                <Input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)} />
-              </div>
-              <div>
-                <Label>Payment Time</Label>
-                <Input type="time" value={formTime} onChange={(e) => setFormTime(e.target.value)} />
-              </div>
+              <Input type="number" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} placeholder="e.g. 25000" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={resetForm}>Cancel</Button>
-            <Button onClick={() => saveSalary.mutate()} disabled={saveSalary.isPending}>
-              {saveSalary.isPending ? "Saving..." : editId ? "Update" : "Schedule"}
+            <Button variant="outline" onClick={() => { setShowPayDialog(false); setPayAgentId(""); setPayAmount(""); }}>Cancel</Button>
+            <Button
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => {
+                if (confirm(`Pay ${formatPKR(parseFloat(payAmount || "0"))} to ${getAgentName(payAgentId)}?`)) {
+                  paySalary.mutate();
+                }
+              }}
+              disabled={paySalary.isPending || !payAgentId || !payAmount}
+            >
+              {paySalary.isPending ? "Paying..." : "Pay Now"}
             </Button>
           </DialogFooter>
         </DialogContent>

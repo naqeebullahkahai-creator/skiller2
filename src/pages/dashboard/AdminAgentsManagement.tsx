@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Headphones, Search, Users, CheckCircle, XCircle, Star,
-  MessageSquare, ChevronRight, Shield, Clock, BarChart3, ArrowLeft, DollarSign
+  MessageSquare, ChevronRight, Shield, Clock, BarChart3, ArrowLeft, DollarSign, Wallet
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,9 @@ interface AgentData {
   avg_rating: number;
   last_seen_at: string | null;
   created_at: string;
+  wallet_balance: number;
+  total_earned: number;
+  total_withdrawn: number;
 }
 
 const useAdminAgents = (searchQuery?: string) => {
@@ -66,12 +69,19 @@ const useAdminAgents = (searchQuery?: string) => {
         .select("agent_id, status, rating")
         .in("agent_id", agentIds);
 
+      // Get agent wallets
+      const { data: wallets } = await supabase
+        .from("agent_wallets")
+        .select("agent_id, balance, total_earned, total_withdrawn")
+        .in("agent_id", agentIds);
+
       const agents: AgentData[] = (profiles || []).map(p => {
         const online = onlineStatus?.find(o => o.user_id === p.id);
         const agentSessions = sessions?.filter(s => s.agent_id === p.id) || [];
         const resolved = agentSessions.filter(s => s.status === "ended");
         const rated = resolved.filter(s => s.rating);
         const avgRating = rated.length > 0 ? rated.reduce((sum, s) => sum + (s.rating || 0), 0) / rated.length : 0;
+        const wallet = wallets?.find((w: any) => w.agent_id === p.id);
 
         return {
           id: p.id,
@@ -84,6 +94,9 @@ const useAdminAgents = (searchQuery?: string) => {
           avg_rating: avgRating,
           last_seen_at: online?.last_seen_at || null,
           created_at: p.created_at,
+          wallet_balance: (wallet as any)?.balance || 0,
+          total_earned: (wallet as any)?.total_earned || 0,
+          total_withdrawn: (wallet as any)?.total_withdrawn || 0,
         };
       });
 
@@ -214,9 +227,11 @@ const AdminAgentsManagement = () => {
                   <TableRow>
                     <TableHead>Agent</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Balance</TableHead>
                     <TableHead>Sessions</TableHead>
                     <TableHead>Resolved</TableHead>
                     <TableHead className="hidden lg:table-cell">Avg Rating</TableHead>
+                    <TableHead className="hidden lg:table-cell">Total Earned</TableHead>
                     <TableHead className="hidden lg:table-cell">Last Seen</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -224,14 +239,14 @@ const AdminAgentsManagement = () => {
                   {isLoading ? (
                     [...Array(3)].map((_, i) => (
                       <TableRow key={i}>
-                        {[...Array(6)].map((_, j) => (
+                        {[...Array(8)].map((_, j) => (
                           <TableCell key={j}><Skeleton className="h-6 w-20" /></TableCell>
                         ))}
                       </TableRow>
                     ))
                   ) : agents.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                         No agents found. Assign the "support_agent" role via Roles & Permissions.
                       </TableCell>
                     </TableRow>
@@ -254,6 +269,9 @@ const AdminAgentsManagement = () => {
                             {agent.is_online ? <><CheckCircle size={10} /> Online</> : <><XCircle size={10} /> Offline</>}
                           </Badge>
                         </TableCell>
+                        <TableCell>
+                          <span className="font-bold text-primary">{new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", minimumFractionDigits: 0 }).format(agent.wallet_balance)}</span>
+                        </TableCell>
                         <TableCell>{agent.total_sessions}</TableCell>
                         <TableCell>{agent.resolved_sessions}</TableCell>
                         <TableCell className="hidden lg:table-cell">
@@ -261,6 +279,9 @@ const AdminAgentsManagement = () => {
                             <Star className="h-3 w-3 text-yellow-500" />
                             <span className="text-sm">{agent.avg_rating > 0 ? agent.avg_rating.toFixed(1) : "—"}</span>
                           </div>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs font-medium">
+                          {new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", minimumFractionDigits: 0 }).format(agent.total_earned)}
                         </TableCell>
                         <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
                           {agent.last_seen_at ? format(new Date(agent.last_seen_at), "MMM dd, HH:mm") : "Never"}
@@ -302,7 +323,11 @@ const AdminAgentsManagement = () => {
                         {agent.is_online ? <><CheckCircle size={10} /> Online</> : <><XCircle size={10} /> Offline</>}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                      <div className="bg-primary/10 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Balance</p>
+                        <p className="text-sm font-bold text-primary">{new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", minimumFractionDigits: 0 }).format(agent.wallet_balance)}</p>
+                      </div>
                       <div className="bg-muted/50 rounded-lg p-2">
                         <p className="text-xs text-muted-foreground">Sessions</p>
                         <p className="text-sm font-bold">{agent.total_sessions}</p>
