@@ -4,8 +4,6 @@ import {
   FileText, Activity, ShieldCheck, LogIn, X, Eye,
   CheckCircle, XCircle, AlertCircle
 } from "lucide-react";
-import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
-import { isProductionDomain } from "@/utils/domainRouting";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -259,28 +257,9 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
                   variant="outline"
                   size="sm"
                   className="shrink-0 gap-1.5"
-                  onClick={async () => {
-                    const role = staffRole?.role || user?.role || "customer";
-                    const host = window.location.hostname.toLowerCase();
-                    const hyphen = host.match(/^(?:admin|seller|customer|agent)-([a-z0-9-]+)\.2bd\.net$/);
-                    const dot = host.match(/^(?:admin|seller|customer|agent)\.([a-z0-9-]+)\.2bd\.net$/);
-                    const main = host.match(/^([a-z0-9-]+)\.2bd\.net$/);
-                    const baseLabel = hyphen?.[1] || dot?.[1] || main?.[1] || "fanzon";
-                    
-                    let targetUrl: string;
-                    if (isProductionDomain()) {
-                      if (role === "seller") {
-                        targetUrl = `https://seller-${baseLabel}.2bd.net/seller/dashboard`;
-                      } else if (role === "support_agent") {
-                        targetUrl = `https://agent-${baseLabel}.2bd.net/agent/dashboard`;
-                      } else {
-                        targetUrl = `https://customer-${baseLabel}.2bd.net/account/profile`;
-                      }
-                      const ssoUrl = await buildCrossDomainUrl(targetUrl);
-                      window.open(ssoUrl, '_blank');
-                    } else {
-                      window.open(`/admin/view-as/${userId}`, '_blank');
-                    }
+                  onClick={() => {
+                    // Open impersonation in new tab via AdminViewAsPage
+                    window.open(`/admin/view-as/${userId}`, '_blank');
                   }}
                 >
                   <Eye size={14} />
