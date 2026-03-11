@@ -292,8 +292,8 @@ const SettlementTable = ({ items, isPending, selectedIds = [], onToggleSelect, o
                     />
                   </TableHead>
                 )}
+                <TableHead>Order ID</TableHead>
                 <TableHead>Product</TableHead>
-                <TableHead>Tracking</TableHead>
                 <TableHead>Order Amount</TableHead>
                 <TableHead>Commission</TableHead>
                 <TableHead>Seller Payout</TableHead>
