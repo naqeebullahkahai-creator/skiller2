@@ -31,6 +31,9 @@ interface AgentData {
   avg_rating: number;
   last_seen_at: string | null;
   created_at: string;
+  wallet_balance: number;
+  total_earned: number;
+  total_withdrawn: number;
 }
 
 const useAdminAgents = (searchQuery?: string) => {
