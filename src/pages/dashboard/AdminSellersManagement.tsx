@@ -250,7 +250,7 @@ const AdminSellersManagement = () => {
   const statCards = [
     { label: "Total Sellers", value: stats.totalSellers, icon: <Store className="h-5 w-5 text-white" />, color: "bg-blue-500" },
     { label: "Verified", value: stats.verifiedSellers, icon: <ShieldCheck className="h-5 w-5 text-white" />, color: "bg-green-500" },
-    { label: "Unverified", value: stats.totalSellers - stats.verifiedSellers, icon: <AlertCircle className="h-5 w-5 text-white" />, color: "bg-yellow-500" },
+    { label: "Unverified", value: pendingSellers.length, icon: <AlertCircle className="h-5 w-5 text-white" />, color: "bg-yellow-500" },
     { label: "Rejected", value: rejectedSellers.length, icon: <XCircle className="h-5 w-5 text-white" />, color: "bg-red-500" },
   ];
 
