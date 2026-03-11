@@ -227,9 +227,11 @@ const AdminAgentsManagement = () => {
                   <TableRow>
                     <TableHead>Agent</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Balance</TableHead>
                     <TableHead>Sessions</TableHead>
                     <TableHead>Resolved</TableHead>
                     <TableHead className="hidden lg:table-cell">Avg Rating</TableHead>
+                    <TableHead className="hidden lg:table-cell">Total Earned</TableHead>
                     <TableHead className="hidden lg:table-cell">Last Seen</TableHead>
                   </TableRow>
                 </TableHeader>
