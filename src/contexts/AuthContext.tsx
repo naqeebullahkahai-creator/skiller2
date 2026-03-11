@@ -142,7 +142,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     name: string, 
     email: string, 
     password: string, 
-    isSeller: boolean = false
+    isSeller: boolean = false,
+    phoneNumber?: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const redirectUrl = isSeller 
@@ -157,6 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           data: {
             full_name: name,
             is_seller: isSeller,
+            phone_number: phoneNumber || null,
           },
         },
       });
