@@ -17,6 +17,7 @@ import { getCrossDomainRedirectUrl, getInAppRedirectPath, isProductionDomain } f
 import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RealTimeFieldValidator from "@/components/auth/RealTimeFieldValidator";
+import PakistanPhoneInput from "@/components/auth/PakistanPhoneInput";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
