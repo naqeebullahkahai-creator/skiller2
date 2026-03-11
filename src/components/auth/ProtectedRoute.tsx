@@ -27,11 +27,11 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
 
   // If user is on wrong domain, redirect them to the correct one instead of showing "Access Denied"
   useEffect(() => {
-    if (isLoading || !isAuthenticated || !role || hasTriedDomainRedirect.current) return;
+    if (isLoading || !isAuthenticated || !actualRole || hasTriedDomainRedirect.current || isImpersonating) return;
     
-    if (!isDomainAllowedForRole(role) && isProductionDomain()) {
+    if (!isDomainAllowedForRole(actualRole) && isProductionDomain()) {
       hasTriedDomainRedirect.current = true;
-      const targetUrl = getCrossDomainRedirectUrl(role);
+      const targetUrl = getCrossDomainRedirectUrl(actualRole);
       if (targetUrl) {
         buildCrossDomainUrl(targetUrl).then((ssoUrl) => {
           window.location.replace(ssoUrl);
