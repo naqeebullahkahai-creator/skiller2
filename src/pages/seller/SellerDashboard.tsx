@@ -125,7 +125,10 @@ const SellerDashboard = () => {
       <div className="sticky top-0 z-50 bg-background border-b border-border px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-foreground">Seller Center</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-bold text-foreground">Seller Center</h1>
+              {isVerified && <Badge className="bg-green-600 text-white text-[10px]">✓ Verified</Badge>}
+            </div>
             <p className="text-xs text-muted-foreground">Welcome, {profile?.full_name || "Seller"}</p>
           </div>
           <div className="flex items-center gap-2">
