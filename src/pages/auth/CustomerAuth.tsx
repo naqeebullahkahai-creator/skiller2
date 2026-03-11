@@ -182,7 +182,7 @@ const CustomerAuth = () => {
           return;
         }
         
-        const result = await signup(formData.name, formData.email, formData.password, false);
+        const result = await signup(formData.name, formData.email, formData.password, false, formData.phone);
         
         if (result.success) {
           navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
