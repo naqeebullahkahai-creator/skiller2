@@ -76,8 +76,8 @@ export const useAdminSidebarCounts = () => {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'order_settlements' }, () => refetch())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'return_requests' }, () => refetch())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'flash_sale_nominations' }, () => refetch())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_roles' }, () => refetch())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'agent_payouts' }, () => refetch())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'payout_requests' }, () => refetch())
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [refetch]);

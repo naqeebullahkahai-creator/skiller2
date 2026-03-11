@@ -314,17 +314,17 @@ const SettlementTable = ({ items, isPending, selectedIds = [], onToggleSelect, o
                     </TableCell>
                   )}
                   <TableCell>
-                    <div>
-                      <p className="font-medium line-clamp-1">{s.product_title || 'N/A'}</p>
-                      <p className="text-xs text-muted-foreground">{s.courier_name || 'No courier'}</p>
-                    </div>
+                    <Badge variant="outline" className="font-mono text-xs">
+                      {s.order_id?.slice(0, 8)}...
+                    </Badge>
                   </TableCell>
                   <TableCell>
-                    {s.tracking_id ? (
-                      <Badge variant="outline" className="font-mono text-xs">{s.tracking_id}</Badge>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">No tracking</span>
-                    )}
+                    <div>
+                      <p className="font-medium line-clamp-1">{s.product_title || 'N/A'}</p>
+                      {s.tracking_id && (
+                        <p className="text-xs text-muted-foreground">Tracking: {s.tracking_id}</p>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="font-medium">{formatPKR(s.order_amount)}</TableCell>
                   <TableCell>
