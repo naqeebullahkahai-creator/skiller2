@@ -210,7 +210,7 @@ const BusinessAuth = () => {
             description: "Please check your email to verify your account.",
           });
           navigate(`/business/verify-email-pending?email=${encodeURIComponent(formData.email)}`);
-          setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+          setFormData({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
         } else {
           toast({
             title: "Error",
