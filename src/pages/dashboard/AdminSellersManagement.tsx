@@ -297,7 +297,7 @@ const AdminSellersManagement = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 w-full max-w-lg">
+        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="verified" className="gap-1">
             Verified
@@ -305,7 +305,11 @@ const AdminSellersManagement = () => {
           </TabsTrigger>
           <TabsTrigger value="unverified" className="gap-1">
             Unverified
-            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4">{unverifiedSellers.length}</Badge>
+            <Badge className="bg-yellow-500 text-white text-[10px] px-1.5 py-0 h-4">{pendingSellers.length}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="rejected" className="gap-1">
+            Rejected
+            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4">{rejectedSellers.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="all">All</TabsTrigger>
         </TabsList>
