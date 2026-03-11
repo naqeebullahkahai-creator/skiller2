@@ -1,12 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Order, OrderItem } from './useOrders';
 
 /**
  * Fetches admin user IDs from user_roles to distinguish
  * "Direct Store" orders (admin-owned products) from "Vendor" orders.
+ * Includes real-time subscription for instant updates.
  */
 export const useAdminOrderClassification = () => {
+  const queryClient = useQueryClient();
+
   // Get all admin user IDs
   const adminIdsQuery = useQuery({
     queryKey: ['admin-user-ids'],
@@ -35,15 +39,58 @@ export const useAdminOrderClassification = () => {
         items: (Array.isArray(order.items) ? order.items : []) as OrderItem[],
       })) as Order[];
     },
-    staleTime: 30000,
+    staleTime: 10000,
   });
+
+  // Real-time subscription for orders
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-orders-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        (payload) => {
+          queryClient.setQueryData<Order[]>(['admin-classified-orders'], (old) => {
+            if (!old) return old;
+
+            if (payload.eventType === 'INSERT') {
+              const newOrder = {
+                ...payload.new,
+                items: (Array.isArray(payload.new.items) ? payload.new.items : []) as OrderItem[],
+              } as Order;
+              return [newOrder, ...old];
+            }
+
+            if (payload.eventType === 'UPDATE') {
+              return old.map((order) =>
+                order.id === payload.new.id
+                  ? {
+                      ...order,
+                      ...payload.new,
+                      items: (Array.isArray(payload.new.items) ? payload.new.items : order.items) as OrderItem[],
+                    }
+                  : order
+              );
+            }
+
+            if (payload.eventType === 'DELETE') {
+              return old.filter((order) => order.id !== payload.old.id);
+            }
+
+            return old;
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const adminIds = adminIdsQuery.data || new Set<string>();
   const allOrders = ordersQuery.data || [];
 
-  // Classify: an order is "direct" if ALL its items belong to admin sellers
-  // "vendor" if ALL items belong to non-admin sellers
-  // Mixed orders appear in both views
   const directOrders = allOrders.filter(order =>
     order.items.length > 0 && order.items.some(item => adminIds.has(item.seller_id))
   );
@@ -52,7 +99,6 @@ export const useAdminOrderClassification = () => {
     order.items.length > 0 && order.items.some(item => !adminIds.has(item.seller_id))
   );
 
-  // Revenue calculations
   const calcRevenue = (orders: Order[], filterFn: (item: OrderItem) => boolean) => {
     let total = 0;
     for (const order of orders) {
