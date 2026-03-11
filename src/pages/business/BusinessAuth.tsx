@@ -381,6 +381,20 @@ const BusinessAuth = () => {
                 </div>
               )}
 
+              {mode === "signup" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                  <PakistanPhoneInput
+                    value={formData.phone}
+                    onChange={(val) => {
+                      setFormData((prev) => ({ ...prev, phone: val }));
+                      if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
+                    }}
+                    error={errors.phone}
+                  />
+                </div>
+              )}
+
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                 <div className="relative">
