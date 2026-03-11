@@ -334,9 +334,14 @@ const AdminSellersManagement = () => {
           <SellerTable sellers={verifiedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} />
         </TabsContent>
 
-        {/* Unverified Tab (pending + rejected) */}
+        {/* Unverified Tab (pending only) */}
         <TabsContent value="unverified" className="mt-4">
-          <SellerTable sellers={unverifiedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
+          <SellerTable sellers={pendingSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} />
+        </TabsContent>
+
+        {/* Rejected Tab */}
+        <TabsContent value="rejected" className="mt-4">
+          <SellerTable sellers={rejectedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
         </TabsContent>
 
         {/* All Tab */}
