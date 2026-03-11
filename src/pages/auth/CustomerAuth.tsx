@@ -13,7 +13,7 @@ import { FanzonSpinner } from "@/components/ui/fanzon-spinner";
 import { supabase } from "@/integrations/supabase/client";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import { checkEmailRoleConflict } from "@/utils/roleValidation";
-import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainRouting";
+import { getCrossDomainRedirectUrl, getInAppRedirectPath, isProductionDomain } from "@/utils/domainRouting";
 import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RealTimeFieldValidator from "@/components/auth/RealTimeFieldValidator";
@@ -64,24 +64,22 @@ const CustomerAuth = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && role) {
-      const crossDomainUrl = getCrossDomainRedirectUrl(role);
-      if (crossDomainUrl) {
-        buildCrossDomainUrl(crossDomainUrl).then((url) => {
-          window.location.href = url;
-        });
-        return;
+      // On production, redirect to correct role domain if needed
+      if (isProductionDomain()) {
+        const crossDomainUrl = getCrossDomainRedirectUrl(role);
+        if (crossDomainUrl) {
+          buildCrossDomainUrl(crossDomainUrl).then((url) => {
+            window.location.href = url;
+          });
+          return;
+        }
       }
       
+      // In-app redirect based on role
       const redirectPath = getInAppRedirectPath(role);
-      if (role === "seller") {
-        toast({
-          title: "Redirecting to Seller Portal",
-          description: "You have a seller account. Redirecting to your dashboard.",
-        });
-      }
       navigate(redirectPath, { replace: true });
     }
-  }, [isAuthenticated, role, isLoading, navigate, toast]);
+  }, [isAuthenticated, role, isLoading, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
