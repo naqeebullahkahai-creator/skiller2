@@ -269,6 +269,9 @@ const AdminAgentsManagement = () => {
                             {agent.is_online ? <><CheckCircle size={10} /> Online</> : <><XCircle size={10} /> Offline</>}
                           </Badge>
                         </TableCell>
+                        <TableCell>
+                          <span className="font-bold text-primary">{new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", minimumFractionDigits: 0 }).format(agent.wallet_balance)}</span>
+                        </TableCell>
                         <TableCell>{agent.total_sessions}</TableCell>
                         <TableCell>{agent.resolved_sessions}</TableCell>
                         <TableCell className="hidden lg:table-cell">
@@ -276,6 +279,9 @@ const AdminAgentsManagement = () => {
                             <Star className="h-3 w-3 text-yellow-500" />
                             <span className="text-sm">{agent.avg_rating > 0 ? agent.avg_rating.toFixed(1) : "—"}</span>
                           </div>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell text-xs font-medium">
+                          {new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", minimumFractionDigits: 0 }).format(agent.total_earned)}
                         </TableCell>
                         <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
                           {agent.last_seen_at ? format(new Date(agent.last_seen_at), "MMM dd, HH:mm") : "Never"}
