@@ -62,7 +62,7 @@ const BusinessAuth = () => {
   useEffect(() => {
     setMode(location.pathname === "/business/login" ? "login" : "signup");
     setErrors({});
-    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+    setFormData({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
     setAgreedToTerms(false);
   }, [location.pathname]);
 
