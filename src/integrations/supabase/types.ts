@@ -2225,6 +2225,8 @@ export type Database = {
           customer_id: string | null
           customer_name: string
           customer_phone: string | null
+          delivery_boy_name: string | null
+          delivery_boy_phone: string | null
           delivery_instructions: string | null
           id: string
           items: Json
@@ -2249,6 +2251,8 @@ export type Database = {
           customer_id?: string | null
           customer_name: string
           customer_phone?: string | null
+          delivery_boy_name?: string | null
+          delivery_boy_phone?: string | null
           delivery_instructions?: string | null
           id?: string
           items?: Json
@@ -2273,6 +2277,8 @@ export type Database = {
           customer_id?: string | null
           customer_name?: string
           customer_phone?: string | null
+          delivery_boy_name?: string | null
+          delivery_boy_phone?: string | null
           delivery_instructions?: string | null
           id?: string
           items?: Json
@@ -4515,6 +4521,7 @@ export type Database = {
       notification_type: "order" | "price_drop" | "promotion" | "system"
       order_status:
         | "pending"
+        | "confirmed"
         | "processing"
         | "shipped"
         | "delivered"
@@ -4697,6 +4704,7 @@ export const Constants = {
       notification_type: ["order", "price_drop", "promotion", "system"],
       order_status: [
         "pending",
+        "confirmed",
         "processing",
         "shipped",
         "delivered",

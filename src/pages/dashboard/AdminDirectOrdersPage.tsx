@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck, XCircle, Store, Tag } from "lucide-react";
+import { MoreHorizontal, Search, RefreshCw, Eye, Truck, XCircle, Store } from "lucide-react";
 import DateRangeFilter, { DateRange } from "@/components/admin/DateRangeFilter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,6 @@ import {
 import { useAdminOrderClassification } from "@/hooks/useAdminOrderClassification";
 import { useOrderCancellation } from "@/hooks/useOrderCancellation";
 import { formatPKR } from "@/hooks/useProducts";
-import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
-import { generateShippingLabel } from "@/utils/generateShippingLabel";
 import ShippingDialog from "@/components/orders/ShippingDialog";
 import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
 import { cn } from "@/lib/utils";
@@ -55,11 +53,13 @@ const AdminDirectOrdersPage = () => {
       return d >= dateRange.from && (!dateRange.to || d <= new Date(dateRange.to.getTime() + 86400000));
     });
 
-  const updateOrderStatus = async (orderId: string, newStatus: string, trackingInfo?: { tracking_id: string; courier_name: string }) => {
+  const updateOrderStatus = async (orderId: string, newStatus: string, trackingInfo?: { tracking_id: string; courier_name: string; delivery_boy_name?: string; delivery_boy_phone?: string }) => {
     const updateData: any = { order_status: newStatus };
     if (trackingInfo) {
       updateData.tracking_id = trackingInfo.tracking_id;
       updateData.courier_name = trackingInfo.courier_name;
+      if (trackingInfo.delivery_boy_name) updateData.delivery_boy_name = trackingInfo.delivery_boy_name;
+      if (trackingInfo.delivery_boy_phone) updateData.delivery_boy_phone = trackingInfo.delivery_boy_phone;
     }
     const { error } = await supabase.from("orders").update(updateData).eq("id", orderId);
     if (error) {
@@ -199,12 +199,6 @@ const AdminDirectOrdersPage = () => {
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal size={16} /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild><Link to={`/account/orders/${order.id}`}><Eye className="h-4 w-4 mr-2" />View Details</Link></DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => generateOrderInvoice({ id: order.id, order_number: order.order_number, customer_name: order.customer_name, customer_phone: order.customer_phone, shipping_address: order.shipping_address, payment_method: order.payment_method, total_amount_pkr: order.total_amount_pkr, order_status: order.order_status, items: order.items, created_at: order.created_at, tracking_id: order.tracking_id, courier_name: order.courier_name })}>
-                              <Printer className="h-4 w-4 mr-2" />Print Invoice
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => generateShippingLabel({ id: order.id, order_number: order.order_number, customer_name: order.customer_name, customer_phone: order.customer_phone, shipping_address: order.shipping_address, payment_method: order.payment_method, total_amount_pkr: order.total_amount_pkr, order_status: order.order_status, items: order.items, created_at: order.created_at, tracking_id: order.tracking_id, courier_name: order.courier_name })}>
-                              <Tag className="h-4 w-4 mr-2" />Print Shipping Label
-                            </DropdownMenuItem>
                             {order.order_status === "processing" && (<><DropdownMenuSeparator /><DropdownMenuItem onClick={() => { setSelectedOrderForShipping(order); setShippingDialogOpen(true); }}><Truck className="h-4 w-4 mr-2" />Ship Order</DropdownMenuItem></>)}
                             {canCancelOrder(order.order_status).canCancel && (<><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => { setSelectedOrderForCancel(order); setCancelDialogOpen(true); }}><XCircle className="h-4 w-4 mr-2" />Cancel Order</DropdownMenuItem></>)}
                           </DropdownMenuContent>
@@ -230,7 +224,7 @@ const AdminDirectOrdersPage = () => {
         </CardContent>
       </Card>
 
-      {selectedOrderForShipping && <ShippingDialog open={shippingDialogOpen} onOpenChange={setShippingDialogOpen} orderId={selectedOrderForShipping.id} orderNumber={selectedOrderForShipping.order_number || `#${selectedOrderForShipping.id.slice(0, 8)}`} onConfirm={async (tid, cn) => { await updateOrderStatus(selectedOrderForShipping.id, "shipped", { tracking_id: tid, courier_name: cn }); }} />}
+      {selectedOrderForShipping && <ShippingDialog open={shippingDialogOpen} onOpenChange={setShippingDialogOpen} orderId={selectedOrderForShipping.id} orderNumber={selectedOrderForShipping.order_number || `#${selectedOrderForShipping.id.slice(0, 8)}`} onConfirm={async (tid, cn, dbn, dbp) => { await updateOrderStatus(selectedOrderForShipping.id, "shipped", { tracking_id: tid, courier_name: cn, delivery_boy_name: dbn, delivery_boy_phone: dbp }); }} />}
       {selectedOrderForCancel && <CancelOrderDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen} orderId={selectedOrderForCancel.id} orderNumber={selectedOrderForCancel.order_number || `#${selectedOrderForCancel.id.slice(0, 8)}`} orderStatus={selectedOrderForCancel.order_status} paymentStatus={selectedOrderForCancel.payment_status} totalAmount={selectedOrderForCancel.total_amount_pkr} role="admin" onCancelled={() => refetch()} />}
     </div>
   );

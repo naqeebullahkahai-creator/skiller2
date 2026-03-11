@@ -126,11 +126,35 @@ const OrderStatusDropdown = ({
     }
   };
 
-  const handleShippingConfirm = async (trackingId: string, courierName: string) => {
-    await updateStatus("shipped", {
-      tracking_id: trackingId,
-      courier_name: courierName,
-    });
+  const handleShippingConfirm = async (trackingId: string, courierName: string, deliveryBoyName?: string, deliveryBoyPhone?: string) => {
+    const updateData: Record<string, unknown> = { order_status: "shipped", tracking_id: trackingId, courier_name: courierName };
+    if (deliveryBoyName) updateData.delivery_boy_name = deliveryBoyName;
+    if (deliveryBoyPhone) updateData.delivery_boy_phone = deliveryBoyPhone;
+
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update(updateData)
+        .eq("id", orderId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Status Updated",
+        description: "Order status changed to shipped",
+      });
+      onStatusChange?.("shipped");
+    } catch (error: unknown) {
+      console.error("Error updating order status:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update order status",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   // If no transitions allowed, just show a badge

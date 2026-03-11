@@ -31,6 +31,8 @@ export interface Order {
   tracking_id: string | null;
   courier_name: string | null;
   shipped_at: string | null;
+  delivery_boy_name: string | null;
+  delivery_boy_phone: string | null;
 }
 
 interface UseOrdersOptions {

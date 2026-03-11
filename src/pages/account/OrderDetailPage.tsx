@@ -34,14 +34,12 @@ import {
   Star,
   Loader2,
   PackageCheck,
-  FileText,
   XCircle,
   Settings,
-  Tag,
+  Phone,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
-import { generateShippingLabel } from "@/utils/generateShippingLabel";
 import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
 import OrderStatusDropdown from "@/components/orders/OrderStatusDropdown";
 
@@ -71,6 +69,8 @@ interface Order {
   courier_name: string | null;
   shipped_at: string | null;
   cancellation_reason?: string | null;
+  delivery_boy_name?: string | null;
+  delivery_boy_phone?: string | null;
 }
 
 interface Review {
@@ -115,7 +115,6 @@ const OrderDetailPage = () => {
   const [reviewText, setReviewText] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   
-  // Check if user can manage orders (admin or seller)
   const canManageOrder = isSuperAdmin || role === "admin" || role === "seller";
 
   useEffect(() => {
@@ -123,7 +122,6 @@ const OrderDetailPage = () => {
       fetchOrder();
       fetchExistingReviews();
 
-      // Subscribe to realtime updates
       const channel = supabase
         .channel(`order-${orderId}`)
         .on(
@@ -160,13 +158,11 @@ const OrderDetailPage = () => {
     try {
       setIsLoading(true);
       
-      // Admins and sellers can view any order, customers only their own
       let query = supabase
         .from("orders")
         .select("*")
         .eq("id", orderId);
       
-      // Only filter by customer_id for customers
       if (!canManageOrder) {
         query = query.eq("customer_id", user.id);
       }
@@ -313,7 +309,7 @@ const OrderDetailPage = () => {
             </p>
           </div>
         </div>
-        {/* Action buttons - scrollable on mobile */}
+        {/* Action buttons */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 no-scrollbar">
           {canCancel && (
             <Button 
@@ -326,14 +322,6 @@ const OrderDetailPage = () => {
               Cancel
             </Button>
           )}
-          <Button variant="outline" size="sm" className="shrink-0 h-8 text-xs" onClick={() => generateOrderInvoice(order)}>
-            <FileText className="h-3.5 w-3.5 mr-1.5" />
-            Invoice
-          </Button>
-          <Button variant="outline" size="sm" className="shrink-0 h-8 text-xs" onClick={() => generateShippingLabel(order)}>
-            <Tag className="h-3.5 w-3.5 mr-1.5" />
-            Label
-          </Button>
         </div>
       </div>
 
@@ -341,32 +329,52 @@ const OrderDetailPage = () => {
       {order.tracking_id && order.courier_name && (
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-4">
-            <div className="flex items-center gap-4">
-              <div className="bg-primary/10 p-3 rounded-full">
+            <div className="flex items-start gap-4">
+              <div className="bg-primary/10 p-3 rounded-full shrink-0">
                 <Truck className="h-6 w-6 text-primary" />
               </div>
-              <div className="flex-1">
-                <p className="font-medium">Shipment Tracking</p>
-                <p className="text-sm text-muted-foreground">
-                  Courier: <span className="font-medium text-foreground">{order.courier_name}</span>
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Tracking ID: <span className="font-medium text-foreground">{order.tracking_id}</span>
-                </p>
-                {order.shipped_at && (
-                  <p className="text-sm text-muted-foreground">
-                    Shipped on: <span className="font-medium text-foreground">
-                      {new Date(order.shipped_at).toLocaleDateString("en-PK", {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </p>
-                )}
+              <div className="flex-1 space-y-1">
+                <p className="font-semibold text-base">Shipment Tracking</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Courier: </span>
+                    <span className="font-medium text-foreground">{order.courier_name}</span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Tracking ID: </span>
+                    <span className="font-mono font-medium text-foreground bg-primary/10 px-2 py-0.5 rounded">{order.tracking_id}</span>
+                  </div>
+                  {order.delivery_boy_name && (
+                    <div className="flex items-center gap-1">
+                      <User className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Rider: </span>
+                      <span className="font-medium text-foreground">{order.delivery_boy_name}</span>
+                    </div>
+                  )}
+                  {order.delivery_boy_phone && (
+                    <div className="flex items-center gap-1">
+                      <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                      <a href={`tel:${order.delivery_boy_phone}`} className="font-medium text-primary hover:underline">
+                        {order.delivery_boy_phone}
+                      </a>
+                    </div>
+                  )}
+                  {order.shipped_at && (
+                    <div className="col-span-full">
+                      <span className="text-muted-foreground">Shipped on: </span>
+                      <span className="font-medium text-foreground">
+                        {new Date(order.shipped_at).toLocaleDateString("en-PK", {
+                          weekday: "short",
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -382,7 +390,6 @@ const OrderDetailPage = () => {
               Order Status
             </CardTitle>
             
-            {/* Admin/Seller Status Dropdown */}
             {canManageOrder && order && !isCancelled && (
               <div className="flex items-center gap-2">
                 <Settings size={16} className="text-muted-foreground" />

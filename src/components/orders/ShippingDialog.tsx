@@ -24,7 +24,7 @@ interface ShippingDialogProps {
   onOpenChange: (open: boolean) => void;
   orderId: string;
   orderNumber: string;
-  onConfirm: (trackingId: string, courierName: string) => Promise<void>;
+  onConfirm: (trackingId: string, courierName: string, deliveryBoyName?: string, deliveryBoyPhone?: string) => Promise<void>;
 }
 
 const COURIER_OPTIONS = [
@@ -46,6 +46,8 @@ const ShippingDialog = ({
 }: ShippingDialogProps) => {
   const [trackingId, setTrackingId] = useState("");
   const [courierName, setCourierName] = useState("");
+  const [deliveryBoyName, setDeliveryBoyName] = useState("");
+  const [deliveryBoyPhone, setDeliveryBoyPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
@@ -53,9 +55,11 @@ const ShippingDialog = ({
 
     setIsSubmitting(true);
     try {
-      await onConfirm(trackingId.trim(), courierName);
+      await onConfirm(trackingId.trim(), courierName, deliveryBoyName.trim() || undefined, deliveryBoyPhone.trim() || undefined);
       setTrackingId("");
       setCourierName("");
+      setDeliveryBoyName("");
+      setDeliveryBoyPhone("");
       onOpenChange(false);
     } finally {
       setIsSubmitting(false);
@@ -102,6 +106,29 @@ const ShippingDialog = ({
             />
             <p className="text-xs text-muted-foreground">
               Customer will receive this tracking ID to track their package
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="deliveryBoyName">Delivery Boy Name</Label>
+            <Input
+              id="deliveryBoyName"
+              placeholder="e.g., Ali Ahmed"
+              value={deliveryBoyName}
+              onChange={(e) => setDeliveryBoyName(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="deliveryBoyPhone">Delivery Boy Phone</Label>
+            <Input
+              id="deliveryBoyPhone"
+              placeholder="e.g., 0300-1234567"
+              value={deliveryBoyPhone}
+              onChange={(e) => setDeliveryBoyPhone(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Customer can call this number to coordinate delivery
             </p>
           </div>
         </div>
