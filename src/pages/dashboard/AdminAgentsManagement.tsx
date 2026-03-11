@@ -323,7 +323,11 @@ const AdminAgentsManagement = () => {
                         {agent.is_online ? <><CheckCircle size={10} /> Online</> : <><XCircle size={10} /> Offline</>}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                      <div className="bg-primary/10 rounded-lg p-2">
+                        <p className="text-xs text-muted-foreground">Balance</p>
+                        <p className="text-sm font-bold text-primary">{new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", minimumFractionDigits: 0 }).format(agent.wallet_balance)}</p>
+                      </div>
                       <div className="bg-muted/50 rounded-lg p-2">
                         <p className="text-xs text-muted-foreground">Sessions</p>
                         <p className="text-sm font-bold">{agent.total_sessions}</p>
