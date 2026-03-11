@@ -235,7 +235,7 @@ const AdminSellersManagement = () => {
   const [unrejectSeller, setUnrejectSeller] = useState<any>(null);
 
   const verifiedSellers = sellers.filter(s => s.verification_status === "verified");
-  const unverifiedSellers = sellers.filter(s => s.verification_status !== "verified");
+  const pendingSellers = sellers.filter(s => s.verification_status === "pending");
   const rejectedSellers = sellers.filter(s => s.verification_status === "rejected");
 
   const handleUnreject = () => {
@@ -250,7 +250,7 @@ const AdminSellersManagement = () => {
   const statCards = [
     { label: "Total Sellers", value: stats.totalSellers, icon: <Store className="h-5 w-5 text-white" />, color: "bg-blue-500" },
     { label: "Verified", value: stats.verifiedSellers, icon: <ShieldCheck className="h-5 w-5 text-white" />, color: "bg-green-500" },
-    { label: "Unverified", value: stats.totalSellers - stats.verifiedSellers, icon: <AlertCircle className="h-5 w-5 text-white" />, color: "bg-yellow-500" },
+    { label: "Unverified", value: pendingSellers.length, icon: <AlertCircle className="h-5 w-5 text-white" />, color: "bg-yellow-500" },
     { label: "Rejected", value: rejectedSellers.length, icon: <XCircle className="h-5 w-5 text-white" />, color: "bg-red-500" },
   ];
 
@@ -297,7 +297,7 @@ const AdminSellersManagement = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 w-full max-w-lg">
+        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="verified" className="gap-1">
             Verified
@@ -305,7 +305,11 @@ const AdminSellersManagement = () => {
           </TabsTrigger>
           <TabsTrigger value="unverified" className="gap-1">
             Unverified
-            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4">{unverifiedSellers.length}</Badge>
+            <Badge className="bg-yellow-500 text-white text-[10px] px-1.5 py-0 h-4">{pendingSellers.length}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="rejected" className="gap-1">
+            Rejected
+            <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4">{rejectedSellers.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="all">All</TabsTrigger>
         </TabsList>
@@ -330,9 +334,14 @@ const AdminSellersManagement = () => {
           <SellerTable sellers={verifiedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} />
         </TabsContent>
 
-        {/* Unverified Tab (pending + rejected) */}
+        {/* Unverified Tab (pending only) */}
         <TabsContent value="unverified" className="mt-4">
-          <SellerTable sellers={unverifiedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
+          <SellerTable sellers={pendingSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} />
+        </TabsContent>
+
+        {/* Rejected Tab */}
+        <TabsContent value="rejected" className="mt-4">
+          <SellerTable sellers={rejectedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
         </TabsContent>
 
         {/* All Tab */}

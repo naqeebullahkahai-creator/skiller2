@@ -39,6 +39,19 @@ const AdminAgentPayoutsPage = () => {
     },
   });
 
+  // Get agent saved wallets for payment details
+  const { data: agentWallets = [] } = useQuery({
+    queryKey: ["agent-saved-wallets-admin"],
+    queryFn: async () => {
+      const { data } = await supabase.from("agent_saved_wallets").select("*").eq("is_default", true);
+      return data || [];
+    },
+  });
+
+  const getAgentPaymentDetails = (agentId: string) => {
+    return agentWallets.find((w: any) => w.agent_id === agentId);
+  };
+
   // Get payouts
   const { data: payouts = [], isLoading } = useQuery({
     queryKey: ["agent-payouts"],
@@ -123,7 +136,20 @@ const AdminAgentPayoutsPage = () => {
                   ) : (
                     filtered.map((payout: any) => (
                       <TableRow key={payout.id}>
-                        <TableCell className="font-medium text-sm">{(agentsMap as any)[payout.agent_id] || payout.agent_id.slice(0, 8)}</TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium text-sm">{(agentsMap as any)[payout.agent_id] || payout.agent_id.slice(0, 8)}</p>
+                            {(() => {
+                              const details = getAgentPaymentDetails(payout.agent_id);
+                              if (details) return (
+                                <div className="text-[10px] text-muted-foreground mt-0.5">
+                                  <span className="capitalize font-medium">{details.wallet_type}</span> • {details.account_name} • <span className="font-mono">{details.account_number}</span>
+                                </div>
+                              );
+                              return <p className="text-[10px] text-muted-foreground">No payment details</p>;
+                            })()}
+                          </div>
+                        </TableCell>
                         <TableCell className="font-bold">{formatPKR(payout.amount)}</TableCell>
                         <TableCell className="text-xs">{format(new Date(payout.created_at), "MMM dd, yyyy")}</TableCell>
                         <TableCell className="hidden md:table-cell text-xs font-mono">

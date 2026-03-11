@@ -435,6 +435,36 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_wallet_transactions: {
+        Row: {
+          agent_id: string
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          transaction_type: string
+        }
+        Insert: {
+          agent_id: string
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          transaction_type?: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          transaction_type?: string
+        }
+        Relationships: []
+      }
       agent_wallets: {
         Row: {
           agent_id: string
@@ -4409,6 +4439,7 @@ export type Database = {
         Args: { p_flash_sale_id: string }
         Returns: number
       }
+      process_agent_salary: { Args: { p_salary_id: string }; Returns: Json }
       process_customer_refund: {
         Args: { p_admin_id: string; p_return_request_id: string }
         Returns: boolean
@@ -4448,6 +4479,10 @@ export type Database = {
       }
       reject_deposit_request: {
         Args: { p_admin_id: string; p_deposit_id: string; p_reason: string }
+        Returns: Json
+      }
+      request_agent_withdrawal: {
+        Args: { p_agent_id: string; p_amount: number }
         Returns: Json
       }
       restock_order_items: { Args: { p_order_id: string }; Returns: boolean }
