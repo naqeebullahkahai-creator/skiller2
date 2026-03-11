@@ -26,7 +26,7 @@ interface AuthContextType {
   isLoading: boolean;
   isSuperAdmin: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (name: string, email: string, password: string, isSeller?: boolean) => Promise<{ success: boolean; error?: string }>;
+  signup: (name: string, email: string, password: string, isSeller?: boolean, phoneNumber?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
@@ -142,7 +142,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     name: string, 
     email: string, 
     password: string, 
-    isSeller: boolean = false
+    isSeller: boolean = false,
+    phoneNumber?: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const redirectUrl = isSeller 
@@ -157,6 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           data: {
             full_name: name,
             is_seller: isSeller,
+            phone_number: phoneNumber || null,
           },
         },
       });

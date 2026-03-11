@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2, TrendingUp, ShieldCheck, Wallet, Package, AlertCircle, Briefcase } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2, TrendingUp, ShieldCheck, Wallet, Package, AlertCircle, Briefcase, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,7 @@ import { getCrossDomainRedirectUrl, getInAppRedirectPath } from "@/utils/domainR
 import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RealTimeFieldValidator from "@/components/auth/RealTimeFieldValidator";
+import PakistanPhoneInput from "@/components/auth/PakistanPhoneInput";
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -26,6 +27,7 @@ const loginSchema = z.object({
 const signupSchema = z.object({
   name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(50, { message: "Name must be less than 50 characters" }),
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
+  phone: z.string().regex(/^\+92\d{10}$/, { message: "Enter a valid 10-digit Pakistani number" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -45,6 +47,7 @@ const BusinessAuth = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -59,7 +62,7 @@ const BusinessAuth = () => {
   useEffect(() => {
     setMode(location.pathname === "/business/login" ? "login" : "signup");
     setErrors({});
-    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+    setFormData({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
     setAgreedToTerms(false);
   }, [location.pathname]);
 
@@ -199,7 +202,7 @@ const BusinessAuth = () => {
           return;
         }
         
-        const result = await signup(formData.name, formData.email, formData.password, true);
+        const result = await signup(formData.name, formData.email, formData.password, true, formData.phone);
         
         if (result.success) {
           toast({
@@ -207,7 +210,7 @@ const BusinessAuth = () => {
             description: "Please check your email to verify your account.",
           });
           navigate(`/business/verify-email-pending?email=${encodeURIComponent(formData.email)}`);
-          setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+          setFormData({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
         } else {
           toast({
             title: "Error",
@@ -375,6 +378,20 @@ const BusinessAuth = () => {
                   </div>
                   {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
                   <RealTimeFieldValidator value={formData.name} fieldType="name" show={mode === "signup"} />
+                </div>
+              )}
+
+              {mode === "signup" && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                  <PakistanPhoneInput
+                    value={formData.phone}
+                    onChange={(val) => {
+                      setFormData((prev) => ({ ...prev, phone: val }));
+                      if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
+                    }}
+                    error={errors.phone}
+                  />
                 </div>
               )}
 
