@@ -74,7 +74,7 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
   // If on wrong production domain, show loading while redirect happens

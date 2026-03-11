@@ -112,7 +112,7 @@ const ResetPassword = () => {
         // Sign out and redirect to login after 2 seconds
         setTimeout(async () => {
           await supabase.auth.signOut();
-          navigate("/auth");
+          navigate("/auth/login");
         }, 2000);
       }
     } catch (error) {
@@ -147,7 +147,7 @@ const ResetPassword = () => {
           <p className="text-muted-foreground mb-6">
             This password reset link is no longer valid. Please request a new one.
           </p>
-          <Button onClick={() => navigate("/auth")} className="gap-2">
+          <Button onClick={() => navigate("/auth/login")} className="gap-2">
             Back to Login
             <ArrowRight size={16} />
           </Button>

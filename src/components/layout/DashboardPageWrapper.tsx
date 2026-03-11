@@ -37,7 +37,7 @@ const DashboardPageWrapper = ({
 
   const handleLogout = async () => {
     await logout();
-    navigate("/auth");
+    navigate("/auth/login");
   };
 
   return (

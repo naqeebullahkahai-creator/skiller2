@@ -492,7 +492,7 @@ const SellerAuth = () => {
               Looking to shop instead?
             </p>
             <Link
-              to="/auth"
+              to="/auth/login"
               className="text-sm text-primary font-medium hover:text-primary/80 transition-colors inline-flex items-center gap-1"
             >
               Go to Customer Login

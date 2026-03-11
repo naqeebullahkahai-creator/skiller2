@@ -50,7 +50,7 @@ const MobileSellerLayout = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/auth");
+    navigate("/auth/login");
   };
 
   // Bottom navigation for mobile

@@ -24,7 +24,7 @@ import ComparisonBar from "./components/comparison/ComparisonBar";
 import VisualEditToggle from "./components/admin/VisualEditToggle";
 // BackToDashboardBar removed - strict role isolation
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
+
 import SellerAuth from "./pages/seller/SellerAuth";
 import BusinessAuth from "./pages/business/BusinessAuth";
 import EmailVerificationPending from "./pages/business/EmailVerificationPending";
@@ -278,10 +278,8 @@ const App = () => (
                             <Route path="/" element={<Index />} />
                           )}
                           
-                          {/* Auth routes - available on all domains */}
-                          <Route path="/auth" element={<Auth />} />
-                          
                           {/* Customer Auth Routes - /auth/* */}
+                          <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
                           <Route path="/auth/login" element={<CustomerAuth />} />
                           <Route path="/auth/signup" element={<CustomerAuth />} />
                           <Route path="/auth/verify-email" element={<CustomerEmailVerification />} />
