@@ -255,18 +255,11 @@ const UserDetailViewer = ({ userId, onClose }: UserDetailViewerProps) => {
                   </div>
                 </div>
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0 gap-1.5"
-                  onClick={() => {
-                    // Open impersonation in new tab via AdminViewAsPage
-                    window.open(`/admin/view-as/${userId}`, '_blank');
-                  }}
-                >
-                  <Eye size={14} />
-                  View as User
-                </Button>
+                {user.display_id && (
+                  <Badge variant="outline" className="shrink-0 text-xs font-mono">
+                    {user.display_id}
+                  </Badge>
+                )}
               </div>
               
               <Tabs defaultValue="overview" className="w-full">
