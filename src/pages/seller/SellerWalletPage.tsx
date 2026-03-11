@@ -275,10 +275,16 @@ const SellerWalletPage = () => {
                         {txn.net_amount >= 0 ? "+" : ""}{formatPKR(Math.abs(txn.net_amount))}
                       </span>
                     </div>
+                    {txn.description && (
+                      <p className="text-xs text-muted-foreground line-clamp-1 mb-0.5">{txn.description}</p>
+                    )}
                     <div className="text-xs text-muted-foreground flex items-center justify-between">
                       <span>{new Date(txn.created_at).toLocaleDateString()}</span>
                       {txn.commission_amount > 0 && <span>Commission: {txn.commission_percentage}%</span>}
                     </div>
+                    {txn.order_id && (
+                      <p className="text-[10px] font-mono text-muted-foreground mt-0.5">Order: {txn.order_id.slice(0, 8)}...</p>
+                    )}
                   </div>
                 ))}
               </div>
