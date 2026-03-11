@@ -27,6 +27,7 @@ const loginSchema = z.object({
 const signupSchema = z.object({
   name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(50, { message: "Name must be less than 50 characters" }),
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
+  phone: z.string().regex(/^\+92\d{10}$/, { message: "Enter a valid 10-digit Pakistani number" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
