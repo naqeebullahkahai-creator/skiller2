@@ -78,7 +78,7 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
   }
 
   // If on wrong production domain, show loading while redirect happens
-  if (isProductionDomain() && role && !isDomainAllowedForRole(role)) {
+  if (isProductionDomain() && actualRole && !isDomainAllowedForRole(actualRole) && !isImpersonating) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background">
         <div className="text-2xl font-bold text-primary tracking-tight mb-4">FANZON</div>
