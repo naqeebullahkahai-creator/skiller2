@@ -87,6 +87,22 @@ const AdminAgentSalaryPage = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // Pay salary now (credit agent wallet)
+  const paySalary = useMutation({
+    mutationFn: async (salaryId: string) => {
+      const { data, error } = await supabase.rpc("process_agent_salary", { p_salary_id: salaryId });
+      if (error) throw error;
+      const result = data as any;
+      if (!result?.success) throw new Error(result?.message || "Failed");
+      return result;
+    },
+    onSuccess: (data) => {
+      toast.success(`Rs. ${data.amount} credited to agent wallet!`);
+      queryClient.invalidateQueries({ queryKey: ["agent-salaries"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const toggleActive = useMutation({
     mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
       const { error } = await supabase.from("agent_salaries").update({ is_active: active }).eq("id", id);
