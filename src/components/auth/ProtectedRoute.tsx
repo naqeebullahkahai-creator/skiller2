@@ -88,6 +88,11 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
     );
   }
 
+  // When impersonating, skip all role checks - admin is already authenticated
+  if (isImpersonating && isSuperAdmin) {
+    return <>{children}</>;
+  }
+
   // Super admin check for admin routes
   if (requireSuperAdmin || (allowedRoles?.includes("admin") && location.pathname.startsWith("/admin"))) {
     if (!isSuperAdmin) {
@@ -97,13 +102,13 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
   }
 
   // Role-based session locking
-  if (role === "seller" && !canAccessAccountPage(role, location.pathname)) {
+  if (actualRole === "seller" && !canAccessAccountPage(actualRole, location.pathname)) {
     return <Navigate to="/seller/dashboard" replace />;
   }
-  if (role === "admin" && !canAccessAccountPage(role, location.pathname)) {
+  if (actualRole === "admin" && !canAccessAccountPage(actualRole, location.pathname)) {
     return <Navigate to="/admin/dashboard" replace />;
   }
-  if (role === "support_agent" && !canAccessAccountPage(role, location.pathname)) {
+  if (actualRole === "support_agent" && !canAccessAccountPage(actualRole, location.pathname)) {
     return <Navigate to="/agent/dashboard" replace />;
   }
 
@@ -112,8 +117,8 @@ const ProtectedRoute = ({ children, allowedRoles, requireSuperAdmin = false }: P
     if (allowedRoles.includes("admin") && !isSuperAdmin) {
       return <Navigate to="/forbidden" replace />;
     }
-    if (!role || !allowedRoles.includes(role)) {
-      const redirectPath = getRoleRedirectPath(role);
+    if (!actualRole || !allowedRoles.includes(actualRole)) {
+      const redirectPath = getRoleRedirectPath(actualRole);
       return <Navigate to={redirectPath} replace />;
     }
   }
