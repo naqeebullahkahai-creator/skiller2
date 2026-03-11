@@ -231,6 +231,11 @@ const AdminAgentSalaryPage = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
+                        <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700 text-xs h-7"
+                          disabled={!salary.is_active || paySalary.isPending}
+                          onClick={() => { if (confirm(`Pay ${formatPKR(salary.amount)} to ${getAgentName(salary.agent_id)} now?`)) paySalary.mutate(salary.id); }}>
+                          <DollarSign size={12} className="mr-0.5" /> Pay Now
+                        </Button>
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(salary)}>
                           <Edit size={14} />
                         </Button>
