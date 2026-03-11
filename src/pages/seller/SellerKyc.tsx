@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -60,7 +61,8 @@ const steps = [
 
 const SellerKyc = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const { sellerProfile, isLoading, hasSubmittedKyc, submitKyc } = useSellerKyc();
+  const { sellerProfile, isLoading, hasSubmittedKyc, isVerified, submitKyc } = useSellerKyc();
+  const navigate = useNavigate();
 
   const form = useForm<KycFormData>({
     resolver: zodResolver(fullSchema),
@@ -138,6 +140,12 @@ const SellerKyc = () => {
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Verified sellers don't need this page - redirect to dashboard
+  if (isVerified) {
+    navigate("/seller/dashboard", { replace: true });
+    return null;
   }
 
   // Show pending state if KYC already submitted

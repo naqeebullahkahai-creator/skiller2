@@ -134,7 +134,7 @@ const SellerStorefront = () => {
     );
   }
 
-  if (!seller) {
+  if (!seller || (seller.verification_status && seller.verification_status !== 'verified')) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Header />
