@@ -55,11 +55,13 @@ const AdminVendorOrdersPage = () => {
       return d >= dateRange.from && (!dateRange.to || d <= new Date(dateRange.to.getTime() + 86400000));
     });
 
-  const updateOrderStatus = async (orderId: string, newStatus: string, trackingInfo?: { tracking_id: string; courier_name: string }) => {
+  const updateOrderStatus = async (orderId: string, newStatus: string, trackingInfo?: { tracking_id: string; courier_name: string; delivery_boy_name?: string; delivery_boy_phone?: string }) => {
     const updateData: any = { order_status: newStatus };
     if (trackingInfo) {
       updateData.tracking_id = trackingInfo.tracking_id;
       updateData.courier_name = trackingInfo.courier_name;
+      if (trackingInfo.delivery_boy_name) updateData.delivery_boy_name = trackingInfo.delivery_boy_name;
+      if (trackingInfo.delivery_boy_phone) updateData.delivery_boy_phone = trackingInfo.delivery_boy_phone;
     }
     const { error } = await supabase.from("orders").update(updateData).eq("id", orderId);
     if (error) {
