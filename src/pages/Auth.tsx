@@ -150,10 +150,6 @@ const Auth = () => {
         {/* Card */}
         <div className="bg-card rounded-2xl border border-border p-6 sm:p-8" style={{ boxShadow: 'var(--shadow-3)' }}>
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold mb-3">
-              <ShoppingBag className="h-3 w-3" />
-              Customer Portal
-            </div>
             <h2 className="text-xl font-semibold text-foreground">
               {mode === "login" ? "Welcome Back" : "Create Account"}
             </h2>
