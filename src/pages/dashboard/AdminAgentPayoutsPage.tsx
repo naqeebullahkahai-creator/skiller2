@@ -39,6 +39,19 @@ const AdminAgentPayoutsPage = () => {
     },
   });
 
+  // Get agent saved wallets for payment details
+  const { data: agentWallets = [] } = useQuery({
+    queryKey: ["agent-saved-wallets-admin"],
+    queryFn: async () => {
+      const { data } = await supabase.from("agent_saved_wallets").select("*").eq("is_default", true);
+      return data || [];
+    },
+  });
+
+  const getAgentPaymentDetails = (agentId: string) => {
+    return agentWallets.find((w: any) => w.agent_id === agentId);
+  };
+
   // Get payouts
   const { data: payouts = [], isLoading } = useQuery({
     queryKey: ["agent-payouts"],
