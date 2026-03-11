@@ -41,9 +41,8 @@ export const useAdminSidebarCounts = () => {
       const [
         pendingOrders, pendingKyc, pendingApprovals,
         pendingSellerDeposits, pendingCustomerDeposits,
-        pendingCommissions, pendingReturns, pendingNominations, cancelledOrders,
-        totalSellers, totalCustomers, totalAgents,
-        confirmedOrders, shippedOrders, deliveredOrders, pendingPayouts,
+        pendingCommissions, pendingReturns, pendingNominations,
+        pendingPayouts, pendingWithdrawals,
       ] = await Promise.all([
         fetchCount('orders', {}, { order_status: ['pending', 'processing'] }),
         fetchCount('seller_profiles', { verification_status: 'pending' }),
@@ -53,22 +52,15 @@ export const useAdminSidebarCounts = () => {
         fetchCount('order_settlements', { status: 'pending' }),
         fetchCount('return_requests', {}, { status: ['return_requested', 'approved'] }),
         fetchCount('flash_sale_nominations', { status: 'pending' }),
-        fetchCount('orders', { order_status: 'cancelled' }),
-        fetchCount('user_roles', { role: 'seller' }),
-        fetchCount('user_roles', { role: 'customer' }),
-        fetchCount('user_roles', { role: 'support_agent' }),
-        fetchCount('orders', { order_status: 'confirmed' }),
-        fetchCount('orders', { order_status: 'shipped' }),
-        fetchCount('orders', { order_status: 'delivered' }),
         fetchCount('agent_payouts', { status: 'pending' }),
+        fetchCount('payout_requests', { status: 'pending' }),
       ]);
 
       return {
         pendingOrders, pendingKyc, pendingApprovals,
         pendingSellerDeposits, pendingCustomerDeposits,
-        pendingCommissions, pendingReturns, pendingNominations, cancelledOrders,
-        totalSellers, totalCustomers, totalAgents,
-        confirmedOrders, shippedOrders, deliveredOrders, pendingPayouts,
+        pendingCommissions, pendingReturns, pendingNominations,
+        pendingPayouts, pendingWithdrawals,
       };
     },
     refetchInterval: 30000,
