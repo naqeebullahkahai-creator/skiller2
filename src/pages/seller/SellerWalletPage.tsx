@@ -227,6 +227,7 @@ const SellerWalletPage = () => {
                     <TableRow>
                       <TableHead>Date</TableHead>
                       <TableHead>Type</TableHead>
+                      <TableHead>Details</TableHead>
                       <TableHead className="text-right">Gross</TableHead>
                       <TableHead className="text-right">Commission</TableHead>
                       <TableHead className="text-right">Net</TableHead>
@@ -240,6 +241,14 @@ const SellerWalletPage = () => {
                           <div className="flex items-center gap-2">
                             {getTransactionIcon(txn.transaction_type)}
                             <span className="capitalize">{txn.transaction_type.replace('_', ' ')}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-xs text-muted-foreground">
+                            {txn.description && <p className="line-clamp-1">{txn.description}</p>}
+                            {txn.order_id && (
+                              <p className="font-mono text-[10px] mt-0.5">Order: {txn.order_id.slice(0, 8)}...</p>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="text-right">{formatPKR(txn.gross_amount)}</TableCell>
