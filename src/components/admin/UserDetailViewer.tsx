@@ -4,6 +4,10 @@ import {
   FileText, Activity, ShieldCheck, LogIn, X, Eye,
   CheckCircle, XCircle, AlertCircle
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
+import { isProductionDomain } from "@/utils/domainRouting";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
