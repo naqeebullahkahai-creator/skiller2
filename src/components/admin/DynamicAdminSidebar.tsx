@@ -58,26 +58,25 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     {
       name: "Sellers", icon: Store, feature: 'users',
-      badge: counts.pendingKyc + counts.totalSellers,
+      badge: counts.pendingKyc,
       children: [
-        { name: "All Sellers", href: "/admin/sellers-management", icon: Store, badge: counts.totalSellers },
+        { name: "All Sellers", href: "/admin/sellers-management", icon: Store },
         { name: "Seller KYC", href: "/admin/seller-kyc", icon: FileText, badge: counts.pendingKyc },
         { name: "Seller Directory", href: "/admin/sellers", icon: Users },
       ]
     },
     {
       name: "Customers", icon: UserCircle, feature: 'users',
-      badge: counts.totalCustomers,
       children: [
-        { name: "All Customers", href: "/admin/customers-management", icon: UserCircle, badge: counts.totalCustomers },
+        { name: "All Customers", href: "/admin/customers-management", icon: UserCircle },
         { name: "User Directory", href: "/admin/users", icon: Users },
       ]
     },
     {
       name: "Agents", icon: Headphones, feature: 'users',
-      badge: counts.totalAgents + counts.pendingPayouts,
+      badge: counts.pendingPayouts,
       children: [
-        { name: "Overview", href: "/admin/agents-management", icon: Headphones, badge: counts.totalAgents },
+        { name: "Overview", href: "/admin/agents-management", icon: Headphones },
         { name: "Assign Role", href: "/admin/agents/roles", icon: Shield },
         { name: "Live Monitor", href: "/admin/agents/monitor", icon: Users },
         { name: "Salaries", href: "/admin/agents/salaries", icon: DollarSign },
@@ -86,12 +85,12 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
     },
     {
       name: "Orders", icon: ShoppingCart, feature: 'orders',
-      badge: counts.pendingOrders + counts.pendingReturns + counts.cancelledOrders,
+      badge: counts.pendingOrders + counts.pendingReturns,
       children: [
         { name: "All Orders", href: "/admin/orders-management", icon: ShoppingCart, badge: counts.pendingOrders },
         { name: "Direct Orders", href: "/admin/store/orders", icon: Store },
         { name: "Vendor Orders", href: "/admin/orders/vendor", icon: Package },
-        { name: "Cancellations", href: "/admin/cancellations", icon: ShoppingCart, badge: counts.cancelledOrders },
+        { name: "Cancellations", href: "/admin/cancellations", icon: ShoppingCart },
         { name: "Returns", href: "/admin/returns", icon: ShoppingCart, badge: counts.pendingReturns },
         { name: "Track Orders", href: "/admin/tracking-search", icon: Search },
       ]
