@@ -98,7 +98,7 @@ export const useAdminStore = () => {
   });
 
   // Admin store orders (orders containing admin products)
-  const { data: adminOrders, isLoading: ordersLoading } = useQuery({
+  const { data: adminOrders, isLoading: ordersLoading, refetch: refetchOrders } = useQuery({
     queryKey: ["admin-store-orders"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
