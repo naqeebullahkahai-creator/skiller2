@@ -254,6 +254,7 @@ const App = () => (
                           <OfflineIndicator />
                           <SplashScreen />
                           <BrowserRouter>
+                          <ImpersonationBanner />
                           <SystemAnnouncementBanner />
                           <ScrollToTop />
                           {/* Strict role isolation - no cross-role features */}
