@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { 
   User, Mail, Phone, Calendar, Package, Wallet, 
-  FileText, Activity, ShieldCheck, LogIn, X, Eye,
+  FileText, Activity, ShieldCheck, LogIn, X,
   CheckCircle, XCircle, AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
