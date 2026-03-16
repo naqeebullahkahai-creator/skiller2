@@ -75,18 +75,6 @@ const OrderManagement = () => {
     return styles[method] || "bg-gray-100 text-gray-800";
   };
 
-  // Define allowed status transitions
-  const getNextStatuses = (currentStatus: string): string[] => {
-    const transitions: Record<string, string[]> = {
-      pending: ["confirmed", "cancelled"],
-      confirmed: ["processing", "cancelled"],
-      processing: ["shipped", "cancelled"],
-      shipped: ["delivered"],
-      delivered: [],
-      cancelled: [],
-    };
-    return transitions[currentStatus] || [];
-  };
 
   return (
     <div className="space-y-6">
