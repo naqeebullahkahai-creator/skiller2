@@ -94,11 +94,13 @@ const SellerAddProductPage = () => {
           videoUrl: product.video_url || "",
         });
 
-        setVariants((variantRows || []).map((variant) => ({
+        setVariants((variantRows || []).map((variant, index) => ({
+          id: `existing-${productId}-${index}`,
           variant_name: variant.variant_name,
           variant_value: variant.variant_value,
           additional_price_pkr: variant.additional_price_pkr,
           stock_count: variant.stock_count,
+          image_urls: [],
         })));
       } catch (error: any) {
         toast({
