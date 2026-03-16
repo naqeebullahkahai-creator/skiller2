@@ -58,6 +58,63 @@ const SellerAddProductPage = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  useEffect(() => {
+    if (!isEditMode || !productId || !user) return;
+
+    const fetchProduct = async () => {
+      setIsLoadingProduct(true);
+      try {
+        const [{ data: product, error: productError }, { data: variantRows, error: variantError }] = await Promise.all([
+          supabase
+            .from("products")
+            .select("id, seller_id, title, category, brand, sku, price_pkr, discount_price_pkr, stock_count, images, description, video_url")
+            .eq("id", productId)
+            .eq("seller_id", user.id)
+            .maybeSingle(),
+          supabase
+            .from("product_variants")
+            .select("variant_name, variant_value, additional_price_pkr, stock_count")
+            .eq("product_id", productId),
+        ]);
+
+        if (productError) throw productError;
+        if (variantError) throw variantError;
+        if (!product) throw new Error("Product not found");
+
+        setFormData({
+          title: product.title || "",
+          category: product.category || "",
+          brand: product.brand || "",
+          sku: product.sku || "",
+          originalPrice: String(product.price_pkr ?? ""),
+          discountedPrice: String(product.discount_price_pkr ?? product.price_pkr ?? ""),
+          stock: String(product.stock_count ?? ""),
+          images: product.images || [],
+          description: product.description || "",
+          videoUrl: product.video_url || "",
+        });
+
+        setVariants((variantRows || []).map((variant) => ({
+          variant_name: variant.variant_name,
+          variant_value: variant.variant_value,
+          additional_price_pkr: variant.additional_price_pkr,
+          stock_count: variant.stock_count,
+        })));
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to load product",
+          variant: "destructive",
+        });
+        navigate("/seller/products", { replace: true });
+      } finally {
+        setIsLoadingProduct(false);
+      }
+    };
+
+    fetchProduct();
+  }, [isEditMode, productId, user, toast, navigate]);
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || !user) return;
