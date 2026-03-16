@@ -657,7 +657,7 @@ const SellerAddProductPage = () => {
             ) : (
               <>
                 <Check size={18} />
-                Submit for Approval
+                {isEditMode ? "Save Changes" : "Submit for Approval"}
               </>
             )}
           </Button>

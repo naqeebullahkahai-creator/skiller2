@@ -178,8 +178,6 @@ const AdminDirectOrdersPage = () => {
         </CardContent>
       </Card>
 
-      {selectedOrderForShipping && <ShippingDialog open={shippingDialogOpen} onOpenChange={setShippingDialogOpen} orderId={selectedOrderForShipping.id} orderNumber={selectedOrderForShipping.order_number || `#${selectedOrderForShipping.id.slice(0, 8)}`} onConfirm={async (tid, cn, dbn, dbp) => { await updateOrderStatus(selectedOrderForShipping.id, "shipped", { tracking_id: tid, courier_name: cn, delivery_boy_name: dbn, delivery_boy_phone: dbp }); }} />}
-      {selectedOrderForCancel && <CancelOrderDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen} orderId={selectedOrderForCancel.id} orderNumber={selectedOrderForCancel.order_number || `#${selectedOrderForCancel.id.slice(0, 8)}`} orderStatus={selectedOrderForCancel.order_status} paymentStatus={selectedOrderForCancel.payment_status} totalAmount={selectedOrderForCancel.total_amount_pkr} role="admin" onCancelled={() => refetch()} />}
     </div>
   );
 };
