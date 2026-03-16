@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck, XCircle, Tag } from "lucide-react";
+import { MoreHorizontal, Search, RefreshCw, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,17 +24,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDashboard } from "@/contexts/DashboardContext";
-import { useOrders, Order } from "@/hooks/useOrders";
-import { useOrderCancellation } from "@/hooks/useOrderCancellation";
+import { useOrders } from "@/hooks/useOrders";
 import { formatPKR } from "@/hooks/useProducts";
-import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
-import { generateShippingLabel } from "@/utils/generateShippingLabel";
-import ShippingDialog from "@/components/orders/ShippingDialog";
-import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
+import OrderStatusDropdown from "@/components/orders/OrderStatusDropdown";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
