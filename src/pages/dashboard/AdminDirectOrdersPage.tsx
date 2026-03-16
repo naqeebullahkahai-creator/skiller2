@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Search, RefreshCw, Eye, Truck, XCircle, Store } from "lucide-react";
+import { MoreHorizontal, Search, RefreshCw, Eye, Store } from "lucide-react";
 import DateRangeFilter, { DateRange } from "@/components/admin/DateRangeFilter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,18 +13,13 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAdminOrderClassification } from "@/hooks/useAdminOrderClassification";
-import { useOrderCancellation } from "@/hooks/useOrderCancellation";
 import { formatPKR } from "@/hooks/useProducts";
-import ShippingDialog from "@/components/orders/ShippingDialog";
-import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Order } from "@/hooks/useOrders";
+import OrderStatusDropdown from "@/components/orders/OrderStatusDropdown";
 
 const AdminDirectOrdersPage = () => {
   const { directOrders, directRevenue, isLoading, refetch } = useAdminOrderClassification();
