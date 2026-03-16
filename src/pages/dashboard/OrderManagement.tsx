@@ -227,43 +227,6 @@ const OrderManagement = () => {
                                 View Details
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handlePrintInvoice(order)}>
-                              <Printer className="h-4 w-4 mr-2" />
-                              Print Invoice
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handlePrintLabel(order)}>
-                              <Tag className="h-4 w-4 mr-2" />
-                              Print Shipping Label
-                            </DropdownMenuItem>
-                            {order.order_status === "processing" && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                  onClick={() => {
-                                    setSelectedOrderForShipping(order);
-                                    setShippingDialogOpen(true);
-                                  }}
-                                >
-                                  <Truck className="h-4 w-4 mr-2" />
-                                  Ship Order
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                            {canCancelOrder(order.order_status).canCancel && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                  className="text-destructive focus:text-destructive"
-                                  onClick={() => {
-                                    setSelectedOrderForCancel(order);
-                                    setCancelDialogOpen(true);
-                                  }}
-                                >
-                                  <XCircle className="h-4 w-4 mr-2" />
-                                  Cancel Order
-                                </DropdownMenuItem>
-                              </>
-                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
