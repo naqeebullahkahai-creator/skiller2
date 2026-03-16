@@ -320,6 +320,18 @@ const SellerAddProductPage = () => {
     }
   };
 
+  if (isEditMode && isLoadingProduct) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card>
+          <CardContent className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Page Header */}
@@ -337,9 +349,9 @@ const SellerAddProductPage = () => {
             <Package className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Add New Product</h1>
+            <h1 className="text-2xl font-bold text-foreground">{isEditMode ? "Edit Product" : "Add New Product"}</h1>
             <p className="text-muted-foreground">
-              Fill in the details to list your product
+              {isEditMode ? "Update your product details" : "Fill in the details to list your product"}
             </p>
           </div>
         </div>
