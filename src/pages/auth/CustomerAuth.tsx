@@ -71,9 +71,13 @@ const CustomerAuth = () => {
       if (isProductionDomain()) {
         const crossDomainUrl = getCrossDomainRedirectUrl(role);
         if (crossDomainUrl) {
-          buildCrossDomainUrl(crossDomainUrl).then((url) => {
-            window.location.href = url;
-          });
+          buildCrossDomainUrl(crossDomainUrl)
+            .then((url) => {
+              window.location.replace(url);
+            })
+            .catch((error) => {
+              console.error("[SSO] Customer redirect failed:", error);
+            });
           return;
         }
       }

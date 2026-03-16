@@ -246,33 +246,6 @@ const OrderManagement = () => {
         </CardContent>
       </Card>
 
-      {/* Shipping Dialog */}
-      {selectedOrderForShipping && (
-        <ShippingDialog
-          open={shippingDialogOpen}
-          onOpenChange={setShippingDialogOpen}
-          orderId={selectedOrderForShipping.id}
-          orderNumber={selectedOrderForShipping.order_number || `#${selectedOrderForShipping.id.slice(0, 8)}`}
-          onConfirm={handleShippingConfirm}
-        />
-      )}
-
-      {/* Cancel Order Dialog */}
-      {selectedOrderForCancel && (
-        <CancelOrderDialog
-          open={cancelDialogOpen}
-          onOpenChange={setCancelDialogOpen}
-          orderId={selectedOrderForCancel.id}
-          orderNumber={selectedOrderForCancel.order_number || `#${selectedOrderForCancel.id.slice(0, 8)}`}
-          orderStatus={selectedOrderForCancel.order_status}
-          paymentStatus={selectedOrderForCancel.payment_status}
-          totalAmount={selectedOrderForCancel.total_amount_pkr}
-          role={role === "admin" ? "admin" : "seller"}
-          onCancelled={() => {
-            refetch();
-          }}
-        />
-      )}
     </div>
   );
 };

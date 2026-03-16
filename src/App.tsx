@@ -489,6 +489,7 @@ const App = () => (
                                <Route index element={<SellerDashboardHome />} />
                               <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
                               <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
+                              <Route path="products/:productId/edit" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
                               <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
                               <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
                               <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />

@@ -11,15 +11,34 @@ import { supabase } from "@/integrations/supabase/client";
 const TOKEN_HASH_PREFIX = "#sso_";
 const LOGOUT_HASH = "#sso_logout";
 
+async function getShareableSession() {
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session?.access_token && session?.refresh_token) {
+      return session;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 200 * (attempt + 1)));
+  }
+
+  const { data, error } = await supabase.auth.refreshSession();
+  if (error) {
+    throw error;
+  }
+
+  if (data.session?.access_token && data.session?.refresh_token) {
+    return data.session;
+  }
+
+  throw new Error("Unable to prepare single sign-on session");
+}
+
 /**
  * Build a cross-domain URL that includes the current session tokens.
  */
 export async function buildCrossDomainUrl(targetUrl: string): Promise<string> {
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (!session?.access_token || !session?.refresh_token) {
-    return targetUrl;
-  }
+  const session = await getShareableSession();
 
   const params = new URLSearchParams({
     access_token: session.access_token,

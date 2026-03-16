@@ -333,7 +333,10 @@ const SellerProductsPage = () => {
                               >
                                 <Eye size={14} /> View on Store
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="gap-2">
+                              <DropdownMenuItem
+                                className="gap-2"
+                                onClick={() => navigate(`/seller/products/${product.id}/edit`)}
+                              >
                                 <Edit size={14} /> Edit
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
