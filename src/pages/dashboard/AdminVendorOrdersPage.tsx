@@ -155,8 +155,6 @@ const AdminVendorOrdersPage = () => {
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal size={16} /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild><Link to={`/account/orders/${order.id}`}><Eye className="h-4 w-4 mr-2" />View Details</Link></DropdownMenuItem>
-                            {order.order_status === "processing" && (<><DropdownMenuSeparator /><DropdownMenuItem onClick={() => { setSelectedOrderForShipping(order); setShippingDialogOpen(true); }}><Truck className="h-4 w-4 mr-2" />Ship Order</DropdownMenuItem></>)}
-                            {canCancelOrder(order.order_status).canCancel && (<><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => { setSelectedOrderForCancel(order); setCancelDialogOpen(true); }}><XCircle className="h-4 w-4 mr-2" />Cancel Order</DropdownMenuItem></>)}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
