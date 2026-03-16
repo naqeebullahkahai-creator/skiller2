@@ -30,13 +30,16 @@ const steps = [
 
 const SellerAddProductPage = () => {
   const navigate = useNavigate();
+  const { productId } = useParams();
   const { toast } = useToast();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isEditMode = Boolean(productId);
   
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     category: "",
