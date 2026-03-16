@@ -39,14 +39,8 @@ const OrderManagement = () => {
     role: role as "admin" | "seller",
     sellerId: currentSellerId,
   });
-  const { canCancelOrder } = useOrderCancellation();
-  
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
-  const [selectedOrderForShipping, setSelectedOrderForShipping] = useState<Order | null>(null);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedOrderForCancel, setSelectedOrderForCancel] = useState<Order | null>(null);
 
   // Filter orders - supports FZN-ORD-XXXXX format search
   const filteredOrders = orders
@@ -59,67 +53,6 @@ const OrderManagement = () => {
       );
     })
     .filter((order) => statusFilter === "all" || order.order_status === statusFilter);
-
-  const handleStatusChange = async (order: Order, newStatus: string) => {
-    // If changing to shipped, show the shipping dialog
-    if (newStatus === "shipped") {
-      setSelectedOrderForShipping(order);
-      setShippingDialogOpen(true);
-      return;
-    }
-
-    // If changing to cancelled, show the cancel dialog
-    if (newStatus === "cancelled") {
-      setSelectedOrderForCancel(order);
-      setCancelDialogOpen(true);
-      return;
-    }
-    
-    await updateOrderStatus(order.id, newStatus);
-  };
-
-  const handleShippingConfirm = async (trackingId: string, courierName: string) => {
-    if (!selectedOrderForShipping) return;
-    
-    await updateOrderStatus(selectedOrderForShipping.id, "shipped", {
-      tracking_id: trackingId,
-      courier_name: courierName,
-    });
-  };
-
-  const handlePrintInvoice = (order: Order) => {
-    generateOrderInvoice({
-      id: order.id,
-      order_number: order.order_number,
-      customer_name: order.customer_name,
-      customer_phone: order.customer_phone,
-      shipping_address: order.shipping_address,
-      payment_method: order.payment_method,
-      total_amount_pkr: order.total_amount_pkr,
-      order_status: order.order_status,
-      items: order.items,
-      created_at: order.created_at,
-      tracking_id: order.tracking_id,
-      courier_name: order.courier_name,
-    });
-  };
-
-  const handlePrintLabel = (order: Order) => {
-    generateShippingLabel({
-      id: order.id,
-      order_number: order.order_number,
-      customer_name: order.customer_name,
-      customer_phone: order.customer_phone,
-      shipping_address: order.shipping_address,
-      payment_method: order.payment_method,
-      total_amount_pkr: order.total_amount_pkr,
-      order_status: order.order_status,
-      items: order.items,
-      created_at: order.created_at,
-      tracking_id: order.tracking_id,
-      courier_name: order.courier_name,
-    });
-  };
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
