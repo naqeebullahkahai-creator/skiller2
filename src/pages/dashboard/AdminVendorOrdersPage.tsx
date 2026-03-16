@@ -23,16 +23,10 @@ import OrderStatusDropdown from "@/components/orders/OrderStatusDropdown";
 
 const AdminVendorOrdersPage = () => {
   const { vendorOrders, vendorRevenue, isLoading, refetch } = useAdminOrderClassification();
-  const { canCancelOrder } = useOrderCancellation();
-  const { toast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
-  const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
-  const [selectedOrderForShipping, setSelectedOrderForShipping] = useState<Order | null>(null);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedOrderForCancel, setSelectedOrderForCancel] = useState<Order | null>(null);
 
   const filteredOrders = vendorOrders
     .filter((order) => {
@@ -48,29 +42,6 @@ const AdminVendorOrdersPage = () => {
       return d >= dateRange.from && (!dateRange.to || d <= new Date(dateRange.to.getTime() + 86400000));
     });
 
-  const updateOrderStatus = async (orderId: string, newStatus: string, trackingInfo?: { tracking_id: string; courier_name: string; delivery_boy_name?: string; delivery_boy_phone?: string }) => {
-    const updateData: any = { order_status: newStatus };
-    if (trackingInfo) {
-      updateData.tracking_id = trackingInfo.tracking_id;
-      updateData.courier_name = trackingInfo.courier_name;
-      if (trackingInfo.delivery_boy_name) updateData.delivery_boy_name = trackingInfo.delivery_boy_name;
-      if (trackingInfo.delivery_boy_phone) updateData.delivery_boy_phone = trackingInfo.delivery_boy_phone;
-    }
-    const { error } = await supabase.from("orders").update(updateData).eq("id", orderId);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Status Updated", description: `Order status changed to ${newStatus}` });
-      refetch();
-    }
-  };
-
-  const handleStatusChange = (order: Order, newStatus: string) => {
-    if (newStatus === "shipped") { setSelectedOrderForShipping(order); setShippingDialogOpen(true); return; }
-    if (newStatus === "cancelled") { setSelectedOrderForCancel(order); setCancelDialogOpen(true); return; }
-    updateOrderStatus(order.id, newStatus);
-  };
-
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
       pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -81,14 +52,6 @@ const AdminVendorOrdersPage = () => {
       cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
     };
     return styles[status] || styles.pending;
-  };
-
-  const getNextStatuses = (currentStatus: string): string[] => {
-    const transitions: Record<string, string[]> = {
-      pending: ["confirmed", "cancelled"], confirmed: ["processing", "cancelled"],
-      processing: ["shipped", "cancelled"], shipped: ["delivered"], delivered: [], cancelled: [],
-    };
-    return transitions[currentStatus] || [];
   };
 
   const deliveredCount = vendorOrders.filter(o => o.order_status === 'delivered').length;
