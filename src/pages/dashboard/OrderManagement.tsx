@@ -193,32 +193,15 @@ const OrderManagement = () => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {getNextStatuses(order.order_status).length > 0 ? (
-                          <Select
-                            value={order.order_status}
-                            onValueChange={(value) => handleStatusChange(order, value)}
-                          >
-                            <SelectTrigger className="w-32 h-8">
-                              <Badge className={cn("capitalize", getStatusBadge(order.order_status))}>
-                                {order.order_status}
-                              </Badge>
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={order.order_status} disabled>
-                                {order.order_status} (current)
-                              </SelectItem>
-                              {getNextStatuses(order.order_status).map((status) => (
-                                <SelectItem key={status} value={status}>
-                                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Badge className={cn("capitalize", getStatusBadge(order.order_status))}>
-                            {order.order_status}
-                          </Badge>
-                        )}
+                        <OrderStatusDropdown
+                          orderId={order.id}
+                          orderNumber={order.order_number || `#${order.id.slice(0, 8)}`}
+                          currentStatus={order.order_status}
+                          paymentStatus={order.payment_status}
+                          totalAmount={order.total_amount_pkr}
+                          role={role as "admin" | "seller"}
+                          onStatusChange={() => refetch()}
+                        />
                       </TableCell>
                       <TableCell>
                         {order.tracking_id ? (
