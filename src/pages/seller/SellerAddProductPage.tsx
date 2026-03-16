@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Check, ChevronRight, ChevronLeft, Upload, X, Loader2, Package, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,13 +30,16 @@ const steps = [
 
 const SellerAddProductPage = () => {
   const navigate = useNavigate();
+  const { productId } = useParams();
   const { toast } = useToast();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isEditMode = Boolean(productId);
   
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -54,6 +57,65 @@ const SellerAddProductPage = () => {
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    if (!isEditMode || !productId || !user) return;
+
+    const fetchProduct = async () => {
+      setIsLoadingProduct(true);
+      try {
+        const [{ data: product, error: productError }, { data: variantRows, error: variantError }] = await Promise.all([
+          supabase
+            .from("products")
+            .select("id, seller_id, title, category, brand, sku, price_pkr, discount_price_pkr, stock_count, images, description, video_url")
+            .eq("id", productId)
+            .eq("seller_id", user.id)
+            .maybeSingle(),
+          supabase
+            .from("product_variants")
+            .select("variant_name, variant_value, additional_price_pkr, stock_count")
+            .eq("product_id", productId),
+        ]);
+
+        if (productError) throw productError;
+        if (variantError) throw variantError;
+        if (!product) throw new Error("Product not found");
+
+        setFormData({
+          title: product.title || "",
+          category: product.category || "",
+          brand: product.brand || "",
+          sku: product.sku || "",
+          originalPrice: String(product.price_pkr ?? ""),
+          discountedPrice: String(product.discount_price_pkr ?? product.price_pkr ?? ""),
+          stock: String(product.stock_count ?? ""),
+          images: product.images || [],
+          description: product.description || "",
+          videoUrl: product.video_url || "",
+        });
+
+        setVariants((variantRows || []).map((variant, index) => ({
+          id: `existing-${productId}-${index}`,
+          variant_name: variant.variant_name,
+          variant_value: variant.variant_value,
+          additional_price_pkr: variant.additional_price_pkr,
+          stock_count: variant.stock_count,
+          image_urls: [],
+        })));
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to load product",
+          variant: "destructive",
+        });
+        navigate("/seller/products", { replace: true });
+      } finally {
+        setIsLoadingProduct(false);
+      }
+    };
+
+    fetchProduct();
+  }, [isEditMode, productId, user, toast, navigate]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -159,32 +221,67 @@ const SellerAddProductPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Create the product with seller_id automatically set to current user
-      const { data: newProduct, error: productError } = await supabase
-        .from("products")
-        .insert({
-          seller_id: user.id, // CRUCIAL: Automatically set seller_id to logged-in user
-          title: formData.title,
-          description: formData.description || null,
-          category: formData.category,
-          brand: formData.brand || null,
-          sku: formData.sku || null,
-          price_pkr: Number(formData.originalPrice),
-          discount_price_pkr: Number(formData.discountedPrice),
-          stock_count: Number(formData.stock),
-          images: formData.images,
-          status: "pending",
-          video_url: formData.videoUrl || null,
-        })
-        .select("id")
-        .single();
+      const productPayload = {
+        seller_id: user.id,
+        title: formData.title,
+        description: formData.description || null,
+        category: formData.category,
+        brand: formData.brand || null,
+        sku: formData.sku || null,
+        price_pkr: Number(formData.originalPrice),
+        discount_price_pkr: Number(formData.discountedPrice),
+        stock_count: Number(formData.stock),
+        images: formData.images,
+        status: isEditMode ? undefined : "pending",
+        video_url: formData.videoUrl || null,
+      };
+
+      const { data: savedProduct, error: productError } = isEditMode
+        ? await supabase
+            .from("products")
+            .update({
+              title: productPayload.title,
+              description: productPayload.description,
+              category: productPayload.category,
+              brand: productPayload.brand,
+              sku: productPayload.sku,
+              price_pkr: productPayload.price_pkr,
+              discount_price_pkr: productPayload.discount_price_pkr,
+              stock_count: productPayload.stock_count,
+              images: productPayload.images,
+              video_url: productPayload.video_url,
+            })
+            .eq("id", productId)
+            .eq("seller_id", user.id)
+            .select("id")
+            .single()
+        : await supabase
+            .from("products")
+            .insert({
+              seller_id: user.id,
+              title: productPayload.title,
+              description: productPayload.description,
+              category: productPayload.category,
+              brand: productPayload.brand,
+              sku: productPayload.sku,
+              price_pkr: productPayload.price_pkr,
+              discount_price_pkr: productPayload.discount_price_pkr,
+              stock_count: productPayload.stock_count,
+              images: productPayload.images,
+              status: "pending",
+              video_url: productPayload.video_url,
+            })
+            .select("id")
+            .single();
 
       if (productError) throw productError;
+      if (!savedProduct?.id) throw new Error("Product save failed");
 
-      // If there are variants, add them
-      if (variants.length > 0 && newProduct) {
+      await supabase.from("product_variants").delete().eq("product_id", savedProduct.id);
+
+      if (variants.length > 0) {
         const variantsToInsert = variants.map((v) => ({
-          product_id: newProduct.id,
+          product_id: savedProduct.id,
           variant_name: v.variant_name,
           variant_value: v.variant_value,
           additional_price_pkr: v.additional_price_pkr,
@@ -196,33 +293,46 @@ const SellerAddProductPage = () => {
           .insert(variantsToInsert);
 
         if (variantsError) {
-          console.error("Error adding variants:", variantsError);
+          console.error("Error saving variants:", variantsError);
           toast({
             title: "Warning",
-            description: "Product created but some variants failed to save.",
+            description: "Product saved but some variants failed to save.",
             variant: "destructive",
           });
         }
       }
 
       toast({
-        title: "Product Submitted! 🎉",
-        description: "Your product has been submitted for approval. You'll be notified once it's live.",
+        title: isEditMode ? "Product Updated" : "Product Submitted! 🎉",
+        description: isEditMode
+          ? "Your product changes have been saved successfully."
+          : "Your product has been submitted for approval. You'll be notified once it's live.",
       });
 
-      // Redirect back to products list
       navigate("/seller/products");
     } catch (err: any) {
-      console.error("Error creating product:", err);
+      console.error("Error saving product:", err);
       toast({
         title: "Error",
-        description: err.message || "Failed to create product",
+        description: err.message || "Failed to save product",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isEditMode && isLoadingProduct) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card>
+          <CardContent className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -241,9 +351,9 @@ const SellerAddProductPage = () => {
             <Package className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Add New Product</h1>
+            <h1 className="text-2xl font-bold text-foreground">{isEditMode ? "Edit Product" : "Add New Product"}</h1>
             <p className="text-muted-foreground">
-              Fill in the details to list your product
+              {isEditMode ? "Update your product details" : "Fill in the details to list your product"}
             </p>
           </div>
         </div>
@@ -549,7 +659,7 @@ const SellerAddProductPage = () => {
             ) : (
               <>
                 <Check size={18} />
-                Submit for Approval
+                {isEditMode ? "Save Changes" : "Submit for Approval"}
               </>
             )}
           </Button>

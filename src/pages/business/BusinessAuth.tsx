@@ -77,9 +77,13 @@ const BusinessAuth = () => {
       if (role === "customer") return;
       const crossDomainUrl = getCrossDomainRedirectUrl(role);
       if (crossDomainUrl) {
-        buildCrossDomainUrl(crossDomainUrl).then((url) => {
-          window.location.href = url;
-        });
+        buildCrossDomainUrl(crossDomainUrl)
+          .then((url) => {
+            window.location.replace(url);
+          })
+          .catch((error) => {
+            console.error("[SSO] Business redirect failed:", error);
+          });
         return;
       }
       

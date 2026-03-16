@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Search, RefreshCw, Eye, Truck, XCircle, Users } from "lucide-react";
+import { MoreHorizontal, Search, RefreshCw, Eye, Users } from "lucide-react";
 import DateRangeFilter, { DateRange } from "@/components/admin/DateRangeFilter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,31 +13,20 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAdminOrderClassification } from "@/hooks/useAdminOrderClassification";
-import { useOrderCancellation } from "@/hooks/useOrderCancellation";
 import { formatPKR } from "@/hooks/useProducts";
-import ShippingDialog from "@/components/orders/ShippingDialog";
-import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Order } from "@/hooks/useOrders";
+import OrderStatusDropdown from "@/components/orders/OrderStatusDropdown";
 
 const AdminVendorOrdersPage = () => {
   const { vendorOrders, vendorRevenue, isLoading, refetch } = useAdminOrderClassification();
-  const { canCancelOrder } = useOrderCancellation();
-  const { toast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
-  const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
-  const [selectedOrderForShipping, setSelectedOrderForShipping] = useState<Order | null>(null);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedOrderForCancel, setSelectedOrderForCancel] = useState<Order | null>(null);
 
   const filteredOrders = vendorOrders
     .filter((order) => {
@@ -53,29 +42,6 @@ const AdminVendorOrdersPage = () => {
       return d >= dateRange.from && (!dateRange.to || d <= new Date(dateRange.to.getTime() + 86400000));
     });
 
-  const updateOrderStatus = async (orderId: string, newStatus: string, trackingInfo?: { tracking_id: string; courier_name: string; delivery_boy_name?: string; delivery_boy_phone?: string }) => {
-    const updateData: any = { order_status: newStatus };
-    if (trackingInfo) {
-      updateData.tracking_id = trackingInfo.tracking_id;
-      updateData.courier_name = trackingInfo.courier_name;
-      if (trackingInfo.delivery_boy_name) updateData.delivery_boy_name = trackingInfo.delivery_boy_name;
-      if (trackingInfo.delivery_boy_phone) updateData.delivery_boy_phone = trackingInfo.delivery_boy_phone;
-    }
-    const { error } = await supabase.from("orders").update(updateData).eq("id", orderId);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Status Updated", description: `Order status changed to ${newStatus}` });
-      refetch();
-    }
-  };
-
-  const handleStatusChange = (order: Order, newStatus: string) => {
-    if (newStatus === "shipped") { setSelectedOrderForShipping(order); setShippingDialogOpen(true); return; }
-    if (newStatus === "cancelled") { setSelectedOrderForCancel(order); setCancelDialogOpen(true); return; }
-    updateOrderStatus(order.id, newStatus);
-  };
-
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
       pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -86,14 +52,6 @@ const AdminVendorOrdersPage = () => {
       cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
     };
     return styles[status] || styles.pending;
-  };
-
-  const getNextStatuses = (currentStatus: string): string[] => {
-    const transitions: Record<string, string[]> = {
-      pending: ["confirmed", "cancelled"], confirmed: ["processing", "cancelled"],
-      processing: ["shipped", "cancelled"], shipped: ["delivered"], delivered: [], cancelled: [],
-    };
-    return transitions[currentStatus] || [];
   };
 
   const deliveredCount = vendorOrders.filter(o => o.order_status === 'delivered').length;
@@ -182,25 +140,21 @@ const AdminVendorOrdersPage = () => {
                       <TableCell className="text-sm">{order.items.length} items</TableCell>
                       <TableCell className="font-medium">{formatPKR(order.total_amount_pkr)}</TableCell>
                       <TableCell>
-                        {getNextStatuses(order.order_status).length > 0 ? (
-                          <Select value={order.order_status} onValueChange={(v) => handleStatusChange(order, v)}>
-                            <SelectTrigger className="w-32 h-8"><Badge className={cn("capitalize", getStatusBadge(order.order_status))}>{order.order_status}</Badge></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={order.order_status} disabled>{order.order_status} (current)</SelectItem>
-                              {getNextStatuses(order.order_status).map(s => <SelectItem key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Badge className={cn("capitalize", getStatusBadge(order.order_status))}>{order.order_status}</Badge>
-                        )}
+                        <OrderStatusDropdown
+                          orderId={order.id}
+                          orderNumber={order.order_number || `#${order.id.slice(0, 8)}`}
+                          currentStatus={order.order_status}
+                          paymentStatus={order.payment_status}
+                          totalAmount={order.total_amount_pkr}
+                          role="admin"
+                          onStatusChange={() => refetch()}
+                        />
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal size={16} /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild><Link to={`/account/orders/${order.id}`}><Eye className="h-4 w-4 mr-2" />View Details</Link></DropdownMenuItem>
-                            {order.order_status === "processing" && (<><DropdownMenuSeparator /><DropdownMenuItem onClick={() => { setSelectedOrderForShipping(order); setShippingDialogOpen(true); }}><Truck className="h-4 w-4 mr-2" />Ship Order</DropdownMenuItem></>)}
-                            {canCancelOrder(order.order_status).canCancel && (<><DropdownMenuSeparator /><DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => { setSelectedOrderForCancel(order); setCancelDialogOpen(true); }}><XCircle className="h-4 w-4 mr-2" />Cancel Order</DropdownMenuItem></>)}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -224,8 +178,6 @@ const AdminVendorOrdersPage = () => {
         </CardContent>
       </Card>
 
-      {selectedOrderForShipping && <ShippingDialog open={shippingDialogOpen} onOpenChange={setShippingDialogOpen} orderId={selectedOrderForShipping.id} orderNumber={selectedOrderForShipping.order_number || `#${selectedOrderForShipping.id.slice(0, 8)}`} onConfirm={async (tid, cn, dbn, dbp) => { await updateOrderStatus(selectedOrderForShipping.id, "shipped", { tracking_id: tid, courier_name: cn, delivery_boy_name: dbn, delivery_boy_phone: dbp }); }} />}
-      {selectedOrderForCancel && <CancelOrderDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen} orderId={selectedOrderForCancel.id} orderNumber={selectedOrderForCancel.order_number || `#${selectedOrderForCancel.id.slice(0, 8)}`} orderStatus={selectedOrderForCancel.order_status} paymentStatus={selectedOrderForCancel.payment_status} totalAmount={selectedOrderForCancel.total_amount_pkr} role="admin" onCancelled={() => refetch()} />}
     </div>
   );
 };

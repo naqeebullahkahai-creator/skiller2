@@ -438,6 +438,7 @@ const App = () => (
                               <Route path="kyc" element={<SellerKyc />} />
                               <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
                               <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
+                              <Route path="products/:productId/edit" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
                               <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
                               <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
                               <Route path="reviews" element={<SellerReviewsPage />} />
@@ -488,6 +489,7 @@ const App = () => (
                                <Route index element={<SellerDashboardHome />} />
                               <Route path="products" element={<VerifiedSellerGuard><SellerProductsPage /></VerifiedSellerGuard>} />
                               <Route path="products/new" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
+                              <Route path="products/:productId/edit" element={<VerifiedSellerGuard><SellerAddProductPage /></VerifiedSellerGuard>} />
                               <Route path="orders" element={<VerifiedSellerGuard><AdminOrderManagement /></VerifiedSellerGuard>} />
                               <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
                               <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />

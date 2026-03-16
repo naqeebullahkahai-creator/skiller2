@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MoreHorizontal, Search, RefreshCw, Printer, Eye, Truck, XCircle, Tag } from "lucide-react";
+import { MoreHorizontal, Search, RefreshCw, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,17 +24,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useDashboard } from "@/contexts/DashboardContext";
-import { useOrders, Order } from "@/hooks/useOrders";
-import { useOrderCancellation } from "@/hooks/useOrderCancellation";
+import { useOrders } from "@/hooks/useOrders";
 import { formatPKR } from "@/hooks/useProducts";
-import { generateOrderInvoice } from "@/utils/generateOrderInvoice";
-import { generateShippingLabel } from "@/utils/generateShippingLabel";
-import ShippingDialog from "@/components/orders/ShippingDialog";
-import CancelOrderDialog from "@/components/orders/CancelOrderDialog";
+import OrderStatusDropdown from "@/components/orders/OrderStatusDropdown";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
@@ -44,14 +39,8 @@ const OrderManagement = () => {
     role: role as "admin" | "seller",
     sellerId: currentSellerId,
   });
-  const { canCancelOrder } = useOrderCancellation();
-  
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
-  const [selectedOrderForShipping, setSelectedOrderForShipping] = useState<Order | null>(null);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedOrderForCancel, setSelectedOrderForCancel] = useState<Order | null>(null);
 
   // Filter orders - supports FZN-ORD-XXXXX format search
   const filteredOrders = orders
@@ -64,67 +53,6 @@ const OrderManagement = () => {
       );
     })
     .filter((order) => statusFilter === "all" || order.order_status === statusFilter);
-
-  const handleStatusChange = async (order: Order, newStatus: string) => {
-    // If changing to shipped, show the shipping dialog
-    if (newStatus === "shipped") {
-      setSelectedOrderForShipping(order);
-      setShippingDialogOpen(true);
-      return;
-    }
-
-    // If changing to cancelled, show the cancel dialog
-    if (newStatus === "cancelled") {
-      setSelectedOrderForCancel(order);
-      setCancelDialogOpen(true);
-      return;
-    }
-    
-    await updateOrderStatus(order.id, newStatus);
-  };
-
-  const handleShippingConfirm = async (trackingId: string, courierName: string) => {
-    if (!selectedOrderForShipping) return;
-    
-    await updateOrderStatus(selectedOrderForShipping.id, "shipped", {
-      tracking_id: trackingId,
-      courier_name: courierName,
-    });
-  };
-
-  const handlePrintInvoice = (order: Order) => {
-    generateOrderInvoice({
-      id: order.id,
-      order_number: order.order_number,
-      customer_name: order.customer_name,
-      customer_phone: order.customer_phone,
-      shipping_address: order.shipping_address,
-      payment_method: order.payment_method,
-      total_amount_pkr: order.total_amount_pkr,
-      order_status: order.order_status,
-      items: order.items,
-      created_at: order.created_at,
-      tracking_id: order.tracking_id,
-      courier_name: order.courier_name,
-    });
-  };
-
-  const handlePrintLabel = (order: Order) => {
-    generateShippingLabel({
-      id: order.id,
-      order_number: order.order_number,
-      customer_name: order.customer_name,
-      customer_phone: order.customer_phone,
-      shipping_address: order.shipping_address,
-      payment_method: order.payment_method,
-      total_amount_pkr: order.total_amount_pkr,
-      order_status: order.order_status,
-      items: order.items,
-      created_at: order.created_at,
-      tracking_id: order.tracking_id,
-      courier_name: order.courier_name,
-    });
-  };
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
@@ -147,18 +75,6 @@ const OrderManagement = () => {
     return styles[method] || "bg-gray-100 text-gray-800";
   };
 
-  // Define allowed status transitions
-  const getNextStatuses = (currentStatus: string): string[] => {
-    const transitions: Record<string, string[]> = {
-      pending: ["confirmed", "cancelled"],
-      confirmed: ["processing", "cancelled"],
-      processing: ["shipped", "cancelled"],
-      shipped: ["delivered"],
-      delivered: [],
-      cancelled: [],
-    };
-    return transitions[currentStatus] || [];
-  };
 
   return (
     <div className="space-y-6">
@@ -277,32 +193,15 @@ const OrderManagement = () => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {getNextStatuses(order.order_status).length > 0 ? (
-                          <Select
-                            value={order.order_status}
-                            onValueChange={(value) => handleStatusChange(order, value)}
-                          >
-                            <SelectTrigger className="w-32 h-8">
-                              <Badge className={cn("capitalize", getStatusBadge(order.order_status))}>
-                                {order.order_status}
-                              </Badge>
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={order.order_status} disabled>
-                                {order.order_status} (current)
-                              </SelectItem>
-                              {getNextStatuses(order.order_status).map((status) => (
-                                <SelectItem key={status} value={status}>
-                                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Badge className={cn("capitalize", getStatusBadge(order.order_status))}>
-                            {order.order_status}
-                          </Badge>
-                        )}
+                        <OrderStatusDropdown
+                          orderId={order.id}
+                          orderNumber={order.order_number || `#${order.id.slice(0, 8)}`}
+                          currentStatus={order.order_status}
+                          paymentStatus={order.payment_status}
+                          totalAmount={order.total_amount_pkr}
+                          role={role as "admin" | "seller"}
+                          onStatusChange={() => refetch()}
+                        />
                       </TableCell>
                       <TableCell>
                         {order.tracking_id ? (
@@ -328,43 +227,6 @@ const OrderManagement = () => {
                                 View Details
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handlePrintInvoice(order)}>
-                              <Printer className="h-4 w-4 mr-2" />
-                              Print Invoice
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handlePrintLabel(order)}>
-                              <Tag className="h-4 w-4 mr-2" />
-                              Print Shipping Label
-                            </DropdownMenuItem>
-                            {order.order_status === "processing" && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                  onClick={() => {
-                                    setSelectedOrderForShipping(order);
-                                    setShippingDialogOpen(true);
-                                  }}
-                                >
-                                  <Truck className="h-4 w-4 mr-2" />
-                                  Ship Order
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                            {canCancelOrder(order.order_status).canCancel && (
-                              <>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                  className="text-destructive focus:text-destructive"
-                                  onClick={() => {
-                                    setSelectedOrderForCancel(order);
-                                    setCancelDialogOpen(true);
-                                  }}
-                                >
-                                  <XCircle className="h-4 w-4 mr-2" />
-                                  Cancel Order
-                                </DropdownMenuItem>
-                              </>
-                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -384,33 +246,6 @@ const OrderManagement = () => {
         </CardContent>
       </Card>
 
-      {/* Shipping Dialog */}
-      {selectedOrderForShipping && (
-        <ShippingDialog
-          open={shippingDialogOpen}
-          onOpenChange={setShippingDialogOpen}
-          orderId={selectedOrderForShipping.id}
-          orderNumber={selectedOrderForShipping.order_number || `#${selectedOrderForShipping.id.slice(0, 8)}`}
-          onConfirm={handleShippingConfirm}
-        />
-      )}
-
-      {/* Cancel Order Dialog */}
-      {selectedOrderForCancel && (
-        <CancelOrderDialog
-          open={cancelDialogOpen}
-          onOpenChange={setCancelDialogOpen}
-          orderId={selectedOrderForCancel.id}
-          orderNumber={selectedOrderForCancel.order_number || `#${selectedOrderForCancel.id.slice(0, 8)}`}
-          orderStatus={selectedOrderForCancel.order_status}
-          paymentStatus={selectedOrderForCancel.payment_status}
-          totalAmount={selectedOrderForCancel.total_amount_pkr}
-          role={role === "admin" ? "admin" : "seller"}
-          onCancelled={() => {
-            refetch();
-          }}
-        />
-      )}
     </div>
   );
 };
