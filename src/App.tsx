@@ -429,6 +429,7 @@ const App = () => (
                               <Route path="pending-commissions" element={<AdminPendingCommissionsPage />} />
                               <Route path="tracking-search" element={<AdminTrackingSearchPage />} />
                               <Route path="view-as/:userId" element={<AdminViewAsPage />} />
+                              <Route path="platform-blueprint" element={<AdminPlatformBlueprintPage />} />
                             </Route>
                           )}
 
