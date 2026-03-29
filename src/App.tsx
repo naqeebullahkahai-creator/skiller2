@@ -132,6 +132,7 @@ import AdminStoreProductsPage from "./pages/dashboard/AdminStoreProductsPage";
 import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
 import AdminStoreOrdersPage from "./pages/dashboard/AdminStoreOrdersPage";
 import AdminStoreAddProductPage from "./pages/dashboard/AdminStoreAddProductPage";
+import AdminPlatformBlueprintPage from "./pages/dashboard/AdminPlatformBlueprintPage";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
