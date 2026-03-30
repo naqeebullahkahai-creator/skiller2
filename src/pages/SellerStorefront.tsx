@@ -134,20 +134,22 @@ const SellerStorefront = () => {
     );
   }
 
-  if (!seller || (seller.verification_status && seller.verification_status !== 'verified')) {
+  if (!seller) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-12 text-center">
           <Store className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
           <h1 className="text-2xl font-bold mb-2">Store Not Found</h1>
-          <p className="text-muted-foreground mb-6">This seller store doesn't exist or is not verified.</p>
+          <p className="text-muted-foreground mb-6">This seller store doesn't exist.</p>
           <Link to="/"><Button>Back to Home</Button></Link>
         </main>
         <Footer />
       </div>
     );
   }
+
+  const isVerifiedSeller = seller.verification_status === 'verified';
 
   const storeName = seller.shop_name || seller.legal_name || seller.profile_name || "Store";
   const storeInitials = storeName?.slice(0, 2)?.toUpperCase() || "ST";
