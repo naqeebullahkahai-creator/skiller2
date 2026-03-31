@@ -125,7 +125,27 @@ const AdminDashboardHome = () => {
         <p className="text-white/80 text-sm">Platform management & oversight</p>
       </div>
 
-      {/* Executive Metric Cards */}
+      {/* Module Dashboards */}
+      <div>
+        <h2 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Management Modules</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {moduleDashboards.map((mod, i) => (
+            <Card key={i} className="cursor-pointer hover:shadow-xl transition-all active:scale-[0.98] border-0 shadow-sm overflow-hidden" onClick={() => navigate(mod.href)}>
+              <CardContent className="p-0">
+                <div className={cn("p-4 flex items-center gap-4", mod.color)}>
+                  {mod.icon}
+                  <div>
+                    <h3 className="font-bold text-white">{mod.title}</h3>
+                    <p className="text-white/70 text-xs">{mod.description}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/50 ml-auto" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {executiveCards.map((card, i) => (
           <Card key={i} className="border-0 shadow-sm">
