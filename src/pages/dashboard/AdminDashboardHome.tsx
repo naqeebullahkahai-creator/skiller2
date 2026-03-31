@@ -98,6 +98,13 @@ const AdminDashboardHome = () => {
     { label: "Pending", value: stats?.pendingApprovals?.toLocaleString() || "0", icon: <AlertTriangle className="w-4 h-4" />, color: (stats?.pendingApprovals || 0) > 0 ? "text-amber-500" : "text-muted-foreground" },
   ];
 
+  // Module Dashboard Cards (top priority)
+  const moduleDashboards = [
+    { icon: <Store className="w-7 h-7 text-white" />, title: "Seller Dashboard", description: "Full seller management module", href: "/admin/module/sellers", color: "bg-emerald-600" },
+    { icon: <Users className="w-7 h-7 text-white" />, title: "Customer Dashboard", description: "Full customer management module", href: "/admin/module/customers", color: "bg-blue-600" },
+    { icon: <Headphones className="w-7 h-7 text-white" />, title: "Agent Dashboard", description: "Full agent management module", href: "/admin/module/agents", color: "bg-violet-600" },
+  ];
+
   const commandCenterActions: CommandCardProps[] = [
     { icon: <Store className="w-6 h-6 text-white" />, title: "Sellers Management", description: "KYC, products, earnings, subscriptions", href: "/admin/sellers-management", color: "bg-blue-500" },
     { icon: <Users className="w-6 h-6 text-white" />, title: "Customers Management", description: "Orders, wallets, deposits, support", href: "/admin/customers-management", color: "bg-cyan-500" },
