@@ -98,6 +98,13 @@ const AdminDashboardHome = () => {
     { label: "Pending", value: stats?.pendingApprovals?.toLocaleString() || "0", icon: <AlertTriangle className="w-4 h-4" />, color: (stats?.pendingApprovals || 0) > 0 ? "text-amber-500" : "text-muted-foreground" },
   ];
 
+  // Module Dashboard Cards (top priority)
+  const moduleDashboards = [
+    { icon: <Store className="w-7 h-7 text-white" />, title: "Seller Dashboard", description: "Full seller management module", href: "/admin/module/sellers", color: "bg-emerald-600" },
+    { icon: <Users className="w-7 h-7 text-white" />, title: "Customer Dashboard", description: "Full customer management module", href: "/admin/module/customers", color: "bg-blue-600" },
+    { icon: <Headphones className="w-7 h-7 text-white" />, title: "Agent Dashboard", description: "Full agent management module", href: "/admin/module/agents", color: "bg-violet-600" },
+  ];
+
   const commandCenterActions: CommandCardProps[] = [
     { icon: <Store className="w-6 h-6 text-white" />, title: "Sellers Management", description: "KYC, products, earnings, subscriptions", href: "/admin/sellers-management", color: "bg-blue-500" },
     { icon: <Users className="w-6 h-6 text-white" />, title: "Customers Management", description: "Orders, wallets, deposits, support", href: "/admin/customers-management", color: "bg-cyan-500" },
@@ -118,7 +125,27 @@ const AdminDashboardHome = () => {
         <p className="text-white/80 text-sm">Platform management & oversight</p>
       </div>
 
-      {/* Executive Metric Cards */}
+      {/* Module Dashboards */}
+      <div>
+        <h2 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Management Modules</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {moduleDashboards.map((mod, i) => (
+            <Card key={i} className="cursor-pointer hover:shadow-xl transition-all active:scale-[0.98] border-0 shadow-sm overflow-hidden" onClick={() => navigate(mod.href)}>
+              <CardContent className="p-0">
+                <div className={cn("p-4 flex items-center gap-4", mod.color)}>
+                  {mod.icon}
+                  <div>
+                    <h3 className="font-bold text-white">{mod.title}</h3>
+                    <p className="text-white/70 text-xs">{mod.description}</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-white/50 ml-auto" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {executiveCards.map((card, i) => (
           <Card key={i} className="border-0 shadow-sm">

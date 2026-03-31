@@ -135,7 +135,14 @@ const AdminDashboard = () => {
     { icon: <Lock size={18} className="text-red-600" />, title: "Security", description: "Audit & logs", href: "/admin-app/security", color: "bg-red-100" },
   ];
 
+  const moduleDashboards: ActionCardProps[] = [
+    { icon: <Store size={20} className="text-white" />, title: "Seller Dashboard", description: "Full seller module", href: "/admin/module/sellers", color: "bg-emerald-600" },
+    { icon: <Users size={20} className="text-white" />, title: "Customer Dashboard", description: "Full customer module", href: "/admin/module/customers", color: "bg-blue-600" },
+    { icon: <Headphones size={20} className="text-white" />, title: "Agent Dashboard", description: "Full agent module", href: "/admin/module/agents", color: "bg-violet-600" },
+  ];
+
   const sections = [
+    { title: "📊 Management Modules", items: moduleDashboards },
     { title: "👥 Users & Verification", items: userActions },
     { title: "📦 Orders & Returns", items: orderActions },
     { title: "🛍️ Products & Catalog", items: productActions },

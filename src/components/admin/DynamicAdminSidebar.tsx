@@ -57,6 +57,14 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
   const navGroups: NavGroup[] = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     {
+      name: "📊 Modules", icon: LayoutDashboard,
+      children: [
+        { name: "Seller Dashboard", href: "/admin/module/sellers", icon: Store },
+        { name: "Customer Dashboard", href: "/admin/module/customers", icon: UserCircle },
+        { name: "Agent Dashboard", href: "/admin/module/agents", icon: Headphones },
+      ]
+    },
+    {
       name: "Sellers", icon: Store, feature: 'users',
       badge: counts.pendingKyc,
       children: [
