@@ -133,6 +133,12 @@ import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
 import AdminStoreOrdersPage from "./pages/dashboard/AdminStoreOrdersPage";
 import AdminStoreAddProductPage from "./pages/dashboard/AdminStoreAddProductPage";
 import AdminPlatformBlueprintPage from "./pages/dashboard/AdminPlatformBlueprintPage";
+import SellerModuleLayout from "./components/admin/modules/SellerModuleLayout";
+import CustomerModuleLayout from "./components/admin/modules/CustomerModuleLayout";
+import AgentModuleLayout from "./components/admin/modules/AgentModuleLayout";
+import SellerModuleHome from "./pages/admin/modules/SellerModuleHome";
+import CustomerModuleHome from "./pages/admin/modules/CustomerModuleHome";
+import AgentModuleHome from "./pages/admin/modules/AgentModuleHome";
 
 // Seller Sub-Pages
 import SellerKyc from "./pages/seller/SellerKyc";
