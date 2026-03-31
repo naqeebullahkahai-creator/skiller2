@@ -8,13 +8,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export interface ModuleNavItem {
   name: string;
   href: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<any>;
   badge?: number;
 }
 
 interface AdminModuleLayoutProps {
   title: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ComponentType<any>;
   color: string;
   backHref: string;
   navItems: ModuleNavItem[];
