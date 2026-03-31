@@ -439,6 +439,53 @@ const App = () => (
                             </Route>
                           )}
 
+                          {/* Admin Module Dashboards */}
+                          {((domainRole === 'admin') || devAllowsAll) && (
+                            <>
+                              {/* Seller Module */}
+                              <Route path="/admin/module/sellers" element={<ProtectedRoute allowedRoles={["admin"]}><SellerModuleLayout /></ProtectedRoute>}>
+                                <Route index element={<SellerModuleHome />} />
+                                <Route path="directory" element={<AdminSellersDirectory />} />
+                                <Route path="kyc" element={<AdminSellerKyc />} />
+                                <Route path="kyc/:sellerId" element={<AdminSellerDetail />} />
+                                <Route path="orders" element={<AdminOrderManagement />} />
+                                <Route path="vendor-orders" element={<AdminVendorOrdersPage />} />
+                                <Route path="approvals" element={<AdminProductApprovals />} />
+                                <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
+                                <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                                <Route path="deposits" element={<AdminSellerDepositsPage />} />
+                                <Route path="payouts" element={<AdminPayoutManagement />} />
+                                <Route path="commissions" element={<AdminPendingCommissionsPage />} />
+                                <Route path="subscriptions" element={<AdminSubscriptionPage />} />
+                                <Route path="reviews" element={<AdminReviewsPage />} />
+                                <Route path="returns" element={<AdminReturnsPage />} />
+                                <Route path="cancellations" element={<AdminCancellationsPage />} />
+                              </Route>
+
+                              {/* Customer Module */}
+                              <Route path="/admin/module/customers" element={<ProtectedRoute allowedRoles={["admin"]}><CustomerModuleLayout /></ProtectedRoute>}>
+                                <Route index element={<CustomerModuleHome />} />
+                                <Route path="directory" element={<AdminUserDirectory />} />
+                                <Route path="orders" element={<AdminOrderManagement />} />
+                                <Route path="deposits" element={<AdminUserDepositsPage />} />
+                                <Route path="wallets" element={<AdminBalanceAdjustmentsPage />} />
+                                <Route path="returns" element={<AdminReturnsPage />} />
+                                <Route path="reviews" element={<AdminReviewsPage />} />
+                                <Route path="notifications" element={<AdminNotificationsPage />} />
+                              </Route>
+
+                              {/* Agent Module */}
+                              <Route path="/admin/module/agents" element={<ProtectedRoute allowedRoles={["admin"]}><AgentModuleLayout /></ProtectedRoute>}>
+                                <Route index element={<AgentModuleHome />} />
+                                <Route path="roles" element={<AdminAgentRolePage />} />
+                                <Route path="monitor" element={<AdminAgentOnlineMonitor />} />
+                                <Route path="salaries" element={<AdminAgentSalaryPage />} />
+                                <Route path="payouts" element={<AdminAgentPayoutsPage />} />
+                                <Route path="chats" element={<AdminAgentsManagement />} />
+                              </Route>
+                            </>
+                          )}
+
                            {/* Seller Routes - seller domain (and dev/preview) */}
                            {((domainRole === 'seller') || devAllowsAll) && (
                              <Route path="/seller" element={<ProtectedRoute allowedRoles={["seller"]}><SellerDashboardLayout /></ProtectedRoute>}>
