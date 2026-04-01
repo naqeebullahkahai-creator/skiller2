@@ -9,7 +9,7 @@ const CustomerModuleLayout = () => {
     { name: "Overview", href: "/admin/module/customers", icon: UserCircle },
     { name: "All Customers", href: "/admin/module/customers/directory", icon: Users },
     { name: "Customer Orders", href: "/admin/module/customers/orders", icon: ShoppingCart },
-    { name: "Customer Deposits", href: "/admin/module/customers/deposits", icon: CreditCard, badge: counts.pendingCustomerDeposits },
+    { name: "Deposits", href: "/admin/module/customers/deposits", icon: CreditCard, badge: counts.pendingCustomerDeposits },
     { name: "Wallets", href: "/admin/module/customers/wallets", icon: Wallet },
     { name: "Returns", href: "/admin/module/customers/returns", icon: RotateCcw, badge: counts.pendingReturns },
     { name: "Reviews", href: "/admin/module/customers/reviews", icon: Star },
