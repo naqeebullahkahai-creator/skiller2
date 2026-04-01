@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Bell, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 interface AppHeaderProps {
   title: string;
@@ -21,7 +21,7 @@ const AppHeader = ({ title, subtitle }: AppHeaderProps) => {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <img src="/fanzoon-icon.png" alt="FANZOON" className="h-7 w-7 object-contain" />
+          <img src="/fanzon-icon.png" alt="FANZON" className="h-7 w-7 object-contain rounded-md" />
           <button
             onClick={() => logout()}
             className="p-2 text-primary-foreground/70 active:scale-95 transition-all"

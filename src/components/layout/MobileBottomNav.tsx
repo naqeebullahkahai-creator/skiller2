@@ -1,20 +1,16 @@
-import { Home, Grid3X3, ShoppingCart, Package, User } from "lucide-react";
+import { Home, Grid3X3, Heart, Package, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 const MobileBottomNav = () => {
   const location = useLocation();
-  const { items } = useCart();
   const { isAuthenticated, setShowAuthModal, setAuthModalMode } = useAuth();
-
-  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const navItems = [
     { icon: Home, label: "Home", path: "/", requiresAuth: false },
     { icon: Grid3X3, label: "Categories", path: "/categories", requiresAuth: false },
-    { icon: ShoppingCart, label: "Cart", path: "/checkout", isCenter: true, requiresAuth: false },
+    { icon: Heart, label: "Wishlist", path: "/account/wishlist", requiresAuth: true },
     { icon: Package, label: "Orders", path: "/account/orders", requiresAuth: true },
     { icon: User, label: "Account", path: "/account", requiresAuth: true },
   ];
@@ -38,42 +34,26 @@ const MobileBottomNav = () => {
         <div className="flex items-center justify-around h-14 max-w-[100vw]">
           {navItems.map((item) => {
             const active = isActive(item.path);
-            const isCartCenter = item.isCenter;
-
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={(e) => handleNavClick(e, item)}
                 className={cn(
-                  "flex flex-col items-center justify-center flex-1 h-full relative ripple touch-target",
+                  "flex flex-col items-center justify-center flex-1 h-full relative",
                   "active:scale-[0.92] transition-all duration-150"
                 )}
               >
-                {isCartCenter ? (
-                  <div className="relative -mt-5 w-[52px] h-[52px] rounded-full bg-primary flex items-center justify-center border-[3px] border-card elevation-3">
-                    <item.icon size={22} className="text-primary-foreground" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full px-1">
-                        {cartCount > 99 ? "99+" : cartCount}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <div className="relative">
-                    <item.icon
-                      size={22}
-                      strokeWidth={active ? 2.5 : 1.8}
-                      className={cn(
-                        "transition-colors duration-150",
-                        active ? "text-primary" : "text-muted-foreground"
-                      )}
-                    />
-                  </div>
-                )}
+                <item.icon
+                  size={22}
+                  strokeWidth={active ? 2.5 : 1.8}
+                  className={cn(
+                    "transition-colors duration-150",
+                    active ? "text-primary" : "text-muted-foreground"
+                  )}
+                />
                 <span className={cn(
-                  "text-[10px] font-medium transition-colors duration-150",
-                  isCartCenter ? "mt-0.5" : "mt-1",
+                  "text-[10px] font-medium mt-1 transition-colors duration-150",
                   active ? "text-primary font-semibold" : "text-muted-foreground"
                 )}>
                   {item.label}

@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Package, ShoppingCart, Settings, Wallet,
-  UserCircle, Store, DollarSign, Headphones, Shield, Megaphone,
-  ChevronDown, ChevronRight, Users, Receipt, CreditCard, Scale,
-  PiggyBank, Percent, Zap, BarChart3, FileText, Star, Tag,
-  Image, Bell, Wrench, Lock, KeyRound, Activity, Clock, Search, Truck
+  UserCircle, Store, Headphones, Shield,
+  Megaphone, Zap, BarChart3, Star, Tag, Image, Bell, Wrench, 
+  Lock, KeyRound, FileText, MessageSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -13,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PermissionFeature } from "@/hooks/useRoleManagement";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useAdminSidebarCounts } from "@/hooks/useAdminSidebarCounts";
+import { ChevronDown } from "lucide-react";
 
 interface NavChild {
   name: string;
@@ -51,46 +50,21 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
   const { isSuperAdmin } = useAuth();
   const counts = useAdminSidebarCounts();
 
-  const totalDeposits = counts.pendingSellerDeposits + counts.pendingCustomerDeposits;
-  const totalWithdrawals = counts.pendingWithdrawals + counts.pendingPayouts;
-
   const navGroups: NavGroup[] = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    // Management Modules - main entry points
     {
-      name: "📊 Modules", icon: LayoutDashboard,
-      children: [
-        { name: "Seller Dashboard", href: "/admin/module/sellers", icon: Store },
-        { name: "Customer Dashboard", href: "/admin/module/customers", icon: UserCircle },
-        { name: "Agent Dashboard", href: "/admin/module/agents", icon: Headphones },
-      ]
-    },
-    {
-      name: "Sellers", icon: Store, feature: 'users',
+      name: "Seller Module", href: "/admin/module/sellers", icon: Store,
       badge: counts.pendingKyc,
-      children: [
-        { name: "All Sellers", href: "/admin/sellers-management", icon: Store },
-        { name: "Seller KYC", href: "/admin/seller-kyc", icon: FileText, badge: counts.pendingKyc },
-        { name: "Seller Directory", href: "/admin/sellers", icon: Users },
-      ]
     },
     {
-      name: "Customers", icon: UserCircle, feature: 'users',
-      children: [
-        { name: "All Customers", href: "/admin/customers-management", icon: UserCircle },
-        { name: "User Directory", href: "/admin/users", icon: Users },
-      ]
+      name: "Customer Module", href: "/admin/module/customers", icon: UserCircle,
     },
     {
-      name: "Agents", icon: Headphones, feature: 'users',
+      name: "Agent Module", href: "/admin/module/agents", icon: Headphones,
       badge: counts.pendingPayouts,
-      children: [
-        { name: "Overview", href: "/admin/agents-management", icon: Headphones },
-        { name: "Assign Role", href: "/admin/agents/roles", icon: Shield },
-        { name: "Live Monitor", href: "/admin/agents/monitor", icon: Users },
-        { name: "Salaries", href: "/admin/agents/salaries", icon: DollarSign },
-        { name: "Payouts", href: "/admin/agents/payouts", icon: Wallet, badge: counts.pendingPayouts },
-      ]
     },
+    // Core operational sections
     {
       name: "Orders", icon: ShoppingCart, feature: 'orders',
       badge: counts.pendingOrders + counts.pendingReturns,
@@ -100,7 +74,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "Vendor Orders", href: "/admin/orders/vendor", icon: Package },
         { name: "Cancellations", href: "/admin/cancellations", icon: ShoppingCart },
         { name: "Returns", href: "/admin/returns", icon: ShoppingCart, badge: counts.pendingReturns },
-        { name: "Track Orders", href: "/admin/tracking-search", icon: Search },
       ]
     },
     {
@@ -110,47 +83,15 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "All Products", href: "/admin/products-management", icon: Package },
         { name: "Categories", href: "/admin/categories", icon: Tag },
         { name: "Approvals", href: "/admin/approvals", icon: FileText, badge: counts.pendingApprovals },
-        { name: "Bulk Uploads", href: "/admin/bulk-uploads", icon: Package },
       ]
     },
     {
-      name: "Wallets", icon: Wallet, feature: 'payouts',
+      name: "Finance", icon: Wallet, feature: 'payouts',
       children: [
-        { name: "Wallet Hub", href: "/admin/wallet-management", icon: Wallet },
         { name: "Admin Wallet", href: "/admin/wallet", icon: Wallet },
-        { name: "Commission Wallet", href: "/admin/commission-wallet", icon: Percent },
-        { name: "Subscription Wallet", href: "/admin/subscription-wallet", icon: Receipt },
-        { name: "Store Wallet", href: "/admin/store/wallet", icon: Store },
-      ]
-    },
-    {
-      name: "Deposits", icon: PiggyBank, feature: 'payouts',
-      badge: totalDeposits,
-      children: [
-        { name: "Seller Deposits", href: "/admin/deposits/sellers", icon: PiggyBank, badge: counts.pendingSellerDeposits },
-        { name: "Customer Deposits", href: "/admin/deposits/users", icon: PiggyBank, badge: counts.pendingCustomerDeposits },
-        { name: "Deposit Settings", href: "/admin/deposits/settings", icon: Settings },
-      ]
-    },
-    {
-      name: "Withdrawals", icon: DollarSign, feature: 'payouts',
-      badge: totalWithdrawals,
-      children: [
-        { name: "Payout Requests", href: "/admin/payouts", icon: DollarSign, badge: counts.pendingWithdrawals },
-        { name: "Withdrawal Methods", href: "/admin/withdrawal-methods", icon: CreditCard },
-        { name: "Balance Adjustments", href: "/admin/balance-adjustments", icon: Scale },
-      ]
-    },
-    {
-      name: "Commission & Fees", icon: Percent, feature: 'payouts',
-      badge: counts.pendingCommissions,
-      children: [
-        { name: "Pending Commissions", href: "/admin/pending-commissions", icon: Clock, badge: counts.pendingCommissions },
-        { name: "Commission Settings", href: "/admin/commission-management", icon: Percent },
         { name: "Commission Wallet", href: "/admin/commission-wallet", icon: Wallet },
-        { name: "Subscriptions", href: "/admin/subscriptions", icon: Receipt },
-        { name: "Payment Methods", href: "/admin/payment-methods", icon: CreditCard },
-        { name: "Payment Settings", href: "/admin/payment-settings", icon: Settings },
+        { name: "Subscription Wallet", href: "/admin/subscription-wallet", icon: Wallet },
+        { name: "Store Wallet", href: "/admin/store/wallet", icon: Store },
       ]
     },
     {
@@ -176,7 +117,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "Site Content", href: "/admin/content-manager", icon: FileText },
         { name: "Brand Assets", href: "/admin/brand-assets", icon: Image },
         { name: "Notifications", href: "/admin/notifications", icon: Bell },
-        { name: "Chat Shortcuts", href: "/admin/chat-shortcuts", icon: FileText },
+        { name: "Chat Shortcuts", href: "/admin/chat-shortcuts", icon: MessageSquare },
         { name: "All Settings", href: "/admin/all-settings", icon: Wrench },
         { name: "Platform Blueprint", href: "/admin/platform-blueprint", icon: FileText },
       ]
@@ -186,8 +127,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
       children: [
         { name: "Store Home", href: "/admin/store", icon: Store },
         { name: "Products", href: "/admin/store/products", icon: Package },
-        { name: "Orders", href: "/admin/store/orders", icon: ShoppingCart },
-        { name: "Wallet", href: "/admin/store/wallet", icon: Wallet },
       ]
     },
     {
@@ -222,7 +161,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
   const isLinkActive = (href: string) => {
     const currentPath = normalizeAdminPath(location.pathname);
     const targetPath = normalizeAdminPath(href);
-
     if (currentPath === targetPath) return true;
     if (targetPath === "/admin/dashboard") return false;
     return currentPath.startsWith(targetPath + "/");
@@ -236,7 +174,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
   return (
     <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
       {visibleGroups.map((group) => {
-        // Direct link (no children)
         if (!group.children || group.children.length === 0) {
           return (
             <Link
@@ -244,7 +181,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
               to={group.href!}
               onClick={onNavigate}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors relative",
                 isLinkActive(group.href!)
                   ? "bg-primary text-primary-foreground"
                   : "text-[hsl(var(--dashboard-sidebar-text))] hover:bg-[hsl(var(--dashboard-sidebar-hover))] hover:text-white"
@@ -264,7 +201,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
           );
         }
 
-        // Dropdown group
         const active = isGroupActive(group);
 
         return (

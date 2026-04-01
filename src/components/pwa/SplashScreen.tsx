@@ -18,27 +18,25 @@ const SplashScreen = () => {
     <div
       className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-br from-primary via-primary to-primary/90 transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}
     >
-      {/* Glow effect */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
       </div>
 
       <div className={`transition-all duration-700 ease-out ${logoReady ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-75 translate-y-4"}`}>
         <img
-          src="/fanzon-icon-new.png"
+          src="/fanzon-icon.png"
           alt="FANZON"
-          className="w-20 h-20 rounded-2xl shadow-2xl"
+          className="w-20 h-20 rounded-2xl shadow-2xl object-contain"
         />
       </div>
 
-      <h1 className={`text-primary-foreground text-2xl font-bold mt-5 tracking-widest transition-all duration-700 delay-200 ${logoReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
-        FANZON
-      </h1>
+      <div className={`mt-5 transition-all duration-700 delay-200 ${logoReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+        <img src="/fanzon-logo.png" alt="FANZON" className="h-8 object-contain" />
+      </div>
       <p className={`text-primary-foreground/50 text-xs mt-1.5 tracking-wider transition-all duration-700 delay-300 ${logoReady ? "opacity-100" : "opacity-0"}`}>
         Shop Smarter
       </p>
 
-      {/* Minimal loading bar */}
       <div className={`mt-10 w-16 h-0.5 bg-primary-foreground/20 rounded-full overflow-hidden transition-all duration-500 delay-500 ${logoReady ? "opacity-100" : "opacity-0"}`}>
         <div className="h-full bg-primary-foreground/60 rounded-full animate-[loading_1.2s_ease-in-out_infinite]" />
       </div>
