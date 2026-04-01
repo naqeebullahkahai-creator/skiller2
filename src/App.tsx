@@ -293,6 +293,7 @@ const App = () => (
                           <Route path="/auth/login" element={<CustomerAuth />} />
                           <Route path="/auth/signup" element={<CustomerAuth />} />
                           <Route path="/auth/verify-email" element={<CustomerEmailVerification />} />
+                          <Route path="/auth/qr-login" element={<QRLoginPage />} />
                           
                           {/* Business Partner Auth Routes - /business/* */}
                           <Route path="/business/login" element={<BusinessAuth />} />
