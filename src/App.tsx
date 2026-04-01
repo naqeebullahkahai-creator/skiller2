@@ -64,6 +64,7 @@ import AddressesPage from "./pages/account/AddressesPage";
 import CustomerMessagesPage from "./pages/account/MessagesPage";
 import NotificationsPage from "./pages/account/NotificationsPage";
 import WalletPage from "./pages/account/WalletPage";
+import LoginDevicesPage from "./pages/account/LoginDevicesPage";
 
 // New Mobile-First Dashboard Pages
 import AdminDashboardLayout from "./components/dashboard/AdminDashboardLayout";
