@@ -48,6 +48,7 @@ import InstallPrompt from "./components/pwa/InstallPrompt";
 import NotificationPermissionBanner from "./components/notifications/NotificationPermissionBanner";
 import MobileFloatingBackButton from "./components/mobile/MobileFloatingBackButton";
 import SplashScreen from "./components/pwa/SplashScreen";
+import QRConfirmPage from "./pages/QRConfirmPage";
 import { useAdminInactivityLogout } from "./hooks/useAdminInactivityLogout";
 import { useLoginTracking } from "./hooks/useLoginTracking";
 import { useIsMobile } from "./hooks/use-mobile";
