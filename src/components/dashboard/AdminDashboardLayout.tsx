@@ -144,9 +144,14 @@ const AdminDashboardLayout = () => {
           )}
         >
           <div className="flex h-16 items-center justify-between px-4 border-b border-[hsl(var(--dashboard-sidebar-border))]">
-            {sidebarOpen && (
+            {sidebarOpen ? (
               <Link to="/admin/dashboard" className="flex items-center gap-2">
+                <img src="/fanzon-icon.png" alt="FANZON" className="h-7 w-7 object-contain rounded-md" />
                 <span className="text-xl font-bold text-primary">FANZON</span>
+              </Link>
+            ) : (
+              <Link to="/admin/dashboard">
+                <img src="/fanzon-icon.png" alt="FANZON" className="h-7 w-7 object-contain rounded-md" />
               </Link>
             )}
             <Button
