@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "fanzoon-icon.png", "fanzoon-logo.png"],
+      includeAssets: ["favicon.ico", "fanzon-icon.png", "fanzon-logo.png"],
       manifest: {
         name: "FANZON - Pakistan's Premium Store",
         short_name: "FANZON",
