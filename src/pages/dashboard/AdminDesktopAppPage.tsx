@@ -61,20 +61,19 @@ const useLiveStats = () => {
   return useQuery({
     queryKey: ["desktop-app-live-stats"],
     queryFn: async () => {
-      const [sellersRes, productsRes, ordersRes, walletsRes] = await Promise.all([
+      const [sellersRes, productsRes, ordersRes] = await Promise.all([
         supabase.from("seller_profiles").select("id, verification_status", { count: "exact" }),
-        supabase.from("products").select("id, is_active", { count: "exact" }),
-        supabase.from("orders").select("id, total_amount, order_status", { count: "exact" }),
-        supabase.from("seller_wallets").select("current_balance, total_earnings"),
+        supabase.from("products").select("id, status", { count: "exact" }),
+        supabase.from("orders").select("id, total_amount_pkr, order_status", { count: "exact" }),
       ]);
 
       const totalSellers = sellersRes.count || 0;
       const verifiedSellers = sellersRes.data?.filter(s => s.verification_status === "verified").length || 0;
       const totalProducts = productsRes.count || 0;
-      const activeProducts = productsRes.data?.filter(p => p.is_active).length || 0;
+      const activeProducts = productsRes.data?.filter(p => p.status === "approved").length || 0;
       const totalOrders = ordersRes.count || 0;
       const deliveredOrders = ordersRes.data?.filter(o => o.order_status === "delivered").length || 0;
-      const totalRevenue = ordersRes.data?.reduce((sum, o) => sum + Number(o.total_amount || 0), 0) || 0;
+      const totalRevenue = ordersRes.data?.reduce((sum, o) => sum + Number(o.total_amount_pkr || 0), 0) || 0;
 
       return { totalSellers, verifiedSellers, totalProducts, activeProducts, totalOrders, deliveredOrders, totalRevenue };
     },
