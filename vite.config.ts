@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/api/, /^\/admin/, /^\/~oauth/],
         // Precache critical assets
         additionalManifestEntries: [
-          { url: "/fanzoon-icon.png", revision: CACHE_VERSION },
+          { url: "/fanzon-icon.png", revision: CACHE_VERSION },
         ],
         runtimeCaching: [
           // Cache Google Fonts
