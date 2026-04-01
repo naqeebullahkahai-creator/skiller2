@@ -1,4 +1,4 @@
-import { Headphones, Users, Shield, Activity, Wallet, DollarSign, MessageSquare, Settings } from "lucide-react";
+import { Headphones, Shield, Activity, Wallet, DollarSign, MessageSquare } from "lucide-react";
 import AdminModuleLayout, { ModuleNavItem } from "./AdminModuleLayout";
 import { useAdminSidebarCounts } from "@/hooks/useAdminSidebarCounts";
 

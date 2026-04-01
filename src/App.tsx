@@ -460,6 +460,7 @@ const App = () => (
                                 <Route path="reviews" element={<AdminReviewsPage />} />
                                 <Route path="returns" element={<AdminReturnsPage />} />
                                 <Route path="cancellations" element={<AdminCancellationsPage />} />
+                                <Route path="chat-shortcuts" element={<AdminChatShortcutsPage />} />
                               </Route>
 
                               {/* Customer Module */}
