@@ -133,6 +133,7 @@ import AdminStoreWalletPage from "./pages/dashboard/AdminStoreWalletPage";
 import AdminStoreOrdersPage from "./pages/dashboard/AdminStoreOrdersPage";
 import AdminStoreAddProductPage from "./pages/dashboard/AdminStoreAddProductPage";
 import AdminPlatformBlueprintPage from "./pages/dashboard/AdminPlatformBlueprintPage";
+import AdminApkBuildPage from "./pages/dashboard/AdminApkBuildPage";
 import SellerModuleLayout from "./components/admin/modules/SellerModuleLayout";
 import CustomerModuleLayout from "./components/admin/modules/CustomerModuleLayout";
 import AgentModuleLayout from "./components/admin/modules/AgentModuleLayout";
@@ -436,6 +437,7 @@ const App = () => (
                               <Route path="tracking-search" element={<AdminTrackingSearchPage />} />
                               <Route path="view-as/:userId" element={<AdminViewAsPage />} />
                               <Route path="platform-blueprint" element={<AdminPlatformBlueprintPage />} />
+                              <Route path="apk-build" element={<AdminApkBuildPage />} />
                             </Route>
                           )}
 
