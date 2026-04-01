@@ -31,6 +31,7 @@ import EmailVerificationPending from "./pages/business/EmailVerificationPending"
 import EmailVerificationSuccess from "./pages/business/EmailVerificationSuccess";
 import CustomerAuth from "./pages/auth/CustomerAuth";
 import CustomerEmailVerification from "./pages/auth/CustomerEmailVerification";
+import QRLoginPage from "./pages/auth/QRLoginPage";
 import ResetPassword from "./pages/ResetPassword";
 import ProductListing from "./pages/ProductListing";
 import ProductDetail from "./pages/ProductDetail";
@@ -63,6 +64,7 @@ import AddressesPage from "./pages/account/AddressesPage";
 import CustomerMessagesPage from "./pages/account/MessagesPage";
 import NotificationsPage from "./pages/account/NotificationsPage";
 import WalletPage from "./pages/account/WalletPage";
+import LoginDevicesPage from "./pages/account/LoginDevicesPage";
 
 // New Mobile-First Dashboard Pages
 import AdminDashboardLayout from "./components/dashboard/AdminDashboardLayout";
@@ -293,6 +295,7 @@ const App = () => (
                           <Route path="/auth/login" element={<CustomerAuth />} />
                           <Route path="/auth/signup" element={<CustomerAuth />} />
                           <Route path="/auth/verify-email" element={<CustomerEmailVerification />} />
+                          <Route path="/auth/qr-login" element={<QRLoginPage />} />
                           
                           {/* Business Partner Auth Routes - /business/* */}
                           <Route path="/business/login" element={<BusinessAuth />} />
@@ -362,6 +365,7 @@ const App = () => (
                                 <Route path="notifications" element={<NotificationsPage />} />
                                 <Route path="wallet" element={<WalletPage />} />
                                 <Route path="referrals" element={<ReferralPage />} />
+                                <Route path="devices" element={<LoginDevicesPage />} />
                               </Route>
                               <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
                             </>

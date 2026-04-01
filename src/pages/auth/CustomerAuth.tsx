@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, ShoppingBag, TrendingUp, ShieldCheck, Wallet, Package, Phone } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, ShoppingBag, TrendingUp, ShieldCheck, Wallet, Package, Phone, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ import { buildCrossDomainUrl } from "@/utils/crossDomainAuth";
 import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
 import RealTimeFieldValidator from "@/components/auth/RealTimeFieldValidator";
 import PakistanPhoneInput from "@/components/auth/PakistanPhoneInput";
-import QRLoginSection from "@/components/auth/QRLoginSection";
+
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -474,21 +474,13 @@ const CustomerAuth = () => {
             </form>
 
              {mode === "login" && (
-              <>
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border" />
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span className="bg-card px-3 text-xs text-muted-foreground uppercase tracking-wider">Or scan QR</span>
-                  </div>
-                </div>
-
-                <QRLoginSection 
-                  onLoginSuccess={() => navigate("/")} 
-                  className="py-2"
-                />
-              </>
+                <Link
+                  to="/auth/qr-login"
+                  className="flex items-center justify-center gap-2 w-full py-3 mt-4 rounded-xl border border-border bg-secondary hover:bg-muted transition-colors text-sm font-medium text-foreground"
+                >
+                  <QrCode size={18} className="text-primary" />
+                  Login with QR Code
+                </Link>
              )}
 
             <div className="relative my-6">
