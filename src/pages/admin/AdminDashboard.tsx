@@ -140,6 +140,7 @@ const AdminDashboard = () => {
     { icon: <Shield size={18} className="text-purple-600" />, title: "Roles & Staff", description: "Permissions", href: "/admin/roles", color: "bg-purple-100" },
     { icon: <Store size={18} className="text-green-600" />, title: "Admin Store", description: "Your own store", href: "/admin/store", color: "bg-green-100" },
     { icon: <FileText size={18} className="text-indigo-600" />, title: "Platform Blueprint", description: "System overview", href: "/admin/platform-blueprint", color: "bg-indigo-100" },
+    { icon: <Smartphone size={18} className="text-green-600" />, title: "APK Builder", description: "Native app guide", href: "/admin/apk-build", color: "bg-green-100" },
   ];
 
   const renderHome = () => (
