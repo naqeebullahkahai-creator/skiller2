@@ -70,7 +70,7 @@ const useLiveStats = () => {
       const totalSellers = sellersRes.count || 0;
       const verifiedSellers = sellersRes.data?.filter(s => s.verification_status === "verified").length || 0;
       const totalProducts = productsRes.count || 0;
-      const activeProducts = productsRes.data?.filter(p => p.status === "approved").length || 0;
+      const activeProducts = productsRes.data?.filter(p => p.status === "active").length || 0;
       const totalOrders = ordersRes.count || 0;
       const deliveredOrders = ordersRes.data?.filter(o => o.order_status === "delivered").length || 0;
       const totalRevenue = ordersRes.data?.reduce((sum, o) => sum + Number(o.total_amount_pkr || 0), 0) || 0;
