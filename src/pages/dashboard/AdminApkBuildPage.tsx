@@ -92,7 +92,7 @@ const AdminApkBuildPage = () => {
             <h2 className="font-bold text-base">Step 1: Download Project Files</h2>
           </div>
           <p className="text-sm text-muted-foreground">Ye ZIP file download karo. Ismein sab kuch ready hai — capacitor config, package.json, setup scripts.</p>
-          <a href="/documents/FANZON-APK-Project.zip" download>
+          <a href="/FANZON-APK-Project.zip" download>
             <Button className="w-full gap-2 bg-primary hover:bg-primary/90 h-12 text-base">
               <Download size={18} /> Download FANZON-APK-Project.zip
             </Button>

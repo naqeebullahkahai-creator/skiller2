@@ -100,7 +100,7 @@ const AdminDesktopAppPage = () => {
       <Step num={2} title="Project Download Karo" open={true}>
         <p className="text-xs text-muted-foreground">Ye file download karo — ismein sab kuch ready hai, kuch banane ki zaroorat nahi:</p>
         
-        <a href="/documents/FANZON-Desktop-App.tar.gz" download className="block">
+        <a href="/FANZON-Desktop-App.zip" download className="block">
           <Button className="w-full gap-2 h-11 text-sm mt-1">
             <Download size={16} /> Download FANZON-Desktop-App
           </Button>
