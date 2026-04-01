@@ -646,8 +646,11 @@ const App = () => (
                           <Route path="/seller-center" element={<Navigate to="/seller/dashboard" replace />} />
                           <Route path="/seller-center/*" element={<Navigate to="/seller/dashboard" replace />} />
                           
-                          {/* Forbidden Route */}
-                          <Route path="/forbidden" element={<Forbidden />} />
+                           {/* QR Login Confirm */}
+                           <Route path="/qr-confirm" element={<QRConfirmPage />} />
+                           
+                           {/* Forbidden Route */}
+                           <Route path="/forbidden" element={<Forbidden />} />
                           
                           <Route path="*" element={<NotFound />} />
                         </Routes>
