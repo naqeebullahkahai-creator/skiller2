@@ -437,6 +437,7 @@ const App = () => (
                               <Route path="tracking-search" element={<AdminTrackingSearchPage />} />
                               <Route path="view-as/:userId" element={<AdminViewAsPage />} />
                               <Route path="platform-blueprint" element={<AdminPlatformBlueprintPage />} />
+                              <Route path="apk-build" element={<AdminApkBuildPage />} />
                             </Route>
                           )}
 
