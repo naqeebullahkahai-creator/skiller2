@@ -363,6 +363,7 @@ const App = () => (
                                 <Route path="notifications" element={<NotificationsPage />} />
                                 <Route path="wallet" element={<WalletPage />} />
                                 <Route path="referrals" element={<ReferralPage />} />
+                                <Route path="devices" element={<LoginDevicesPage />} />
                               </Route>
                               <Route path="/my-orders" element={<Navigate to="/account/orders" replace />} />
                             </>
