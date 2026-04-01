@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Settings, Wallet,
   UserCircle, Store, Headphones, Shield,
   Megaphone, Zap, BarChart3, Star, Tag, Image, Bell, Wrench, 
-  Lock, KeyRound, FileText, MessageSquare
+  Lock, KeyRound, FileText, MessageSquare, Smartphone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
@@ -120,6 +120,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "Chat Shortcuts", href: "/admin/chat-shortcuts", icon: MessageSquare },
         { name: "All Settings", href: "/admin/all-settings", icon: Wrench },
         { name: "Platform Blueprint", href: "/admin/platform-blueprint", icon: FileText },
+        { name: "APK Builder", href: "/admin/apk-build", icon: Smartphone },
       ]
     },
     {
