@@ -8,7 +8,7 @@ import {
   Lock, Wrench, Globe, Megaphone, DollarSign,
   AlertTriangle, ChevronRight, Headphones,
   Layers, Receipt, BadgeCheck, BookOpen,
-  Home, User, LayoutGrid
+  Home, User, LayoutGrid, Smartphone
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
