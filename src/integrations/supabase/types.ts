@@ -2821,6 +2821,42 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_login_sessions: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          device_info: string | null
+          id: string
+          ip_address: string | null
+          session_token: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          session_token: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          device_info?: string | null
+          id?: string
+          ip_address?: string | null
+          session_token?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       recently_viewed_products: {
         Row: {
           id: string
