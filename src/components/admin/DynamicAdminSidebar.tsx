@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Settings, Wallet,
   UserCircle, Store, Headphones, Shield,
   Megaphone, Zap, BarChart3, Star, Tag, Image, Bell, Wrench, 
-  Lock, KeyRound, FileText, MessageSquare, Smartphone
+  Lock, KeyRound, FileText, MessageSquare, Smartphone, Monitor
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePermissions } from "@/contexts/PermissionsContext";
