@@ -120,6 +120,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "Chat Shortcuts", href: "/admin/chat-shortcuts", icon: MessageSquare },
         { name: "All Settings", href: "/admin/all-settings", icon: Wrench },
         { name: "Platform Blueprint", href: "/admin/platform-blueprint", icon: FileText },
+        { name: "APK Builder", href: "/admin/apk-build", icon: Smartphone },
       ]
     },
     {
