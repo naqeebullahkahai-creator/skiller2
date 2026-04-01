@@ -2,8 +2,13 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Copy, Download, Smartphone, Monitor, AlertTriangle, ChevronDown, ChevronUp, ExternalLink, ArrowRight, Info, Terminal, FolderOpen, FileCode, Play, Rocket } from "lucide-react";
+import { Check, Copy, Download, Smartphone, AlertTriangle, ChevronDown, ChevronUp, Info, Terminal, Rocket, Key, Globe, Zap, Package, Play } from "lucide-react";
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
+
+const SUPABASE_URL = "https://faevzfibzcbuqjoatmjm.supabase.co";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZXZ6ZmliemNidXFqb2F0bWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3OTM4OTQsImV4cCI6MjA4NzM2OTg5NH0.1P6q4Xo5xKWHExRnUOaQPjwq-AxmQ6K4Sp4FTpWPXGM";
+const SYNC_API = `${SUPABASE_URL}/functions/v1/sync-products`;
 
 const CopyBlock = ({ label, code }: { label?: string; code: string }) => {
   const [copied, setCopied] = useState(false);
@@ -18,12 +23,7 @@ const CopyBlock = ({ label, code }: { label?: string; code: string }) => {
       {label && <p className="text-xs font-semibold text-foreground mb-1">📋 {label}</p>}
       <div className="relative bg-muted rounded-lg p-3 pr-12 overflow-x-auto border border-border">
         <pre className="text-xs text-foreground whitespace-pre-wrap break-all font-mono">{code}</pre>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="absolute top-2 right-2 h-7 w-7"
-          onClick={handleCopy}
-        >
+        <Button size="icon" variant="ghost" className="absolute top-2 right-2 h-7 w-7" onClick={handleCopy}>
           {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
         </Button>
       </div>
@@ -52,479 +52,209 @@ const InfoBox = ({ children, variant = "info" }: { children: React.ReactNode; va
   );
 };
 
-const StepSection = ({ step, title, icon, badge, children, defaultOpen = false }: { step: number; title: string; icon: React.ReactNode; badge?: string; children: React.ReactNode; defaultOpen?: boolean }) => {
+const StepCard = ({ step, title, icon: Icon, children, defaultOpen = false }: { step: number; title: string; icon: any; children: React.ReactNode; defaultOpen?: boolean }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <Card className="border-border overflow-hidden">
-      <button onClick={() => setOpen(!open)} className="w-full text-left">
-        <CardHeader className="py-3 px-4 bg-muted/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">
-                {step}
-              </div>
-              <div className="flex items-center gap-2">
-                {icon}
-                <CardTitle className="text-sm">{title}</CardTitle>
-              </div>
-              {badge && <Badge variant="secondary" className="text-[10px]">{badge}</Badge>}
-            </div>
-            {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+    <Card className="border-border/50">
+      <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors py-3 px-4" onClick={() => setOpen(!open)}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">{step}</div>
+            <Icon size={18} className="text-primary" />
+            <CardTitle className="text-sm">{title}</CardTitle>
           </div>
-        </CardHeader>
-      </button>
-      {open && <CardContent className="pt-4 px-4 pb-4 space-y-3">{children}</CardContent>}
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </div>
+      </CardHeader>
+      {open && <CardContent className="space-y-3 pt-0 px-4 pb-4">{children}</CardContent>}
     </Card>
   );
 };
 
 const AdminApkBuildPage = () => {
-  const projectId = "55bb4009-1fbf-4c5e-941b-15943679bf51";
-  const previewUrl = `https://${projectId}.lovableproject.com?forceHideBadge=true`;
-  const appId = "app.lovable.55bb40091fbf4c5e941b15943679bf51";
-  const appName = "FANZON";
-
-  const capacitorConfig = `import type { CapacitorConfig } from '@capacitor/cli';
-
-const config: CapacitorConfig = {
-  appId: '${appId}',
-  appName: '${appName}',
-  webDir: 'dist',
-  server: {
-    url: '${previewUrl}',
-    cleartext: true
-  },
-  plugins: {
-    SplashScreen: {
-      launchShowDuration: 2000,
-      backgroundColor: '#ffffff',
-      showSpinner: false,
-    },
-    StatusBar: {
-      style: 'light',
-      backgroundColor: '#F97316',
-    },
-  },
-};
-
-export default config;`;
-
-  const productionConfig = `import type { CapacitorConfig } from '@capacitor/cli';
-
-const config: CapacitorConfig = {
-  appId: '${appId}',
-  appName: '${appName}',
-  webDir: 'dist',
-  plugins: {
-    SplashScreen: {
-      launchShowDuration: 2000,
-      backgroundColor: '#ffffff',
-      showSpinner: false,
-    },
-  },
-};
-
-export default config;`;
-
   return (
-    <div className="space-y-4 max-w-3xl mx-auto">
+    <div className="space-y-4 overflow-x-hidden pb-20">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-primary/10">
-          <Smartphone size={22} className="text-primary" />
+      <div className="bg-gradient-to-r from-orange-600 to-amber-500 rounded-xl p-5 text-white">
+        <div className="flex items-center gap-3 mb-2">
+          <Smartphone className="h-7 w-7" />
+          <h1 className="text-xl font-bold">APK Builder</h1>
+          <Badge className="bg-white/20 text-white border-0">Ready-Made</Badge>
         </div>
-        <div>
-          <h1 className="text-lg font-bold text-foreground">📱 FANZON APK Builder - Complete Roadmap</h1>
-          <p className="text-xs text-muted-foreground">Starting se APK banane tak ka poora step-by-step guide</p>
-        </div>
+        <p className="text-white/80 text-sm">Download ready-made project → Follow steps → Get APK</p>
       </div>
 
-      {/* Overview */}
-      <Card className="border-primary/30 bg-primary/5">
-        <CardContent className="p-4">
-          <h3 className="font-bold text-sm text-foreground mb-2">🎯 Ye Guide Kiya Karega?</h3>
-          <ul className="text-xs text-muted-foreground space-y-1.5">
-            <li className="flex gap-2"><ArrowRight size={12} className="text-primary shrink-0 mt-0.5" /> FANZON website ko real Android/iOS app mein convert karega</li>
-            <li className="flex gap-2"><ArrowRight size={12} className="text-primary shrink-0 mt-0.5" /> Aapko .APK file milegi jo kisi bhi phone mein install ho sakti hai</li>
-            <li className="flex gap-2"><ArrowRight size={12} className="text-primary shrink-0 mt-0.5" /> Google Play Store / Apple App Store par publish kar saktay ho</li>
-            <li className="flex gap-2"><ArrowRight size={12} className="text-primary shrink-0 mt-0.5" /> Sirf ek baar setup karna hai, phir updates bahut easy hain</li>
-          </ul>
-          <InfoBox variant="tip">
-            <strong>Time Required:</strong> Pehli baar ~1-2 ghante, baad mein sirf 5 minute per update.
+      {/* Download Section */}
+      <Card className="border-2 border-primary/30 bg-primary/5">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Download className="h-5 w-5 text-primary" />
+            <h2 className="font-bold text-base">Step 1: Download Project Files</h2>
+          </div>
+          <p className="text-sm text-muted-foreground">Ye ZIP file download karo. Ismein sab kuch ready hai — capacitor config, package.json, setup scripts.</p>
+          <a href="/documents/FANZON-APK-Project.zip" download>
+            <Button className="w-full gap-2 bg-primary hover:bg-primary/90 h-12 text-base">
+              <Download size={18} /> Download FANZON-APK-Project.zip
+            </Button>
+          </a>
+          <InfoBox variant="success">
+            ZIP mein ye files hain: <code>capacitor.config.ts</code>, <code>package.json</code>, <code>setup.bat</code> (Windows), <code>setup.sh</code> (Mac/Linux), <code>README.md</code>
           </InfoBox>
         </CardContent>
       </Card>
 
-      {/* STEP 0: Requirements */}
-      <StepSection step={0} title="Requirements - Ye Pehle Install Karo" icon={<Download size={16} className="text-primary" />} badge="Zaroori" defaultOpen={true}>
-        <p className="text-sm font-medium text-foreground">In software ko apne computer mein pehle download aur install karo:</p>
+      {/* API Keys Section */}
+      <Card className="border-2 border-amber-300/30 bg-amber-50/50 dark:bg-amber-900/10">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Key className="h-5 w-5 text-amber-600" />
+            <h2 className="font-bold text-base">🔑 API Keys (Ye Aapki Hain)</h2>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Aapka project Lovable Cloud pe hai, isliye Supabase ki keys automatically mil gayi hain. Ye keys aapke project ki hain — kisi aur ko na dena!
+          </p>
+
+          <CopyBlock label="Supabase URL" code={SUPABASE_URL} />
+          <CopyBlock label="Anon Key (Public — safe to use in app)" code={ANON_KEY} />
+          <CopyBlock label="Sync API Endpoint" code={SYNC_API} />
+
+          <InfoBox variant="warning">
+            <strong>Anon Key public hai</strong> — isko app mein use karna safe hai. Ye key sirf wahi kaam karti hai jo RLS policies allow karti hain. Aapki actual secret key Lovable Cloud mein safe hai.
+          </InfoBox>
+
+          <InfoBox variant="info">
+            <strong>Supabase Dashboard kahan hai?</strong> Lovable Cloud use kar rahe ho to alag se Supabase account ki zarurat nahi. Sab kuch Lovable ke andar se manage hota hai. Keys yehi hain jo upar di hain.
+          </InfoBox>
+        </CardContent>
+      </Card>
+
+      {/* Prerequisites */}
+      <StepCard step={2} title="Prerequisites Install Karo" icon={Package} defaultOpen={true}>
+        <p className="text-sm text-muted-foreground">Ye 3 cheezein pehle install karo:</p>
         
-        <div className="space-y-3 mt-2">
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">1️⃣</span>
-              <strong className="text-sm">Node.js (Version 18 ya upar)</strong>
+        <div className="space-y-2">
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-semibold text-sm">1. Node.js 18+</span>
+              <Badge variant="outline" className="text-xs">Required</Badge>
             </div>
-            <p className="text-xs text-muted-foreground ml-7 mb-2">Ye JavaScript ka runtime hai. Commands run karne ke liye zaroori hai.</p>
-            <div className="ml-7">
-              <a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer" className="text-primary text-xs hover:underline flex items-center gap-1">
-                Download Node.js <ExternalLink size={10} />
-              </a>
-            </div>
-            <InfoBox variant="info">
-              <strong>Install ke baad check karo:</strong> Terminal/CMD kholein aur type karein: <code className="bg-muted px-1 rounded">node --version</code> — Agar version dikhe to sahi install hua.
-            </InfoBox>
+            <p className="text-xs text-muted-foreground mb-1">JavaScript runtime</p>
+            <CopyBlock code="https://nodejs.org" />
           </div>
-
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">2️⃣</span>
-              <strong className="text-sm">Git</strong>
-            </div>
-            <p className="text-xs text-muted-foreground ml-7 mb-2">Code ko download karne ke liye zaroori hai.</p>
-            <div className="ml-7">
-              <a href="https://git-scm.com/" target="_blank" rel="noopener noreferrer" className="text-primary text-xs hover:underline flex items-center gap-1">
-                Download Git <ExternalLink size={10} />
-              </a>
-            </div>
-            <InfoBox variant="info">
-              <strong>Check:</strong> <code className="bg-muted px-1 rounded">git --version</code>
-            </InfoBox>
-          </div>
-
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">3️⃣</span>
-              <strong className="text-sm">Android Studio (Android APK ke liye)</strong>
-            </div>
-            <p className="text-xs text-muted-foreground ml-7 mb-2">Android app build karne ka official tool. Emulator bhi milta hai testing ke liye.</p>
-            <div className="ml-7">
-              <a href="https://developer.android.com/studio" target="_blank" rel="noopener noreferrer" className="text-primary text-xs hover:underline flex items-center gap-1">
-                Download Android Studio <ExternalLink size={10} />
-              </a>
-            </div>
-            <InfoBox variant="warning">
-              <strong>Android Studio install karne ke baad:</strong><br/>
-              1. Open karein → "More Actions" → "SDK Manager" click karein<br/>
-              2. "SDK Platforms" mein "Android 13 (API 33)" ya latest tick karein<br/>
-              3. "SDK Tools" mein "Android SDK Build-Tools" tick karein<br/>
-              4. "Apply" click karein aur download hone dein
-            </InfoBox>
-          </div>
-
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">4️⃣</span>
-              <strong className="text-sm">Java JDK 17+</strong>
-            </div>
-            <p className="text-xs text-muted-foreground ml-7 mb-2">Android build system (Gradle) ke liye zaroori hai.</p>
-            <div className="ml-7">
-              <a href="https://adoptium.net/" target="_blank" rel="noopener noreferrer" className="text-primary text-xs hover:underline flex items-center gap-1">
-                Download Java JDK <ExternalLink size={10} />
-              </a>
-            </div>
-            <InfoBox variant="info">
-              <strong>Check:</strong> <code className="bg-muted px-1 rounded">java --version</code>
-            </InfoBox>
-          </div>
-
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">5️⃣</span>
-              <strong className="text-sm">Xcode (Sirf Mac ke liye - iOS app)</strong>
-            </div>
-            <p className="text-xs text-muted-foreground ml-7 mb-2">Sirf agar iPhone/iPad app banana hai to zaroorat hai. Windows par nahi chalega.</p>
-            <div className="ml-7">
-              <a href="https://developer.apple.com/xcode/" target="_blank" rel="noopener noreferrer" className="text-primary text-xs hover:underline flex items-center gap-1">
-                Download Xcode <ExternalLink size={10} />
-              </a>
-            </div>
-          </div>
-        </div>
-      </StepSection>
-
-      {/* STEP 1: Terminal Kholein */}
-      <StepSection step={1} title="Terminal / CMD Kholein" icon={<Terminal size={16} className="text-primary" />} badge="Basics">
-        <p className="text-sm text-foreground font-medium">Terminal woh jagah hai jahan commands paste karke run karte hain.</p>
-        
-        <div className="space-y-2 mt-2">
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <strong className="text-xs text-foreground">Windows par:</strong>
-            <p className="text-xs text-muted-foreground mt-1">Start menu mein "cmd" ya "PowerShell" search karein → Open karein</p>
-            <p className="text-xs text-muted-foreground">Ya: <code className="bg-muted px-1 rounded">Win + R</code> press karein → <code className="bg-muted px-1 rounded">cmd</code> type karein → Enter</p>
-          </div>
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <strong className="text-xs text-foreground">Mac par:</strong>
-            <p className="text-xs text-muted-foreground mt-1">Spotlight (<code className="bg-muted px-1 rounded">Cmd + Space</code>) → "Terminal" type karein → Open karein</p>
-          </div>
-        </div>
-
-        <InfoBox variant="tip">
-          Har command ko terminal mein paste karein aur Enter press karein. Ek command complete hone ka wait karein phir doosri run karein.
-        </InfoBox>
-      </StepSection>
-
-      {/* STEP 2: GitHub Export */}
-      <StepSection step={2} title="Lovable se Code Download Karo" icon={<FolderOpen size={16} className="text-primary" />} badge="Required">
-        <p className="text-sm text-foreground">Pehle FANZON ka code apne computer par laana hai.</p>
-        
-        <div className="p-3 bg-card rounded-lg border border-border space-y-2">
-          <p className="text-xs font-semibold text-foreground">A) Lovable se GitHub par Export:</p>
-          <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-1 ml-2">
-            <li>Lovable editor mein ooper right corner mein <strong>GitHub icon</strong> click karein</li>
-            <li>"Export to GitHub" select karein</li>
-            <li>Apna GitHub account connect karein (agar pehle se nahi hai)</li>
-            <li>Repository name dein aur export karein</li>
-          </ol>
-        </div>
-
-        <div className="p-3 bg-card rounded-lg border border-border space-y-2 mt-2">
-          <p className="text-xs font-semibold text-foreground">B) Terminal mein Code Download:</p>
-          <p className="text-xs text-muted-foreground">Terminal kholein aur ye commands ek ek karke paste karein:</p>
           
-          <CopyBlock label="1. Desktop par jaayein (ya jahan save karna hai)" code="cd Desktop" />
-          <CopyBlock label="2. Code download karein (YOUR_USERNAME aur YOUR_REPO apna daalein)" code="git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git" />
-          <CopyBlock label="3. Project folder mein jaayein" code="cd YOUR_REPO" />
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-semibold text-sm">2. Java JDK 17</span>
+              <Badge variant="outline" className="text-xs">Required</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground mb-1">Android build ke liye</p>
+            <CopyBlock code="https://adoptium.net" />
+          </div>
+
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-semibold text-sm">3. Android Studio</span>
+              <Badge variant="outline" className="text-xs">Required</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground mb-1">APK build ke liye</p>
+            <CopyBlock code="https://developer.android.com/studio" />
+            <InfoBox variant="tip">Install karne ke baad Android Studio kholein → SDK Manager → Android SDK install karo</InfoBox>
+          </div>
+        </div>
+      </StepCard>
+
+      {/* Step 3: Extract & Run */}
+      <StepCard step={3} title="ZIP Extract Karo aur Setup Chalao" icon={Terminal}>
+        <p className="text-sm text-muted-foreground">Downloaded ZIP ko extract karo, phir terminal/CMD kholein us folder mein:</p>
+        
+        <CopyBlock label="Windows (CMD mein):" code="cd fanzon-mobile\nsetup.bat" />
+        <CopyBlock label="Mac/Linux (Terminal mein):" code="cd fanzon-mobile\nchmod +x setup.sh && ./setup.sh" />
+        
+        <InfoBox variant="info">
+          Setup script automatically ye sab karega: npm install → cap add android → cap sync → Android Studio kholega
+        </InfoBox>
+      </StepCard>
+
+      {/* Step 4: Build APK */}
+      <StepCard step={4} title="APK Build Karo (Android Studio mein)" icon={Play}>
+        <p className="text-sm text-muted-foreground">Android Studio khulega automatically. Ab:</p>
+        
+        <div className="space-y-2">
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <p className="font-semibold text-sm mb-1">Debug APK (Testing ke liye):</p>
+            <ol className="text-xs space-y-1 list-decimal list-inside text-muted-foreground">
+              <li>Build menu click karo</li>
+              <li>Build Bundle(s) / APK(s) → Build APK(s)</li>
+              <li>Wait karo build hone tak</li>
+            </ol>
+            <CopyBlock label="APK yahan milega:" code="android/app/build/outputs/apk/debug/app-debug.apk" />
+          </div>
+
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <p className="font-semibold text-sm mb-1">🏪 Signed APK (Play Store ke liye):</p>
+            <ol className="text-xs space-y-1 list-decimal list-inside text-muted-foreground">
+              <li>Build → Generate Signed Bundle / APK</li>
+              <li>"Create new..." click karo keystore ke liye</li>
+              <li>Password set karo (yaad rakhna!)</li>
+              <li>APK select karo → Release → Build</li>
+            </ol>
+            <CopyBlock label="Signed APK yahan milega:" code="android/app/build/outputs/apk/release/app-release.apk" />
+          </div>
+        </div>
+      </StepCard>
+
+      {/* API Endpoints */}
+      <StepCard step={5} title="API Endpoints (App Integration)" icon={Globe}>
+        <p className="text-sm text-muted-foreground">Agar aap custom app bana rahe hain to ye API endpoints use karo:</p>
+
+        <div className="space-y-3">
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <p className="font-semibold text-sm mb-1">🔐 Seller Login</p>
+            <CopyBlock code={`POST ${SYNC_API}?action=login\nHeaders:\n  Authorization: Bearer <access_token>\n  apikey: ${ANON_KEY}`} />
+          </div>
+
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <p className="font-semibold text-sm mb-1">📦 Sync Products (Bulk Upload)</p>
+            <CopyBlock code={`POST ${SYNC_API}?action=sync\nHeaders:\n  Authorization: Bearer <access_token>\n  apikey: ${ANON_KEY}\n  Content-Type: application/json\nBody:\n{\n  "products": [\n    {\n      "local_id": "1",\n      "title": "Product Name",\n      "price_pkr": 500,\n      "stock_count": 10,\n      "category": "Electronics",\n      "description": "Description here"\n    }\n  ]\n}`} />
+          </div>
+
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <p className="font-semibold text-sm mb-1">🖼️ Upload Image</p>
+            <CopyBlock code={`POST ${SYNC_API}?action=upload-image\nHeaders:\n  Authorization: Bearer <access_token>\n  apikey: ${ANON_KEY}\nBody:\n{\n  "base64": "<base64_encoded_image>",\n  "filename": "photo.jpg"\n}`} />
+          </div>
+
+          <div className="p-3 rounded-lg bg-muted/50 border">
+            <p className="font-semibold text-sm mb-1">📋 Get My Products</p>
+            <CopyBlock code={`GET ${SYNC_API}?action=seller-products\nHeaders:\n  Authorization: Bearer <access_token>\n  apikey: ${ANON_KEY}`} />
+          </div>
         </div>
 
         <InfoBox variant="info">
-          <strong>YOUR_USERNAME</strong> = Aapka GitHub username<br/>
-          <strong>YOUR_REPO</strong> = Jo naam diya tha export mein
+          <strong>Access Token kaise milega?</strong> Supabase auth se login karo: <code>supabase.auth.signInWithPassword()</code> — response mein <code>session.access_token</code> milega.
         </InfoBox>
-      </StepSection>
-
-      {/* STEP 3: Dependencies Install */}
-      <StepSection step={3} title="Zaruri Packages Install Karo" icon={<Download size={16} className="text-primary" />} badge="Required">
-        <p className="text-sm text-foreground">Ab terminal mein ye commands paste karein (aap project folder mein hone chahiye):</p>
-        
-        <CopyBlock label="1. Pehle project ki sab cheezein install karo (2-3 min lagega)" code="npm install" />
-        
-        <InfoBox variant="info">Ye command bahut saari files download karega. Internet speed par depend karta hai. Wait karein jab tak complete na ho.</InfoBox>
-        
-        <CopyBlock label="2. Capacitor install karo (ye website ko app mein convert karta hai)" code="npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios" />
-        
-        <CopyBlock label="3. Optional: Extra features ke liye (splash screen, status bar etc)" code="npm install @capacitor/splash-screen @capacitor/status-bar @capacitor/keyboard @capacitor/haptics" />
-      </StepSection>
-
-      {/* STEP 4: Capacitor Initialize */}
-      <StepSection step={4} title="Capacitor Setup Karo" icon={<FileCode size={16} className="text-primary" />} badge="Required">
-        <p className="text-sm text-foreground">Ab Capacitor ko project mein add karo:</p>
-        
-        <CopyBlock label="Terminal mein ye command run karo" code="npx cap init" />
-        
-        <div className="p-3 bg-card rounded-lg border border-border mt-2">
-          <p className="text-xs font-semibold text-foreground">Jab ye puche to ye jawab do:</p>
-          <div className="mt-2 space-y-2 ml-2">
-            <div className="flex items-center gap-2">
-              <ArrowRight size={12} className="text-primary" />
-              <span className="text-xs text-foreground"><strong>App name:</strong> <code className="bg-muted px-1 rounded">{appName}</code></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ArrowRight size={12} className="text-primary" />
-              <span className="text-xs text-foreground"><strong>App ID:</strong> <code className="bg-muted px-1 rounded">{appId}</code></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ArrowRight size={12} className="text-primary" />
-              <span className="text-xs text-foreground"><strong>Web asset directory:</strong> <code className="bg-muted px-1 rounded">dist</code></span>
-            </div>
-          </div>
-        </div>
-
-        <p className="text-sm text-foreground mt-3 font-medium">⚠️ Ab ye IMPORTANT step hai - Config file update karo:</p>
-        <p className="text-xs text-muted-foreground">Project folder mein <code className="bg-muted px-1 rounded">capacitor.config.ts</code> file hogi. Us file ka sara content delete karo aur ye paste karo:</p>
-        
-        <CopyBlock label="capacitor.config.ts — Ye poora copy karke paste karo file mein" code={capacitorConfig} />
-        
-        <InfoBox variant="warning">
-          <strong>File kahan hai?</strong> Project ke main folder mein — jaise <code className="bg-muted px-1 rounded">Desktop/YOUR_REPO/capacitor.config.ts</code><br/>
-          Koi bhi text editor mein khol saktay ho (Notepad, VS Code etc)
-        </InfoBox>
-      </StepSection>
-
-      {/* STEP 5: Android Add */}
-      <StepSection step={5} title="Android Platform Add Karo" icon={<Smartphone size={16} className="text-primary" />} badge="Android">
-        <p className="text-sm text-foreground">Terminal mein ye commands run karo:</p>
-        
-        <CopyBlock label="1. Android platform add karo" code="npx cap add android" />
-        <CopyBlock label="2. Android dependencies update karo" code="npx cap update android" />
-        
-        <InfoBox variant="success">
-          Ye command project mein ek <code className="bg-muted px-1 rounded">android</code> folder banayega. Yahi folder Android Studio mein open hoga.
-        </InfoBox>
-      </StepSection>
-
-      {/* STEP 6: Build & Sync */}
-      <StepSection step={6} title="Project Build Aur Sync Karo" icon={<Play size={16} className="text-primary" />} badge="Required">
-        <p className="text-sm text-foreground">Website ko app ke liye ready karo:</p>
-        
-        <CopyBlock label="1. Website build karo" code="npm run build" />
-        <CopyBlock label="2. Build ko Android mein sync karo" code="npx cap sync" />
-        
-        <InfoBox variant="tip">
-          <strong>Yaad rakhein:</strong> Jab bhi code mein koi change karo, ye dono commands phir se run karni hain:<br/>
-          <code className="bg-muted px-1 rounded">npm run build</code> → <code className="bg-muted px-1 rounded">npx cap sync</code>
-        </InfoBox>
-      </StepSection>
-
-      {/* STEP 7: Test */}
-      <StepSection step={7} title="App Test Karo (Emulator ya Phone)" icon={<Play size={16} className="text-primary" />} badge="Testing">
-        <p className="text-sm text-foreground font-medium">2 Tareeqay hain app test karne ke:</p>
-        
-        <div className="p-3 bg-card rounded-lg border border-border mt-2">
-          <p className="text-xs font-semibold text-foreground">Option A: Emulator par (Computer mein phone ka duplicate)</p>
-          <CopyBlock label="Terminal mein run karo" code="npx cap run android" />
-          <p className="text-xs text-muted-foreground mt-1">Ye Android Studio ka emulator khol dega aur app install kar dega.</p>
-        </div>
-
-        <div className="p-3 bg-card rounded-lg border border-border mt-2">
-          <p className="text-xs font-semibold text-foreground">Option B: Android Studio mein khol kar (zyada control)</p>
-          <CopyBlock label="Android Studio mein project kholo" code="npx cap open android" />
-          <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-1 mt-2 ml-2">
-            <li>Android Studio khulega aur project load hoga (pehli baar slow hoga)</li>
-            <li>Ooper mein green ▶️ (Play) button dikhega</li>
-            <li>Uske saath device select karein (emulator ya USB phone)</li>
-            <li>Play button click karein — App install ho jayega!</li>
-          </ol>
-        </div>
-
-        <div className="p-3 bg-card rounded-lg border border-border mt-2">
-          <p className="text-xs font-semibold text-foreground">Option C: Real phone par test (USB se)</p>
-          <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-1 ml-2">
-            <li>Phone mein <strong>Settings → About Phone → Build Number</strong> par 7 baar tap karein</li>
-            <li><strong>Developer Options</strong> enable ho jayega</li>
-            <li>Developer Options mein <strong>"USB Debugging"</strong> ON karein</li>
-            <li>Phone ko USB se computer se connect karein</li>
-            <li>Phone par "Allow USB Debugging" par <strong>OK</strong> karein</li>
-            <li>Android Studio mein apka phone dikhega device list mein</li>
-          </ol>
-        </div>
-
-        <InfoBox variant="tip">
-          <strong>Hot Reload:</strong> Config mein server URL set hai, to jab Lovable mein changes karo, phone par refresh karo to changes dikh jayein!
-        </InfoBox>
-      </StepSection>
-
-      {/* STEP 8: Final APK */}
-      <StepSection step={8} title="Final APK File Banao (Release)" icon={<Rocket size={16} className="text-primary" />} badge="🎯 Final APK">
-        <p className="text-sm text-foreground font-medium text-destructive">⚠️ IMPORTANT: Production APK ke liye pehle config change karo!</p>
-        
-        <p className="text-xs text-foreground mt-2">1. <code className="bg-muted px-1 rounded">capacitor.config.ts</code> file kholein aur ye paste karo (server URL hata diya hai):</p>
-        <CopyBlock label="Production Config — Server URL Removed" code={productionConfig} />
-
-        <p className="text-xs text-foreground mt-2">2. Terminal mein ye run karo:</p>
-        <CopyBlock code={`npm run build\nnpx cap sync`} />
-
-        <p className="text-xs text-foreground mt-2">3. Android Studio mein kholein:</p>
-        <CopyBlock code="npx cap open android" />
-
-        <div className="p-3 bg-card rounded-lg border border-border mt-2">
-          <p className="text-xs font-semibold text-foreground">4. Android Studio mein ye karein:</p>
-          <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-2 mt-2 ml-2">
-            <li>Menu mein <strong>Build</strong> click karein</li>
-            <li><strong>"Generate Signed Bundle / APK"</strong> click karein</li>
-            <li>Popup aayega — <strong>"APK"</strong> select karein → Next</li>
-            <li><strong>"Create new..."</strong> click karein keystore banane ke liye:
-              <ul className="list-disc list-inside ml-4 mt-1 space-y-0.5">
-                <li>Key store path: Koi bhi jagah save karo (.jks extension)</li>
-                <li>Password: Strong password daalein (YAAD RAKHEIN!)</li>
-                <li>Alias: <code className="bg-muted px-1 rounded">fanzon</code></li>
-                <li>Validity: <code className="bg-muted px-1 rounded">25</code> years</li>
-                <li>Name / Organization: Apni company ka naam</li>
-              </ul>
-            </li>
-            <li><strong>"release"</strong> build type select karein → Finish</li>
-            <li>Wait karein jab tak build complete ho</li>
-          </ol>
-        </div>
-
-        <p className="text-xs text-foreground mt-3">5. APK file yahan milegi:</p>
-        <CopyBlock label="APK File Location" code="android/app/build/outputs/apk/release/app-release.apk" />
-
-        <InfoBox variant="success">
-          <strong>🎉 Done!</strong> Ye <code className="bg-muted px-1 rounded">app-release.apk</code> file kisi bhi Android phone mein install ho sakti hai! WhatsApp ya email se bheej saktay ho.
-        </InfoBox>
-
-        <InfoBox variant="warning">
-          <strong>Keystore file (.jks) bahut important hai!</strong> Agar kho gayi to app ka update nahi de saktay. Safe jagah save karein aur password yaad rakhein.
-        </InfoBox>
-      </StepSection>
-
-      {/* STEP 9: Play Store */}
-      <StepSection step={9} title="Google Play Store Par Publish Karo" icon={<Rocket size={16} className="text-primary" />} badge="Optional">
-        <p className="text-sm text-foreground">Play Store par app daalne ke liye:</p>
-        
-        <div className="p-3 bg-card rounded-lg border border-border space-y-2">
-          <p className="text-xs font-semibold text-foreground">Google Play Store Steps:</p>
-          <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-1.5 ml-2">
-            <li><a href="https://play.google.com/console" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google Play Console</a> par account banao ($25 one-time fee)</li>
-            <li>"Create app" click karo</li>
-            <li>Play Store ke liye APK nahi AAB (Android App Bundle) chahiye:</li>
-          </ol>
-          <CopyBlock label="AAB file generate karo (Play Store ke liye)" code="cd android && ./gradlew bundleRelease" />
-          <p className="text-xs text-muted-foreground">AAB file yahan milegi:</p>
-          <CopyBlock code="android/app/build/outputs/bundle/release/app-release.aab" />
-          <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-1 ml-2" start={4}>
-            <li>Play Console mein AAB upload karo</li>
-            <li>Screenshots, description, icon etc add karo</li>
-            <li>Review ke liye submit karo (2-7 din lagta hai approval)</li>
-          </ol>
-        </div>
-
-        <div className="p-3 bg-card rounded-lg border border-border space-y-2 mt-2">
-          <p className="text-xs font-semibold text-foreground">Apple App Store Steps (Sirf Mac):</p>
-          <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-1 ml-2">
-            <li>Apple Developer Program join karo ($99/year)</li>
-            <li>Xcode mein <code className="bg-muted px-1 rounded">npx cap open ios</code> run karo</li>
-            <li>Product → Archive karein</li>
-            <li>App Store Connect par upload karein</li>
-          </ol>
-        </div>
-      </StepSection>
-
-      {/* Quick Reference */}
-      <StepSection step={10} title="Quick Commands Cheat Sheet" icon={<Terminal size={16} className="text-primary" />} badge="Reference">
-        <p className="text-sm text-foreground mb-2">Sab important commands ek jagah:</p>
-        {[
-          { label: "Dependencies install", cmd: "npm install" },
-          { label: "Capacitor install", cmd: "npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios" },
-          { label: "Capacitor initialize", cmd: "npx cap init" },
-          { label: "Android add", cmd: "npx cap add android" },
-          { label: "iOS add (Mac only)", cmd: "npx cap add ios" },
-          { label: "Build project", cmd: "npm run build" },
-          { label: "Sync to native", cmd: "npx cap sync" },
-          { label: "Test on Android", cmd: "npx cap run android" },
-          { label: "Open in Android Studio", cmd: "npx cap open android" },
-          { label: "AAB for Play Store", cmd: "cd android && ./gradlew bundleRelease" },
-        ].map((item, i) => (
-          <CopyBlock key={i} label={item.label} code={item.cmd} />
-        ))}
-      </StepSection>
+      </StepCard>
 
       {/* Troubleshooting */}
-      <StepSection step={11} title="Common Problems & Solutions" icon={<AlertTriangle size={16} className="text-amber-600" />} badge="Help">
-        <div className="space-y-3">
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <p className="text-xs font-semibold text-destructive">❌ "npx: command not found"</p>
-            <p className="text-xs text-muted-foreground mt-1">→ Node.js install nahi hai. Step 0 mein Node.js install karo.</p>
+      <StepCard step={6} title="Troubleshooting" icon={AlertTriangle}>
+        <div className="space-y-2 text-sm">
+          <div className="p-2 rounded bg-muted/50 border">
+            <p className="font-semibold">❌ "SDK not found"</p>
+            <p className="text-xs text-muted-foreground">Android Studio → Settings → SDK Manager → Android SDK install karo</p>
           </div>
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <p className="text-xs font-semibold text-destructive">❌ "JAVA_HOME is not set"</p>
-            <p className="text-xs text-muted-foreground mt-1">→ Java JDK install nahi hai ya path set nahi hai. Step 0 mein JDK install karo.</p>
+          <div className="p-2 rounded bg-muted/50 border">
+            <p className="font-semibold">❌ "JDK not found"</p>
+            <p className="text-xs text-muted-foreground">JAVA_HOME environment variable set karo pointing to JDK folder</p>
           </div>
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <p className="text-xs font-semibold text-destructive">❌ "SDK not found"</p>
-            <p className="text-xs text-muted-foreground mt-1">→ Android Studio mein SDK Manager kholein aur SDK 33+ install karein.</p>
+          <div className="p-2 rounded bg-muted/50 border">
+            <p className="font-semibold">❌ Build fail</p>
+            <p className="text-xs text-muted-foreground">Terminal mein <code>npx cap sync</code> dobara chalao</p>
           </div>
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <p className="text-xs font-semibold text-destructive">❌ Build fail ho raha hai</p>
-            <p className="text-xs text-muted-foreground mt-1">→ <code className="bg-muted px-1 rounded">npx cap sync</code> run karein phir dubara try karein.</p>
-          </div>
-          <div className="p-3 bg-card rounded-lg border border-border">
-            <p className="text-xs font-semibold text-destructive">❌ App white screen dikha raha hai</p>
-            <p className="text-xs text-muted-foreground mt-1">→ capacitor.config.ts mein server URL check karein. <code className="bg-muted px-1 rounded">npm run build</code> aur <code className="bg-muted px-1 rounded">npx cap sync</code> phir se run karein.</p>
+          <div className="p-2 rounded bg-muted/50 border">
+            <p className="font-semibold">❌ Blank white screen</p>
+            <p className="text-xs text-muted-foreground">Internet connection check karo — app live website load karta hai</p>
           </div>
         </div>
-      </StepSection>
+      </StepCard>
     </div>
   );
 };
