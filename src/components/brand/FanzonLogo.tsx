@@ -20,7 +20,7 @@ const FanzonLogo = ({ className, textClassName, size = "md", showText = true, ic
   if (iconOnly) {
     return (
       <img
-        src="/fanzon-icon-new.png"
+        src="/fanzon-icon.png"
         alt="FANZON"
         className={cn(config.icon, "object-contain", className)}
       />
@@ -30,7 +30,7 @@ const FanzonLogo = ({ className, textClassName, size = "md", showText = true, ic
   return (
     <div className={cn("inline-flex items-center", config.gap, className)}>
       <img
-        src="/fanzon-icon-new.png"
+        src="/fanzon-icon.png"
         alt="FANZON"
         className={cn(config.icon, "object-contain flex-shrink-0")}
       />

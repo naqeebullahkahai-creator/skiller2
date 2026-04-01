@@ -3,9 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 
 const logos = [
-  { name: "FANZOON Logo (Full)", file: "/fanzoon-logo.png", size: "512×512" },
-  { name: "FANZOON App Icon", file: "/fanzoon-icon.png", size: "512×512" },
-  { name: "Favicon", file: "/favicon.ico", size: "ICO" },
+  { name: "FANZON Logo (Full)", file: "/fanzon-logo.png", size: "512×512" },
+  { name: "FANZON App Icon", file: "/fanzon-icon.png", size: "512×512" },
+  { name: "Favicon", file: "/fanzon-icon.png", size: "PNG" },
 ];
 
 const AdminBrandAssetsPage = () => {

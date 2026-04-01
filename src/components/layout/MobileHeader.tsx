@@ -25,13 +25,13 @@ const MobileHeader = () => {
           {/* Top row: Logo + Cart */}
           <div className="flex items-center justify-between mb-2">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/fanzoon-icon.png" alt="FANZON" className="h-8 w-8 object-contain" />
-              <span className="font-bold text-foreground text-lg tracking-tight">FANZON</span>
+              <img src="/fanzon-icon.png" alt="FANZON" className="h-7 w-7 object-contain rounded-md" />
+              <img src="/fanzon-logo.png" alt="FANZON" className="h-5 object-contain" />
             </Link>
 
             <div className="flex items-center gap-0.5">
               <Link
-                to="/checkout"
+                to="/account/orders"
                 className="relative p-2.5 text-foreground/70 active:scale-90 transition-transform touch-target flex items-center justify-center"
               >
                 <ShoppingCart size={22} />

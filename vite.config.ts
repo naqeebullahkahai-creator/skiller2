@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "fanzoon-icon.png", "fanzoon-logo.png"],
+      includeAssets: ["favicon.ico", "fanzon-icon.png", "fanzon-logo.png"],
       manifest: {
         name: "FANZON - Pakistan's Premium Store",
         short_name: "FANZON",
@@ -33,17 +33,17 @@ export default defineConfig(({ mode }) => ({
         start_url: "/",
         icons: [
           {
-            src: "fanzoon-icon.png",
+            src: "fanzon-icon.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "fanzoon-icon.png",
+            src: "fanzon-icon.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "fanzoon-icon.png",
+            src: "fanzon-icon.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/api/, /^\/admin/, /^\/~oauth/],
         // Precache critical assets
         additionalManifestEntries: [
-          { url: "/fanzoon-icon.png", revision: CACHE_VERSION },
+          { url: "/fanzon-icon.png", revision: CACHE_VERSION },
         ],
         runtimeCaching: [
           // Cache Google Fonts

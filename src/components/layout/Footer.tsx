@@ -134,8 +134,8 @@ const Footer = () => {
       <div className="border-t border-primary-foreground/8">
         <div className="container mx-auto py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/fanzoon-icon.png" alt="FANZON" className="h-6 w-6 object-contain opacity-60" />
-            <span className="text-sm font-display font-bold text-primary-foreground/40">FANZOON</span>
+            <img src="/fanzon-icon.png" alt="FANZON" className="h-6 w-6 object-contain opacity-60" />
+            <span className="text-sm font-display font-bold text-primary-foreground/40">FANZON</span>
           </div>
           <p className="text-[11px] text-primary-foreground/30">
             © 2026 FANZOON. All rights reserved.
