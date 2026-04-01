@@ -32,6 +32,7 @@ const menuItems = [
   { icon: Heart, label: "My Wishlist", path: "/account/wishlist" },
   { icon: MapPin, label: "Saved Addresses", path: "/account/addresses" },
   { icon: Bell, label: "Notifications", path: "/account/notifications" },
+  { icon: Settings, label: "Login Devices", path: "/account/devices" },
   { icon: HelpCircle, label: "Help Center", path: "/help" },
 ];
 
