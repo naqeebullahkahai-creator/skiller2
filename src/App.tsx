@@ -439,6 +439,7 @@ const App = () => (
                               <Route path="view-as/:userId" element={<AdminViewAsPage />} />
                               <Route path="platform-blueprint" element={<AdminPlatformBlueprintPage />} />
                               <Route path="apk-build" element={<AdminApkBuildPage />} />
+                              <Route path="desktop-app" element={<AdminDesktopAppPage />} />
                             </Route>
                           )}
 

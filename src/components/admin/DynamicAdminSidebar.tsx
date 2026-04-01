@@ -121,6 +121,7 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "All Settings", href: "/admin/all-settings", icon: Wrench },
         { name: "Platform Blueprint", href: "/admin/platform-blueprint", icon: FileText },
         { name: "APK Builder", href: "/admin/apk-build", icon: Smartphone },
+        { name: "Desktop App", href: "/admin/desktop-app", icon: Monitor },
       ]
     },
     {
