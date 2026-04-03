@@ -6,11 +6,12 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
-  Monitor, Download, Copy, Check, Users, Package, ShoppingCart,
+  Monitor, Download, Copy, Check, Package, ShoppingCart,
   DollarSign, RefreshCw, Wifi, Activity, Terminal, CheckCircle2,
-  Clock, TrendingUp, FileText, Laptop, Shield, Zap
+  Clock, Laptop, Shield, Zap, Store, TrendingUp
 } from "lucide-react";
 
 const CopyBlock = ({ text, label }: { text: string; label?: string }) => {
@@ -31,28 +32,6 @@ const CopyBlock = ({ text, label }: { text: string; label?: string }) => {
   );
 };
 
-const useLiveStats = () => {
-  return useQuery({
-    queryKey: ["admin-desktop-live-stats"],
-    queryFn: async () => {
-      const [sellers, products, orders, revenue] = await Promise.all([
-        supabase.from("seller_profiles").select("*", { count: "exact", head: true }),
-        supabase.from("products").select("*", { count: "exact", head: true }).eq("status", "active"),
-        supabase.from("orders").select("*", { count: "exact", head: true }),
-        supabase.from("orders").select("total_amount_pkr").eq("order_status", "delivered"),
-      ]);
-      const totalRevenue = revenue.data?.reduce((s, o) => s + Number(o.total_amount_pkr || 0), 0) || 0;
-      return {
-        sellers: sellers.count || 0,
-        products: products.count || 0,
-        orders: orders.count || 0,
-        revenue: totalRevenue,
-      };
-    },
-    refetchInterval: 15000,
-  });
-};
-
 const StatCard = ({ icon: Icon, label, value, color, loading }: any) => (
   <Card className="border-border/50">
     <CardContent className="p-4">
@@ -71,16 +50,30 @@ const StatCard = ({ icon: Icon, label, value, color, loading }: any) => (
   </Card>
 );
 
-const AdminDesktopAppPage = () => {
-  const { data: stats, isLoading, refetch, dataUpdatedAt } = useLiveStats();
-  const lastUpdate = dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("en-PK") : "—";
+const SellerDesktopAppPage = () => {
+  const { user } = useAuth();
 
-  const steps = [
-    { n: 1, title: "Node.js Install Karein", desc: "nodejs.org se LTS version download karein", cmd: "node --version" },
-    { n: 2, title: "ZIP Download Karein", desc: "Neeche se FANZON Admin Desktop download karein", cmd: null },
-    { n: 3, title: "Extract & Run Setup", desc: "ZIP extract karke setup.bat double-click karein", cmd: "setup.bat" },
-    { n: 4, title: ".exe Build Karein (Optional)", desc: "Installer banana ho to ye command run karein", cmd: "npm run build" },
-  ];
+  const { data: stats, isLoading, refetch, dataUpdatedAt } = useQuery({
+    queryKey: ["seller-desktop-stats", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return { products: 0, orders: 0, revenue: 0 };
+      const [products, orders, revenue] = await Promise.all([
+        supabase.from("products").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "active"),
+        supabase.from("orders").select("items").contains("items", JSON.stringify([{ seller_id: user.id }])),
+        supabase.from("wallet_transactions").select("net_amount").eq("seller_id", user.id).eq("transaction_type", "earning"),
+      ]);
+      const totalRevenue = revenue.data?.reduce((s, t) => s + Number(t.net_amount || 0), 0) || 0;
+      return {
+        products: products.count || 0,
+        orders: orders.data?.length || 0,
+        revenue: totalRevenue,
+      };
+    },
+    refetchInterval: 15000,
+    enabled: !!user?.id,
+  });
+
+  const lastUpdate = dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("en-PK") : "—";
 
   return (
     <div className="space-y-6">
@@ -88,11 +81,11 @@ const AdminDesktopAppPage = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2.5 bg-primary/10 rounded-xl">
-            <Monitor size={22} className="text-primary" />
+            <Store size={22} className="text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Admin Desktop App</h1>
-            <p className="text-sm text-muted-foreground">Windows/Mac/Linux desktop software</p>
+            <h1 className="text-xl font-bold text-foreground">Seller Desktop App</h1>
+            <p className="text-sm text-muted-foreground">Apni dukaan desktop se chalayein</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -106,14 +99,13 @@ const AdminDesktopAppPage = () => {
       </div>
 
       {/* Live Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={Users} label="Total Sellers" value={stats?.sellers} color="bg-blue-500" loading={isLoading} />
-        <StatCard icon={Package} label="Active Products" value={stats?.products} color="bg-emerald-500" loading={isLoading} />
-        <StatCard icon={ShoppingCart} label="Total Orders" value={stats?.orders} color="bg-purple-500" loading={isLoading} />
-        <StatCard icon={DollarSign} label="Revenue" value={`₨${((stats?.revenue || 0) / 1000).toFixed(0)}K`} color="bg-orange-500" loading={isLoading} />
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard icon={Package} label="My Products" value={stats?.products} color="bg-emerald-500" loading={isLoading} />
+        <StatCard icon={ShoppingCart} label="My Orders" value={stats?.orders} color="bg-purple-500" loading={isLoading} />
+        <StatCard icon={DollarSign} label="Earnings" value={`₨${((stats?.revenue || 0) / 1000).toFixed(0)}K`} color="bg-orange-500" loading={isLoading} />
       </div>
       <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-        <Activity size={10} /> Last updated: {lastUpdate} • Auto-refresh every 15s
+        <Activity size={10} /> Last updated: {lastUpdate}
       </p>
 
       {/* Tabs */}
@@ -128,36 +120,36 @@ const AdminDesktopAppPage = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Laptop size={18} /> Download Admin Desktop App
+                <Laptop size={18} /> Download Seller Desktop App
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 space-y-3">
+              <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 size={16} className="text-emerald-600 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">v2.0 — No Build Tools Required!</p>
+                    <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">v2.0 — Sirf Node.js chahiye!</p>
                     <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
-                      SQLite hata diya gaya hai. Ab sirf Node.js chahiye — koi Visual Studio ya C++ compiler nahi chahiye!
+                      Koi extra tools install karne ki zaroorat nahi. Download karein, extract karein, setup.bat chalayein!
                     </p>
                   </div>
                 </div>
               </div>
 
-              <a href="/FANZON-Admin-Desktop.zip" download className="block">
+              <a href="/FANZON-Seller-Desktop.zip" download className="block">
                 <Button className="w-full gap-2 h-12 text-base">
-                  <Download size={18} /> Download Admin Desktop v2.0
+                  <Download size={18} /> Download Seller Desktop v2.0
                 </Button>
               </a>
 
               <div className="grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
                 <div className="p-2 bg-muted/30 rounded-lg">
                   <p className="font-medium text-foreground">Windows</p>
-                  <p>.exe installer</p>
+                  <p>.exe</p>
                 </div>
                 <div className="p-2 bg-muted/30 rounded-lg">
                   <p className="font-medium text-foreground">macOS</p>
-                  <p>.dmg file</p>
+                  <p>.dmg</p>
                 </div>
                 <div className="p-2 bg-muted/30 rounded-lg">
                   <p className="font-medium text-foreground">Linux</p>
@@ -171,37 +163,24 @@ const AdminDesktopAppPage = () => {
         <TabsContent value="setup" className="mt-4 space-y-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Step-by-Step Setup</CardTitle>
+              <CardTitle className="text-base">Setup Guide</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {steps.map((step) => (
-                <div key={step.n} className="flex gap-3">
-                  <div className="shrink-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">
-                    {step.n}
-                  </div>
+              {[
+                { n: 1, t: "Node.js Install", d: "nodejs.org se download karein", c: "node --version" },
+                { n: 2, t: "ZIP Download", d: "Download button se ZIP lein", c: null },
+                { n: 3, t: "Extract & Run", d: "ZIP extract kar ke setup.bat chalayein", c: "setup.bat" },
+                { n: 4, t: ".exe Banana Ho (Optional)", d: "Installer build karein", c: "npm run build" },
+              ].map((s) => (
+                <div key={s.n} className="flex gap-3">
+                  <div className="shrink-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">{s.n}</div>
                   <div className="flex-1 space-y-1.5">
-                    <p className="text-sm font-semibold text-foreground">{step.title}</p>
-                    <p className="text-xs text-muted-foreground">{step.desc}</p>
-                    {step.cmd && <CopyBlock text={step.cmd} />}
+                    <p className="text-sm font-semibold text-foreground">{s.t}</p>
+                    <p className="text-xs text-muted-foreground">{s.d}</p>
+                    {s.c && <CopyBlock text={s.c} />}
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-
-          <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/10">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-2">
-                <Clock size={16} className="text-amber-600 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Masla Aaye To?</p>
-                  <ul className="text-xs text-amber-700 dark:text-amber-400 mt-1 space-y-1 list-disc pl-4">
-                    <li>Node.js version 18+ honi chahiye</li>
-                    <li><code>npm install</code> fail ho to: <code>npm cache clean --force</code> run karein</li>
-                    <li>Windows Firewall allow karein agar app block ho</li>
-                  </ul>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -210,17 +189,16 @@ const AdminDesktopAppPage = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Shield size={18} /> Pre-Configured API Keys
+                <Shield size={18} /> API Keys (Pre-configured)
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-start gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
                 <Zap size={14} className="text-emerald-600 mt-0.5" />
-                <p className="text-xs text-emerald-700 dark:text-emerald-300">API keys already code mein add hain. Kuch manually set karne ki zaroorat nahi!</p>
+                <p className="text-xs text-emerald-700 dark:text-emerald-300">Sab keys already code mein hain — kuch karne ki zaroorat nahi!</p>
               </div>
               <CopyBlock label="Backend URL" text="https://faevzfibzcbuqjoatmjm.supabase.co" />
-              <CopyBlock label="Anon Key" text="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
-              <p className="text-[11px] text-muted-foreground">Ye publishable keys hain — code mein safe hain.</p>
+              <CopyBlock label="Anon Key (Publishable)" text="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
             </CardContent>
           </Card>
         </TabsContent>
@@ -229,4 +207,4 @@ const AdminDesktopAppPage = () => {
   );
 };
 
-export default AdminDesktopAppPage;
+export default SellerDesktopAppPage;
