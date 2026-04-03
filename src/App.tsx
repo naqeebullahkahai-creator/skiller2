@@ -518,6 +518,7 @@ const App = () => (
                               <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
                               <Route path="settings" element={<SellerSettingsPage />} />
                               <Route path="fee-guide" element={<SellerFeeGuidePage />} />
+                              <Route path="desktop-app" element={<SellerDesktopAppPage />} />
                             </Route>
                           )}
 
