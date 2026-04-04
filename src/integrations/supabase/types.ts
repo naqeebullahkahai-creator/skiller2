@@ -4554,7 +4554,13 @@ export type Database = {
       deposit_request_status: "pending" | "approved" | "rejected"
       deposit_requester_type: "customer" | "seller"
       discount_type: "fixed" | "percentage"
-      notification_type: "order" | "price_drop" | "promotion" | "system"
+      notification_type:
+        | "order"
+        | "price_drop"
+        | "promotion"
+        | "system"
+        | "wallet"
+        | "stock"
       order_status:
         | "pending"
         | "confirmed"
@@ -4737,7 +4743,14 @@ export const Constants = {
       deposit_request_status: ["pending", "approved", "rejected"],
       deposit_requester_type: ["customer", "seller"],
       discount_type: ["fixed", "percentage"],
-      notification_type: ["order", "price_drop", "promotion", "system"],
+      notification_type: [
+        "order",
+        "price_drop",
+        "promotion",
+        "system",
+        "wallet",
+        "stock",
+      ],
       order_status: [
         "pending",
         "confirmed",
