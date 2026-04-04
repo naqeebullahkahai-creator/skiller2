@@ -8,199 +8,148 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import {
-  Monitor, Download, Copy, Check, Package, ShoppingCart,
-  DollarSign, RefreshCw, Wifi, Activity, Terminal, CheckCircle2,
-  Clock, Laptop, Shield, Zap, Store, TrendingUp
-} from "lucide-react";
+import { Monitor, Copy, Check, Shield, Wifi, WifiOff, RefreshCw, Package, ShoppingCart, DollarSign, Settings, FileCode, Terminal, ArrowLeft, Zap, HardDrive, Globe, Lock, FolderTree, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const CopyBlock = ({ text, label }: { text: string; label?: string }) => {
-  const [copied, setCopied] = useState(false);
-  return (
-    <div>
-      {label && <p className="text-[11px] font-medium text-muted-foreground mb-1">{label}</p>}
-      <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-lg px-3 py-2.5">
-        <code className="text-xs font-mono flex-1 break-all text-foreground">{text}</code>
-        <button
-          onClick={() => { navigator.clipboard.writeText(text); setCopied(true); toast.success("Copied!"); setTimeout(() => setCopied(false), 1500); }}
-          className="shrink-0 p-1.5 rounded-md hover:bg-primary/10"
-        >
-          {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="text-muted-foreground" />}
-        </button>
-      </div>
-    </div>
-  );
-};
+const SU = "https://faevzfibzcbuqjoatmjm.supabase.co";
+const SK = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZXZ6ZmliemNidXFqb2F0bWptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3OTM4OTQsImV4cCI6MjA4NzM2OTg5NH0.1P6q4Xo5xKWHExRnUOaQPjwq-AxmQ6K4Sp4FTpWPXGM";
 
-const StatCard = ({ icon: Icon, label, value, color, loading }: any) => (
-  <Card className="border-border/50">
-    <CardContent className="p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2.5 rounded-xl ${color}`}>
-          <Icon size={18} className="text-white" />
-        </div>
-        <div className="flex-1">
-          <p className="text-xs text-muted-foreground">{label}</p>
-          {loading ? <Skeleton className="h-6 w-16 mt-1" /> : (
-            <p className="text-xl font-bold text-foreground">{value}</p>
-          )}
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+const PKG=`{
+  "name":"fanzon-seller-desktop","version":"1.0.0",
+  "description":"FANZON Seller Center – Desktop","main":"electron/main.cjs",
+  "scripts":{"start":"electron .","build":"electron-builder --win --x64"},
+  "build":{"appId":"com.fanzon.seller","productName":"FANZON Seller Center","directories":{"output":"release"},"win":{"target":"nsis","icon":"assets/icon.ico"},"nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true}},
+  "dependencies":{"electron-store":"^8.1.0","@supabase/supabase-js":"^2.49.0"},
+  "devDependencies":{"electron":"^33.0.0","electron-builder":"^25.0.0"}
+}`;
+const MAIN=`const{app,BrowserWindow,ipcMain,Tray,nativeImage}=require('electron');const path=require('path');const Store=require('electron-store');const store=new Store({defaults:{windowBounds:{width:1200,height:780}}});let mainWindow,tray;
+function createWindow(){const{width,height}=store.get('windowBounds');mainWindow=new BrowserWindow({width,height,minWidth:1000,minHeight:680,title:'FANZON Seller Center',icon:path.join(__dirname,'../assets/icon.png'),webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false},frame:false,backgroundColor:'#0f172a'});mainWindow.loadFile(path.join(__dirname,'../renderer/index.html'));mainWindow.on('resize',()=>{const[w,h]=mainWindow.getSize();store.set('windowBounds',{width:w,height:h})})}
+function createTray(){const icon=nativeImage.createFromPath(path.join(__dirname,'../assets/icon.png'));tray=new Tray(icon.resize({width:16,height:16}));tray.setToolTip('FANZON Seller');tray.on('click',()=>mainWindow?.show())}
+ipcMain.handle('minimize-window',()=>mainWindow?.minimize());ipcMain.handle('maximize-window',()=>{mainWindow?.isMaximized()?mainWindow.unmaximize():mainWindow?.maximize()});ipcMain.handle('close-window',()=>mainWindow?.close());
+app.whenReady().then(()=>{createWindow();createTray()});app.on('window-all-closed',()=>{if(process.platform!=='darwin')app.quit()});`;
+const PRELOAD=`const{contextBridge,ipcRenderer}=require('electron');contextBridge.exposeInMainWorld('electronAPI',{minimize:()=>ipcRenderer.invoke('minimize-window'),maximize:()=>ipcRenderer.invoke('maximize-window'),close:()=>ipcRenderer.invoke('close-window')});`;
+const APPJS=`const SUPABASE_URL='${SU}';const SUPABASE_KEY='${SK}';
+let currentPage='dashboard',isOnline=false,currentUser=null,sellerId=null,syncTimer=null;
+let D={products:[],orders:[],wallet:null};
+function openDB(){return new Promise((r,j)=>{const q=indexedDB.open('fanzon_seller',1);q.onupgradeneeded=e=>{const d=e.target.result;['products','orders'].forEach(n=>{if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'})})};q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)})}
+async function saveL(n,d){const db=await openDB();const tx=db.transaction(n,'readwrite');tx.objectStore(n).clear();d.forEach(i=>tx.objectStore(n).put(i))}
+async function getL(n){const db=await openDB();return new Promise(r=>{const q=db.transaction(n,'readonly').objectStore(n).getAll();q.onsuccess=()=>r(q.result||[]);q.onerror=()=>r([])})}
+async function api(ep,opt={}){const r=await fetch(SUPABASE_URL+'/rest/v1/'+ep,{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(currentUser?.access_token||SUPABASE_KEY),'Content-Type':'application/json','Prefer':'return=representation',...opt.headers},...opt});return r.json()}
+async function checkOnline(){try{const r=await fetch(SUPABASE_URL+'/rest/v1/',{headers:{'apikey':SUPABASE_KEY},signal:AbortSignal.timeout(5000)});const was=!isOnline;isOnline=r.ok;if(was&&isOnline)syncData()}catch{isOnline=false}document.getElementById('status-dot').className='status-dot '+(isOnline?'online':'offline');document.getElementById('status-text').textContent=isOnline?'Online – Synced':'Offline Mode'}
+async function login(e,p){try{const r=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});const d=await r.json();if(d.access_token){currentUser=d;sellerId=d.user?.id;localStorage.setItem('fz_seller',JSON.stringify(d));boot();return{ok:true}}return{ok:false,msg:d.error_description||'Failed'}}catch{const s=localStorage.getItem('fz_seller');if(s){currentUser=JSON.parse(s);sellerId=currentUser.user?.id;boot();return{ok:true}}return{ok:false,msg:'Offline & no session'}}}
+function logout(){currentUser=null;sellerId=null;localStorage.removeItem('fz_seller');clearInterval(syncTimer);showLogin()}
+async function syncData(){if(!isOnline||!sellerId)return;try{const[p,o,w]=await Promise.all([api('products?select=*&seller_id=eq.'+sellerId+'&order=created_at.desc'),api('orders?select=*&seller_id=eq.'+sellerId+'&order=created_at.desc&limit=200'),api('seller_wallets?select=*&seller_id=eq.'+sellerId+'&limit=1')]);D.products=p||[];D.orders=o||[];D.wallet=w?.[0]||null;await Promise.all([saveL('products',D.products),saveL('orders',D.orders)]);renderPage()}catch(e){console.error('Sync:',e)}}
+const NAV=[{id:'dashboard',l:'Dashboard',i:'📊'},{id:'products',l:'My Products',i:'📦'},{id:'orders',l:'My Orders',i:'🛒'},{id:'wallet',l:'Wallet',i:'💰'},{id:'add-product',l:'Add Product',i:'➕'},{id:'sync',l:'Sync Center',i:'🔄'},{id:'settings',l:'Settings',i:'⚙️'}];
+function renderNav(){document.getElementById('sidebar-nav').innerHTML=NAV.map(n=>'<div class="nav-item '+(currentPage===n.id?'active':'')+'" onclick="go(\\''+n.id+'\\')"><span>'+n.i+'</span>'+n.l+'</div>').join('')+'<div class="nav-section">Account</div><div class="nav-item" onclick="logout()"><span>🚪</span>Logout</div>'}
+function go(p){currentPage=p;renderNav();renderPage()}
+function renderPage(){({dashboard:pgDash,products:pgProd,orders:pgOrd,wallet:pgWal,'add-product':pgAdd,sync:pgSync,settings:pgSet}[currentPage]||pgDash)()}
+function pgDash(){const p=D.products,o=D.orders,w=D.wallet;const rev=o.filter(x=>x.order_status==='delivered').reduce((s,x)=>s+Number(x.total_amount_pkr||0),0);const pend=o.filter(x=>x.order_status==='pending').length;const act=p.filter(x=>x.status==='active').length;document.getElementById('main-content').innerHTML='<div class="page-header"><h1 class="page-title">Seller Dashboard</h1></div><div class="stats-grid"><div class="stat-card emerald"><div class="stat-label">Products</div><div class="stat-value">'+p.length+'</div><small style="color:#4ade80">'+act+' active</small></div><div class="stat-card blue"><div class="stat-label">Orders</div><div class="stat-value">'+o.length+'</div><small style="color:#fbbf24">'+pend+' pending</small></div><div class="stat-card amber"><div class="stat-label">Revenue</div><div class="stat-value">Rs.'+rev.toLocaleString()+'</div></div><div class="stat-card purple"><div class="stat-label">Wallet</div><div class="stat-value">Rs.'+Number(w?.current_balance||0).toLocaleString()+'</div></div></div><h3 style="margin-bottom:12px;font-size:15px">Recent Orders</h3><table class="data-table"><thead><tr><th>Order #</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead><tbody>'+o.slice(0,8).map(x=>'<tr><td>'+(x.order_number||x.id.slice(0,8))+'</td><td>'+(x.customer_name||'-')+'</td><td>Rs.'+Number(x.total_amount_pkr||0).toLocaleString()+'</td><td><span class="badge badge-'+(x.order_status==='delivered'?'success':x.order_status==='pending'?'warning':'info')+'">'+x.order_status+'</span></td></tr>').join('')+'</tbody></table>'}
+function pgProd(){const p=D.products;document.getElementById('main-content').innerHTML='<div class="page-header"><h1 class="page-title">Products ('+p.length+')</h1><button class="sync-btn" onclick="go(\\'add-product\\')">➕ Add</button></div><table class="data-table"><thead><tr><th>Title</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead><tbody>'+p.map(x=>'<tr><td>'+(x.title||'-').substring(0,40)+'</td><td>Rs.'+Number(x.price_pkr||0).toLocaleString()+'</td><td>'+(x.stock_count||0)+'</td><td><span class="badge badge-'+(x.status==='active'?'success':'warning')+'">'+x.status+'</span></td></tr>').join('')+'</tbody></table>'}
+function pgOrd(){const o=D.orders;document.getElementById('main-content').innerHTML='<div class="page-header"><h1 class="page-title">Orders ('+o.length+')</h1></div><table class="data-table"><thead><tr><th>Order #</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody>'+o.map(x=>'<tr><td>'+(x.order_number||x.id.slice(0,8))+'</td><td>'+(x.customer_name||'-')+'</td><td>Rs.'+Number(x.total_amount_pkr||0).toLocaleString()+'</td><td><span class="badge badge-'+(x.order_status==='delivered'?'success':x.order_status==='cancelled'?'danger':x.order_status==='pending'?'warning':'info')+'">'+x.order_status+'</span></td><td>'+new Date(x.created_at).toLocaleDateString()+'</td></tr>').join('')+'</tbody></table>'}
+function pgWal(){const w=D.wallet;document.getElementById('main-content').innerHTML='<div class="page-header"><h1 class="page-title">Wallet</h1></div><div class="stats-grid" style="grid-template-columns:repeat(3,1fr)"><div class="stat-card emerald"><div class="stat-label">Balance</div><div class="stat-value">Rs.'+Number(w?.current_balance||0).toLocaleString()+'</div></div><div class="stat-card blue"><div class="stat-label">Earnings</div><div class="stat-value">Rs.'+Number(w?.total_earnings||0).toLocaleString()+'</div></div><div class="stat-card amber"><div class="stat-label">Withdrawn</div><div class="stat-value">Rs.'+Number(w?.total_withdrawn||0).toLocaleString()+'</div></div></div>'}
+function pgAdd(){document.getElementById('main-content').innerHTML='<div class="page-header"><h1 class="page-title">Add Product</h1></div><div class="settings-group" style="max-width:600px"><div style="margin-bottom:12px"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Title</label><input class="login-input" id="pt" placeholder="Product title"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"><div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Price (PKR)</label><input class="login-input" id="pp" type="number" placeholder="0"></div><div><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Stock</label><input class="login-input" id="ps" type="number" placeholder="0"></div></div><div style="margin-bottom:12px"><label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Description</label><textarea class="login-input" id="pd" rows="3" placeholder="Description" style="resize:vertical;min-height:80px"></textarea></div><button class="sync-btn" onclick="doAdd()" style="width:100%">📦 Add Product</button><p id="am" style="font-size:12px;margin-top:8px;text-align:center"></p></div>'}
+async function doAdd(){const t=document.getElementById('pt').value,p=Number(document.getElementById('pp').value),s=Number(document.getElementById('ps').value),d=document.getElementById('pd').value,m=document.getElementById('am');if(!t||!p){m.style.color='var(--danger)';m.textContent='Title & Price required';return}if(isOnline&&sellerId){try{await api('products',{method:'POST',body:JSON.stringify({title:t,price_pkr:p,stock_count:s,description:d,seller_id:sellerId,status:'pending'})});m.style.color='var(--success)';m.textContent='✅ Added! Pending approval.';syncData()}catch{m.style.color='var(--danger)';m.textContent='Failed'}}else{D.products.unshift({id:crypto.randomUUID(),title:t,price_pkr:p,stock_count:s,description:d,seller_id:sellerId,status:'pending_sync',created_at:new Date().toISOString()});await saveL('products',D.products);m.style.color='var(--warning)';m.textContent='📱 Saved offline. Will sync when online.'}}
+function pgSync(){document.getElementById('main-content').innerHTML='<div class="page-header"><h1 class="page-title">Sync Center</h1></div><div class="sync-panel"><div class="sync-header"><div><h3 style="font-size:15px">Data Sync</h3><p style="font-size:12px;color:var(--muted)">'+(isOnline?'🟢 Connected':'🔴 Offline')+'</p></div><button class="sync-btn" onclick="syncData().then(pgSync)">🔄 Sync Now</button></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px"><div style="background:var(--bg);padding:12px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700">'+D.products.length+'</div><div style="font-size:11px;color:var(--muted)">Products</div></div><div style="background:var(--bg);padding:12px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700">'+D.orders.length+'</div><div style="font-size:11px;color:var(--muted)">Orders</div></div><div style="background:var(--bg);padding:12px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700">Rs.'+Number(D.wallet?.current_balance||0).toLocaleString()+'</div><div style="font-size:11px;color:var(--muted)">Wallet</div></div></div></div>'}
+function pgSet(){document.getElementById('main-content').innerHTML='<div class="page-header"><h1 class="page-title">Settings</h1></div><div class="settings-group"><h3 style="font-size:15px;margin-bottom:12px">General</h3><div class="settings-row"><span>Auto Sync</span><div class="toggle on" onclick="this.classList.toggle(\\'on\\')"></div></div><div class="settings-row"><span>Notifications</span><div class="toggle on" onclick="this.classList.toggle(\\'on\\')"></div></div></div><div class="settings-group"><div class="settings-row"><span>Version</span><span style="color:var(--muted)">1.0.0</span></div><div class="settings-row"><span>Status</span><span style="color:'+(isOnline?'var(--success)':'var(--danger)')+'">'+(isOnline?'Online':'Offline')+'</span></div></div>'}
+function showLogin(){document.getElementById('sidebar-nav').innerHTML='';document.getElementById('main-content').innerHTML='<div class="login-container"><div class="login-card"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">FANZON</div><div style="font-size:12px;color:var(--muted);margin-bottom:24px">Seller Center</div><input class="login-input" id="le" type="email" placeholder="Seller Email"><input class="login-input" id="lp" type="password" placeholder="Password"><div id="lerr" style="color:var(--danger);font-size:12px;margin-bottom:8px"></div><button class="login-btn" style="background:linear-gradient(135deg,#10b981,#34d399)" id="lbtn" onclick="doLogin()">Sign In</button><div style="margin-top:16px;font-size:11px;color:var(--muted)">Works offline with saved session</div></div></div>'}
+async function doLogin(){const b=document.getElementById('lbtn'),e=document.getElementById('lerr');b.disabled=true;b.textContent='Signing in...';const r=await login(document.getElementById('le').value,document.getElementById('lp').value);if(!r.ok){e.textContent=r.msg;b.disabled=false;b.textContent='Sign In'}}
+async function boot(){renderNav();D.products=await getL('products');D.orders=await getL('orders');pgDash();syncData();syncTimer=setInterval(syncData,30000)}
+async function init(){await checkOnline();setInterval(checkOnline,10000);const s=localStorage.getItem('fz_seller');if(s){currentUser=JSON.parse(s);sellerId=currentUser.user?.id;boot()}else showLogin()}
+init();`;
+
+const HTML=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>FANZON Seller</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0f172a;--sidebar:#1e293b;--card:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--primary:#10b981;--primary-glow:#34d399;--success:#22c55e;--danger:#ef4444;--warning:#f59e0b;--border:#334155}body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}.titlebar{display:flex;align-items:center;justify-content:space-between;height:36px;background:#0b1120;-webkit-app-region:drag;padding:0 12px}.titlebar-title{font-size:12px;font-weight:600;color:var(--muted)}.titlebar-btns{display:flex;gap:4px;-webkit-app-region:no-drag}.titlebar-btns button{width:14px;height:14px;border-radius:50%;border:none;cursor:pointer}.btn-min{background:#f59e0b}.btn-max{background:#22c55e}.btn-close{background:#ef4444}.app-layout{display:flex;height:calc(100vh - 36px)}.sidebar{width:220px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column}.sidebar-header{padding:20px 16px;border-bottom:1px solid var(--border)}.sidebar-logo{font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--primary-glow));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.sidebar-sub{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:1px}.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px;transition:.2s;margin-bottom:2px}.nav-item:hover{background:rgba(16,185,129,.1);color:var(--text)}.nav-item.active{background:rgba(16,185,129,.15);color:var(--primary-glow);font-weight:600}.nav-section{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:12px 12px 6px}.status-bar{padding:12px 16px;border-top:1px solid var(--border)}.status-indicator{display:flex;align-items:center;gap:6px;font-size:11px}.status-dot{width:8px;height:8px;border-radius:50%}.status-dot.online{background:var(--success);box-shadow:0 0 8px var(--success)}.status-dot.offline{background:var(--danger);box-shadow:0 0 8px var(--danger)}.main{flex:1;overflow-y:auto;padding:24px}.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.page-title{font-size:22px;font-weight:700}.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden}.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}.stat-card.emerald::before{background:linear-gradient(90deg,#10b981,#34d399)}.stat-card.blue::before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}.stat-card.amber::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}.stat-card.purple::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}.stat-label{font-size:12px;color:var(--muted);margin-bottom:6px}.stat-value{font-size:28px;font-weight:800}.data-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border)}.data-table th{text-align:left;padding:12px 16px;font-size:11px;text-transform:uppercase;color:var(--muted);background:rgba(0,0,0,.2)}.data-table td{padding:12px 16px;font-size:13px;border-top:1px solid var(--border)}.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}.badge-success{background:rgba(34,197,94,.15);color:#4ade80}.badge-warning{background:rgba(245,158,11,.15);color:#fbbf24}.badge-danger{background:rgba(239,68,68,.15);color:#f87171}.badge-info{background:rgba(59,130,246,.15);color:#60a5fa}.sync-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}.sync-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sync-btn{background:linear-gradient(135deg,var(--primary),var(--primary-glow));color:white;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}.login-container{max-width:400px;margin:80px auto;text-align:center}.login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 32px}.login-input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;margin-bottom:12px;outline:none}.login-input:focus{border-color:var(--primary)}.login-btn{width:100%;padding:12px;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}.settings-group{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}.settings-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0}.settings-row+.settings-row{border-top:1px solid var(--border)}.toggle{width:44px;height:24px;background:var(--border);border-radius:12px;position:relative;cursor:pointer;transition:.3s}.toggle.on{background:var(--primary)}.toggle::after{content:'';width:18px;height:18px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:.3s}.toggle.on::after{left:23px}</style></head><body>
+<div class="titlebar"><span class="titlebar-title">FANZON Seller Center v1.0</span><div class="titlebar-btns"><button class="btn-min" onclick="window.electronAPI?.minimize()"></button><button class="btn-max" onclick="window.electronAPI?.maximize()"></button><button class="btn-close" onclick="window.electronAPI?.close()"></button></div></div>
+<div class="app-layout"><div class="sidebar"><div class="sidebar-header"><div class="sidebar-logo">FANZON</div><div class="sidebar-sub">Seller Center</div></div><div class="sidebar-nav" id="sidebar-nav"></div><div class="status-bar"><div class="status-indicator"><div class="status-dot" id="status-dot"></div><span id="status-text">Checking...</span></div></div></div><div class="main" id="main-content"></div></div>
+<script src="app.js"></script></body></html>`;
+
+const FOLDER=`fanzon-seller-desktop/
+├── package.json
+├── electron/
+│   ├── main.cjs
+│   └── preload.cjs
+├── renderer/
+│   ├── index.html
+│   └── app.js
+└── assets/
+    └── icon.png`;
+
+const FILES:{name:string;code:string}[]=[
+  {name:"package.json",code:PKG},{name:"electron/main.cjs",code:MAIN},
+  {name:"electron/preload.cjs",code:PRELOAD},{name:"renderer/index.html",code:HTML},
+  {name:"renderer/app.js",code:APPJS},
+];
 
 const SellerDesktopAppPage = () => {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [copied, setCopied] = useState<string|null>(null);
 
-  const { data: stats, isLoading, refetch, dataUpdatedAt } = useQuery({
-    queryKey: ["seller-desktop-stats", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return { products: 0, orders: 0, revenue: 0 };
-      const [products, orders, revenue] = await Promise.all([
-        supabase.from("products").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "active"),
-        supabase.from("orders").select("items").contains("items", JSON.stringify([{ seller_id: user.id }])),
-        supabase.from("wallet_transactions").select("net_amount").eq("seller_id", user.id).eq("transaction_type", "earning"),
-      ]);
-      const totalRevenue = revenue.data?.reduce((s, t) => s + Number(t.net_amount || 0), 0) || 0;
-      return {
-        products: products.count || 0,
-        orders: orders.data?.length || 0,
-        revenue: totalRevenue,
-      };
-    },
-    refetchInterval: 15000,
-    enabled: !!user?.id,
-  });
-
-  const lastUpdate = dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("en-PK") : "—";
+  const copy = (code:string, name:string) => {
+    navigator.clipboard.writeText(code); setCopied(name);
+    toast.success(`${name} copied!`); setTimeout(()=>setCopied(null),2000);
+  };
+  const CBtn = ({code,name}:{code:string;name:string}) => (
+    <Button size="sm" variant="ghost" className="absolute top-2 right-2 h-7 px-2 text-xs" onClick={()=>copy(code,name)}>
+      {copied===name?<Check className="w-3.5 h-3.5 mr-1"/>:<Copy className="w-3.5 h-3.5 mr-1"/>}{copied===name?"Copied":"Copy"}
+    </Button>
+  );
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-xl p-6 text-white">
+        <Button variant="ghost" size="sm" onClick={()=>navigate(-1)} className="mb-3 text-white/80 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8"><ArrowLeft className="h-4 w-4"/>Back</Button>
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-primary/10 rounded-xl">
-            <Store size={22} className="text-primary" />
-          </div>
+          <div className="p-3 bg-white/15 rounded-xl"><Package className="w-8 h-8"/></div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Seller Desktop App</h1>
-            <p className="text-sm text-muted-foreground">Apni dukaan desktop se chalayein</p>
+            <h1 className="text-2xl font-bold flex items-center gap-2">Seller Desktop Software<Badge className="bg-white/20 text-white border-0 text-xs">Offline + Online</Badge></h1>
+            <p className="text-white/70 text-sm">Complete .exe with products, orders, wallet & offline sync</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="gap-1.5 text-emerald-600 border-emerald-200 bg-emerald-50">
-            <Wifi size={12} /> Live
-          </Badge>
-          <Button variant="ghost" size="sm" onClick={() => refetch()}>
-            <RefreshCw size={14} className="mr-1" /> Refresh
-          </Button>
-        </div>
       </div>
 
-      {/* Live Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatCard icon={Package} label="My Products" value={stats?.products} color="bg-emerald-500" loading={isLoading} />
-        <StatCard icon={ShoppingCart} label="My Orders" value={stats?.orders} color="bg-purple-500" loading={isLoading} />
-        <StatCard icon={DollarSign} label="Earnings" value={`₨${((stats?.revenue || 0) / 1000).toFixed(0)}K`} color="bg-orange-500" loading={isLoading} />
-      </div>
-      <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-        <Activity size={10} /> Last updated: {lastUpdate}
-      </p>
-
-      {/* Tabs */}
-      <Tabs defaultValue="download">
-        <TabsList className="grid grid-cols-3 w-full max-w-md">
-          <TabsTrigger value="download"><Download size={14} className="mr-1" /> Download</TabsTrigger>
-          <TabsTrigger value="setup"><Terminal size={14} className="mr-1" /> Setup</TabsTrigger>
-          <TabsTrigger value="api"><Shield size={14} className="mr-1" /> API Info</TabsTrigger>
+      <Tabs defaultValue="files">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="files"><FileCode className="w-4 h-4 mr-1.5"/>Complete Files</TabsTrigger>
+          <TabsTrigger value="setup"><Terminal className="w-4 h-4 mr-1.5"/>Setup Guide</TabsTrigger>
+          <TabsTrigger value="features"><Zap className="w-4 h-4 mr-1.5"/>Features</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="download" className="mt-4 space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Laptop size={18} /> Download Seller Desktop App
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">v2.0 — Sirf Node.js chahiye!</p>
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
-                      Koi extra tools install karne ki zaroorat nahi. Download karein, extract karein, setup.bat chalayein!
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <a href="/FANZON-Seller-Desktop.zip" download className="block">
-                <Button className="w-full gap-2 h-12 text-base">
-                  <Download size={18} /> Download Seller Desktop v2.0
-                </Button>
-              </a>
-
-              <div className="grid grid-cols-3 gap-2 text-center text-xs text-muted-foreground">
-                <div className="p-2 bg-muted/30 rounded-lg">
-                  <p className="font-medium text-foreground">Windows</p>
-                  <p>.exe</p>
-                </div>
-                <div className="p-2 bg-muted/30 rounded-lg">
-                  <p className="font-medium text-foreground">macOS</p>
-                  <p>.dmg</p>
-                </div>
-                <div className="p-2 bg-muted/30 rounded-lg">
-                  <p className="font-medium text-foreground">Linux</p>
-                  <p>.AppImage</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="files" className="space-y-4 mt-4">
+          <Card><CardHeader className="pb-3"><CardTitle className="text-sm flex items-center gap-2"><FolderTree className="w-4 h-4 text-emerald-500"/>Folder Structure</CardTitle></CardHeader>
+          <CardContent className="relative"><CBtn code={FOLDER} name="folder"/><pre className="bg-muted/50 p-4 rounded-lg text-xs font-mono">{FOLDER}</pre></CardContent></Card>
+          {FILES.map(f=>(
+            <Card key={f.name}><CardHeader className="pb-2"><CardTitle className="text-sm"><code className="text-emerald-600 dark:text-emerald-400">{f.name}</code></CardTitle></CardHeader>
+            <CardContent className="relative"><CBtn code={f.code} name={f.name}/><pre className="bg-muted/50 p-4 rounded-lg text-[11px] font-mono overflow-x-auto max-h-[400px] overflow-y-auto leading-relaxed">{f.code}</pre></CardContent></Card>
+          ))}
         </TabsContent>
 
-        <TabsContent value="setup" className="mt-4 space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Setup Guide</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                { n: 1, t: "Node.js Install", d: "nodejs.org se download karein", c: "node --version" },
-                { n: 2, t: "ZIP Download", d: "Download button se ZIP lein", c: null },
-                { n: 3, t: "Extract & Run", d: "ZIP extract kar ke setup.bat chalayein", c: "setup.bat" },
-                { n: 4, t: ".exe Banana Ho (Optional)", d: "Installer build karein", c: "npm run build" },
-              ].map((s) => (
-                <div key={s.n} className="flex gap-3">
-                  <div className="shrink-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">{s.n}</div>
-                  <div className="flex-1 space-y-1.5">
-                    <p className="text-sm font-semibold text-foreground">{s.t}</p>
-                    <p className="text-xs text-muted-foreground">{s.d}</p>
-                    {s.c && <CopyBlock text={s.c} />}
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+        <TabsContent value="setup" className="space-y-4 mt-4">
+          {[{s:1,t:"Create Folder",c:"mkdir fanzon-seller-desktop\ncd fanzon-seller-desktop\nmkdir electron renderer assets"},{s:2,t:"Create Files",c:"Copy all 5 files from 'Complete Files' tab."},{s:3,t:"Add Icon",c:"Place 256x256 PNG at assets/icon.png"},{s:4,t:"Install",c:"npm install"},{s:5,t:"Run",c:"npm start"},{s:6,t:"Build .exe",c:"npm run build\n→ release/FANZON Seller Center Setup.exe"}].map(x=>(
+            <Card key={x.s}><CardContent className="p-4 flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-emerald-500/15 text-emerald-500 flex items-center justify-center text-sm font-bold shrink-0">{x.s}</div>
+              <div className="flex-1"><h3 className="font-semibold text-sm mb-2">{x.t}</h3><div className="relative"><CBtn code={x.c} name={`s${x.s}`}/><pre className="bg-muted/50 p-3 rounded-lg text-xs font-mono whitespace-pre-wrap">{x.c}</pre></div></div>
+            </CardContent></Card>
+          ))}
         </TabsContent>
 
-        <TabsContent value="api" className="mt-4 space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Shield size={18} /> API Keys (Pre-configured)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-                <Zap size={14} className="text-emerald-600 mt-0.5" />
-                <p className="text-xs text-emerald-700 dark:text-emerald-300">Sab keys already code mein hain — kuch karne ki zaroorat nahi!</p>
-              </div>
-              <CopyBlock label="Backend URL" text="https://faevzfibzcbuqjoatmjm.supabase.co" />
-              <CopyBlock label="Anon Key (Publishable)" text="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
-            </CardContent>
-          </Card>
+        <TabsContent value="features" className="mt-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              {icon:<WifiOff className="w-5 h-5"/>,t:"Offline Mode",d:"Add products offline, auto-sync when internet returns.",c:"text-red-500"},
+              {icon:<Wifi className="w-5 h-5"/>,t:"Real-time Sync",d:"Auto-syncs products, orders & wallet every 30s.",c:"text-green-500"},
+              {icon:<Package className="w-5 h-5"/>,t:"Product Management",d:"View, add products with offline queue.",c:"text-blue-500"},
+              {icon:<ShoppingCart className="w-5 h-5"/>,t:"Order Tracking",d:"All orders with status & amounts.",c:"text-violet-500"},
+              {icon:<DollarSign className="w-5 h-5"/>,t:"Wallet",d:"Balance, earnings & withdrawals live.",c:"text-amber-500"},
+              {icon:<Upload className="w-5 h-5"/>,t:"Offline Add Product",d:"Add without internet, syncs automatically.",c:"text-teal-500"},
+              {icon:<Lock className="w-5 h-5"/>,t:"Secure Auth",d:"Login persists offline. Context isolation.",c:"text-rose-500"},
+              {icon:<Settings className="w-5 h-5"/>,t:"System Tray",d:"Runs in background with custom titlebar.",c:"text-muted-foreground"},
+            ].map(f=>(
+              <Card key={f.t}><CardContent className="p-4 flex items-start gap-3">
+                <div className={f.c}>{f.icon}</div>
+                <div><h3 className="font-semibold text-sm">{f.t}</h3><p className="text-xs text-muted-foreground mt-0.5">{f.d}</p></div>
+              </CardContent></Card>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>
