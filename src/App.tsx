@@ -113,7 +113,7 @@ import AdminWithdrawalMethodsPage from "./pages/dashboard/AdminWithdrawalMethods
 import AdminPaymentSettingsPage from "./pages/dashboard/AdminPaymentSettingsPage";
 import AdminAllSettingsPage from "./pages/dashboard/AdminAllSettingsPage";
 import AdminDirectOrdersPage from "./pages/dashboard/AdminDirectOrdersPage";
-import AdminVendorOrdersPage from "./pages/dashboard/AdminVendorOrdersPage";
+import AdminSellerOrdersPage from "./pages/dashboard/AdminSellerOrdersPage";
 import AdminChatShortcutsPage from "./pages/dashboard/AdminChatShortcutsPage";
 import AdminSiteContentPage from "./pages/dashboard/AdminSiteContentPage";
 import AdminBrandAssetsPage from "./pages/dashboard/AdminBrandAssetsPage";
