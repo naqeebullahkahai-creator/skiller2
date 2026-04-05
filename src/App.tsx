@@ -608,8 +608,7 @@ const App = () => (
                               <Route path="analytics" element={<AdminAnalyticsPage />} />
                               <Route path="reviews" element={<AdminReviewsPage />} />
                               <Route path="qa" element={<AdminQAModerationPage />} />
-                              <Route path="flash-sales" element={<FlashSaleManager />} />
-                              <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                              {/* Flash sales removed */}
                               <Route path="vouchers" element={<VoucherManager />} />
                               <Route path="banners" element={<BannerManager />} />
                               <Route path="subscriptions" element={<AdminSubscriptionPage />} />
