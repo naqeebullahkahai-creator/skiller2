@@ -459,7 +459,7 @@ const App = () => (
                                 <Route path="kyc" element={<AdminSellerKyc />} />
                                 <Route path="kyc/:sellerId" element={<AdminSellerDetail />} />
                                 <Route path="orders" element={<AdminOrderManagement />} />
-                                <Route path="vendor-orders" element={<AdminVendorOrdersPage />} />
+                                <Route path="vendor-orders" element={<AdminSellerOrdersPage />} />
                                 <Route path="approvals" element={<AdminProductApprovals />} />
                                 <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
                                 <Route path="flash-nominations" element={<AdminFlashNominations />} />
