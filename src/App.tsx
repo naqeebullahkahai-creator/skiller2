@@ -592,7 +592,8 @@ const App = () => (
                               <Route path="security-management" element={<Navigate to="/admin-app/roles" replace />} />
                               <Route path="orders" element={<AdminOrderManagement />} />
                               <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
-                              <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />
+                              <Route path="orders/vendor" element={<AdminSellerOrdersPage />} />
+                              <Route path="seller-orders" element={<AdminSellerOrdersPage />} />
                               <Route path="users" element={<AdminUserDirectory />} />
                               <Route path="sellers" element={<AdminSellersDirectory />} />
                               <Route path="sellers/:sellerId" element={<AdminSellerDetailPage />} />
