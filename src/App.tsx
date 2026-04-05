@@ -565,7 +565,7 @@ const App = () => (
                               <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
                               <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
                               <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
-                              <Route path="flash-sale" element={<SellerFlashSalePage />} />
+                              {/* Flash sale removed */}
                               <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
                               <Route path="settings" element={<SellerSettingsPage />} />
                               <Route path="fee-guide" element={<SellerFeeGuidePage />} />
