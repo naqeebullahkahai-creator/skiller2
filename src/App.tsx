@@ -510,7 +510,7 @@ const App = () => (
                               <Route path="reviews" element={<SellerReviewsPage />} />
                               <Route path="qa" element={<VerifiedSellerGuard><SellerQAPage /></VerifiedSellerGuard>} />
                               <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
-                              <Route path="flash-sale" element={<SellerFlashSalePage />} />
+                              {/* Flash sale removed */}
                               <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
                               <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
                               <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
