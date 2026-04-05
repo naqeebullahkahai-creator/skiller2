@@ -87,7 +87,7 @@ import AdminSettings from "./pages/dashboard/DashboardSettings";
 import AdminSellerKyc from "./pages/dashboard/AdminSellerKyc";
 import AdminSellerDetail from "./pages/dashboard/AdminSellerDetail";
 import AdminPayoutManagement from "./pages/dashboard/AdminPayoutManagement";
-import FlashSaleManager from "./pages/dashboard/FlashSaleManager";
+// FlashSaleManager removed
 import VoucherManager from "./pages/dashboard/VoucherManager";
 import BannerManager from "./pages/dashboard/BannerManager";
 import AdminBulkUploadLogs from "./pages/dashboard/AdminBulkUploadLogs";
