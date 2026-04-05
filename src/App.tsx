@@ -87,7 +87,7 @@ import AdminSettings from "./pages/dashboard/DashboardSettings";
 import AdminSellerKyc from "./pages/dashboard/AdminSellerKyc";
 import AdminSellerDetail from "./pages/dashboard/AdminSellerDetail";
 import AdminPayoutManagement from "./pages/dashboard/AdminPayoutManagement";
-import FlashSaleManager from "./pages/dashboard/FlashSaleManager";
+// FlashSaleManager removed
 import VoucherManager from "./pages/dashboard/VoucherManager";
 import BannerManager from "./pages/dashboard/BannerManager";
 import AdminBulkUploadLogs from "./pages/dashboard/AdminBulkUploadLogs";
@@ -100,7 +100,7 @@ import AdminRolesPage from "./pages/dashboard/AdminRolesPage";
 import SocialSettingsPage from "./pages/dashboard/SocialSettingsPage";
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
 import AdminReviewsPage from "./pages/dashboard/AdminReviewsPage";
-import AdminFlashNominations from "./pages/dashboard/AdminFlashNominations";
+// AdminFlashNominations removed
 import AdminQAModerationPage from "./pages/dashboard/AdminQAModerationPage";
 import AdminCancelledOrdersPage from "./pages/admin/AdminCancelledOrdersPage";
 import AdminSubscriptionPage from "./pages/dashboard/AdminSubscriptionPage";
@@ -113,7 +113,7 @@ import AdminWithdrawalMethodsPage from "./pages/dashboard/AdminWithdrawalMethods
 import AdminPaymentSettingsPage from "./pages/dashboard/AdminPaymentSettingsPage";
 import AdminAllSettingsPage from "./pages/dashboard/AdminAllSettingsPage";
 import AdminDirectOrdersPage from "./pages/dashboard/AdminDirectOrdersPage";
-import AdminVendorOrdersPage from "./pages/dashboard/AdminVendorOrdersPage";
+import AdminSellerOrdersPage from "./pages/dashboard/AdminSellerOrdersPage";
 import AdminChatShortcutsPage from "./pages/dashboard/AdminChatShortcutsPage";
 import AdminSiteContentPage from "./pages/dashboard/AdminSiteContentPage";
 import AdminBrandAssetsPage from "./pages/dashboard/AdminBrandAssetsPage";
@@ -152,7 +152,7 @@ import SellerWalletPage from "./pages/seller/SellerWalletPage";
 import SellerMessagesPage from "./pages/seller/SellerMessagesPage";
 import SellerAnalyticsPage from "./pages/seller/SellerAnalyticsPage";
 import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
-import SellerFlashSalePage from "./pages/seller/SellerFlashSalePage";
+// SellerFlashSalePage removed
 import SellerReviewsPage from "./pages/seller/SellerReviewsPage";
 import SellerVouchersPage from "./pages/seller/SellerVouchersPage";
 import SellerBulkUploadPage from "./pages/seller/SellerBulkUploadPage";
@@ -386,7 +386,7 @@ const App = () => (
                               <Route path="orders-management" element={<Navigate to="/admin/orders" replace />} />
                               <Route path="products-management" element={<Navigate to="/admin/products" replace />} />
                               <Route path="finance-management" element={<Navigate to="/admin/wallet-management" replace />} />
-                              <Route path="marketing-management" element={<Navigate to="/admin/flash-sales" replace />} />
+                              <Route path="marketing-management" element={<Navigate to="/admin/vouchers" replace />} />
                               <Route path="content-management" element={<Navigate to="/admin/reviews" replace />} />
                               <Route path="security-management" element={<Navigate to="/admin/roles" replace />} />
                               <Route path="users" element={<AdminUserDirectory />} />
@@ -395,7 +395,8 @@ const App = () => (
                               <Route path="roles" element={<AdminRolesPage />} />
                               <Route path="orders" element={<AdminOrderManagement />} />
                               <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
-                              <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />
+                              <Route path="orders/vendor" element={<AdminSellerOrdersPage />} />
+                              <Route path="seller-orders" element={<AdminSellerOrdersPage />} />
                               <Route path="cancellations" element={<AdminCancellationsPage />} />
                               <Route path="cancelled" element={<AdminCancelledOrdersPage />} />
                               <Route path="orders/cancelled" element={<AdminCancelledOrdersPage />} />
@@ -407,8 +408,7 @@ const App = () => (
                               <Route path="seller-kyc/:sellerId" element={<AdminSellerDetail />} />
                               <Route path="payouts" element={<AdminPayoutManagement />} />
                               <Route path="subscriptions" element={<AdminSubscriptionPage />} />
-                              <Route path="flash-sales" element={<FlashSaleManager />} />
-                              <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                              {/* Flash sales removed */}
                               <Route path="reviews" element={<AdminReviewsPage />} />
                               <Route path="qa" element={<AdminQAModerationPage />} />
                               <Route path="vouchers" element={<VoucherManager />} />
@@ -459,10 +459,10 @@ const App = () => (
                                 <Route path="kyc" element={<AdminSellerKyc />} />
                                 <Route path="kyc/:sellerId" element={<AdminSellerDetail />} />
                                 <Route path="orders" element={<AdminOrderManagement />} />
-                                <Route path="vendor-orders" element={<AdminVendorOrdersPage />} />
+                                <Route path="vendor-orders" element={<AdminSellerOrdersPage />} />
                                 <Route path="approvals" element={<AdminProductApprovals />} />
                                 <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
-                                <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                                {/* Flash nominations removed */}
                                 <Route path="deposits" element={<AdminSellerDepositsPage />} />
                                 <Route path="payouts" element={<AdminPayoutManagement />} />
                                 <Route path="commissions" element={<AdminPendingCommissionsPage />} />
@@ -510,7 +510,7 @@ const App = () => (
                               <Route path="reviews" element={<SellerReviewsPage />} />
                               <Route path="qa" element={<VerifiedSellerGuard><SellerQAPage /></VerifiedSellerGuard>} />
                               <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
-                              <Route path="flash-sale" element={<SellerFlashSalePage />} />
+                              {/* Flash sale removed */}
                               <Route path="messages" element={<VerifiedSellerGuard><SellerMessagesPage /></VerifiedSellerGuard>} />
                               <Route path="wallet" element={<VerifiedSellerGuard><SellerWalletPage /></VerifiedSellerGuard>} />
                               <Route path="analytics" element={<VerifiedSellerGuard><SellerAnalyticsPage /></VerifiedSellerGuard>} />
@@ -565,7 +565,7 @@ const App = () => (
                               <Route path="vouchers" element={<VerifiedSellerGuard><SellerVouchersPage /></VerifiedSellerGuard>} />
                               <Route path="returns" element={<VerifiedSellerGuard><SellerReturnsPage /></VerifiedSellerGuard>} />
                               <Route path="cancelled" element={<VerifiedSellerGuard><SellerCancelledOrdersPage /></VerifiedSellerGuard>} />
-                              <Route path="flash-sale" element={<SellerFlashSalePage />} />
+                              {/* Flash sale removed */}
                               <Route path="bulk-upload" element={<VerifiedSellerGuard><SellerBulkUploadPage /></VerifiedSellerGuard>} />
                               <Route path="settings" element={<SellerSettingsPage />} />
                               <Route path="fee-guide" element={<SellerFeeGuidePage />} />
@@ -587,12 +587,13 @@ const App = () => (
                               <Route path="orders-management" element={<Navigate to="/admin-app/orders" replace />} />
                               <Route path="products-management" element={<Navigate to="/admin-app/products" replace />} />
                               <Route path="finance-management" element={<Navigate to="/admin-app/wallet-management" replace />} />
-                              <Route path="marketing-management" element={<Navigate to="/admin-app/flash-sales" replace />} />
+                              <Route path="marketing-management" element={<Navigate to="/admin-app/vouchers" replace />} />
                               <Route path="content-management" element={<Navigate to="/admin-app/reviews" replace />} />
                               <Route path="security-management" element={<Navigate to="/admin-app/roles" replace />} />
                               <Route path="orders" element={<AdminOrderManagement />} />
                               <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
-                              <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />
+                              <Route path="orders/vendor" element={<AdminSellerOrdersPage />} />
+                              <Route path="seller-orders" element={<AdminSellerOrdersPage />} />
                               <Route path="users" element={<AdminUserDirectory />} />
                               <Route path="sellers" element={<AdminSellersDirectory />} />
                               <Route path="sellers/:sellerId" element={<AdminSellerDetailPage />} />
@@ -607,8 +608,7 @@ const App = () => (
                               <Route path="analytics" element={<AdminAnalyticsPage />} />
                               <Route path="reviews" element={<AdminReviewsPage />} />
                               <Route path="qa" element={<AdminQAModerationPage />} />
-                              <Route path="flash-sales" element={<FlashSaleManager />} />
-                              <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                              {/* Flash sales removed */}
                               <Route path="vouchers" element={<VoucherManager />} />
                               <Route path="banners" element={<BannerManager />} />
                               <Route path="subscriptions" element={<AdminSubscriptionPage />} />

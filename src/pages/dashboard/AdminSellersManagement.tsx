@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Store, Search, Eye, ShieldCheck, XCircle, CheckCircle, AlertCircle,
-  TrendingUp, Package, Wallet, Users, FileCheck, Zap, CreditCard,
-  BarChart3, Percent, PiggyBank, Settings, ChevronRight, Scale, UserCheck, ArrowLeft, RotateCcw
+  TrendingUp, Package, Wallet, Users, FileCheck, CreditCard,
+  BarChart3, Percent, PiggyBank, Settings, ChevronRight, Scale, UserCheck, ArrowLeft, RotateCcw,
+  ShoppingCart, ArrowUpRight, Calendar, DollarSign, Clock
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,11 +20,17 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useAdminSellers } from "@/hooks/useAdminSellers";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import { useAdminSellers, useSellerDetails } from "@/hooks/useAdminSellers";
 import { useAdminSellerProfiles } from "@/hooks/useAdminSellerProfiles";
 import { useAdminDepositRequests } from "@/hooks/useDeposits";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import SellerPerformanceCharts from "@/components/admin/SellerPerformanceCharts";
 
 const formatPKR = (amount: number) =>
   new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", minimumFractionDigits: 0 }).format(amount);
@@ -39,6 +46,194 @@ const getVerificationBadge = (status: string | undefined) => {
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
+};
+
+// Inline Seller Detail Dialog
+const SellerDetailDialog = ({ sellerId, open, onOpenChange }: { sellerId: string; open: boolean; onOpenChange: (o: boolean) => void }) => {
+  const { seller, isLoading } = useSellerDetails(sellerId);
+
+  if (!open) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Store className="h-5 w-5" />
+            Seller Details
+          </DialogTitle>
+        </DialogHeader>
+        
+        {isLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-40 w-full" />
+          </div>
+        ) : seller ? (
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+              <Avatar className="h-16 w-16">
+                {seller.profile?.avatar_url && <AvatarImage src={seller.profile.avatar_url} />}
+                <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                  {seller.shop_name?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="text-lg font-bold">{seller.shop_name}</h3>
+                <p className="text-sm text-muted-foreground">{seller.profile?.full_name}</p>
+                <p className="text-xs text-muted-foreground font-mono">ID: {seller.user_id}</p>
+                <p className="text-xs text-muted-foreground">{seller.profile?.email}</p>
+                <div className="mt-1">{getVerificationBadge(seller.verification_status)}</div>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Card><CardContent className="p-3 text-center">
+                <Package className="h-5 w-5 mx-auto text-blue-500 mb-1" />
+                <p className="text-xl font-bold">{seller.products?.length || 0}</p>
+                <p className="text-xs text-muted-foreground">Products</p>
+              </CardContent></Card>
+              <Card><CardContent className="p-3 text-center">
+                <ShoppingCart className="h-5 w-5 mx-auto text-purple-500 mb-1" />
+                <p className="text-xl font-bold">{seller.orders?.length || 0}</p>
+                <p className="text-xs text-muted-foreground">Orders</p>
+              </CardContent></Card>
+              <Card><CardContent className="p-3 text-center">
+                <Wallet className="h-5 w-5 mx-auto text-green-500 mb-1" />
+                <p className="text-xl font-bold">{formatPKR(seller.wallet?.current_balance || 0)}</p>
+                <p className="text-xs text-muted-foreground">Balance</p>
+              </CardContent></Card>
+              <Card><CardContent className="p-3 text-center">
+                <TrendingUp className="h-5 w-5 mx-auto text-emerald-500 mb-1" />
+                <p className="text-xl font-bold">{formatPKR(seller.wallet?.total_earnings || 0)}</p>
+                <p className="text-xs text-muted-foreground">Total Earnings</p>
+              </CardContent></Card>
+            </div>
+
+            {/* KYC Info */}
+            <Card>
+              <CardHeader className="pb-2"><CardTitle className="text-sm">KYC Information</CardTitle></CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div><span className="text-muted-foreground">Legal Name:</span> {seller.legal_name}</div>
+                  <div><span className="text-muted-foreground">CNIC:</span> {seller.cnic_number}</div>
+                  <div><span className="text-muted-foreground">City:</span> {seller.city}</div>
+                  <div><span className="text-muted-foreground">Bank:</span> {seller.bank_name}</div>
+                  <div><span className="text-muted-foreground">IBAN:</span> {seller.iban}</div>
+                  <div><span className="text-muted-foreground">Account:</span> {seller.account_title}</div>
+                </div>
+                {/* KYC Documents */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
+                  {seller.cnic_front_url && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">CNIC Front</p>
+                      <img src={seller.cnic_front_url} alt="CNIC Front" className="w-full aspect-video object-cover rounded border" />
+                    </div>
+                  )}
+                  {seller.cnic_back_url && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">CNIC Back</p>
+                      <img src={seller.cnic_back_url} alt="CNIC Back" className="w-full aspect-video object-cover rounded border" />
+                    </div>
+                  )}
+                  {seller.selfie_url && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Selfie</p>
+                      <img src={seller.selfie_url} alt="Selfie" className="w-full aspect-square object-cover rounded border" />
+                    </div>
+                  )}
+                  {seller.bank_cheque_url && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Bank Cheque</p>
+                      <img src={seller.bank_cheque_url} alt="Bank Cheque" className="w-full aspect-video object-cover rounded border" />
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Products List */}
+            {seller.products && seller.products.length > 0 && (
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Products ({seller.products.length})</CardTitle></CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader><TableRow>
+                      <TableHead>Product</TableHead><TableHead>Price</TableHead><TableHead>Stock</TableHead><TableHead>Status</TableHead>
+                    </TableRow></TableHeader>
+                    <TableBody>
+                      {seller.products.map((p: any) => (
+                        <TableRow key={p.id}>
+                          <TableCell className="font-medium truncate max-w-[200px]">{p.title}</TableCell>
+                          <TableCell>{formatPKR(p.price_pkr)}</TableCell>
+                          <TableCell>{p.stock_count}</TableCell>
+                          <TableCell><Badge variant={p.status === 'active' ? 'default' : 'secondary'}>{p.status}</Badge></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Recent Orders */}
+            {seller.orders && seller.orders.length > 0 && (
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Recent Orders ({seller.orders.length})</CardTitle></CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader><TableRow>
+                      <TableHead>Order #</TableHead><TableHead>Date</TableHead><TableHead>Amount</TableHead><TableHead>Status</TableHead>
+                    </TableRow></TableHeader>
+                    <TableBody>
+                      {seller.orders.map((o: any) => (
+                        <TableRow key={o.id}>
+                          <TableCell className="font-medium">#{o.order_number}</TableCell>
+                          <TableCell>{format(new Date(o.created_at), "MMM dd, yyyy")}</TableCell>
+                          <TableCell>{formatPKR(o.total_amount_pkr)}</TableCell>
+                          <TableCell><Badge variant="outline">{o.order_status}</Badge></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Wallet Transactions */}
+            {seller.transactions && seller.transactions.length > 0 && (
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Wallet Transactions</CardTitle></CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader><TableRow>
+                      <TableHead>Date</TableHead><TableHead>Type</TableHead><TableHead>Amount</TableHead><TableHead>Description</TableHead>
+                    </TableRow></TableHeader>
+                    <TableBody>
+                      {seller.transactions.map((tx: any) => (
+                        <TableRow key={tx.id}>
+                          <TableCell>{format(new Date(tx.created_at), "MMM dd")}</TableCell>
+                          <TableCell><Badge variant={tx.net_amount >= 0 ? 'default' : 'secondary'}>{tx.transaction_type}</Badge></TableCell>
+                          <TableCell className={tx.net_amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            {tx.net_amount >= 0 ? '+' : ''}{formatPKR(tx.net_amount || 0)}
+                          </TableCell>
+                          <TableCell className="max-w-xs truncate">{tx.description}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        ) : (
+          <p className="text-center text-muted-foreground py-8">Seller not found</p>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 interface QuickActionProps {
@@ -70,12 +265,11 @@ const QuickAction = ({ icon, title, description, href, badge, color }: QuickActi
 };
 
 const SellerTable = ({ 
-  sellers, isLoading, navigate, toAdminPath, searchQuery, showUnreject, onUnreject 
+  sellers, isLoading, onViewSeller, searchQuery, showUnreject, onUnreject 
 }: {
   sellers: any[];
   isLoading: boolean;
-  navigate: any;
-  toAdminPath: (p: string) => string;
+  onViewSeller: (seller: any) => void;
   searchQuery: string;
   showUnreject?: boolean;
   onUnreject?: (seller: any) => void;
@@ -145,7 +339,7 @@ const SellerTable = ({
                     <TableCell className="hidden lg:table-cell">{format(new Date(seller.created_at), "MMM dd, yyyy")}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
+                        <Button variant="ghost" size="sm" onClick={() => onViewSeller(seller)}>
                           <Eye size={16} className="mr-1" /> View
                         </Button>
                         {showUnreject && seller.verification_status === "rejected" && onUnreject && (
@@ -178,7 +372,7 @@ const SellerTable = ({
           <Card><CardContent className="p-6 text-center text-muted-foreground">No sellers found</CardContent></Card>
         ) : (
           filtered.map((seller) => (
-            <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => navigate(toAdminPath(`/admin/sellers/${seller.id}`))}>
+            <Card key={seller.id} className="border-0 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onClick={() => onViewSeller(seller)}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-3">
                   <Avatar className="h-10 w-10 shrink-0">
@@ -233,6 +427,46 @@ const AdminSellersManagement = () => {
   const { pendingCount: pendingKyc, updateStatus } = useAdminSellerProfiles();
   const { pendingCount: pendingDeposits } = useAdminDepositRequests("seller");
   const [unrejectSeller, setUnrejectSeller] = useState<any>(null);
+  const [viewingSellerId, setViewingSellerId] = useState<string | null>(null);
+
+  // Analytics data
+  const { data: analyticsData } = useQuery({
+    queryKey: ["sellers-analytics-overview"],
+    queryFn: async () => {
+      const [ordersRes, withdrawalsRes, depositsRes, recentSellersRes] = await Promise.all([
+        supabase.from("orders").select("total_amount_pkr, order_status, created_at, items"),
+        supabase.from("wallet_transactions").select("net_amount, transaction_type, created_at").eq("transaction_type", "withdrawal"),
+        supabase.from("deposit_requests").select("amount, status, created_at").eq("requester_type", "seller"),
+        supabase.from("seller_profiles").select("created_at").order("created_at", { ascending: false }).limit(30),
+      ]);
+
+      const totalRevenue = ordersRes.data?.reduce((sum, o) => sum + Number(o.total_amount_pkr), 0) || 0;
+      const deliveredOrders = ordersRes.data?.filter(o => o.order_status === "delivered").length || 0;
+      const pendingOrders = ordersRes.data?.filter(o => o.order_status === "pending" || o.order_status === "processing").length || 0;
+      const totalWithdrawals = withdrawalsRes.data?.reduce((sum, w) => sum + Math.abs(Number(w.net_amount)), 0) || 0;
+      const pendingDepositsAmount = depositsRes.data?.filter(d => d.status === "pending").reduce((sum, d) => sum + Number(d.amount), 0) || 0;
+      const approvedDeposits = depositsRes.data?.filter(d => d.status === "approved").length || 0;
+      const pendingDepositsCount = depositsRes.data?.filter(d => d.status === "pending").length || 0;
+
+      // New registrations this month
+      const now = new Date();
+      const thisMonth = recentSellersRes.data?.filter(s => {
+        const d = new Date(s.created_at);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }).length || 0;
+
+      return {
+        totalRevenue,
+        deliveredOrders,
+        pendingOrders,
+        totalWithdrawals,
+        pendingDepositsAmount,
+        approvedDeposits,
+        pendingDepositsCount,
+        newRegistrationsThisMonth: thisMonth,
+      };
+    },
+  });
 
   const verifiedSellers = sellers.filter(s => s.verification_status === "verified");
   const pendingSellers = sellers.filter(s => s.verification_status === "pending");
@@ -240,11 +474,14 @@ const AdminSellersManagement = () => {
 
   const handleUnreject = () => {
     if (!unrejectSeller) return;
-    // Find the seller_profile id from useAdminSellerProfiles or use the seller.id (which is seller_profile.id)
     updateStatus.mutate(
       { id: unrejectSeller.id, status: "verified" },
       { onSettled: () => setUnrejectSeller(null) }
     );
+  };
+
+  const handleViewSeller = (seller: any) => {
+    setViewingSellerId(seller.id);
   };
 
   const statCards = [
@@ -258,17 +495,26 @@ const AdminSellersManagement = () => {
     { icon: <FileCheck className="w-5 h-5 text-white" />, title: "KYC Approvals", description: "Review seller applications", href: "/admin/seller-kyc", badge: pendingKyc, color: "bg-amber-500" },
     { icon: <UserCheck className="w-5 h-5 text-white" />, title: "Seller Approvals", description: "Approve new registrations", href: "/admin/approvals", color: "bg-primary" },
     { icon: <PiggyBank className="w-5 h-5 text-white" />, title: "Seller Deposits", description: "Approve deposit requests", href: "/admin/deposits/sellers", badge: pendingDeposits, color: "bg-violet-500" },
+    { icon: <ShoppingCart className="w-5 h-5 text-white" />, title: "Seller Orders", description: "View seller marketplace orders", href: "/admin/seller-orders", color: "bg-purple-500" },
     { icon: <Package className="w-5 h-5 text-white" />, title: "Product Catalog", description: "Manage seller products", href: "/admin/products", color: "bg-cyan-500" },
     { icon: <Wallet className="w-5 h-5 text-white" />, title: "Payouts", description: "Seller withdrawal requests", href: "/admin/payouts", color: "bg-orange-500" },
     { icon: <Scale className="w-5 h-5 text-white" />, title: "Balance Adjustments", description: "Credit/debit seller wallets", href: "/admin/balance-adjustments", color: "bg-rose-500" },
-    { icon: <Percent className="w-5 h-5 text-white" />, title: "Commission & Fees", description: "Manage platform fees", href: "/admin/commission-management", color: "bg-indigo-500" },
+    { icon: <Percent className="w-5 h-5 text-white" />, title: "Pending Commissions", description: "Settle delivered order commissions", href: "/admin/pending-commissions", color: "bg-indigo-500" },
     { icon: <CreditCard className="w-5 h-5 text-white" />, title: "Subscriptions", description: "Plans & billing", href: "/admin/subscriptions", color: "bg-teal-500" },
-    { icon: <Zap className="w-5 h-5 text-white" />, title: "Flash Sale Nominations", description: "Seller flash sale requests", href: "/admin/flash-nominations", color: "bg-red-500" },
     { icon: <BarChart3 className="w-5 h-5 text-white" />, title: "Performance Analytics", description: "Seller metrics & leaderboard", href: "/admin/analytics", color: "bg-purple-500" },
   ];
 
   return (
     <div className="space-y-6 overflow-x-hidden">
+      {/* Inline Seller Detail Dialog */}
+      {viewingSellerId && (
+        <SellerDetailDialog
+          sellerId={viewingSellerId}
+          open={!!viewingSellerId}
+          onOpenChange={(o) => { if (!o) setViewingSellerId(null); }}
+        />
+      )}
+
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl p-5 text-white">
         <Button variant="ghost" size="sm" onClick={() => navigate(toAdminPath("/admin/dashboard"))} className="mb-2 text-white/90 hover:text-white hover:bg-white/10 gap-1.5 px-2 h-8">
@@ -304,7 +550,7 @@ const AdminSellersManagement = () => {
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">{verifiedSellers.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="unverified" className="gap-1">
-            Unverified
+            Pending
             <Badge className="bg-yellow-500 text-white text-[10px] px-1.5 py-0 h-4">{pendingSellers.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="rejected" className="gap-1">
@@ -323,46 +569,120 @@ const AdminSellersManagement = () => {
         )}
 
         {/* Overview Tab */}
-        <TabsContent value="overview" className="mt-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {quickActions.map((action, i) => <QuickAction key={i} {...action} href={toAdminPath(action.href)} />)}
+        <TabsContent value="overview" className="mt-4 space-y-6">
+          {/* Analytics Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <DollarSign className="h-4 w-4 text-green-500" />
+                  <span className="text-xs text-muted-foreground">Total Revenue</span>
+                </div>
+                <p className="text-lg font-bold">{formatPKR(analyticsData?.totalRevenue || 0)}</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <ShoppingCart className="h-4 w-4 text-purple-500" />
+                  <span className="text-xs text-muted-foreground">Delivered Orders</span>
+                </div>
+                <p className="text-lg font-bold">{analyticsData?.deliveredOrders || 0}</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <ArrowUpRight className="h-4 w-4 text-orange-500" />
+                  <span className="text-xs text-muted-foreground">Total Withdrawals</span>
+                </div>
+                <p className="text-lg font-bold">{formatPKR(analyticsData?.totalWithdrawals || 0)}</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="h-4 w-4 text-blue-500" />
+                  <span className="text-xs text-muted-foreground">New This Month</span>
+                </div>
+                <p className="text-lg font-bold">{analyticsData?.newRegistrationsThisMonth || 0}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock className="h-4 w-4 text-yellow-500" />
+                  <span className="text-xs text-muted-foreground">Pending Orders</span>
+                </div>
+                <p className="text-lg font-bold">{analyticsData?.pendingOrders || 0}</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <PiggyBank className="h-4 w-4 text-violet-500" />
+                  <span className="text-xs text-muted-foreground">Pending Deposits</span>
+                </div>
+                <p className="text-lg font-bold">{analyticsData?.pendingDepositsCount || 0} ({formatPKR(analyticsData?.pendingDepositsAmount || 0)})</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <span className="text-xs text-muted-foreground">Approved Deposits</span>
+                </div>
+                <p className="text-lg font-bold">{analyticsData?.approvedDeposits || 0}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3">QUICK ACTIONS</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {quickActions.map((action, i) => <QuickAction key={i} {...action} href={toAdminPath(action.href)} />)}
+            </div>
           </div>
         </TabsContent>
 
         {/* Verified Tab */}
         <TabsContent value="verified" className="mt-4">
-          <SellerTable sellers={verifiedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} />
+          <SellerTable sellers={verifiedSellers} isLoading={isLoading} onViewSeller={handleViewSeller} searchQuery={searchQuery} />
         </TabsContent>
 
         {/* Unverified Tab (pending only) */}
         <TabsContent value="unverified" className="mt-4">
-          <SellerTable sellers={pendingSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} />
+          <SellerTable sellers={pendingSellers} isLoading={isLoading} onViewSeller={handleViewSeller} searchQuery={searchQuery} />
         </TabsContent>
 
         {/* Rejected Tab */}
         <TabsContent value="rejected" className="mt-4">
-          <SellerTable sellers={rejectedSellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
+          <SellerTable sellers={rejectedSellers} isLoading={isLoading} onViewSeller={handleViewSeller} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
         </TabsContent>
 
         {/* All Tab */}
         <TabsContent value="all" className="mt-4">
-          <SellerTable sellers={sellers} isLoading={isLoading} navigate={navigate} toAdminPath={toAdminPath} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
+          <SellerTable sellers={sellers} isLoading={isLoading} onViewSeller={handleViewSeller} searchQuery={searchQuery} showUnreject onUnreject={(seller) => setUnrejectSeller(seller)} />
         </TabsContent>
       </Tabs>
 
-      {/* Unreject Confirmation Dialog */}
-      <AlertDialog open={!!unrejectSeller} onOpenChange={(open) => !open && setUnrejectSeller(null)}>
+      {/* Unreject Dialog */}
+      <AlertDialog open={!!unrejectSeller} onOpenChange={() => setUnrejectSeller(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Unreject & Verify Seller</AlertDialogTitle>
+            <AlertDialogTitle>Un-reject this seller?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to unreject <strong>{unrejectSeller?.shop_name}</strong> and change their status to <strong>Verified</strong>? This will allow the seller to operate on the platform.
+              This will change <strong>{unrejectSeller?.shop_name}</strong> from <em>Rejected</em> to <em>Verified</em>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleUnreject} className="bg-green-600 hover:bg-green-700">
-              <ShieldCheck size={16} className="mr-1" /> Verify Seller
+              Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

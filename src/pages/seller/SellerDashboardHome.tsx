@@ -143,18 +143,18 @@ const SellerDashboardHome = () => {
       color: "bg-primary"
     },
     {
-      icon: <Zap className="w-6 h-6 text-white" />,
-      title: "Flash Sale",
-      description: "Join promotions",
-      href: "/seller/flash-sale",
-      color: "bg-amber-500"
-    },
-    {
       icon: <FileCheck className="w-6 h-6 text-white" />,
       title: "KYC Verification",
       description: "Update documents",
       href: "/seller/kyc",
       color: "bg-teal-500"
+    },
+    {
+      icon: <Tags className="w-6 h-6 text-white" />,
+      title: "My Vouchers",
+      description: "Create discounts",
+      href: "/seller/vouchers",
+      color: "bg-pink-500"
     },
     {
       icon: <Tags className="w-6 h-6 text-white" />,
