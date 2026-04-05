@@ -152,7 +152,7 @@ import SellerWalletPage from "./pages/seller/SellerWalletPage";
 import SellerMessagesPage from "./pages/seller/SellerMessagesPage";
 import SellerAnalyticsPage from "./pages/seller/SellerAnalyticsPage";
 import VerifiedSellerGuard from "./components/seller/VerifiedSellerGuard";
-import SellerFlashSalePage from "./pages/seller/SellerFlashSalePage";
+// SellerFlashSalePage removed
 import SellerReviewsPage from "./pages/seller/SellerReviewsPage";
 import SellerVouchersPage from "./pages/seller/SellerVouchersPage";
 import SellerBulkUploadPage from "./pages/seller/SellerBulkUploadPage";
