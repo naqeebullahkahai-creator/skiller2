@@ -69,9 +69,9 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
       name: "Orders", icon: ShoppingCart, feature: 'orders',
       badge: counts.pendingOrders + counts.pendingReturns,
       children: [
-        { name: "All Orders", href: "/admin/orders-management", icon: ShoppingCart, badge: counts.pendingOrders },
+        { name: "All Orders", href: "/admin/orders", icon: ShoppingCart, badge: counts.pendingOrders },
         { name: "Direct Orders", href: "/admin/store/orders", icon: Store },
-        { name: "Vendor Orders", href: "/admin/orders/vendor", icon: Package },
+        { name: "Seller Orders", href: "/admin/seller-orders", icon: Package },
         { name: "Cancellations", href: "/admin/cancellations", icon: ShoppingCart },
         { name: "Returns", href: "/admin/returns", icon: ShoppingCart, badge: counts.pendingReturns },
       ]
@@ -80,9 +80,10 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
       name: "Products", icon: Package, feature: 'products',
       badge: counts.pendingApprovals,
       children: [
-        { name: "All Products", href: "/admin/products-management", icon: Package },
+        { name: "All Products", href: "/admin/products", icon: Package },
         { name: "Categories", href: "/admin/categories", icon: Tag },
         { name: "Approvals", href: "/admin/approvals", icon: FileText, badge: counts.pendingApprovals },
+        { name: "Settlements", href: "/admin/pending-commissions", icon: Wallet, badge: counts.pendingCommissions },
       ]
     },
     {
@@ -92,14 +93,6 @@ const DynamicAdminSidebar = ({ sidebarOpen, onNavigate }: DynamicAdminSidebarPro
         { name: "Commission Wallet", href: "/admin/commission-wallet", icon: Wallet },
         { name: "Subscription Wallet", href: "/admin/subscription-wallet", icon: Wallet },
         { name: "Store Wallet", href: "/admin/store/wallet", icon: Store },
-      ]
-    },
-    {
-      name: "Flash Sales", icon: Zap, feature: 'flash_sales',
-      badge: counts.pendingNominations,
-      children: [
-        { name: "Manage Sales", href: "/admin/flash-sales", icon: Zap },
-        { name: "Nominations", href: "/admin/flash-nominations", icon: Star, badge: counts.pendingNominations },
       ]
     },
     {
