@@ -386,7 +386,7 @@ const App = () => (
                               <Route path="orders-management" element={<Navigate to="/admin/orders" replace />} />
                               <Route path="products-management" element={<Navigate to="/admin/products" replace />} />
                               <Route path="finance-management" element={<Navigate to="/admin/wallet-management" replace />} />
-                              <Route path="marketing-management" element={<Navigate to="/admin/flash-sales" replace />} />
+                              <Route path="marketing-management" element={<Navigate to="/admin/vouchers" replace />} />
                               <Route path="content-management" element={<Navigate to="/admin/reviews" replace />} />
                               <Route path="security-management" element={<Navigate to="/admin/roles" replace />} />
                               <Route path="users" element={<AdminUserDirectory />} />
