@@ -395,7 +395,8 @@ const App = () => (
                               <Route path="roles" element={<AdminRolesPage />} />
                               <Route path="orders" element={<AdminOrderManagement />} />
                               <Route path="orders/direct" element={<AdminDirectOrdersPage />} />
-                              <Route path="orders/vendor" element={<AdminVendorOrdersPage />} />
+                              <Route path="orders/vendor" element={<AdminSellerOrdersPage />} />
+                              <Route path="seller-orders" element={<AdminSellerOrdersPage />} />
                               <Route path="cancellations" element={<AdminCancellationsPage />} />
                               <Route path="cancelled" element={<AdminCancelledOrdersPage />} />
                               <Route path="orders/cancelled" element={<AdminCancelledOrdersPage />} />
