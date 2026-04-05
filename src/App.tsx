@@ -408,8 +408,7 @@ const App = () => (
                               <Route path="seller-kyc/:sellerId" element={<AdminSellerDetail />} />
                               <Route path="payouts" element={<AdminPayoutManagement />} />
                               <Route path="subscriptions" element={<AdminSubscriptionPage />} />
-                              <Route path="flash-sales" element={<FlashSaleManager />} />
-                              <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                              {/* Flash sales removed */}
                               <Route path="reviews" element={<AdminReviewsPage />} />
                               <Route path="qa" element={<AdminQAModerationPage />} />
                               <Route path="vouchers" element={<VoucherManager />} />
