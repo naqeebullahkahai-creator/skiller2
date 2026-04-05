@@ -462,7 +462,7 @@ const App = () => (
                                 <Route path="vendor-orders" element={<AdminSellerOrdersPage />} />
                                 <Route path="approvals" element={<AdminProductApprovals />} />
                                 <Route path="bulk-uploads" element={<AdminBulkUploadLogs />} />
-                                <Route path="flash-nominations" element={<AdminFlashNominations />} />
+                                {/* Flash nominations removed */}
                                 <Route path="deposits" element={<AdminSellerDepositsPage />} />
                                 <Route path="payouts" element={<AdminPayoutManagement />} />
                                 <Route path="commissions" element={<AdminPendingCommissionsPage />} />
