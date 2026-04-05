@@ -100,7 +100,7 @@ import AdminRolesPage from "./pages/dashboard/AdminRolesPage";
 import SocialSettingsPage from "./pages/dashboard/SocialSettingsPage";
 import AdminAnalyticsPage from "./pages/dashboard/AdminAnalyticsPage";
 import AdminReviewsPage from "./pages/dashboard/AdminReviewsPage";
-import AdminFlashNominations from "./pages/dashboard/AdminFlashNominations";
+// AdminFlashNominations removed
 import AdminQAModerationPage from "./pages/dashboard/AdminQAModerationPage";
 import AdminCancelledOrdersPage from "./pages/admin/AdminCancelledOrdersPage";
 import AdminSubscriptionPage from "./pages/dashboard/AdminSubscriptionPage";
