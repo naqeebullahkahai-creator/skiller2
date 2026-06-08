@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import logoMark from "@/assets/fanzon-logo-mark.png";
 
 interface FanzonLogoProps {
   className?: string;
@@ -20,25 +21,34 @@ const FanzonLogo = ({ className, textClassName, size = "md", showText = true, ic
   if (iconOnly) {
     return (
       <img
-        src="/fanzon-icon.png"
+        src={logoMark}
         alt="FANZON"
         className={cn(config.icon, "object-contain", className)}
+        loading="lazy"
+        width={1024}
+        height={1024}
       />
     );
   }
 
   return (
-    <div className={cn("inline-flex items-center", config.gap, className)}>
+    <div className={cn("inline-flex items-center group", config.gap, className)}>
       <img
-        src="/fanzon-icon.png"
+        src={logoMark}
         alt="FANZON"
-        className={cn(config.icon, "object-contain flex-shrink-0")}
+        className={cn(
+          config.icon,
+          "object-contain flex-shrink-0 drop-shadow-[0_0_12px_hsl(243_75%_59%/0.55)] transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+        )}
+        loading="lazy"
+        width={1024}
+        height={1024}
       />
       {showText && (
         <span className={cn(
-          "font-display font-extrabold tracking-tight leading-none",
+          "font-display font-extrabold tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary-glow",
           config.text,
-          textClassName || "text-foreground"
+          textClassName
         )}>
           FANZON
         </span>
