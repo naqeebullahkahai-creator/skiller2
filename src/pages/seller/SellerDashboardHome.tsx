@@ -157,13 +157,6 @@ const SellerDashboardHome = () => {
       color: "bg-pink-500"
     },
     {
-      icon: <Tags className="w-6 h-6 text-white" />,
-      title: "My Vouchers",
-      description: "Create discounts",
-      href: "/seller/vouchers",
-      color: "bg-pink-500"
-    },
-    {
       icon: <Upload className="w-6 h-6 text-white" />,
       title: "Bulk Upload",
       description: "Import products",
