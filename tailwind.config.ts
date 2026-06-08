@@ -18,9 +18,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Manrope', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Sora', 'Manrope', 'system-ui', 'sans-serif'],
+        body: ['Manrope', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -105,13 +105,13 @@ export default {
         "2xl": "calc(var(--radius) + 8px)",
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'card': '0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.06)',
-        'elevated': '0 20px 40px -12px rgba(0, 0, 0, 0.1)',
-        'glow': '0 0 20px rgba(15, 118, 110, 0.1)',
-        'gold': '0 2px 12px rgba(15, 118, 110, 0.08)',
-        'gold-lg': '0 8px 32px rgba(15, 118, 110, 0.12)',
+        'soft': '0 4px 20px -3px rgba(0, 0, 0, 0.3), 0 10px 30px -10px rgba(79, 70, 229, 0.15)',
+        'card': '0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25)',
+        'card-hover': '0 12px 32px -6px rgba(0, 0, 0, 0.5), 0 0 24px -8px rgba(79, 70, 229, 0.4)',
+        'elevated': '0 24px 48px -12px rgba(0, 0, 0, 0.55)',
+        'glow': '0 0 32px rgba(79, 70, 229, 0.45)',
+        'gold': '0 4px 16px rgba(79, 70, 229, 0.3)',
+        'gold-lg': '0 12px 40px rgba(79, 70, 229, 0.4)',
       },
       keyframes: {
         "accordion-down": {
