@@ -1,5 +1,5 @@
 /* FANZOON — Premium Editorial Marketplace */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -48,82 +48,94 @@
 
 @layer base {
   :root {
-    --background: 40 20% 97%;
-    --foreground: 220 30% 10%;
+    /* MIDNIGHT INDIGO — Premium dark marketplace */
+    --background: 240 36% 7%;        /* #0a0a1a */
+    --foreground: 240 20% 96%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 30% 10%;
+    --card: 240 33% 11%;             /* #141432 */
+    --card-foreground: 240 20% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 10%;
+    --popover: 240 33% 13%;
+    --popover-foreground: 240 20% 96%;
 
-    /* Primary: Deep Teal — refined */
-    --primary: 173 78% 26%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary: Electric Indigo */
+    --primary: 243 75% 59%;          /* #4f46e5 */
+    --primary-foreground: 240 20% 98%;
+    --primary-glow: 252 87% 71%;
 
-    --secondary: 40 15% 94%;
-    --secondary-foreground: 220 25% 15%;
+    --secondary: 240 50% 24%;        /* #1e1e5a */
+    --secondary-foreground: 240 20% 96%;
 
-    --muted: 40 10% 92%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 240 25% 16%;
+    --muted-foreground: 240 12% 65%;
 
-    /* Accent: Rich Amber */
-    --accent: 32 95% 52%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent: Bright indigo highlight */
+    --accent: 252 87% 71%;
+    --accent-foreground: 240 33% 11%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 10% 88%;
-    --input: 40 10% 88%;
-    --ring: 173 78% 26%;
+    --success: 152 70% 50%;
+    --warning: 38 95% 60%;
 
-    --radius: 0.625rem;
+    --border: 240 25% 20%;
+    --input: 240 25% 18%;
+    --ring: 243 75% 59%;
 
-    /* FANZOON unique tokens */
-    --fanzon-gold: 32 95% 52%;
-    --fanzon-gold-light: 32 80% 72%;
-    --fanzon-gold-muted: 32 30% 94%;
-    --fanzon-onyx: 220 30% 10%;
-    --fanzon-charcoal: 220 25% 16%;
-    --fanzon-graphite: 220 18% 28%;
-    --fanzon-ivory: 40 20% 97%;
-    --fanzon-cream: 40 18% 95%;
-    --fanzon-warm-gray: 220 8% 52%;
-    --fanzon-success: 160 64% 38%;
-    --fanzon-warning: 38 92% 50%;
-    --fanzon-star: 45 93% 47%;
-    --fanzon-emerald: 160 60% 36%;
-    --fanzon-teal: 173 78% 26%;
-    --fanzon-teal-light: 173 55% 42%;
-    --fanzon-teal-muted: 173 25% 93%;
-    --fanzon-coral: 12 80% 58%;
-    --fanzon-violet: 262 60% 55%;
+    --radius: 0.875rem;
 
-    /* Shadows — layered depth */
-    --shadow-1: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-    --shadow-2: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03);
-    --shadow-3: 0 6px 20px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.03);
-    --shadow-4: 0 12px 40px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
-    --shadow-gold: 0 4px 16px rgba(15,118,110,0.1);
-    --shadow-hover: 0 8px 30px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.05);
+    /* FANZOON tokens (remapped to Midnight Indigo) */
+    --fanzon-gold: 252 87% 71%;
+    --fanzon-gold-light: 243 75% 75%;
+    --fanzon-gold-muted: 240 40% 20%;
+    --fanzon-onyx: 240 36% 4%;
+    --fanzon-charcoal: 240 33% 11%;
+    --fanzon-graphite: 240 25% 18%;
+    --fanzon-ivory: 240 20% 96%;
+    --fanzon-cream: 240 25% 16%;
+    --fanzon-warm-gray: 240 12% 65%;
+    --fanzon-success: 152 70% 50%;
+    --fanzon-warning: 38 95% 60%;
+    --fanzon-star: 45 95% 60%;
+    --fanzon-emerald: 152 70% 50%;
+    --fanzon-teal: 243 75% 59%;
+    --fanzon-teal-light: 252 87% 71%;
+    --fanzon-teal-muted: 240 40% 20%;
+    --fanzon-coral: 12 85% 65%;
+    --fanzon-violet: 262 85% 70%;
 
-    /* Dashboard */
-    --dashboard-sidebar: 220 28% 11%;
-    --dashboard-sidebar-hover: 220 24% 16%;
-    --dashboard-sidebar-active: 173 78% 26%;
-    --dashboard-sidebar-border: 220 20% 18%;
-    --dashboard-sidebar-text: 220 10% 60%;
-    --dashboard-sidebar-text-active: 173 78% 40%;
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(243 75% 59%), hsl(252 87% 71%));
+    --gradient-hero: linear-gradient(135deg, hsl(240 36% 7%) 0%, hsl(240 50% 18%) 50%, hsl(243 75% 35%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(240 33% 13%) 0%, hsl(240 33% 10%) 100%);
+    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(243 75% 59% / 0.25), transparent 70%);
 
-    --sidebar-background: 220 28% 11%;
-    --sidebar-foreground: 220 10% 75%;
-    --sidebar-primary: 173 78% 26%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 24% 16%;
-    --sidebar-accent-foreground: 220 10% 80%;
-    --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 173 78% 26%;
+    /* Shadows — neon-tinted depth */
+    --shadow-1: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-2: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+    --shadow-3: 0 8px 24px rgba(0,0,0,0.45), 0 4px 8px rgba(0,0,0,0.3);
+    --shadow-4: 0 20px 60px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.35);
+    --shadow-gold: 0 8px 32px hsl(243 75% 59% / 0.35);
+    --shadow-glow: 0 0 40px hsl(243 75% 59% / 0.4);
+    --shadow-hover: 0 12px 40px rgba(0,0,0,0.5), 0 0 24px hsl(243 75% 59% / 0.25);
+
+    /* Dashboard / Sidebar — Onyx with indigo accent */
+    --dashboard-sidebar: 240 38% 5%;
+    --dashboard-sidebar-hover: 240 35% 12%;
+    --dashboard-sidebar-active: 243 75% 59%;
+    --dashboard-sidebar-border: 240 25% 14%;
+    --dashboard-sidebar-text: 240 12% 70%;
+    --dashboard-sidebar-text-active: 252 87% 80%;
+
+    --sidebar-background: 240 38% 5%;
+    --sidebar-foreground: 240 12% 80%;
+    --sidebar-primary: 243 75% 59%;
+    --sidebar-primary-foreground: 240 20% 98%;
+    --sidebar-accent: 240 35% 12%;
+    --sidebar-accent-foreground: 252 87% 80%;
+    --sidebar-border: 240 25% 14%;
+    --sidebar-ring: 243 75% 59%;
   }
 }
 
@@ -135,23 +147,23 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.55;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
+    font-family: 'Sora', 'Manrope', system-ui, sans-serif;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 
   .font-body {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: 'Manrope', system-ui, sans-serif;
   }
 
   .font-display {
-    font-family: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
+    font-family: 'Sora', 'Manrope', system-ui, sans-serif;
   }
 
   .font-urdu {
@@ -189,16 +201,16 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: hsl(220 10% 82%) transparent;
+    scrollbar-color: hsl(240 30% 25%) transparent;
   }
   *::-webkit-scrollbar { width: 4px; height: 4px; }
   *::-webkit-scrollbar-track { background: transparent; }
   *::-webkit-scrollbar-thumb {
-    background: hsl(220 10% 82%);
+    background: hsl(243 50% 35%);
     border-radius: 10px;
   }
   *::-webkit-scrollbar-thumb:hover {
-    background: hsl(220 10% 65%);
+    background: hsl(243 75% 59%);
   }
 
   .touch-target { min-height: 44px; min-width: 44px; }
@@ -272,29 +284,28 @@
 
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(173 78% 26%), hsl(173 55% 40%));
+    background-image: linear-gradient(135deg, hsl(243 75% 65%), hsl(252 87% 78%));
   }
 
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(32 95% 48%), hsl(38 90% 55%), hsl(32 95% 48%));
+    background-image: linear-gradient(135deg, hsl(243 75% 65%), hsl(252 87% 78%), hsl(243 75% 65%));
   }
 
   .border-gold-glow {
-    border: 1px solid hsl(var(--primary) / 0.15);
-    box-shadow: 0 0 12px hsl(var(--primary) / 0.05);
+    border: 1px solid hsl(var(--primary) / 0.3);
+    box-shadow: 0 0 24px hsl(var(--primary) / 0.2);
   }
 
   .btn-gold {
-    background: linear-gradient(135deg, hsl(173 78% 26%), hsl(173 60% 34%));
+    background: var(--gradient-primary);
     color: white;
     font-weight: 600;
-    box-shadow: 0 2px 10px rgba(15,118,110,0.2);
+    box-shadow: 0 4px 20px hsl(243 75% 59% / 0.4);
     transition: all 0.2s;
   }
   .btn-gold:hover {
-    background: linear-gradient(135deg, hsl(173 78% 22%), hsl(173 60% 30%));
-    box-shadow: 0 4px 20px rgba(15,118,110,0.3);
+    box-shadow: 0 8px 32px hsl(243 75% 59% / 0.55);
     transform: translateY(-1px);
   }
 
@@ -338,9 +349,9 @@
     object-fit: cover !important;
   }
 
-  .glass { @apply bg-white/90 backdrop-blur-xl border border-border; box-shadow: var(--shadow-2); }
-  .glass-dark { @apply bg-black/40 backdrop-blur-xl border border-white/10; }
-  .glass-gold { @apply bg-white/95 backdrop-blur-xl; border: 1px solid hsl(var(--primary) / 0.1); box-shadow: var(--shadow-gold); }
+  .glass { @apply backdrop-blur-xl border border-border; background: hsl(var(--card) / 0.7); box-shadow: var(--shadow-2); }
+  .glass-dark { @apply backdrop-blur-xl border border-white/10; background: hsl(240 38% 5% / 0.65); }
+  .glass-gold { @apply backdrop-blur-xl; background: hsl(var(--card) / 0.8); border: 1px solid hsl(var(--primary) / 0.3); box-shadow: var(--shadow-gold); }
 
   /* Unique marketplace section divider */
   .section-divider {
