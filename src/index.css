@@ -48,30 +48,30 @@
 
 @layer base {
   :root {
-    /* MIDNIGHT INDIGO — Premium dark marketplace */
-    --background: 240 36% 7%;        /* #0a0a1a */
-    --foreground: 240 20% 96%;
+    /* EMERALD PRESTIGE — Rich emerald + gold, authoritative marketplace */
+    --background: 158 64% 6%;         /* deep emerald near-black */
+    --foreground: 45 40% 96%;          /* warm ivory text */
 
-    --card: 240 33% 11%;             /* #141432 */
-    --card-foreground: 240 20% 96%;
+    --card: 160 55% 10%;               /* #0d3a2d-ish */
+    --card-foreground: 45 40% 96%;
 
-    --popover: 240 33% 13%;
-    --popover-foreground: 240 20% 96%;
+    --popover: 160 55% 12%;
+    --popover-foreground: 45 40% 96%;
 
-    /* Primary: Electric Indigo */
-    --primary: 243 75% 59%;          /* #4f46e5 */
-    --primary-foreground: 240 20% 98%;
-    --primary-glow: 252 87% 71%;
+    /* Primary: Rich Emerald */
+    --primary: 158 78% 24%;            /* #0d7a5f */
+    --primary-foreground: 45 45% 96%;
+    --primary-glow: 152 65% 40%;
 
-    --secondary: 240 50% 24%;        /* #1e1e5a */
-    --secondary-foreground: 240 20% 96%;
+    --secondary: 158 60% 15%;          /* #064e3b */
+    --secondary-foreground: 45 40% 96%;
 
-    --muted: 240 25% 16%;
-    --muted-foreground: 240 12% 65%;
+    --muted: 160 35% 14%;
+    --muted-foreground: 158 15% 68%;
 
-    /* Accent: Bright indigo highlight */
-    --accent: 252 87% 71%;
-    --accent-foreground: 240 33% 11%;
+    /* Accent: Prestige Gold */
+    --accent: 43 55% 54%;              /* #c9a84c */
+    --accent-foreground: 158 64% 8%;
 
     --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -79,63 +79,63 @@
     --success: 152 70% 50%;
     --warning: 38 95% 60%;
 
-    --border: 240 25% 20%;
-    --input: 240 25% 18%;
-    --ring: 243 75% 59%;
+    --border: 158 30% 20%;
+    --input: 158 30% 16%;
+    --ring: 43 55% 54%;
 
     --radius: 0.875rem;
 
-    /* FANZOON tokens (remapped to Midnight Indigo) */
-    --fanzon-gold: 252 87% 71%;
-    --fanzon-gold-light: 243 75% 75%;
-    --fanzon-gold-muted: 240 40% 20%;
-    --fanzon-onyx: 240 36% 4%;
-    --fanzon-charcoal: 240 33% 11%;
-    --fanzon-graphite: 240 25% 18%;
-    --fanzon-ivory: 240 20% 96%;
-    --fanzon-cream: 240 25% 16%;
-    --fanzon-warm-gray: 240 12% 65%;
+    /* FANZON tokens — Emerald Prestige */
+    --fanzon-gold: 43 55% 54%;
+    --fanzon-gold-light: 43 70% 68%;
+    --fanzon-gold-muted: 43 30% 25%;
+    --fanzon-onyx: 158 64% 5%;
+    --fanzon-charcoal: 160 55% 10%;
+    --fanzon-graphite: 158 30% 16%;
+    --fanzon-ivory: 45 45% 96%;
+    --fanzon-cream: 160 35% 14%;
+    --fanzon-warm-gray: 158 15% 68%;
     --fanzon-success: 152 70% 50%;
     --fanzon-warning: 38 95% 60%;
-    --fanzon-star: 45 95% 60%;
-    --fanzon-emerald: 152 70% 50%;
-    --fanzon-teal: 243 75% 59%;
-    --fanzon-teal-light: 252 87% 71%;
-    --fanzon-teal-muted: 240 40% 20%;
+    --fanzon-star: 43 90% 60%;
+    --fanzon-emerald: 158 78% 30%;
+    --fanzon-teal: 158 78% 24%;
+    --fanzon-teal-light: 152 65% 40%;
+    --fanzon-teal-muted: 158 45% 18%;
     --fanzon-coral: 12 85% 65%;
     --fanzon-violet: 262 85% 70%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(243 75% 59%), hsl(252 87% 71%));
-    --gradient-hero: linear-gradient(135deg, hsl(240 36% 7%) 0%, hsl(240 50% 18%) 50%, hsl(243 75% 35%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(240 33% 13%) 0%, hsl(240 33% 10%) 100%);
-    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(243 75% 59% / 0.25), transparent 70%);
+    --gradient-primary: linear-gradient(135deg, hsl(158 78% 20%), hsl(152 65% 38%));
+    --gradient-hero: linear-gradient(135deg, hsl(158 64% 6%) 0%, hsl(158 60% 15%) 50%, hsl(43 55% 30%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(160 55% 12%) 0%, hsl(160 55% 9%) 100%);
+    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(43 55% 54% / 0.22), transparent 70%);
 
     /* Shadows — neon-tinted depth */
     --shadow-1: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
     --shadow-2: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
     --shadow-3: 0 8px 24px rgba(0,0,0,0.45), 0 4px 8px rgba(0,0,0,0.3);
     --shadow-4: 0 20px 60px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.35);
-    --shadow-gold: 0 8px 32px hsl(243 75% 59% / 0.35);
-    --shadow-glow: 0 0 40px hsl(243 75% 59% / 0.4);
-    --shadow-hover: 0 12px 40px rgba(0,0,0,0.5), 0 0 24px hsl(243 75% 59% / 0.25);
+    --shadow-gold: 0 8px 32px hsl(43 55% 54% / 0.28);
+    --shadow-glow: 0 0 40px hsl(158 78% 30% / 0.35);
+    --shadow-hover: 0 12px 40px rgba(0,0,0,0.5), 0 0 24px hsl(43 55% 54% / 0.22);
 
-    /* Dashboard / Sidebar — Onyx with indigo accent */
-    --dashboard-sidebar: 240 38% 5%;
-    --dashboard-sidebar-hover: 240 35% 12%;
-    --dashboard-sidebar-active: 243 75% 59%;
-    --dashboard-sidebar-border: 240 25% 14%;
-    --dashboard-sidebar-text: 240 12% 70%;
-    --dashboard-sidebar-text-active: 252 87% 80%;
+    /* Dashboard / Sidebar — Emerald onyx with gold accent */
+    --dashboard-sidebar: 158 64% 5%;
+    --dashboard-sidebar-hover: 160 45% 12%;
+    --dashboard-sidebar-active: 158 78% 24%;
+    --dashboard-sidebar-border: 158 30% 14%;
+    --dashboard-sidebar-text: 158 15% 75%;
+    --dashboard-sidebar-text-active: 43 70% 68%;
 
-    --sidebar-background: 240 38% 5%;
-    --sidebar-foreground: 240 12% 80%;
-    --sidebar-primary: 243 75% 59%;
-    --sidebar-primary-foreground: 240 20% 98%;
-    --sidebar-accent: 240 35% 12%;
-    --sidebar-accent-foreground: 252 87% 80%;
-    --sidebar-border: 240 25% 14%;
-    --sidebar-ring: 243 75% 59%;
+    --sidebar-background: 158 64% 5%;
+    --sidebar-foreground: 158 15% 80%;
+    --sidebar-primary: 158 78% 24%;
+    --sidebar-primary-foreground: 45 45% 96%;
+    --sidebar-accent: 160 45% 12%;
+    --sidebar-accent-foreground: 43 70% 68%;
+    --sidebar-border: 158 30% 14%;
+    --sidebar-ring: 43 55% 54%;
   }
 }
 

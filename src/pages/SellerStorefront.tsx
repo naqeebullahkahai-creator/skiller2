@@ -57,6 +57,29 @@ const SellerStorefront = () => {
         };
       }
       
+      // Last resort: if this seller has any product, synthesize a minimal store
+      // so the customer isn't dead-ended after clicking through from a product.
+      const { data: anyProduct } = await supabase
+        .from("products")
+        .select("seller_id, created_at")
+        .eq("seller_id", sellerId!)
+        .limit(1)
+        .maybeSingle();
+      if (anyProduct) {
+        return {
+          user_id: sellerId,
+          shop_name: null,
+          legal_name: null,
+          profile_name: "FANZON Seller",
+          avatar_url: null,
+          city: null,
+          store_logo_url: null,
+          store_banner_url: null,
+          verification_status: null,
+          created_at: anyProduct.created_at || new Date().toISOString(),
+        };
+      }
+
       return null;
     },
     enabled: !!sellerId,
