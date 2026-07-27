@@ -57,8 +57,6 @@ const SellerStorefront = () => {
         };
       }
       
-      return null;
-
       // Last resort: if this seller has any product, synthesize a minimal store
       // so the customer isn't dead-ended after clicking through from a product.
       const { data: anyProduct } = await supabase
